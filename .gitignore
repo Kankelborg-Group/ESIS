@@ -1,0 +1,80 @@
+# Microsoft lock files
+~$*
+
+# LibreOffice lock files
+*.~lock.*#
+
+# PTC Creo versions
+*.asm.*
+*.prt.*
+*.drw.*
+*.rwd.*
+*.rwt.*
+
+# OSX
+*.DS_Store
+*Thumbs.db
+*.bak
+*alias
+
+# Emacs temp files
+*~
+
+# Latex files
+*.aux
+*.log
+*.synctex.gz
+*.out
+*.bbl
+*.blg
+*.toc
+*.lot
+*.lof
+
+# Python files
+*.pyc
+
+# C objects
+*.o
+*.o.d
+
+# Pycharm files
+workspace.xml
+/KSO-III/Engineering/MOSES/Software/Flight/src/Flight Computer/build/
+/KSO-III/Engineering/MOSES/Software/Flight/src/Flight Computer/dist/
+
+# pydoit files
+.doit.db
+
+# Tensorboard logs
+*.tfevents.*
+
+.idea
+
+.qmake.stash
+*.pro.user*
+
+
+### Vim ###
+## Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Session
+Session.vim
+
+# Temporary
+.netrwhist
+*~
+# Auto-generated tag files
+tags
+# Persistent undo
+[._]*.un~
+
+# Pip
+*.egg-info/
+
+.ipynb_checkpoints
