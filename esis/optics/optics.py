@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import astropy.units as u
 from kgpy import Name, optics, vector
-from . import components as cmps
+from .components import Components
 
 __all__ = ['Optics']
 
@@ -13,7 +13,7 @@ default_name = Name('ESIS')
 @dataclasses.dataclass
 class Optics:
     name: Name = dataclasses.field(default_factory=lambda: default_name)
-    components: cmps.Components = dataclasses.field(default_factory=lambda: cmps.Components())
+    components: Components = dataclasses.field(default_factory=lambda: Components())
     wavelengths: u.Quantity = 0 * u.nm
     field_limit: u.Quantity = 0 * u.deg
     pupil_samples: int = 10
