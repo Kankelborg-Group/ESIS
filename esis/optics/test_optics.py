@@ -8,13 +8,7 @@ from . import Optics
 
 class TestOptics:
 
-    def test_esis_as_designed(self, capsys):
 
-        esis = Optics.esis_as_designed(pupil_samples=5, field_samples=5)
-
-        assert isinstance(esis.system, kgpy.optics.System)
-
-        assert isinstance(esis.system.image_rays, kgpy.optics.Rays)
 
     def test_esis_tvls_from_poletto(self, capsys):
         with capsys.disabled():
