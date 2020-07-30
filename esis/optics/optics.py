@@ -12,6 +12,9 @@ default_name = Name('ESIS')
 
 @dataclasses.dataclass
 class Optics:
+    """
+    Add test docstring to see if this is the problem.
+    """
     name: Name = dataclasses.field(default_factory=lambda: default_name)
     components: Components = dataclasses.field(default_factory=lambda: Components())
     wavelengths: u.Quantity = 0 * u.nm
