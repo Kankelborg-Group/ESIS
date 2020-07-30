@@ -13,7 +13,7 @@ Welcome to ESIS's documentation!
 The EUV Snapshot Imaging Spectrograph (ESIS) is a sounding rocket-based tomographic imaging spectrograph that was
 launched from White Sands Missile Range on September 30th, 2019.
 
-..autopackage:: esis
+..automodule:: esis
    :members:
 
 Indices and tables
