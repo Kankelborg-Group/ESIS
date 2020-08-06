@@ -1,6 +1,7 @@
 import typing as typ
 import dataclasses
 import numpy as np
+import scipy.optimize
 import astropy.units as u
 from kgpy import Name, optics
 from .. import Component
@@ -37,10 +38,44 @@ class Grating(Component):
     substrate_thickness: u.Quantity = 0 * u.mm
 
     @classmethod
-    def from_magnification_and_detector_center(
-            cls
-    ):
-        pass
+    def from_gregorian_layout(
+            cls,
+            magnification: float,
+            primary_focal_length: u.Quantity,
+            primary_clear_radius: u.Quantity,
+            detector_channel_radius: u.Quantity,
+            detector_piston: u.Quantity,
+            grating_mechanical_margin: u.Quantity,
+    ) -> 'Grating':
+        M = magnification
+        f = primary_focal_length.to(u.mm).value
+        D_p = 2 * primary_clear_radius.to(u.mm).value
+        r_d = detector_channel_radius.to(u.mm).value
+        x_d = detector_piston.to(u.mm).value
+        m_g = grating_mechanical_margin.to(u.mm).value
+
+        def gregorian_system(prams: typ.Tuple[float, ...]) -> typ.Tuple[float, ...]:
+            x_g, r_g, D_g, h_g = prams
+            eq1 = D_p * (x_g - f) - D_g * f
+            eq2 = (D_p - D_g - 2 * m_g) * (x_g - f) - 2 * f * h_g
+            eq3 = 2 * r_g - D_g + h_g
+            eq4 = M ** 2 * ((x_g - f) ** 2 + r_g ** 2) - ((x_g - x_d) ** 2 + (r_d - r_g) ** 2)
+            return eq1, eq2, eq3, eq4
+
+        x_g = 1.2 * f
+        r_g = D_p / 6
+        D_g = D_p * (x_g - f) / f
+        h_g = D_g / 4
+        x_g, r_g, D_g, h_g = scipy.optimize.fsolve(gregorian_system, (x_g, r_g, D_g, h_g))
+        x_g, r_g, D_g, h_g = x_g << u.mm, r_g << u.mm, D_g << u.mm, h_g << u.mm
+
+        return cls(
+            piston=x_g - primary_focal_length,
+            channel_radius=r_g,
+            aper_decenter_x=-r_g,
+            inner_clear_radius=D_g / 2 - h_g,
+            outer_clear_radius=D_g / 2,
+        )
 
     @property
     def dynamic_clearance_x(self):
