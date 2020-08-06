@@ -36,6 +36,12 @@ class Grating(Component):
     dynamic_clearance: u.Quantity = 0 * u.mm
     substrate_thickness: u.Quantity = 0 * u.mm
 
+    @classmethod
+    def from_magnification_and_detector_center(
+            cls
+    ):
+        pass
+
     @property
     def dynamic_clearance_x(self):
         return self.dynamic_clearance / np.sin(self.aper_half_angle)
@@ -73,7 +79,7 @@ class Grating(Component):
                         wedge_half_angle=self.aper_half_angle,
                     ),
                     radius_of_rotation=self.tangential_radius,
-                    diffraction_order=1,
+                    diffraction_order=1 * u.dimensionless_unscaled,
                     groove_density=self.groove_density,
                     coeff_linear=self.groove_density_coeff_linear,
                     coeff_quadratic=self.groove_density_coeff_quadratic,
