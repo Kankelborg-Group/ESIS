@@ -13,6 +13,7 @@ MainSurfT = optics.surface.Standard[None, optics.aperture.Circular]
 @dataclasses.dataclass
 class FieldStop(Component):
     name: Name = dataclasses.field(default_factory=lambda: Name('field_stop'))
+    piston: u.Quantity = 0 * u.mm
     clear_radius: u.Quantity = 0 * u.mm
     mech_radius: u.Quantity = 0 * u.mm
     num_sides: int = 0
@@ -45,13 +46,14 @@ class FieldStop(Component):
             ),
             transforms=[
                 optics.coordinate.Transform(
-                    # tilt=optics.coordinate.Tilt(z=180 * u.deg / self.num_sides),
+                    translate=optics.coordinate.Translate(z=-self.piston),
                 )
             ],
         )
 
     def copy(self) -> 'FieldStop':
         return FieldStop(
+            piston=self.piston.copy(),
             clear_radius=self.clear_radius.copy(),
             mech_radius=self.mech_radius.copy(),
             num_sides=self.num_sides,

@@ -136,7 +136,7 @@ class Grating(Component):
             ),
             transforms=[
                 optics.coordinate.Transform(
-                    translate=optics.coordinate.Translate(z=self.piston)
+                    translate=optics.coordinate.Translate(z=-self.piston)
                 ),
                 optics.coordinate.Transform(
                     tilt=optics.coordinate.Tilt(z=self.channel_angle),

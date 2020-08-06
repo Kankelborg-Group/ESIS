@@ -16,11 +16,14 @@ class Primary(Component):
     name: Name = dataclasses.field(default_factory=lambda: Name('primary'))
     radius: u.Quantity = np.inf * u.mm
     conic: float = -1
-    piston: u.Quantity = 0 * u.mm
     num_sides: int = 0
     clear_radius: u.Quantity = 0 * u.mm
     border_width: u.Quantity = 0 * u.mm
     substrate_thickness: u.Quantity = 0 * u.mm
+
+    @property
+    def focal_length(self) -> u.Quantity:
+        return self.radius / 2
 
     @property
     def surface(self) -> AperSurfT:
@@ -54,18 +57,12 @@ class Primary(Component):
                     ),
                 ),
             ),
-            transforms=[
-                optics.coordinate.Transform(
-                    # tilt=optics.coordinate.Tilt(z=180 * u.deg / self.num_sides),
-                    translate=optics.coordinate.Translate(z=self.piston),
-                )
-            ],
+            transforms=[],
         )
 
     def copy(self) -> 'Primary':
         return Primary(
             radius=self.radius.copy(),
-            piston=self.piston.copy(),
             num_sides=self.num_sides,
             clear_radius=self.clear_radius.copy(),
             border_width=self.border_width.copy(),

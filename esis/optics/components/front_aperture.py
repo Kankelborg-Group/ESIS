@@ -17,7 +17,7 @@ class FrontAperture(Component):
     def surface(self) -> optics.surface.Standard:
         return optics.surface.Standard(
             name=self.name,
-            thickness=-self.piston,
+            thickness=self.piston,
             aperture=optics.aperture.Circular(
                 is_test_stop=False,
                 radius=self.clear_radius

@@ -24,11 +24,11 @@ def final(
     tuffet_slope = tuffet_dy / tuffet_dx
     tuffet_radius = tuffet_y1 - tuffet_slope * tuffet_x1
 
-    primary_piston = 1000 * u.mm
+    primary_focal_length = 1000 * u.mm
     primary_clear_radius = 77.9 * u.mm
 
     grating_radius = 597.830 * u.mm
-    grating_piston = -374.7 * u.mm
+    grating_piston = primary_focal_length + 374.7 * u.mm
     grating_channel_radius = 2.074999998438000e1 * u.mm
     grating_border_width = 2 * u.mm
     grating_lower_border_width = 4.86 * u.mm
@@ -39,7 +39,7 @@ def final(
     d_c2 = -1.3625e-7 * (u.um / u.mm ** 2)
 
     grating_to_filter_distance = 1.301661998854058 * u.m
-    filter_piston = grating_to_filter_distance + grating_piston
+    filter_piston = grating_piston - grating_to_filter_distance
 
     pix_half_width = 15 * u.um / 2
 
@@ -48,23 +48,23 @@ def final(
         name=Name('ESIS'),
         components=components.Components(
             front_aperture=components.FrontAperture(
-                piston=-500 * u.mm,
+                piston=primary_focal_length + 500 * u.mm,
                 clear_radius=100 * u.mm,
             ),
             central_obscuration=components.CentralObscuration(
-                piston=primary_piston - 1404.270 * u.mm,
+                piston=1404.270 * u.mm,
                 obscured_radius=tuffet_radius,
                 num_sides=num_sides,
             ),
             primary=components.Primary(
-                radius=-2 * primary_piston,
-                piston=primary_piston,
+                radius=-2 * primary_focal_length,
                 num_sides=num_sides,
                 clear_radius=primary_clear_radius,
                 border_width=83.7 * u.mm - primary_clear_radius,
                 substrate_thickness=30 * u.mm,
             ),
             field_stop=components.FieldStop(
+                piston=primary_focal_length,
                 clear_radius=1.82 * u.mm,
                 mech_radius=2.81 * u.mm,
                 num_sides=num_sides,
@@ -101,7 +101,7 @@ def final(
                 clear_radius=15.9 * u.mm,
             ),
             detector=components.Detector(
-                piston=filter_piston + 200 * u.mm,
+                piston=filter_piston - 200 * u.mm,
                 channel_radius=108 * u.mm,
                 channel_angle=channel_angle,
                 inclination=-12.252 * u.deg,

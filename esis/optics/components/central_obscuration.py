@@ -36,8 +36,7 @@ class CentralObscuration(Component):
             surfaces=self.surface,
             transforms=[
                 optics.coordinate.Transform(
-                    # tilt=optics.coordinate.Tilt(z=180 * u.deg / self.num_sides),
-                    translate=optics.coordinate.Translate(z=self.piston)
+                    translate=optics.coordinate.Translate(z=-self.piston)
                 ),
             ],
         )
