@@ -10,6 +10,7 @@ __all__ = ['tvls_grating_and_detector']
 def tvls_grating_and_detector(
         wavelength_1: u.Quantity,
         wavelength_2: u.Quantity,
+        source_piston: u.Quantity,
         magnification: float,
         grating_channel_radius: u.Quantity,
         grating_piston: u.Quantity,
@@ -24,13 +25,12 @@ def tvls_grating_and_detector(
 
     M_c = magnification
 
-    entrance_arm_length = np.sqrt(np.square(grating_channel_radius) + np.square(grating_piston))
-    entrance_arm_angle = np.arctan2(grating_channel_radius, grating_piston) - 180 * u.deg
+    entrance_arm_length = np.sqrt(np.square(grating_channel_radius) + np.square(grating_piston - source_piston))
+    entrance_arm_angle = -np.arctan2(grating_channel_radius, grating_piston - source_piston)
 
     exit_arm_length = magnification * entrance_arm_length
     exit_arm_radius = detector_channel_radius - grating_channel_radius
     exit_arm_piston = np.sqrt(np.square(exit_arm_length) - np.square(exit_arm_radius))
-    detector_piston = exit_arm_piston + grating_piston
     exit_arm_length = np.sqrt(np.square(exit_arm_radius) + np.square(exit_arm_piston))
     exit_arm_angle = np.arctan2(exit_arm_radius, exit_arm_piston)
 
@@ -127,7 +127,7 @@ def tvls_grating_and_detector(
     b_2 = vector.from_components_cylindrical(r_B_2, exit_arm_angle_2)
     db = b_2 - b_1
     b_ave = (b_2 + b_1) / 2
-    detector_piston = b_ave[vector.x] + grating_piston
+    detector_piston = -b_ave[vector.x] + grating_piston
     detector_inclination = np.arctan2(db[vector.y], db[vector.x]) + 90 * u.deg
 
     detector = components.Detector(

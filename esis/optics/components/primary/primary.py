@@ -29,7 +29,7 @@ class Primary(Component):
     def surface(self) -> AperSurfT:
         return optics.surface.Standard(
             name=self.name + 'aper',
-            radius=self.radius,
+            radius=-self.radius,
             conic=self.conic,
             aperture=optics.aperture.RegularPolygon(
                 radius=self.clear_radius,
@@ -46,7 +46,7 @@ class Primary(Component):
                 aperture_surface=self.surface,
                 main_surface=optics.surface.Standard(
                     name=self.name + 'main',
-                    radius=self.radius,
+                    radius=-self.radius,
                     conic=self.conic,
                     material=optics.material.Mirror(thickness=self.substrate_thickness),
                     aperture=optics.aperture.RegularPolygon(

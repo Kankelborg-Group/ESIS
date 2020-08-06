@@ -8,8 +8,6 @@ from . import Optics
 
 class TestOptics:
 
-
-
     def test_esis_tvls_from_poletto(self, capsys):
         with capsys.disabled():
             n = 7

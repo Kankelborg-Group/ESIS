@@ -57,7 +57,7 @@ def final(
                 num_sides=num_sides,
             ),
             primary=components.Primary(
-                radius=-2 * primary_focal_length,
+                radius=2 * primary_focal_length,
                 num_sides=num_sides,
                 clear_radius=primary_clear_radius,
                 border_width=83.7 * u.mm - primary_clear_radius,
@@ -126,12 +126,32 @@ def from_poletto(
 ):
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
+    magnification = 4
+
+    obscuration = esis.components.central_obscuration
+    primary = esis.components.primary
     grating = esis.components.grating
     detector = esis.components.detector
+
+    new_grating = grating.from_gregorian_layout(
+        magnification=magnification,
+        primary_focal_length=primary.focal_length,
+        primary_clear_radius=primary.clear_radius,
+        detector_channel_radius=detector.channel_radius,
+        detector_piston=detector.piston,
+        grating_mechanical_margin=obscuration.obscured_radius - grating.outer_clear_radius,
+    )
+
+    grating.piston = new_grating.piston
+    grating.channel_radius = new_grating.channel_radius
+    grating.aper_decenter_x = new_grating.aper_decenter_x
+    grating.inner_clear_radius = new_grating.inner_clear_radius
+    grating.outer_clear_radius = new_grating.outer_clear_radius
 
     new_grating, new_detector = poletto.tvls_grating_and_detector(
         wavelength_1=esis.wavelengths[..., 0],
         wavelength_2=esis.wavelengths[..., ~0],
+        source_piston=primary.focal_length,
         magnification=4,
         grating_channel_radius=grating.channel_radius,
         grating_piston=grating.piston,
@@ -141,10 +161,10 @@ def from_poletto(
     grating.tangential_radius = new_grating.tangential_radius
     grating.sagittal_radius = new_grating.sagittal_radius
     grating.groove_density = new_grating.groove_density
-    grating.inclination = new_grating.inclination
     grating.groove_density_coeff_linear = new_grating.groove_density_coeff_linear
     grating.groove_density_coeff_quadratic = new_grating.groove_density_coeff_quadratic
     grating.groove_density_coeff_cubic = new_grating.groove_density_coeff_cubic
+    grating.inclination = new_grating.inclination
 
     detector.piston = new_detector.piston
     detector.inclination = new_detector.inclination

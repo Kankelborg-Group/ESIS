@@ -19,6 +19,8 @@ class Grating(Component):
     name: Name = dataclasses.field(default_factory=lambda: default_name)
     tangential_radius: u.Quantity = np.inf * u.mm
     sagittal_radius: u.Quantity = np.inf * u.mm
+    nominal_input_angle: u.Quantity = 0 * u.deg
+    nominal_output_angle: u.Quantity = 0 * u.deg
     groove_density: u.Quantity = 0 / u.mm
     groove_density_coeff_linear: u.Quantity = 0 / (u.mm ** 2)
     groove_density_coeff_quadratic: u.Quantity = 0 / (u.mm ** 3)
@@ -83,7 +85,7 @@ class Grating(Component):
         x_g, r_g, D_g, h_g = x_g << u.mm, r_g << u.mm, D_g << u.mm, h_g << u.mm
 
         return cls(
-            piston=x_g - primary_focal_length,
+            piston=x_g,
             channel_radius=r_g,
             aper_decenter_x=-r_g,
             inner_clear_radius=D_g / 2 - h_g,
