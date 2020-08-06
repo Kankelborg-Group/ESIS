@@ -47,6 +47,19 @@ class Grating(Component):
             detector_piston: u.Quantity,
             grating_mechanical_margin: u.Quantity,
     ) -> 'Grating':
+        """
+        Computes an optimal placement for the grating based on the magnification, the primary location and the detector
+        location.
+        Based off of the procedure developed by Charles Kankelborg in SPIDER/spider/optics/design/configurations.ipynb
+        :param magnification: Requested magnification of the Gregorian telescope
+        :param primary_focal_length: Focal length of the parabolic primary mirror.
+        :param primary_clear_radius: Radius of the usable area on the primary mirror
+        :param detector_channel_radius: Radial distance from the center of the detector to the axis of symmetry
+        :param detector_piston: Distance between the apex of the primary and the center of the detector along the axis
+        of symmetry
+        :param grating_mechanical_margin: Size of the unusable border around the outside of the grating.
+        :return: A new grating instance with the placement consistent with the specified Gregorian system.
+        """
         M = magnification
         f = primary_focal_length.to(u.mm).value
         D_p = 2 * primary_clear_radius.to(u.mm).value
