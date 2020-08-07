@@ -4,7 +4,12 @@ import astropy.units as u
 from kgpy import vector
 from . import components, Optics
 
-__all__ = ['calc_grating_and_detector']
+__all__ = [
+    'calc_grating_and_detector',
+    'diffraction_angle_from_grating_equation',
+    'spectral_focal_curve',
+    'spatial_focal_curve',
+]
 
 
 def calc_grating_and_detector(
@@ -15,8 +20,10 @@ def calc_grating_and_detector(
         grating_channel_radius: u.Quantity,
         grating_piston: u.Quantity,
         detector_channel_radius: u.Quantity,
+        diffraction_order: u.Quantity = 1 * u.dimensionless_unscaled,
         use_toroidal_grating: bool = False,
         use_vls_grating: bool = False,
+        cck_detector_tilt: bool = False
 ) -> typ.Tuple[components.Grating, components.Detector]:
     m = 1
 
@@ -135,6 +142,9 @@ def calc_grating_and_detector(
     grating = components.Grating(
         tangential_radius=R,
         sagittal_radius=rho,
+        nominal_input_angle=alpha,
+        nominal_output_angle=beta_c,
+        diffraction_order=diffraction_order,
         groove_density=sigma_0,
         piston=grating_piston,
         channel_radius=grating_channel_radius,
@@ -144,14 +154,38 @@ def calc_grating_and_detector(
         groove_density_coeff_cubic=sigma_3,
     )
 
+    if not cck_detector_tilt:
+        detector = two_point_detector(lambda_1, lambda_2, r_A, grating)
+        detector.channel_radius = detector_channel_radius
+    else:
+        raise NotImplementedError
+
+    return grating, detector
+
+
+def two_point_detector(
+        wavelength_1: u.Quantity,
+        wavelength_2: u.Quantity,
+        entrance_arm_radius: u.Quantity,
+        grating: components.Grating,
+) -> components.Detector:
+
+    lambda_1, lambda_2 = wavelength_1, wavelength_2
+    m = grating.diffraction_order
+    alpha = grating.nominal_input_angle
+    beta_1, beta_2 = grating.diffraction_angle(lambda_1, alpha), grating.diffraction_angle(lambda_2, alpha)
+    r_A = entrance_arm_radius
+    R = grating.tangential_radius
+    sigma_1 = grating.groove_density_coeff_linear
+
     r_Bh_1 = spectral_focal_curve(lambda_1, m, alpha, beta_1, r_A, R, sigma_1)
     r_Bh_2 = spectral_focal_curve(lambda_2, m, alpha, beta_2, r_A, R, sigma_1)
 
-    r_Bv_1 = spatial_focal_curve(alpha, beta_1, r_A, rho)
-    r_Bv_2 = spatial_focal_curve(alpha, beta_2, r_A, rho)
+    r_Bv_1 = spatial_focal_curve(alpha, beta_1, r_A, grating.sagittal_radius)
+    r_Bv_2 = spatial_focal_curve(alpha, beta_2, r_A, grating.sagittal_radius)
 
-    exit_arm_angle_1 = beta_1 + grating_inclination
-    exit_arm_angle_2 = beta_2 + grating_inclination
+    exit_arm_angle_1 = beta_1 + grating.inclination
+    exit_arm_angle_2 = beta_2 + grating.inclination
 
     bv_1 = vector.from_components_cylindrical(r_Bv_1, exit_arm_angle_1)
     bv_2 = vector.from_components_cylindrical(r_Bv_2, exit_arm_angle_2)
@@ -161,19 +195,33 @@ def calc_grating_and_detector(
     bv_ave = (bv_2 + bv_1) / 2
     bh_ave = (bh_2 + bh_1) / 2
     b_ave = (bv_ave + bh_ave) / 2
-    detector_piston = -bv_ave[vector.x] + grating_piston
+    detector_piston = -bv_ave[vector.x] + grating.piston
 
     dbh = bh_2 - bh_1
     # dbh = bv_2 - bv_1
     detector_inclination = np.arctan2(dbh[vector.y], dbh[vector.x]) + 90 * u.deg
 
-    detector = components.Detector(
+    return components.Detector(
         piston=detector_piston,
-        channel_radius=detector_channel_radius,
         inclination=detector_inclination,
     )
 
-    return grating, detector
+
+def diffraction_angle_from_grating_equation(
+        incidence_angle: u.Quantity,
+        wavelength: u.Quantity,
+        diffraction_order: u.Quantity,
+        groove_density: u.Quantity,
+) -> u.Quantity:
+    """
+    Equation 13 of Poletto and Thomas rearranged to solve for diffraction angle.
+    :param incidence_angle: Signed angle between the surface normal and the incident ray
+    :param wavelength: Wavelength of the incident light rays
+    :param diffraction_order: Quantum number of diffracted ray.
+    :param groove_density: Number of grooves per unit length on the grating surface.
+    :return: Signed angle of the diffracted light
+    """
+    return np.arcsin(diffraction_order * wavelength * groove_density - np.sin(incidence_angle)) << u.rad
 
 
 def spectral_focal_curve(
