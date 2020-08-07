@@ -132,6 +132,7 @@ def from_poletto(
         field_samples: int = 10,
         use_toroidal_grating: bool = False,
         use_vls_grating: bool = False,
+        use_one_wavelength_detector_tilt: bool = False,
 ):
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
@@ -167,6 +168,7 @@ def from_poletto(
         detector_channel_radius=detector.channel_radius,
         use_toroidal_grating=use_toroidal_grating,
         use_vls_grating=use_vls_grating,
+        use_one_wavelength_detector_tilt=use_one_wavelength_detector_tilt,
     )
 
     grating.tangential_radius = new_grating.tangential_radius

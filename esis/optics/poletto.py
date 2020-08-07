@@ -1,4 +1,5 @@
 import typing as typ
+import statistics
 import numpy as np
 import astropy.units as u
 from kgpy import vector
@@ -23,7 +24,7 @@ def calc_grating_and_detector(
         diffraction_order: u.Quantity = 1 * u.dimensionless_unscaled,
         use_toroidal_grating: bool = False,
         use_vls_grating: bool = False,
-        cck_detector_tilt: bool = False
+        use_one_wavelength_detector_tilt: bool = False,
 ) -> typ.Tuple[components.Grating, components.Detector]:
     m = 1
 
@@ -80,7 +81,6 @@ def calc_grating_and_detector(
 
         # Spherical uniform line spacing (SULS)
         if not use_vls_grating:
-
             raise NotImplementedError
 
         # Spherical variable line spacing (SVLS)
@@ -154,13 +154,53 @@ def calc_grating_and_detector(
         groove_density_coeff_cubic=sigma_3,
     )
 
-    if not cck_detector_tilt:
+    if not use_one_wavelength_detector_tilt:
         detector = two_point_detector(lambda_1, lambda_2, r_A, grating)
-        detector.channel_radius = detector_channel_radius
     else:
-        raise NotImplementedError
+        detector = one_point_detector(lambda_c, source_piston, magnification, r_A, grating,
+                                      use_toroidal_grating=use_toroidal_grating, use_vls_grating=use_vls_grating)
+    detector.channel_radius = detector_channel_radius
 
     return grating, detector
+
+
+def one_point_detector(
+        wavelength: u.Quantity,
+        source_piston: u.Quantity,
+        magnification: float,
+        entrance_arm_radius: u.Quantity,
+        grating: components.Grating,
+        use_toroidal_grating: bool = False,
+        use_vls_grating: bool = False,
+) -> components.Detector:
+
+    if not use_toroidal_grating and use_vls_grating:
+        f = source_piston
+        M = magnification
+        alpha = grating.nominal_input_angle
+        beta = grating.diffraction_angle(wavelength, alpha)
+        r_A = entrance_arm_radius
+        r_B = M * r_A
+        R = grating.tangential_radius
+        x_g = grating.piston
+        r_g = grating.channel_radius
+
+        sin_alpha, cos_alpha, tan_alpha = np.sin(alpha), np.cos(alpha), np.tan(alpha)
+        sin_beta, cos_beta, tan_beta = np.sin(beta), np.cos(beta), np.tan(beta)
+
+        tanphi_1spec = r_B * tan_beta / (R * cos_beta) - tan_beta
+        tanphi_1spat = r_B * sin_beta / R
+        tanphi_2spec = r_B * (tan_beta - tan_alpha) / (R * cos_beta) - M * r_g * cos_alpha / ((x_g - f) * cos_beta)
+        tanphi_2spat = r_B * (sin_beta - tan_alpha * cos_beta) / R - M * r_g * cos_beta / ((x_g - f) * cos_alpha)
+        phi = np.arctan([tanphi_1spec, tanphi_1spat, tanphi_2spec, tanphi_2spat]) << u.rad
+        phi_avg = (np.amax(phi) + np.amin(phi)) / 2  # compromise value for detector tilt
+
+        return components.Detector(
+            piston=grating.piston - r_B * np.cos(beta + grating.inclination),
+            inclination=-phi_avg,
+        )
+    else:
+        raise ValueError('Only SVLS supported')
 
 
 def two_point_detector(
