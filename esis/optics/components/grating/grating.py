@@ -97,6 +97,9 @@ class Grating(Component):
     def dynamic_clearance_x(self):
         return self.dynamic_clearance / np.sin(self.aper_half_angle)
 
+    def diffraction_angle(self, wavelength: u.Quantity, input_angle: u.Quantity = 0 * u.deg):
+        return self.main_surface.diffraction_angle(wavelength=wavelength, input_angle=input_angle)
+
     @property
     def surface(self) -> AperSurfT:
         side_border_x = self.side_border_width / np.sin(self.aper_half_angle) + self.dynamic_clearance_x
