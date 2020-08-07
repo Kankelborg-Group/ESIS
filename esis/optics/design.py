@@ -10,6 +10,12 @@ def final(
         pupil_samples: int = 10,
         field_samples: int = 10,
 ) -> Optics:
+    """
+    Final ESIS optical design prepared by Charles Kankelborg and Hans Courrier.
+    :param pupil_samples: Number of rays per axis across the pupil.
+    :param field_samples: Number of rays per axis across the field.
+    :return: An instance of the as-designed ESIS optics model.
+    """
     num_sides = 8
     num_channels = 4
     deg_per_channel = 360 * u.deg / num_sides
@@ -111,8 +117,8 @@ def final(
                 npix_y=1024,
             ),
         ),
-        wavelengths=[[629.7, 609.8, 584.3, ]] * u.AA,
-        # wavelengths=[629.7, 609.8, 584.3, ] * u.AA,
+        # wavelengths=[[629.7, 609.8, 584.3, ]] * u.AA,
+        wavelengths=[629.7, 609.8, 584.3, ] * u.AA,
         # wavelengths=[[629.7]] * u.AA,
         field_limit=vector.from_components(field_limit, field_limit).to(u.arcmin),
         pupil_samples=pupil_samples,
@@ -123,6 +129,8 @@ def final(
 def from_poletto(
         pupil_samples: int = 10,
         field_samples: int = 10,
+        use_toroidal_grating: bool = False,
+        use_vls_grating: bool = False,
 ):
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
@@ -148,14 +156,16 @@ def from_poletto(
     grating.inner_clear_radius = new_grating.inner_clear_radius
     grating.outer_clear_radius = new_grating.outer_clear_radius
 
-    new_grating, new_detector = poletto.tvls_grating_and_detector(
+    new_grating, new_detector = poletto.calc_grating_and_detector(
         wavelength_1=esis.wavelengths[..., 0],
         wavelength_2=esis.wavelengths[..., ~0],
         source_piston=primary.focal_length,
-        magnification=4,
+        magnification=magnification,
         grating_channel_radius=grating.channel_radius,
         grating_piston=grating.piston,
         detector_channel_radius=detector.channel_radius,
+        use_toroidal_grating=use_toroidal_grating,
+        use_vls_grating=use_vls_grating,
     )
 
     grating.tangential_radius = new_grating.tangential_radius

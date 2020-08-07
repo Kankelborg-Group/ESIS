@@ -4,10 +4,10 @@ import astropy.units as u
 from kgpy import vector
 from . import components, Optics
 
-__all__ = ['tvls_grating_and_detector']
+__all__ = ['calc_grating_and_detector']
 
 
-def tvls_grating_and_detector(
+def calc_grating_and_detector(
         wavelength_1: u.Quantity,
         wavelength_2: u.Quantity,
         source_piston: u.Quantity,
@@ -15,13 +15,14 @@ def tvls_grating_and_detector(
         grating_channel_radius: u.Quantity,
         grating_piston: u.Quantity,
         detector_channel_radius: u.Quantity,
+        use_toroidal_grating: bool = False,
+        use_vls_grating: bool = False,
 ) -> typ.Tuple[components.Grating, components.Detector]:
     m = 1
 
     lambda_1 = wavelength_1
     lambda_2 = wavelength_2
     lambda_c = (lambda_1 + lambda_2) / 2
-    # lambda_c = lambda_1
 
     M_c = magnification
 
@@ -54,9 +55,9 @@ def tvls_grating_and_detector(
 
     # Grating equation (13)
     sigma_0 = (np.sin(alpha) + np.sin(beta_c)) / (m * lambda_c)
-
-    # Equation 35
-    rho = r_A * (cos_alpha + cos_beta_c) * M_c / (1 + M_c)
+    sigma_1 = 0 / (u.mm ** 2)
+    sigma_2: u.Quantity = 0 / (u.mm ** 3)
+    sigma_3: u.Quantity = 0 / (u.mm ** 4)
 
     # Grating equation (13)
     beta_1 = np.arcsin(m * lambda_1 * sigma_0 - sin_alpha)
@@ -68,42 +69,68 @@ def tvls_grating_and_detector(
     calpha_plus_cbeta1 = cos_alpha + cos_beta_1
     calpha_plus_cbeta2 = cos_alpha + cos_beta_2
 
-    # Equation 38
-    K_1 = cos2_alpha / r_A + cos2_beta_1 * (calpha_plus_cbeta1 / rho - 1 / r_A)
+    if not use_toroidal_grating:
 
-    # Equation 39
-    K_2 = cos2_alpha / r_A + cos2_beta_2 * (calpha_plus_cbeta2 / rho - 1 / r_A)
+        # Spherical uniform line spacing (SULS)
+        if not use_vls_grating:
 
-    # Equation 36
-    R = (lambda_1 * calpha_plus_cbeta2 - lambda_2 * calpha_plus_cbeta1) / (lambda_1 * K_2 - lambda_2 * K_1)
+            raise NotImplementedError
 
-    # Equation 37
-    sigma_1_denominator = lambda_1 * calpha_plus_cbeta2 - lambda_2 * calpha_plus_cbeta1
-    sigma_1 = (1 / m) * (K_2 * calpha_plus_cbeta1 - K_1 * calpha_plus_cbeta2) / sigma_1_denominator
+        # Spherical variable line spacing (SVLS)
+        else:
 
-    # Equation 33
-    r_Bh_c = cos2_beta_c / (-cos2_alpha / r_A + (cos_alpha + cos_beta_c) / R - m * lambda_c * sigma_1)
-    r_Bh_1 = cos2_beta_1 / (-cos2_alpha / r_A + (cos_alpha + cos_beta_1) / R - m * lambda_1 * sigma_1)
-    r_Bh_2 = cos2_beta_2 / (-cos2_alpha / r_A + (cos_alpha + cos_beta_2) / R - m * lambda_2 * sigma_1)
+            # Equation 31
+            rho = R = r_A * (cos_alpha + cos_beta_c) * M_c / (1 + M_c)
 
-    # Equation 34
-    r_Bv_c = 1 / (-1 / r_A + (cos_alpha + cos_beta_c) / rho)
-    r_Bv_1 = 1 / (-1 / r_A + (cos_alpha + cos_beta_1) / rho)
-    r_Bv_2 = 1 / (-1 / r_A + (cos_alpha + cos_beta_2) / rho)
+            # Equation 26
+            sigma_1 = (M_c + 1) * sin2_alpha / (m * lambda_c * r_A)
 
-    c_alpha = cos_alpha / r_A - 1 / R
-    c_beta_c = cos_beta_c / r_Bh_c - 1 / R
-    sigma_2_1 = sin_alpha * cos_alpha / r_A * c_alpha
-    sigma_2_2 = sin_beta_c * cos_beta_c / r_Bh_c * c_beta_c
-    sigma_2 = - (3 / (2 * m * lambda_c)) * (sigma_2_1 + sigma_2_2)
+    else:
 
-    sigma_3_1 = 4 * sin2_alpha * cos_alpha / np.square(r_A) * c_alpha
-    sigma_3_2 = -cos2_alpha / r_A * np.square(c_alpha)
-    sigma_3_3 = 1 / np.square(R) * (1 / r_A - cos_alpha / R)
-    sigma_3_4 = 4 * sin2_beta_c * cos_beta_c / np.square(r_Bh_c) * c_beta_c
-    sigma_3_5 = -cos2_beta_c / r_Bh_c * np.square(c_beta_c)
-    sigma_3_6 = 1 / np.square(R) * (1 / r_Bh_c - cos_beta_c / R)
-    sigma_3 = -1 / (2 * m * lambda_c) * (sigma_3_1 + sigma_3_2 + sigma_3_3 + sigma_3_4 + sigma_3_5 + sigma_3_6)
+        # Toroidal uniform line spacing (TULS)
+        if not use_vls_grating:
+
+            # Equation 24
+            R = r_A * (cos_alpha + cos_beta_c) * M_c / (1 + M_c)
+
+            # Equation 25
+            rho = cos2_beta_1 / (1 / R - (cos_alpha + cos_beta_1) / r_A)
+
+        # Toroidal variable line spacing (TVLS)
+        else:
+
+            # Equation 35
+            rho = r_A * (cos_alpha + cos_beta_c) * M_c / (1 + M_c)
+
+            # Equation 38
+            K_1 = cos2_alpha / r_A + cos2_beta_1 * (calpha_plus_cbeta1 / rho - 1 / r_A)
+
+            # Equation 39
+            K_2 = cos2_alpha / r_A + cos2_beta_2 * (calpha_plus_cbeta2 / rho - 1 / r_A)
+
+            # Equation 36
+            R = (lambda_1 * calpha_plus_cbeta2 - lambda_2 * calpha_plus_cbeta1) / (lambda_1 * K_2 - lambda_2 * K_1)
+
+            # Equation 37
+            sigma_1_denominator = lambda_1 * calpha_plus_cbeta2 - lambda_2 * calpha_plus_cbeta1
+            sigma_1 = (1 / m) * (K_2 * calpha_plus_cbeta1 - K_1 * calpha_plus_cbeta2) / sigma_1_denominator
+
+            # Equation 33
+            r_Bh_c = spectral_focal_curve(lambda_c, m, alpha, beta_c, r_A, R, sigma_1)
+
+            c_alpha = cos_alpha / r_A - 1 / R
+            c_beta_c = cos_beta_c / r_Bh_c - 1 / R
+            sigma_2_1 = sin_alpha * cos_alpha / r_A * c_alpha
+            sigma_2_2 = sin_beta_c * cos_beta_c / r_Bh_c * c_beta_c
+            sigma_2 = - (3 / (2 * m * lambda_c)) * (sigma_2_1 + sigma_2_2)
+
+            sigma_3_1 = 4 * sin2_alpha * cos_alpha / np.square(r_A) * c_alpha
+            sigma_3_2 = -cos2_alpha / r_A * np.square(c_alpha)
+            sigma_3_3 = 1 / np.square(R) * (1 / r_A - cos_alpha / R)
+            sigma_3_4 = 4 * sin2_beta_c * cos_beta_c / np.square(r_Bh_c) * c_beta_c
+            sigma_3_5 = -cos2_beta_c / r_Bh_c * np.square(c_beta_c)
+            sigma_3_6 = 1 / np.square(R) * (1 / r_Bh_c - cos_beta_c / R)
+            sigma_3 = -1 / (2 * m * lambda_c) * (sigma_3_1 + sigma_3_2 + sigma_3_3 + sigma_3_4 + sigma_3_5 + sigma_3_6)
 
     grating = components.Grating(
         tangential_radius=R,
@@ -117,18 +144,28 @@ def tvls_grating_and_detector(
         groove_density_coeff_cubic=sigma_3,
     )
 
-    r_B_c = (r_Bh_c + r_Bv_c) / 2
-    r_B_1 = (r_Bh_1 + r_Bv_1) / 2
-    r_B_2 = (r_Bh_2 + r_Bv_2) / 2
+    r_Bh_1 = spectral_focal_curve(lambda_1, m, alpha, beta_1, r_A, R, sigma_1)
+    r_Bh_2 = spectral_focal_curve(lambda_2, m, alpha, beta_2, r_A, R, sigma_1)
+
+    r_Bv_1 = spatial_focal_curve(alpha, beta_1, r_A, rho)
+    r_Bv_2 = spatial_focal_curve(alpha, beta_2, r_A, rho)
 
     exit_arm_angle_1 = beta_1 + grating_inclination
     exit_arm_angle_2 = beta_2 + grating_inclination
-    b_1 = vector.from_components_cylindrical(r_B_1, exit_arm_angle_1)
-    b_2 = vector.from_components_cylindrical(r_B_2, exit_arm_angle_2)
-    db = b_2 - b_1
-    b_ave = (b_2 + b_1) / 2
-    detector_piston = -b_ave[vector.x] + grating_piston
-    detector_inclination = np.arctan2(db[vector.y], db[vector.x]) + 90 * u.deg
+
+    bv_1 = vector.from_components_cylindrical(r_Bv_1, exit_arm_angle_1)
+    bv_2 = vector.from_components_cylindrical(r_Bv_2, exit_arm_angle_2)
+    bh_1 = vector.from_components_cylindrical(r_Bh_1, exit_arm_angle_1)
+    bh_2 = vector.from_components_cylindrical(r_Bh_2, exit_arm_angle_2)
+
+    bv_ave = (bv_2 + bv_1) / 2
+    bh_ave = (bh_2 + bh_1) / 2
+    b_ave = (bv_ave + bh_ave) / 2
+    detector_piston = -bv_ave[vector.x] + grating_piston
+
+    dbh = bh_2 - bh_1
+    # dbh = bv_2 - bv_1
+    detector_inclination = np.arctan2(dbh[vector.y], dbh[vector.x]) + 90 * u.deg
 
     detector = components.Detector(
         piston=detector_piston,
@@ -137,3 +174,52 @@ def tvls_grating_and_detector(
     )
 
     return grating, detector
+
+
+def spectral_focal_curve(
+        wavelength: u.Quantity,
+        diffraction_order: u.Quantity,
+        alpha: u.Quantity,
+        beta: u.Quantity,
+        entrance_arm_radius: u.Quantity,
+        grating_tangential_radius: u.Quantity,
+        grating_linear_groove_coefficient: u.Quantity = 0 / (u.mm ** 2),
+):
+    """
+    Equation 33 of Thomas and Poletto (2003)
+    :param wavelength: The wavelength at which to evaluate the spectral focal curve
+    :param diffraction_order: diffraction order of the light leaving the grating
+    :param alpha: Nominal incidence angle of the beam on the grating.
+    :param beta: Nominal diffraction angle of the beam off the grating.
+    :param entrance_arm_radius: Distance from the center of then grating to the center of the source.
+    :param grating_tangential_radius: Tangential radius of the diffraction grating
+    :param grating_linear_groove_coefficient: Linear coefficient for the polynomial variable line spacing
+    :return: The length of the exit arm for optimal spectral focus
+    """
+    m = diffraction_order
+    cos_alpha, cos_beta = np.cos(alpha), np.cos(beta)
+    cos2_alpha, cos2_beta = np.square(cos_alpha), np.square(cos_beta)
+    r_A = entrance_arm_radius
+    R = grating_tangential_radius
+    sigma_1 = grating_linear_groove_coefficient
+    return cos2_beta / (-cos2_alpha / r_A + (cos_alpha + cos_beta) / R - m * wavelength * sigma_1)
+
+
+def spatial_focal_curve(
+        alpha: u.Quantity,
+        beta: u.Quantity,
+        entrance_arm_radius: u.Quantity,
+        grating_sagittal_radius: u.Quantity,
+):
+    """
+    Equation 34 of Thomas and Poletto (2003)
+    :param alpha: Nominal incidence angle of the beam on the grating.
+    :param beta: Nominal diffraction angle of the beam off the grating.
+    :param entrance_arm_radius: Distance from the center of then grating to the center of the source.
+    :param grating_sagittal_radius: Sagittal radius of the diffraction grating
+    :return: The length of the exit arm for optimal spatial focus
+    """
+    cos_alpha, cos_beta = np.cos(alpha), np.cos(beta)
+    r_A = entrance_arm_radius
+    rho = grating_sagittal_radius
+    return 1 / (-1 / r_A + (cos_alpha + cos_beta) / rho)
