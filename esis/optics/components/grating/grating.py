@@ -116,6 +116,27 @@ class Grating(Component):
         )
 
     @property
+    def main_surface(self):
+        return optics.surface.ToroidalVariableLineSpaceGrating(
+            name=Name('main'),
+            radius=self.sagittal_radius,
+            material=optics.material.Mirror(thickness=-self.substrate_thickness),
+            aperture=optics.aperture.IsoscelesTrapezoid(
+                is_active=False,
+                decenter=optics.coordinate.Decenter(x=self.aper_decenter_x + self.dynamic_clearance_x),
+                inner_radius=self.inner_clear_radius - self.inner_border_width - self.dynamic_clearance_x,
+                outer_radius=self.outer_clear_radius + self.outer_border_width - self.dynamic_clearance_x,
+                wedge_half_angle=self.aper_half_angle,
+            ),
+            radius_of_rotation=self.tangential_radius,
+            diffraction_order=self.diffraction_order,
+            groove_density=self.groove_density,
+            coeff_linear=self.groove_density_coeff_linear,
+            coeff_quadratic=self.groove_density_coeff_quadratic,
+            coeff_cubic=self.groove_density_coeff_cubic,
+        )
+
+    @property
     def _surfaces(self) -> optics.surface.Transformed[optics.surface.Substrate[AperSurfT, MainSurfT]]:
         return optics.surface.Transformed(
             name=self.name,
