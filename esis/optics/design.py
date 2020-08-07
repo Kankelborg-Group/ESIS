@@ -85,6 +85,7 @@ def final(
                 inclination=-4.469567242792327 * u.deg,
                 aper_half_angle=deg_per_channel / 2,
                 aper_decenter_x=-grating_channel_radius,
+                diffraction_order=1 << u.dimensionless_unscaled,
                 groove_density_coeff_linear=-d_c1 / np.square(d0),
                 groove_density_coeff_quadratic=(np.square(d_c1) - d0 * d_c2) / np.power(d0, 3),
                 # groove_density_coeff_cubic=(np.power(d_c1, 3) - 2 * d0 * d_c1 * d_c2) / np.power(d0, 4),
