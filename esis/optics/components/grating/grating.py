@@ -21,6 +21,7 @@ class Grating(Component):
     sagittal_radius: u.Quantity = np.inf * u.mm
     nominal_input_angle: u.Quantity = 0 * u.deg
     nominal_output_angle: u.Quantity = 0 * u.deg
+    diffraction_order: u.Quantity = 0 << u.dimensionless_unscaled
     groove_density: u.Quantity = 0 / u.mm
     groove_density_coeff_linear: u.Quantity = 0 / (u.mm ** 2)
     groove_density_coeff_quadratic: u.Quantity = 0 / (u.mm ** 3)
@@ -117,24 +118,7 @@ class Grating(Component):
             name=self.name,
             surfaces=optics.surface.Substrate(
                 aperture_surface=self.surface,
-                main_surface=optics.surface.ToroidalVariableLineSpaceGrating(
-                    name=Name('main'),
-                    radius=self.sagittal_radius,
-                    material=optics.material.Mirror(thickness=-self.substrate_thickness),
-                    aperture=optics.aperture.IsoscelesTrapezoid(
-                        is_active=False,
-                        decenter=optics.coordinate.Decenter(x=self.aper_decenter_x + self.dynamic_clearance_x),
-                        inner_radius=self.inner_clear_radius - self.inner_border_width - self.dynamic_clearance_x,
-                        outer_radius=self.outer_clear_radius + self.outer_border_width - self.dynamic_clearance_x,
-                        wedge_half_angle=self.aper_half_angle,
-                    ),
-                    radius_of_rotation=self.tangential_radius,
-                    diffraction_order=1 * u.dimensionless_unscaled,
-                    groove_density=self.groove_density,
-                    coeff_linear=self.groove_density_coeff_linear,
-                    coeff_quadratic=self.groove_density_coeff_quadratic,
-                    coeff_cubic=self.groove_density_coeff_cubic,
-                )
+                main_surface=self.main_surface,
             ),
             transforms=[
                 optics.coordinate.Transform(
