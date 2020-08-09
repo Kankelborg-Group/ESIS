@@ -12,7 +12,7 @@ class TestGrating:
             primary_clear_radius=100 * u.mm,
             detector_channel_radius=120 * u.mm,
             detector_piston=-150 * u.mm,
-            grating_mechanical_margin= 8 * u.mm,
+            obscuration_margin=8 * u.mm,
         )
 
         assert isinstance(g, Grating)

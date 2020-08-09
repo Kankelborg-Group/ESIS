@@ -18,6 +18,18 @@ class Components:
     filter: Filter = dataclasses.field(default_factory=lambda: Filter())
     detector: Detector = dataclasses.field(default_factory=lambda: Detector())
 
+    def copy(self):
+        return type(self)(
+            dummy_surface=self.dummy_surface.copy(),
+            front_aperture=self.front_aperture.copy(),
+            central_obscuration=self.central_obscuration.copy(),
+            primary=self.primary.copy(),
+            field_stop=self.field_stop.copy(),
+            grating=self.grating.copy(),
+            filter=self.filter.copy(),
+            detector=self.detector.copy(),
+        )
+
     def __iter__(self) -> typ.Iterator[Component]:
         yield from self.dummy_surface
         yield from self.front_aperture

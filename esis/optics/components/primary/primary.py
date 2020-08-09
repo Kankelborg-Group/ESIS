@@ -39,23 +39,27 @@ class Primary(Component):
         )
 
     @property
+    def main_surface(self) -> MainSurfT:
+        return optics.surface.Standard(
+            name=self.name + 'main',
+            radius=-self.radius,
+            conic=self.conic,
+            material=optics.material.Mirror(thickness=self.substrate_thickness),
+            aperture=optics.aperture.RegularPolygon(
+                is_active=False,
+                radius=self.clear_radius + self.border_width,
+                num_sides=self.num_sides,
+                offset_angle=180 * u.deg / self.num_sides,
+            ),
+        )
+
+    @property
     def _surfaces(self) -> optics.surface.Transformed[optics.surface.Substrate[AperSurfT, MainSurfT]]:
         return optics.surface.Transformed(
             name=self.name,
             surfaces=optics.surface.Substrate(
                 aperture_surface=self.surface,
-                main_surface=optics.surface.Standard(
-                    name=self.name + 'main',
-                    radius=-self.radius,
-                    conic=self.conic,
-                    material=optics.material.Mirror(thickness=self.substrate_thickness),
-                    aperture=optics.aperture.RegularPolygon(
-                        is_active=False,
-                        radius=self.clear_radius + self.border_width,
-                        num_sides=self.num_sides,
-                        offset_angle=180 * u.deg / self.num_sides,
-                    ),
-                ),
+                main_surface=self.main_surface,
             ),
             transforms=[],
         )

@@ -59,7 +59,7 @@ class Filter(Component):
             ]
         )
 
-    def copy(self) -> 'Detector':
+    def copy(self) -> 'Filter':
         return Filter(
             name=self.name.copy(),
             piston=self.piston.copy(),

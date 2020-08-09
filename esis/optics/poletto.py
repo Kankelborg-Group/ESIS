@@ -1,9 +1,8 @@
 import typing as typ
-import statistics
 import numpy as np
 import astropy.units as u
 from kgpy import vector
-from . import components, Optics
+from . import components
 
 __all__ = [
     'calc_grating_and_detector',
