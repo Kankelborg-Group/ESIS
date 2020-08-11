@@ -107,7 +107,7 @@ class Optics:
         c.grating = c.grating.apply_gregorian_layout(
             magnification=magnification,
             primary_focal_length=c.primary.focal_length,
-            primary_clear_radius=c.primary.main_surface.aperture.radius,
+            primary_clear_radius=c.primary.clear_radius,
             back_focal_length=other.back_focal_length,
             detector_channel_radius=c.detector.channel_radius,
             obscuration_margin=obscuration_margin,

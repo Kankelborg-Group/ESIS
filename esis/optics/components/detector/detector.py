@@ -149,7 +149,7 @@ class Detector(Component):
 
             other = self.copy()
             other.piston = grating.piston - r_B * np.cos(beta + grating.inclination)
-            other.inclination = -phi_avg
+            other.inclination = (grating.inclination + beta) - phi_avg
 
             return other
 
