@@ -98,15 +98,16 @@ class Optics:
         num_sides = c.primary.num_sides
         wedge_half_angle = c.primary.surface.aperture.half_edge_subtent
 
-        primary_clear_radius = c.primary.main_surface.aperture.min_radius
-        c.detector.channel_radius = primary_clear_radius - c.detector.main_surface.aperture.width_x_neg
+        primary_clear_radius = c.primary.surface.aperture.min_radius
+        detector_half_width = -c.detector.main_surface.aperture.width_x_neg + c.detector.dynamic_clearance
+        c.detector.channel_radius = primary_clear_radius + detector_half_width
         if detector_is_opposite_grating:
             c.detector.channel_radius = -c.detector.channel_radius
 
         c.grating = c.grating.apply_gregorian_layout(
             magnification=magnification,
             primary_focal_length=c.primary.focal_length,
-            primary_clear_radius=c.primary.clear_radius,
+            primary_clear_radius=c.primary.main_surface.aperture.radius,
             back_focal_length=other.back_focal_length,
             detector_channel_radius=c.detector.channel_radius,
             obscuration_margin=obscuration_margin,
@@ -133,7 +134,8 @@ class Optics:
         detector_half_height = c.detector.surface.aperture.half_width_y
         undersize_factor = (detector_half_height - image_margin) / detector_half_height
         fov_min_radius = other.pixel_subtent * undersize_factor * c.detector.npix_y / 2
-        fs_half_radius = fov_min_radius + 2 * other.pixel_subtent
+        pixel_klooge = 4
+        fs_half_radius = fov_min_radius + pixel_klooge * other.pixel_subtent
         c.field_stop.clear_radius = c.primary.focal_length * np.tan(fs_half_radius) / np.cos(wedge_half_angle)
 
         c.field_stop.piston = c.primary.focal_length

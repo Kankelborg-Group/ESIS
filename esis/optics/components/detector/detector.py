@@ -27,6 +27,7 @@ class Detector(Component):
     border_width_left: u.Quantity = 0 * u.mm
     border_width_top: u.Quantity = 0 * u.mm
     border_width_bottom: u.Quantity = 0 * u.mm
+    dynamic_clearance: u.Quantity = 0 * u.mm
 
     @property
     def surface(self) -> AperSurfT:
@@ -91,6 +92,7 @@ class Detector(Component):
             border_width_left=self.border_width_left.copy(),
             border_width_top=self.border_width_top.copy(),
             border_width_bottom=self.border_width_bottom.copy(),
+            dynamic_clearance=self.dynamic_clearance.copy(),
         )
 
     @property
@@ -109,6 +111,7 @@ class Detector(Component):
                 'left border width': format.quantity(self.border_width_left.to(u.mm)),
                 'top border width': format.quantity(self.border_width_top.to(u.mm)),
                 'bottom border width': format.quantity(self.border_width_bottom.to(u.mm)),
+                'dynamic clearance': format.quantity(self.dynamic_clearance.to(u.mm)),
             },
             orient='index',
             columns=[str(self.name)],

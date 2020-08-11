@@ -202,7 +202,7 @@ class Grating(Component):
         """
         M = magnification
         f = primary_focal_length.to(u.mm).value
-        D_p = 2 * primary_clear_radius.to(u.mm).value
+        D_p = 2 * primary_clear_radius.to(u.mm).value * np.cos(self.aper_half_angle)
         r_d = detector_channel_radius.to(u.mm).value
         x_d = -back_focal_length.to(u.mm).value
         m_g = obscuration_margin.to(u.mm).value
@@ -226,8 +226,8 @@ class Grating(Component):
         other.piston = x_g
         other.channel_radius = r_g
         other.aper_decenter_x = -r_g
-        other.inner_clear_radius = D_g / 2 - h_g
-        other.outer_clear_radius = D_g / 2
+        other.inner_clear_radius = (D_g / 2 - h_g) / np.cos(self.aper_half_angle)
+        other.outer_clear_radius = (D_g / 2) / np.cos(self.aper_half_angle)
 
         return other
 

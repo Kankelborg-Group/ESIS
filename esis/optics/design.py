@@ -150,9 +150,9 @@ def final_from_poletto(
 
     obs_thickness = esis.components.central_obscuration.piston - esis.components.grating.piston
     obs_margin = esis.components.central_obscuration.obscured_radius - esis.components.grating.outer_clear_radius
-    primary_clear_radius = esis.components.primary.main_surface.aperture.min_radius
+    primary_clear_radius = esis.components.primary.surface.aperture.min_radius
     detector_radius = esis.components.detector.channel_radius - esis.components.detector.surface.aperture.half_width_x
-    esis.components.detector.border_width_left = detector_radius - primary_clear_radius
+    esis.components.detector.dynamic_clearance = detector_radius - primary_clear_radius
     return esis.apply_poletto_layout(
         wavelength_1=esis.wavelengths[..., 0],
         wavelength_2=esis.wavelengths[..., ~0],
