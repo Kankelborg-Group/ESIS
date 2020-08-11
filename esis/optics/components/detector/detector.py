@@ -1,8 +1,9 @@
 import typing as typ
 import dataclasses
 import numpy as np
+import pandas
 import astropy.units as u
-from kgpy import Name, optics
+from kgpy import Name, optics, format
 from .. import Component, Grating
 
 __all__ = ['Detector']
@@ -39,14 +40,15 @@ class Detector(Component):
 
     @property
     def main_surface(self) -> MainSurfT:
+        aper = self.surface.aperture
         return optics.surface.Standard(
             name=self.name + 'main',
             aperture=optics.aperture.AsymmetricRectangular(
                 is_active=False,
-                width_x_neg=self.border_width_left,
-                width_x_pos=self.border_width_right,
-                width_y_neg=self.border_width_bottom,
-                width_y_pos=self.border_width_top,
+                width_x_neg=-(aper.half_width_x + self.border_width_left),
+                width_x_pos=aper.half_width_x + self.border_width_right,
+                width_y_neg=-(aper.half_width_y + self.border_width_bottom),
+                width_y_pos=aper.half_width_y + self.border_width_top,
             )
         )
 
@@ -75,7 +77,8 @@ class Detector(Component):
         )
 
     def copy(self) -> 'Detector':
-        return Detector(
+        return type(self)(
+            name=self.name.copy(),
             piston=self.piston.copy(),
             channel_radius=self.channel_radius.copy(),
             channel_angle=self.channel_angle.copy(),
@@ -88,7 +91,27 @@ class Detector(Component):
             border_width_left=self.border_width_left.copy(),
             border_width_top=self.border_width_top.copy(),
             border_width_bottom=self.border_width_bottom.copy(),
-            name=self.name.copy()
+        )
+
+    @property
+    def dataframe(self) -> pandas.DataFrame:
+        return pandas.DataFrame.from_dict(
+            data={
+                'piston': format.quantity(self.piston.to(u.mm)),
+                'channel radius': format.quantity(self.channel_radius.to(u.mm)),
+                'channel angle': format.quantity(self.channel_angle.to(u.deg)),
+                'inclination': format.quantity(self.inclination.to(u.deg)),
+                'pixel x half-width': format.quantity(self.pix_half_width_x.to(u.um)),
+                'pixel y half-width': format.quantity(self.pix_half_width_y.to(u.um)),
+                'number of pixels along x': self.npix_x,
+                'number of pixels along y': self.npix_y,
+                'right border width': format.quantity(self.border_width_right.to(u.mm)),
+                'left border width': format.quantity(self.border_width_left.to(u.mm)),
+                'top border width': format.quantity(self.border_width_top.to(u.mm)),
+                'bottom border width': format.quantity(self.border_width_bottom.to(u.mm)),
+            },
+            orient='index',
+            columns=[str(self.name)],
         )
 
     def apply_poletto_prescription(

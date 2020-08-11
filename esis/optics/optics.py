@@ -18,7 +18,7 @@ class Optics:
     name: Name = dataclasses.field(default_factory=lambda: default_name)
     components: comps.Components = dataclasses.field(default_factory=lambda: comps.Components())
     wavelengths: u.Quantity = 0 * u.nm
-    field_limit: u.Quantity = 0 * u.deg
+    field_half_width: u.Quantity = 0 * u.deg
     pupil_samples: int = 10
     field_samples: int = 10
 
@@ -41,8 +41,8 @@ class Optics:
             stop_surface=self.components.grating.surface,
             wavelengths=self.wavelengths,
             pupil_samples=self.pupil_samples,
-            field_min=-self.field_limit,
-            field_max=self.field_limit,
+            field_min=-self.field_half_width,
+            field_max=self.field_half_width,
             field_samples=self.field_samples,
         )
 
@@ -59,7 +59,7 @@ class Optics:
         detector_pos = vector.from_components(detector.piston, detector.channel_radius)
         entrance_arm = grating_pos - source_pos
         exit_arm = detector_pos - grating_pos
-        return vector.length(exit_arm) / vector.length(entrance_arm)
+        return vector.length(exit_arm, keepdims=False) / vector.length(entrance_arm, keepdims=False)
 
     @property
     def effective_focal_length(self) -> u.Quantity:
@@ -70,11 +70,11 @@ class Optics:
         return 2 * np.arctan2(self.components.detector.pix_half_width_x, self.effective_focal_length) << u.rad
 
     def copy(self):
-        return Optics(
+        return type(self)(
             name=self.name.copy(),
             components=self.components.copy(),
             wavelengths=self.wavelengths.copy(),
-            field_limit=self.field_limit.copy(),
+            field_half_width=self.field_half_width.copy(),
             pupil_samples=self.pupil_samples,
             field_samples=self.field_samples,
         )
@@ -85,6 +85,7 @@ class Optics:
             wavelength_2: u.Quantity,
             magnification: u.Quantity,
             obscuration_margin: u.Quantity,
+            obscuration_thickness: u.Quantity,
             image_margin: u.Quantity,
             detector_is_opposite_grating: bool = False,
             use_toroidal_grating: bool = False,
@@ -98,7 +99,7 @@ class Optics:
         wedge_half_angle = c.primary.surface.aperture.half_edge_subtent
 
         primary_clear_radius = c.primary.main_surface.aperture.min_radius
-        c.detector.channel_radius = primary_clear_radius + c.detector.main_surface.aperture.width_x_neg
+        c.detector.channel_radius = primary_clear_radius - c.detector.main_surface.aperture.width_x_neg
         if detector_is_opposite_grating:
             c.detector.channel_radius = -c.detector.channel_radius
 
@@ -131,18 +132,26 @@ class Optics:
 
         detector_half_height = c.detector.surface.aperture.half_width_y
         undersize_factor = (detector_half_height - image_margin) / detector_half_height
-        fov_min_radius = other.pixel_subtent * undersize_factor * c.detector.npix_y
-        fov_radius = fov_min_radius / np.cos(wedge_half_angle)
-        c.field_stop.clear_radius = c.primary.focal_length * np.tan(fov_radius)
+        fov_min_radius = other.pixel_subtent * undersize_factor * c.detector.npix_y / 2
+        fs_half_radius = fov_min_radius + 2 * other.pixel_subtent
+        c.field_stop.clear_radius = c.primary.focal_length * np.tan(fs_half_radius) / np.cos(wedge_half_angle)
+
         c.field_stop.piston = c.primary.focal_length
         c.field_stop.num_sides = num_sides
+        other.field_half_width = vector.from_components(fov_min_radius, fov_min_radius, use_z=False).to(u.arcmin)
 
-        c.central_obscuration.piston = c.grating.piston + c.grating.substrate_thickness + 10 * u.mm
+        output_angle = c.grating.inclination + c.grating.nominal_output_angle
+        c.filter.channel_radius = c.grating.channel_radius - (c.filter.piston - c.grating.piston) * np.tan(output_angle)
+        c.filter.inclination = -output_angle
+
+        c.central_obscuration.piston = c.grating.piston + obscuration_thickness
         c.central_obscuration.obscured_radius = c.grating.outer_clear_radius + obscuration_margin
         c.central_obscuration.num_sides = num_sides
 
         c.front_aperture.piston = c.central_obscuration.piston + 100 * u.mm
-        c.front_aperture.clear_radius = c.detector.channel_radius + c.detector.main_surface.aperture.width_x_pos
+        # c.front_aperture.clear_radius = c.detector.channel_radius + c.detector.main_surface.aperture.width_x_pos
+
+        other.wavelengths = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
 
         other.update()
 

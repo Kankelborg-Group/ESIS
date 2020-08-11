@@ -1,8 +1,9 @@
 import typing as typ
 import dataclasses
 import numpy as np
+import pandas
 import astropy.units as u
-from kgpy import Name, optics
+from kgpy import Name, optics, format
 from .. import Component
 
 __all__ = ['Filter']
@@ -68,4 +69,19 @@ class Filter(Component):
             inclination=self.inclination.copy(),
             clear_radius=self.clear_radius.copy(),
             border_width=self.border_width.copy(),
+        )
+
+    @property
+    def dataframe(self) -> pandas.DataFrame:
+        return pandas.DataFrame.from_dict(
+            data={
+                'piston': format.quantity(self.piston.to(u.mm)),
+                'channel radius': format.quantity(self.channel_radius.to(u.mm)),
+                'channel angle': format.quantity(self.channel_angle.to(u.deg)),
+                'inclination': format.quantity(self.inclination.to(u.deg)),
+                'clear radius': format.quantity(self.clear_radius.to(u.mm)),
+                'border width': format.quantity(self.border_width.to(u.mm)),
+            },
+            orient='index',
+            columns=[str(self.name)],
         )

@@ -1,9 +1,10 @@
 import typing as typ
 import dataclasses
 import numpy as np
+import pandas
 import scipy.optimize
 import astropy.units as u
-from kgpy import Name, optics
+from kgpy import Name, optics, format
 from ... import poletto
 from .. import Component
 
@@ -40,6 +41,39 @@ class Grating(Component):
     side_border_width: u.Quantity = 0 * u.mm
     dynamic_clearance: u.Quantity = 0 * u.mm
     substrate_thickness: u.Quantity = 0 * u.mm
+
+    @property
+    def dataframe(self) -> pandas.DataFrame:
+        c1 = format.quantity(self.groove_density_coeff_linear.to(1 / u.um ** 2), scientific_notation=True)
+        c2 = format.quantity(self.groove_density_coeff_quadratic.to(1 / u.um ** 3), scientific_notation=True)
+        return pandas.DataFrame.from_dict(
+            data={
+                'tangential radius': format.quantity(self.tangential_radius.to(u.mm)),
+                'sagittal radius': format.quantity(self.sagittal_radius.to(u.mm)),
+                'nominal alpha': format.quantity(self.nominal_input_angle.to(u.deg)),
+                'nominal beta': format.quantity(self.nominal_output_angle.to(u.deg)),
+                'diffraction order': format.quantity(self.diffraction_order, digits_after_decimal=0),
+                'nominal groove density': format.quantity(self.groove_density.to(1 / u.um)),
+                'groove density linear coefficient': c1,
+                'groove density quadratic coefficient': c2,
+                'groove density cubic coefficient': format.quantity(self.groove_density_coeff_cubic.to(1 / u.um ** 4)),
+                'piston': format.quantity(self.piston.to(u.mm)),
+                'channel radius': format.quantity(self.channel_radius.to(u.mm)),
+                'channel angle': format.quantity(self.channel_angle.to(u.deg)),
+                'inclination': format.quantity(self.inclination.to(u.deg)),
+                'aperture wedge half-angle': format.quantity(self.aper_half_angle.to(u.deg)),
+                'aperture x decenter': format.quantity(self.aper_decenter_x.to(u.mm)),
+                'inner clear radius': format.quantity(self.inner_clear_radius.to(u.mm)),
+                'outer clear radius': format.quantity(self.outer_clear_radius.to(u.mm)),
+                'inner border width': format.quantity(self.inner_border_width.to(u.mm)),
+                'outer border width': format.quantity(self.outer_border_width.to(u.mm)),
+                'side border width': format.quantity(self.side_border_width.to(u.mm)),
+                'dynamic clearance': format.quantity(self.dynamic_clearance.to(u.mm)),
+                'substrate thickness': format.quantity(self.substrate_thickness.to(u.mm)),
+            },
+            orient='index',
+            columns=[str(self.name)]
+        )
 
     @property
     def is_toroidal(self) -> bool:
@@ -119,11 +153,17 @@ class Grating(Component):
         )
 
     def copy(self) -> 'Grating':
-        return Grating(
+        return type(self)(
             name=self.name.copy(),
             tangential_radius=self.tangential_radius.copy(),
             sagittal_radius=self.sagittal_radius.copy(),
+            nominal_input_angle=self.nominal_input_angle.copy(),
+            nominal_output_angle=self.nominal_output_angle.copy(),
+            diffraction_order=self.diffraction_order.copy(),
             groove_density=self.groove_density.copy(),
+            groove_density_coeff_linear=self.groove_density_coeff_linear.copy(),
+            groove_density_coeff_quadratic=self.groove_density_coeff_quadratic.copy(),
+            groove_density_coeff_cubic=self.groove_density_coeff_cubic.copy(),
             piston=self.piston.copy(),
             channel_radius=self.channel_radius.copy(),
             channel_angle=self.channel_angle.copy(),
@@ -135,10 +175,8 @@ class Grating(Component):
             inner_border_width=self.inner_border_width.copy(),
             outer_border_width=self.outer_border_width.copy(),
             side_border_width=self.side_border_width.copy(),
+            dynamic_clearance=self.dynamic_clearance.copy(),
             substrate_thickness=self.substrate_thickness.copy(),
-            groove_density_coeff_linear=self.groove_density_coeff_linear.copy(),
-            groove_density_coeff_quadratic=self.groove_density_coeff_quadratic.copy(),
-            groove_density_coeff_cubic=self.groove_density_coeff_cubic.copy(),
         )
 
     def apply_gregorian_layout(

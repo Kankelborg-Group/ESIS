@@ -1,7 +1,8 @@
 import typing as typ
 import dataclasses
+import pandas
 import astropy.units as u
-from kgpy import Name, optics
+from kgpy import Name, optics, format
 from . import Component
 
 __all__ = ['CentralObscuration']
@@ -42,9 +43,21 @@ class CentralObscuration(Component):
         )
 
     def copy(self) -> 'CentralObscuration':
-        return CentralObscuration(
+        return type(self)(
             piston=self.piston.copy(),
             obscured_radius=self.obscured_radius.copy(),
             num_sides=self.num_sides,
             name=self.name.copy(),
+        )
+
+    @property
+    def dataframe(self) -> pandas.DataFrame:
+        return pandas.DataFrame.from_dict(
+            data={
+                'piston': format.quantity(self.piston.to(u.mm)),
+                'obscured radius': format.quantity(self.obscured_radius.to(u.mm)),
+                'number of sides': self.num_sides,
+            },
+            orient='index',
+            columns=[str(self.name)],
         )

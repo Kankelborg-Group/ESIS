@@ -80,6 +80,8 @@ def final(
             grating=components.Grating(
                 tangential_radius=grating_radius,
                 sagittal_radius=grating_radius,
+                nominal_input_angle=1.301 * u.deg,
+                nominal_output_angle=8.057 * u.deg,
                 groove_density=groove_density,
                 piston=grating_piston,
                 channel_radius=grating_channel_radius,
@@ -121,7 +123,7 @@ def final(
             ),
         ),
         wavelengths=[629.7, 609.8, 584.3, ] * u.AA,
-        field_limit=vector.from_components(field_limit, field_limit).to(u.arcmin),
+        field_half_width=vector.from_components(field_limit, field_limit).to(u.arcmin),
         pupil_samples=pupil_samples,
         field_samples=field_samples,
     )
@@ -146,64 +148,19 @@ def final_from_poletto(
     """
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
+    obs_thickness = esis.components.central_obscuration.piston - esis.components.grating.piston
     obs_margin = esis.components.central_obscuration.obscured_radius - esis.components.grating.outer_clear_radius
+    primary_clear_radius = esis.components.primary.main_surface.aperture.min_radius
+    detector_radius = esis.components.detector.channel_radius - esis.components.detector.surface.aperture.half_width_x
+    esis.components.detector.border_width_left = detector_radius - primary_clear_radius
     return esis.apply_poletto_layout(
         wavelength_1=esis.wavelengths[..., 0],
         wavelength_2=esis.wavelengths[..., ~0],
         magnification=4 * u.dimensionless_unscaled,
         obscuration_margin=obs_margin,
-        image_margin=1 * u.mm,
+        obscuration_thickness=obs_thickness,
+        image_margin=67 * 2 * esis.components.detector.pix_half_width_x,
         detector_is_opposite_grating=False,
         use_toroidal_grating=use_toroidal_grating,
         use_vls_grating=use_vls_grating,
     )
-
-    # magnification = 4
-    #
-    # obscuration = esis.components.central_obscuration
-    # primary = esis.components.primary
-    # grating = esis.components.grating
-    # detector = esis.components.detector
-    #
-    # new_grating = grating.from_gregorian_layout(
-    #     magnification=magnification,
-    #     primary_focal_length=primary.focal_length,
-    #     primary_clear_radius=primary.clear_radius,
-    #     detector_channel_radius=detector.channel_radius,
-    #     detector_piston=detector.piston,
-    #     obscuration_margin=obscuration.obscured_radius - grating.outer_clear_radius,
-    # )
-    #
-    # grating.piston = new_grating.piston
-    # grating.channel_radius = new_grating.channel_radius
-    # grating.aper_decenter_x = new_grating.aper_decenter_x
-    # grating.inner_clear_radius = new_grating.inner_clear_radius
-    # grating.outer_clear_radius = new_grating.outer_clear_radius
-    #
-    # new_grating, new_detector = poletto.calc_grating_and_detector(
-    #     wavelength_1=esis.wavelengths[..., 0],
-    #     wavelength_2=esis.wavelengths[..., ~0],
-    #     source_piston=primary.focal_length,
-    #     magnification=magnification,
-    #     grating_channel_radius=grating.channel_radius,
-    #     grating_piston=grating.piston,
-    #     detector_channel_radius=detector.channel_radius,
-    #     use_toroidal_grating=use_toroidal_grating,
-    #     use_vls_grating=use_vls_grating,
-    #     use_one_wavelength_detector_tilt=use_one_wavelength_detector_tilt,
-    # )
-    #
-    # grating.tangential_radius = new_grating.tangential_radius
-    # grating.sagittal_radius = new_grating.sagittal_radius
-    # grating.groove_density = new_grating.groove_density
-    # grating.groove_density_coeff_linear = new_grating.groove_density_coeff_linear
-    # grating.groove_density_coeff_quadratic = new_grating.groove_density_coeff_quadratic
-    # grating.groove_density_coeff_cubic = new_grating.groove_density_coeff_cubic
-    # grating.inclination = new_grating.inclination
-    #
-    # detector.piston = new_detector.piston
-    # detector.inclination = new_detector.inclination
-    #
-    # esis.update()
-    #
-    # return esis

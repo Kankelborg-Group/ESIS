@@ -1,7 +1,8 @@
 import typing as typ
 import dataclasses
+import pandas
 import astropy.units as u
-from kgpy import Name, optics
+from kgpy import Name, optics, format
 from .. import Component
 
 __all__ = ['FieldStop']
@@ -12,7 +13,7 @@ MainSurfT = optics.surface.Standard[None, optics.aperture.Circular]
 
 @dataclasses.dataclass
 class FieldStop(Component):
-    name: Name = dataclasses.field(default_factory=lambda: Name('field_stop'))
+    name: Name = dataclasses.field(default_factory=lambda: Name('field stop'))
     piston: u.Quantity = 0 * u.mm
     clear_radius: u.Quantity = 0 * u.mm
     mech_radius: u.Quantity = 0 * u.mm
@@ -58,4 +59,17 @@ class FieldStop(Component):
             mech_radius=self.mech_radius.copy(),
             num_sides=self.num_sides,
             name=self.name.copy(),
+        )
+
+    @property
+    def dataframe(self) -> pandas.DataFrame:
+        return pandas.DataFrame.from_dict(
+            data={
+                'piston': format.quantity(self.piston.to(u.mm)),
+                'clear radius': format.quantity(self.clear_radius.to(u.mm)),
+                'mechanical radius': format.quantity(self.mech_radius.to(u.mm)),
+                'number of sides': self.num_sides,
+            },
+            orient='index',
+            columns=[str(self.name)],
         )

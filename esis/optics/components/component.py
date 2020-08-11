@@ -1,11 +1,12 @@
 import typing as typ
 import abc
 import kgpy.optics
+import kgpy.mixin
 
 __all__ = ['Component']
 
 
-class Component(abc.ABC):
+class Component(kgpy.mixin.Named, abc.ABC):
 
     @property
     @abc.abstractmethod
