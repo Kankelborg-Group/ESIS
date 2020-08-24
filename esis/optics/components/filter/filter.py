@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, optics, format
+from kgpy import Name, transform, optics, format
 from .. import Component
 
 __all__ = ['Filter']
@@ -16,7 +16,7 @@ MainSurfT = optics.surface.Standard[None, optics.aperture.Circular]
 class Filter(Component):
     name: Name = dataclasses.field(default_factory=lambda: Name('filter'))
     piston: u.Quantity = 0 * u.mm
-    channel_radius: u.Quantity = 0 * u .mm
+    channel_radius: u.Quantity = 0 * u.mm
     channel_angle: u.Quantity = 0 * u.deg
     inclination: u.Quantity = 0 * u.deg
     clear_radius: u.Quantity = 0 * u.mm
@@ -45,19 +45,12 @@ class Filter(Component):
                     )
                 )
             ),
-            transforms=[
-                optics.coordinate.Transform(
-                    translate=optics.coordinate.Translate(z=-self.piston)
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(z=self.channel_angle),
-                    translate=optics.coordinate.Translate(x=self.channel_radius),
-                    tilt_first=True,
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(y=-self.inclination),
-                ),
-            ]
+            transform=transform.rigid.TransformList([
+                transform.rigid.Translate.from_components(z=-self.piston),
+                transform.rigid.TiltZ(self.channel_angle),
+                transform.rigid.Translate.from_components(x=self.channel_radius),
+                transform.rigid.TiltY(-self.inclination),
+            ]),
         )
 
     def copy(self) -> 'Filter':

@@ -2,7 +2,7 @@ import typing as typ
 import dataclasses
 import pandas
 import astropy.units as u
-from kgpy import Name, optics, format
+from kgpy import Name, transform, optics, format
 from .. import Component
 
 __all__ = ['FieldStop']
@@ -45,11 +45,9 @@ class FieldStop(Component):
                     )
                 )
             ),
-            transforms=[
-                optics.coordinate.Transform(
-                    translate=optics.coordinate.Translate(z=-self.piston),
-                )
-            ],
+            transform=transform.rigid.TransformList([
+                transform.rigid.Translate.from_components(z=-self.piston),
+            ]),
         )
 
     def copy(self) -> 'FieldStop':

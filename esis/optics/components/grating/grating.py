@@ -4,7 +4,7 @@ import numpy as np
 import pandas
 import scipy.optimize
 import astropy.units as u
-from kgpy import Name, optics, format
+from kgpy import Name, optics, format, transform
 from ... import poletto
 from .. import Component
 
@@ -100,7 +100,7 @@ class Grating(Component):
             name=Name('aper'),
             radius=self.sagittal_radius,
             aperture=optics.aperture.IsoscelesTrapezoid(
-                decenter=optics.coordinate.Decenter(x=self.aper_decenter_x + side_border_x),
+                decenter=transform.rigid.Translate.from_components(x=self.aper_decenter_x + side_border_x),
                 inner_radius=self.inner_clear_radius - side_border_x,
                 outer_radius=self.outer_clear_radius - side_border_x,
                 wedge_half_angle=self.aper_half_angle,
@@ -116,7 +116,7 @@ class Grating(Component):
             material=optics.material.Mirror(thickness=-self.substrate_thickness),
             aperture=optics.aperture.IsoscelesTrapezoid(
                 is_active=False,
-                decenter=optics.coordinate.Decenter(x=self.aper_decenter_x + self.dynamic_clearance_x),
+                decenter=transform.rigid.Translate.from_components(x=self.aper_decenter_x + self.dynamic_clearance_x),
                 inner_radius=self.inner_clear_radius - self.inner_border_width - self.dynamic_clearance_x,
                 outer_radius=self.outer_clear_radius + self.outer_border_width - self.dynamic_clearance_x,
                 wedge_half_angle=self.aper_half_angle,
@@ -137,23 +137,16 @@ class Grating(Component):
                 aperture_surface=self.surface,
                 main_surface=self.main_surface,
             ),
-            transforms=[
-                optics.coordinate.Transform(
-                    translate=optics.coordinate.Translate(z=-self.piston)
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(z=self.channel_angle),
-                    translate=optics.coordinate.Translate(x=self.channel_radius),
-                    tilt_first=True,
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(y=self.inclination)
-                ),
-            ],
+            transform=transform.rigid.TransformList([
+                transform.rigid.Translate.from_components(z=-self.piston),
+                transform.rigid.TiltZ(self.channel_angle),
+                transform.rigid.Translate.from_components(x=self.channel_radius),
+                transform.rigid.TiltY(self.inclination)
+            ]),
         )
 
     def copy(self) -> 'Grating':
-        return type(self)(
+        return Grating(
             name=self.name.copy(),
             tangential_radius=self.tangential_radius.copy(),
             sagittal_radius=self.sagittal_radius.copy(),

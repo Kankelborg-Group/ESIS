@@ -64,7 +64,6 @@ class Primary(Component, PandasDataframable):
                 aperture_surface=self.surface,
                 main_surface=self.main_surface,
             ),
-            transforms=[],
         )
 
     def copy(self) -> 'Primary':

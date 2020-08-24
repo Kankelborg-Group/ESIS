@@ -13,14 +13,14 @@ class DummySurface(Component):
     thickness: u.Quantity = 100 * u.mm
 
     @property
-    def surface(self) -> optics.surface.CoordinateBreak:
-        return optics.surface.CoordinateBreak(
+    def surface(self) -> optics.surface.CoordinateTransform:
+        return optics.surface.CoordinateTransform(
             name=self.name,
             thickness=self.thickness,
         )
 
     @property
-    def _surfaces(self) -> optics.surface.CoordinateBreak:
+    def _surfaces(self) -> optics.surface.CoordinateTransform:
         return self.surface
 
     def copy(self) -> 'DummySurface':

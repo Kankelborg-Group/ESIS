@@ -2,7 +2,7 @@ import typing as typ
 import dataclasses
 import pandas
 import astropy.units as u
-from kgpy import Name, optics, format
+from kgpy import Name, optics, format, transform
 from . import Component
 
 __all__ = ['CentralObscuration']
@@ -35,11 +35,7 @@ class CentralObscuration(Component):
         return optics.surface.Transformed(
             name=self.name,
             surfaces=self.surface,
-            transforms=[
-                optics.coordinate.Transform(
-                    translate=optics.coordinate.Translate(z=-self.piston)
-                ),
-            ],
+            transform=transform.rigid.Translate.from_components(z=-self.piston),
         )
 
     def copy(self) -> 'CentralObscuration':

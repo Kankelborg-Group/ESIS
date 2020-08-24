@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, optics, format
+from kgpy import Name, transform, optics, format
 from .. import Component, Grating
 
 __all__ = ['Detector']
@@ -61,19 +61,12 @@ class Detector(Component):
                 aperture_surface=self.surface,
                 main_surface=self.main_surface,
             ),
-            transforms=[
-                optics.coordinate.Transform(
-                    translate=optics.coordinate.Translate(z=-self.piston)
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(z=self.channel_angle),
-                    translate=optics.coordinate.Translate(x=self.channel_radius),
-                    tilt_first=True,
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(y=self.inclination),
-                ),
-            ],
+            transform=transform.rigid.TransformList([
+                transform.rigid.Translate.from_components(z=-self.piston),
+                transform.rigid.TiltZ(self.channel_angle),
+                transform.rigid.Translate.from_components(x=self.channel_radius),
+                transform.rigid.TiltY(self.inclination),
+            ]),
             is_last_surface=True,
         )
 
