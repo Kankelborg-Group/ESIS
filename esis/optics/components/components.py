@@ -1,7 +1,7 @@
 import typing as typ
 import dataclasses
 import kgpy.optics
-from . import Component, DummySurface, FrontAperture, CentralObscuration, Primary, Filter, FieldStop, Grating, Detector
+from .. import components as cmps
 
 __all__ = ['Components']
 
@@ -9,28 +9,16 @@ __all__ = ['Components']
 @dataclasses.dataclass
 class Components:
 
-    dummy_surface: DummySurface = dataclasses.field(default_factory=lambda: DummySurface())
-    front_aperture: FrontAperture = dataclasses.field(default_factory=lambda: FrontAperture())
-    central_obscuration: CentralObscuration = dataclasses.field(default_factory=lambda: CentralObscuration())
-    primary: Primary = dataclasses.field(default_factory=lambda: Primary())
-    field_stop: FieldStop = dataclasses.field(default_factory=lambda: FieldStop())
-    grating: Grating = dataclasses.field(default_factory=lambda: Grating())
-    filter: Filter = dataclasses.field(default_factory=lambda: Filter())
-    detector: Detector = dataclasses.field(default_factory=lambda: Detector())
+    dummy_surface: cmps.DummySurface = dataclasses.field(default_factory=cmps.DummySurface)
+    front_aperture: cmps.FrontAperture = dataclasses.field(default_factory=cmps.FrontAperture)
+    central_obscuration: cmps.CentralObscuration = dataclasses.field(default_factory=cmps.CentralObscuration)
+    primary: cmps.Primary = dataclasses.field(default_factory=cmps.Primary)
+    field_stop: cmps.FieldStop = dataclasses.field(default_factory=cmps.FieldStop)
+    grating: cmps.Grating = dataclasses.field(default_factory=cmps.Grating)
+    filter: cmps.Filter = dataclasses.field(default_factory=cmps.Filter)
+    detector: cmps.Detector = dataclasses.field(default_factory=cmps.Detector)
 
-    def copy(self):
-        return type(self)(
-            dummy_surface=self.dummy_surface.copy(),
-            front_aperture=self.front_aperture.copy(),
-            central_obscuration=self.central_obscuration.copy(),
-            primary=self.primary.copy(),
-            field_stop=self.field_stop.copy(),
-            grating=self.grating.copy(),
-            filter=self.filter.copy(),
-            detector=self.detector.copy(),
-        )
-
-    def __iter__(self) -> typ.Iterator[Component]:
+    def __iter__(self) -> typ.Iterator[kgpy.optics.component.Component]:
         yield from self.dummy_surface
         yield from self.front_aperture
         yield from self.central_obscuration

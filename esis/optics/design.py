@@ -26,101 +26,92 @@ def final(
     # channel_angle += channel_offset_angle
     channel_angle = 180 * u.deg
 
+    primary = components.Primary(
+        radius=2000 * u.mm,
+        num_sides=num_sides,
+        clear_radius=77.9 * u.mm,
+        substrate_thickness=30 * u.mm,
+    )
+    primary.border_width = 83.7 * u.mm - primary.clear_radius
+
+    front_aperture = components.FrontAperture(
+        piston=primary.focal_length + 500 * u.mm,
+        clear_radius=100 * u.mm,
+    )
+
     tuffet_x1, tuffet_y1 = 2.54 * u.mm, 37.1707 * u.mm
     tuffet_x2, tuffet_y2 = 24.4876 * u.mm, 28.0797 * u.mm
     tuffet_dx, tuffet_dy = tuffet_x2 - tuffet_x1, tuffet_y2 - tuffet_y1
     tuffet_slope = tuffet_dy / tuffet_dx
     tuffet_radius = tuffet_y1 - tuffet_slope * tuffet_x1
+    central_obscuration = components.CentralObscuration(
+        piston=1404.270 * u.mm,
+        obscured_radius=tuffet_radius,
+        num_sides=num_sides,
+    )
 
-    primary_focal_length = 1000 * u.mm
-    primary_clear_radius = 77.9 * u.mm
+    field_stop = components.FieldStop(
+        piston=primary.focal_length.copy(),
+        clear_radius=1.82 * u.mm,
+        mech_radius=2.81 * u.mm,
+        num_sides=num_sides,
+    )
 
-    grating_radius = 597.830 * u.mm
-    grating_piston = primary_focal_length + 374.7 * u.mm
-    grating_channel_radius = 2.074999998438000e1 * u.mm
-    grating_border_width = 2 * u.mm
-    grating_lower_border_width = 4.86 * u.mm
-    grating_inner_clear_radius = grating_channel_radius - (13.02 * u.mm - grating_lower_border_width)
-    groove_density = 2.586608603456000 / u.um
-    d0 = 1 / groove_density
+    grating = components.Grating(
+        piston=primary.focal_length + 374.7 * u.mm,
+        cylindrical_radius=2.074999998438000e1 * u.mm,
+        cylindrical_azimuth=channel_angle.copy(),
+        sagittal_radius=597.830 * u.mm,
+        nominal_input_angle=1.301 * u.deg,
+        nominal_output_angle=8.057 * u.deg,
+        groove_density=2.586608603456000 / u.um,
+        inclination=-4.469567242792327 * u.deg,
+        aper_half_angle=deg_per_channel / 2,
+        diffraction_order=1 << u.dimensionless_unscaled,
+        inner_border_width=4.86 * u.mm,
+        outer_border_width=2 * u.mm,
+        side_border_width=2 * u.mm,
+        dynamic_clearance=1.25 * u.mm,
+        substrate_thickness=10 * u.mm,
+    )
+    grating.tangential_radius = grating.sagittal_radius
+    grating.aper_decenter_x = -grating.cylindrical_radius
+    d0 = 1 / grating.groove_density
     d_c1 = -3.3849e-5 * (u.um / u.mm)
     d_c2 = -1.3625e-7 * (u.um / u.mm ** 2)
+    grating.groove_density_coeff_linear = -d_c1 / np.square(d0)
+    grating.groove_density_coeff_quadratic = (np.square(d_c1) - d0 * d_c2) / np.power(d0, 3)
+    grating.inner_clear_radius = grating.cylindrical_radius - (13.02 * u.mm - grating.inner_border_width)
+    grating.outer_clear_radius = grating.cylindrical_radius + (10.49 * u.mm - grating.outer_border_width)
 
-    grating_to_filter_distance = 1.301661998854058 * u.m
-    filter_piston = grating_piston - grating_to_filter_distance
+    filter = components.Filter(
+        piston=grating.piston - 1.301661998854058 * u.m,
+        cylindrical_radius=95.9 * u.mm,
+        cylindrical_azimuth=channel_angle.copy(),
+        inclination=-3.45 * u.deg,
+        clear_radius=15.9 * u.mm,
+    )
 
-    pix_half_width = 15 * u.um / 2
+    detector = components.Detector(
+        piston=filter.piston - 200 * u.mm,
+        cylindrical_radius=108 * u.mm,
+        cylindrical_azimuth=channel_angle.copy(),
+        inclination=-12.252 * u.deg,
+        pixel_width=15 * u.um,
+        num_pixels=(2048, 1024),
+    )
 
     field_limit = 0.09561 * u.deg
     return Optics(
         name=Name('ESIS'),
         components=components.Components(
-            front_aperture=components.FrontAperture(
-                piston=primary_focal_length + 500 * u.mm,
-                clear_radius=100 * u.mm,
-            ),
-            central_obscuration=components.CentralObscuration(
-                piston=1404.270 * u.mm,
-                obscured_radius=tuffet_radius,
-                num_sides=num_sides,
-            ),
-            primary=components.Primary(
-                radius=2 * primary_focal_length,
-                num_sides=num_sides,
-                clear_radius=primary_clear_radius,
-                border_width=83.7 * u.mm - primary_clear_radius,
-                substrate_thickness=30 * u.mm,
-            ),
-            field_stop=components.FieldStop(
-                piston=primary_focal_length,
-                clear_radius=1.82 * u.mm,
-                mech_radius=2.81 * u.mm,
-                num_sides=num_sides,
-            ),
-            grating=components.Grating(
-                tangential_radius=grating_radius,
-                sagittal_radius=grating_radius,
-                nominal_input_angle=1.301 * u.deg,
-                nominal_output_angle=8.057 * u.deg,
-                groove_density=groove_density,
-                piston=grating_piston,
-                channel_radius=grating_channel_radius,
-                channel_angle=channel_angle,
-                inclination=-4.469567242792327 * u.deg,
-                aper_half_angle=deg_per_channel / 2,
-                aper_decenter_x=-grating_channel_radius,
-                diffraction_order=1 << u.dimensionless_unscaled,
-                groove_density_coeff_linear=-d_c1 / np.square(d0),
-                groove_density_coeff_quadratic=(np.square(d_c1) - d0 * d_c2) / np.power(d0, 3),
-                # groove_density_coeff_cubic=(np.power(d_c1, 3) - 2 * d0 * d_c1 * d_c2) / np.power(d0, 4),
-                # groove_density_coeff_linear=d_c1,
-                # groove_density_coeff_quadratic=d_c2,
-                groove_density_coeff_cubic=0 / u.mm ** 4,
-                inner_clear_radius=grating_inner_clear_radius,
-                outer_clear_radius=grating_channel_radius + (10.49 * u.mm - grating_border_width),
-                inner_border_width=grating_lower_border_width,
-                outer_border_width=grating_border_width,
-                side_border_width=grating_border_width,
-                dynamic_clearance=1.25 * u.mm,
-                substrate_thickness=10 * u.mm,
-            ),
-            filter=components.Filter(
-                piston=filter_piston,
-                channel_radius=95.9 * u.mm,
-                channel_angle=channel_angle,
-                inclination=-3.45 * u.deg,
-                clear_radius=15.9 * u.mm,
-            ),
-            detector=components.Detector(
-                piston=filter_piston - 200 * u.mm,
-                channel_radius=108 * u.mm,
-                channel_angle=channel_angle,
-                inclination=-12.252 * u.deg,
-                pix_half_width_x=pix_half_width,
-                pix_half_width_y=pix_half_width,
-                npix_x=2048,
-                npix_y=1024,
-            ),
+            front_aperture=front_aperture,
+            central_obscuration=central_obscuration,
+            primary=primary,
+            field_stop=field_stop,
+            grating=grating,
+            filter=filter,
+            detector=detector,
         ),
         wavelengths=[629.7, 609.8, 584.3, ] * u.AA,
         field_half_width=vector.from_components(field_limit, field_limit).to(u.arcmin),

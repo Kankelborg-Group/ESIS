@@ -3,26 +3,20 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, transform, optics, format
-from .. import Component, Grating
+from kgpy import Name, vector, transform, optics, format
+from .. import Grating
 
 __all__ = ['Detector']
 
-AperSurfT = optics.surface.Standard[None, optics.aperture.Rectangular]
-MainSurfT = optics.surface.Standard[None, optics.aperture.AsymmetricRectangular]
+SurfT = optics.surface.Standard[None, optics.aperture.Rectangular, optics.aperture.AsymmetricRectangular]
 
 
 @dataclasses.dataclass
-class Detector(Component):
+class Detector(optics.component.CylindricalComponent[SurfT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
-    piston: u.Quantity = 0 * u.mm
-    channel_radius: u.Quantity = 0 * u.mm
-    channel_angle: u.Quantity = 0 * u.deg
     inclination: u.Quantity = 0 * u.deg
-    pix_half_width_x: u.Quantity = 0 * u.mm
-    pix_half_width_y: u.Quantity = 0 * u.mm
-    npix_x: int = 0
-    npix_y: int = 0
+    pixel_width: u.Quantity = 0 * u.um
+    num_pixels: typ.Tuple[int, int] = (0, 0)
     border_width_right: u.Quantity = 0 * u.mm
     border_width_left: u.Quantity = 0 * u.mm
     border_width_top: u.Quantity = 0 * u.mm
@@ -30,63 +24,57 @@ class Detector(Component):
     dynamic_clearance: u.Quantity = 0 * u.mm
 
     @property
-    def surface(self) -> AperSurfT:
-        return optics.surface.Standard(
-            name=self.name + 'aper',
-            aperture=optics.aperture.Rectangular(
-                half_width_x=self.npix_x * self.pix_half_width_x,
-                half_width_y=self.npix_y * self.pix_half_width_y,
-            ),
-        )
+    def pixel_half_width(self) -> u.Quantity:
+        return self.pixel_width / 2
 
     @property
-    def main_surface(self) -> MainSurfT:
-        aper = self.surface.aperture
-        return optics.surface.Standard(
-            name=self.name + 'main',
-            aperture=optics.aperture.AsymmetricRectangular(
-                is_active=False,
-                width_x_neg=-(aper.half_width_x + self.border_width_left),
-                width_x_pos=aper.half_width_x + self.border_width_right,
-                width_y_neg=-(aper.half_width_y + self.border_width_bottom),
-                width_y_pos=aper.half_width_y + self.border_width_top,
-            )
-        )
+    def clear_width(self) -> u.Quantity:
+        return (self.num_pixels[vector.ix] * self.pixel_width).to(u.mm)
 
     @property
-    def _surfaces(self) -> optics.surface.Transformed[optics.surface.Substrate[AperSurfT, MainSurfT]]:
-        return optics.surface.Transformed(
-            name=self.name,
-            surfaces=optics.surface.Substrate(
-                aperture_surface=self.surface,
-                main_surface=self.main_surface,
-            ),
-            transform=transform.rigid.TransformList([
-                transform.rigid.Translate.from_components(z=-self.piston),
-                transform.rigid.TiltZ(self.channel_angle),
-                transform.rigid.Translate.from_components(x=self.channel_radius),
-                transform.rigid.TiltY(self.inclination),
-            ]),
-            is_last_surface=True,
+    def clear_height(self) -> u.Quantity:
+        return (self.num_pixels[vector.iy] * self.pixel_width).to(u.mm)
+
+    @property
+    def clear_half_width(self) -> u.Quantity:
+        return self.clear_width / 2
+
+    @property
+    def clear_half_height(self) -> u.Quantity:
+        return self.clear_height / 2
+
+    @property
+    def transform(self) -> transform.rigid.Transform:
+        return super().transform + transform.rigid.TransformList([
+            transform.rigid.TiltY(self.inclination),
+        ])
+
+    @property
+    def surface(self) -> SurfT:
+        surface = super().surface
+        surface.aperture = optics.aperture.Rectangular(
+            half_width_x=self.clear_half_width,
+            half_width_y=self.clear_half_height,
         )
+        surface.aperture_mechanical = optics.aperture.AsymmetricRectangular(
+            width_x_neg=-(self.clear_half_width + self.border_width_left),
+            width_x_pos=self.clear_half_width + self.border_width_right,
+            width_y_neg=-(self.clear_half_height + self.border_width_bottom),
+            width_y_pos=self.clear_half_height + self.border_width_top,
+        )
+        return surface
 
     def copy(self) -> 'Detector':
-        return type(self)(
-            name=self.name.copy(),
-            piston=self.piston.copy(),
-            channel_radius=self.channel_radius.copy(),
-            channel_angle=self.channel_angle.copy(),
-            inclination=self.inclination.copy(),
-            pix_half_width_x=self.pix_half_width_x.copy(),
-            pix_half_width_y=self.pix_half_width_y.copy(),
-            npix_x=self.npix_x,
-            npix_y=self.npix_y,
-            border_width_right=self.border_width_right.copy(),
-            border_width_left=self.border_width_left.copy(),
-            border_width_top=self.border_width_top.copy(),
-            border_width_bottom=self.border_width_bottom.copy(),
-            dynamic_clearance=self.dynamic_clearance.copy(),
-        )
+        other = super().copy()  # type: Detector
+        other.inclination = self.inclination.copy()
+        other.pixel_width = self.pixel_width.copy()
+        other.num_pixels = self.num_pixels
+        other.border_width_right = self.border_width_right.copy()
+        other.border_width_left = self.border_width_left.copy()
+        other.border_width_top = self.border_width_top.copy()
+        other.border_width_bottom = self.border_width_bottom.copy()
+        other.dynamic_clearance = self.dynamic_clearance.copy()
+        return other
 
     @property
     def dataframe(self) -> pandas.DataFrame:

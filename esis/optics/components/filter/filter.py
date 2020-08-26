@@ -4,65 +4,42 @@ import numpy as np
 import pandas
 import astropy.units as u
 from kgpy import Name, transform, optics, format
-from .. import Component
 
 __all__ = ['Filter']
 
-AperSurfT = optics.surface.Standard[None, optics.aperture.Circular]
-MainSurfT = optics.surface.Standard[None, optics.aperture.Circular]
+SurfT = optics.surface.Standard[None, optics.aperture.Circular, optics.aperture.Circular]
 
 
 @dataclasses.dataclass
-class Filter(Component):
+class Filter(optics.component.CylindricalComponent[SurfT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('filter'))
-    piston: u.Quantity = 0 * u.mm
-    channel_radius: u.Quantity = 0 * u.mm
-    channel_angle: u.Quantity = 0 * u.deg
     inclination: u.Quantity = 0 * u.deg
     clear_radius: u.Quantity = 0 * u.mm
     border_width: u.Quantity = 0 * u.mm
 
     @property
-    def surface(self) -> AperSurfT:
-        return optics.surface.Standard(
-            name=self.name + 'aper',
-            aperture=optics.aperture.Circular(
-                radius=self.clear_radius
-            ),
-        )
+    def transform(self) -> transform.rigid.TransformList:
+        return super().transform + transform.rigid.TransformList([
+            transform.rigid.TiltY(-self.inclination)
+        ])
 
     @property
-    def _surfaces(self) -> optics.surface.Transformed[optics.surface.Substrate[AperSurfT, MainSurfT]]:
-        return optics.surface.Transformed(
-            name=self.name,
-            surfaces=optics.surface.Substrate(
-                aperture_surface=self.surface,
-                main_surface=optics.surface.Standard(
-                    name=self.name + 'main',
-                    aperture=optics.aperture.Circular(
-                        is_active=False,
-                        radius=self.clear_radius + self.border_width,
-                    )
-                )
-            ),
-            transform=transform.rigid.TransformList([
-                transform.rigid.Translate.from_components(z=-self.piston),
-                transform.rigid.TiltZ(self.channel_angle),
-                transform.rigid.Translate.from_components(x=self.channel_radius),
-                transform.rigid.TiltY(-self.inclination),
-            ]),
+    def surface(self) -> SurfT:
+        surface = super().surface
+        surface.aperture = optics.aperture.Circular(
+            radius=self.clear_radius
         )
+        surface.aperture_mechanical = optics.aperture.Circular(
+            radius=self.clear_radius + self.border_width,
+        )
+        return surface
 
     def copy(self) -> 'Filter':
-        return Filter(
-            name=self.name.copy(),
-            piston=self.piston.copy(),
-            channel_radius=self.channel_radius.copy(),
-            channel_angle=self.channel_angle.copy(),
-            inclination=self.inclination.copy(),
-            clear_radius=self.clear_radius.copy(),
-            border_width=self.border_width.copy(),
-        )
+        other = super().copy()      # type: Filter
+        other.inclination = self.inclination.copy()
+        other.clear_radius = self.clear_radius.copy()
+        other.border_width = self.border_width.copy()
+        return other
 
     @property
     def dataframe(self) -> pandas.DataFrame:
