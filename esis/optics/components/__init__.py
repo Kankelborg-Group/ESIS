@@ -1,5 +1,3 @@
-from .component import Component
-from .dummy_surface import DummySurface
 from .front_aperture import FrontAperture
 from .central_obscuration import CentralObscuration
 from .primary import Primary

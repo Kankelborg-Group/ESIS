@@ -2,19 +2,16 @@ import typing as typ
 import dataclasses
 import numpy as np
 import pandas
-from kgpy.mixin import PandasDataframable
 import astropy.units as u
 from kgpy import Name, optics, format
-from .. import Component
 
 __all__ = ['Primary']
 
-AperSurfT = optics.surface.Standard[None, optics.aperture.RegularPolygon]
-MainSurfT = optics.surface.Standard[optics.material.Mirror, optics.aperture.RegularPolygon]
+SurfT = optics.surface.Standard[optics.material.Mirror, optics.aperture.RegularPolygon, optics.aperture.RegularPolygon]
 
 
 @dataclasses.dataclass
-class Primary(Component, PandasDataframable):
+class Primary(optics.component.RelativeComponent[SurfT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('primary'))
     radius: u.Quantity = np.inf * u.mm
     conic: u.Quantity = -1 * u.dimensionless_unscaled
@@ -28,55 +25,32 @@ class Primary(Component, PandasDataframable):
         return self.radius / 2
 
     @property
-    def surface(self) -> AperSurfT:
-        return optics.surface.Standard(
-            name=self.name + 'aper',
-            radius=-self.radius,
-            conic=self.conic,
-            aperture=optics.aperture.RegularPolygon(
-                is_test_stop=False,
-                radius=self.clear_radius,
-                num_sides=self.num_sides,
-                offset_angle=180 * u.deg / self.num_sides,
-            ),
+    def surface(self) -> SurfT:
+        surface = super().surface  # type: SurfT
+        surface.radius = -self.radius
+        surface.conic = self.conic
+        surface.material = optics.material.Mirror(thickness=self.substrate_thickness)
+        surface.aperture = optics.aperture.RegularPolygon(
+            radius=self.clear_radius,
+            num_sides=self.num_sides,
+            offset_angle=180 * u.deg / self.num_sides,
         )
-
-    @property
-    def main_surface(self) -> MainSurfT:
-        return optics.surface.Standard(
-            name=self.name + 'main',
-            radius=-self.radius,
-            conic=self.conic,
-            material=optics.material.Mirror(thickness=self.substrate_thickness),
-            aperture=optics.aperture.RegularPolygon(
-                is_active=False,
-                radius=self.clear_radius + self.border_width,
-                num_sides=self.num_sides,
-                offset_angle=180 * u.deg / self.num_sides,
-            ),
+        surface.aperture_mechanical = optics.aperture.RegularPolygon(
+            radius=self.clear_radius + self.border_width,
+            num_sides=self.num_sides,
+            offset_angle=180 * u.deg / self.num_sides,
         )
-
-    @property
-    def _surfaces(self) -> optics.surface.Transformed[optics.surface.Substrate[AperSurfT, MainSurfT]]:
-        return optics.surface.Transformed(
-            name=self.name,
-            surfaces=optics.surface.Substrate(
-                aperture_surface=self.surface,
-                main_surface=self.main_surface,
-            ),
-            transforms=[],
-        )
+        return surface
 
     def copy(self) -> 'Primary':
-        return Primary(
-            radius=self.radius.copy(),
-            num_sides=self.num_sides,
-            clear_radius=self.clear_radius.copy(),
-            border_width=self.border_width.copy(),
-            substrate_thickness=self.substrate_thickness.copy(),
-            name=self.name.copy(),
-            conic=self.conic
-        )
+        other = super().copy()      # type: Primary
+        other.radius = self.radius.copy()
+        other.conic = self.conic.copy()
+        other.num_sides = self.num_sides
+        other.clear_radius = self.clear_radius.copy()
+        other.border_width = self.border_width.copy()
+        other.substrate_thickness = self.substrate_thickness.copy()
+        return other
 
     @property
     def dataframe(self) -> pandas:

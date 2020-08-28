@@ -4,21 +4,21 @@ import numpy as np
 import pandas
 import scipy.optimize
 import astropy.units as u
-from kgpy import Name, optics, format
+from kgpy import Name, optics, format, transform
 from ... import poletto
-from .. import Component
 
 __all__ = ['Grating']
 
-AperSurfT = optics.surface.Toroidal[None, optics.aperture.IsoscelesTrapezoid]
-MainSurfT = optics.surface.ToroidalVariableLineSpaceGrating[optics.material.Mirror, optics.aperture.IsoscelesTrapezoid]
-
-default_name = Name('grating')
+SurfT = optics.surface.ToroidalVariableLineSpaceGrating[
+    optics.material.Mirror,
+    optics.aperture.IsoscelesTrapezoid,
+    optics.aperture.IsoscelesTrapezoid,
+]
 
 
 @dataclasses.dataclass
-class Grating(Component):
-    name: Name = dataclasses.field(default_factory=lambda: default_name)
+class Grating(optics.component.CylindricalComponent[SurfT]):
+    name: Name = dataclasses.field(default_factory=lambda: Name('grating'))
     tangential_radius: u.Quantity = np.inf * u.mm
     sagittal_radius: u.Quantity = np.inf * u.mm
     nominal_input_angle: u.Quantity = 0 * u.deg
@@ -28,9 +28,6 @@ class Grating(Component):
     groove_density_coeff_linear: u.Quantity = 0 / (u.mm ** 2)
     groove_density_coeff_quadratic: u.Quantity = 0 / (u.mm ** 3)
     groove_density_coeff_cubic: u.Quantity = 0 / (u.mm ** 4)
-    piston: u.Quantity = 0 * u.mm
-    channel_radius: u.Quantity = 0 * u.mm
-    channel_angle: u.Quantity = 0 * u.deg
     inclination: u.Quantity = 0 * u.deg
     aper_half_angle: u.Quantity = 0 * u.deg
     aper_decenter_x: u.Quantity = 0 * u.mm
@@ -94,90 +91,63 @@ class Grating(Component):
         return self.main_surface.diffraction_angle(wavelength=wavelength, input_angle=input_angle)
 
     @property
-    def surface(self) -> AperSurfT:
+    def transform(self) -> transform.rigid.TransformList:
+        return super().transform + transform.rigid.TransformList([
+            transform.rigid.TiltY(self.inclination),
+        ])
+
+    @property
+    def _surface_type(self) -> typ.Type[SurfT]:
+        return optics.surface.ToroidalVariableLineSpaceGrating
+
+    @property
+    def surface(self) -> SurfT:
+        surface = super().surface  # type: SurfT
+        surface.radius = self.sagittal_radius
+        surface.radius_of_rotation = self.tangential_radius
+        surface.diffraction_order = self.diffraction_order
+        surface.groove_density = self.groove_density
+        surface.coeff_linear = self.groove_density_coeff_linear
+        surface.coeff_quadratic = self.groove_density_coeff_quadratic
+        surface.coeff_cubic = self.groove_density_coeff_cubic
+        surface.material = optics.material.Mirror(thickness=-self.substrate_thickness)
         side_border_x = self.side_border_width / np.sin(self.aper_half_angle) + self.dynamic_clearance_x
-        return optics.surface.Toroidal(
-            name=Name('aper'),
-            radius=self.sagittal_radius,
-            aperture=optics.aperture.IsoscelesTrapezoid(
-                decenter=optics.coordinate.Decenter(x=self.aper_decenter_x + side_border_x),
-                inner_radius=self.inner_clear_radius - side_border_x,
-                outer_radius=self.outer_clear_radius - side_border_x,
-                wedge_half_angle=self.aper_half_angle,
-            ),
-            radius_of_rotation=self.tangential_radius,
+        surface.aperture = optics.aperture.IsoscelesTrapezoid(
+            decenter=transform.rigid.Translate.from_components(x=self.aper_decenter_x + side_border_x),
+            inner_radius=self.inner_clear_radius - side_border_x,
+            outer_radius=self.outer_clear_radius - side_border_x,
+            wedge_half_angle=self.aper_half_angle,
         )
-
-    @property
-    def main_surface(self):
-        return optics.surface.ToroidalVariableLineSpaceGrating(
-            name=Name('main'),
-            radius=self.sagittal_radius,
-            material=optics.material.Mirror(thickness=-self.substrate_thickness),
-            aperture=optics.aperture.IsoscelesTrapezoid(
-                is_active=False,
-                decenter=optics.coordinate.Decenter(x=self.aper_decenter_x + self.dynamic_clearance_x),
-                inner_radius=self.inner_clear_radius - self.inner_border_width - self.dynamic_clearance_x,
-                outer_radius=self.outer_clear_radius + self.outer_border_width - self.dynamic_clearance_x,
-                wedge_half_angle=self.aper_half_angle,
-            ),
-            radius_of_rotation=self.tangential_radius,
-            diffraction_order=self.diffraction_order,
-            groove_density=self.groove_density,
-            coeff_linear=self.groove_density_coeff_linear,
-            coeff_quadratic=self.groove_density_coeff_quadratic,
-            coeff_cubic=self.groove_density_coeff_cubic,
+        surface.aperture_mechanical = optics.aperture.IsoscelesTrapezoid(
+            decenter=transform.rigid.Translate.from_components(x=self.aper_decenter_x + self.dynamic_clearance_x),
+            inner_radius=self.inner_clear_radius - self.inner_border_width - self.dynamic_clearance_x,
+            outer_radius=self.outer_clear_radius + self.outer_border_width - self.dynamic_clearance_x,
+            wedge_half_angle=self.aper_half_angle,
         )
-
-    @property
-    def _surfaces(self) -> optics.surface.Transformed[optics.surface.Substrate[AperSurfT, MainSurfT]]:
-        return optics.surface.Transformed(
-            name=self.name,
-            surfaces=optics.surface.Substrate(
-                aperture_surface=self.surface,
-                main_surface=self.main_surface,
-            ),
-            transforms=[
-                optics.coordinate.Transform(
-                    translate=optics.coordinate.Translate(z=-self.piston)
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(z=self.channel_angle),
-                    translate=optics.coordinate.Translate(x=self.channel_radius),
-                    tilt_first=True,
-                ),
-                optics.coordinate.Transform(
-                    tilt=optics.coordinate.Tilt(y=self.inclination)
-                ),
-            ],
-        )
+        return surface
 
     def copy(self) -> 'Grating':
-        return type(self)(
-            name=self.name.copy(),
-            tangential_radius=self.tangential_radius.copy(),
-            sagittal_radius=self.sagittal_radius.copy(),
-            nominal_input_angle=self.nominal_input_angle.copy(),
-            nominal_output_angle=self.nominal_output_angle.copy(),
-            diffraction_order=self.diffraction_order.copy(),
-            groove_density=self.groove_density.copy(),
-            groove_density_coeff_linear=self.groove_density_coeff_linear.copy(),
-            groove_density_coeff_quadratic=self.groove_density_coeff_quadratic.copy(),
-            groove_density_coeff_cubic=self.groove_density_coeff_cubic.copy(),
-            piston=self.piston.copy(),
-            channel_radius=self.channel_radius.copy(),
-            channel_angle=self.channel_angle.copy(),
-            inclination=self.inclination.copy(),
-            aper_half_angle=self.aper_half_angle.copy(),
-            aper_decenter_x=self.aper_decenter_x.copy(),
-            inner_clear_radius=self.inner_clear_radius.copy(),
-            outer_clear_radius=self.outer_clear_radius.copy(),
-            inner_border_width=self.inner_border_width.copy(),
-            outer_border_width=self.outer_border_width.copy(),
-            side_border_width=self.side_border_width.copy(),
-            dynamic_clearance=self.dynamic_clearance.copy(),
-            substrate_thickness=self.substrate_thickness.copy(),
-        )
+        other = super().copy()      # type: Grating
+        other.tangential_radius = self.tangential_radius.copy()
+        other.sagittal_radius = self.sagittal_radius.copy()
+        other.nominal_input_angle = self.nominal_input_angle.copy()
+        other.nominal_output_angle = self.nominal_output_angle.copy()
+        other.diffraction_order = self.diffraction_order.copy()
+        other.groove_density = self.groove_density.copy()
+        other.groove_density_coeff_linear = self.groove_density_coeff_linear.copy()
+        other.groove_density_coeff_quadratic = self.groove_density_coeff_quadratic.copy()
+        other.groove_density_coeff_cubic = self.groove_density_coeff_cubic.copy()
+        other.inclination = self.inclination.copy()
+        other.aper_half_angle = self.aper_half_angle.copy()
+        other.aper_decenter_x = self.aper_decenter_x.copy()
+        other.inner_clear_radius = self.inner_clear_radius.copy()
+        other.outer_clear_radius = self.outer_clear_radius.copy()
+        other.inner_border_width = self.inner_border_width.copy()
+        other.outer_border_width = self.outer_border_width.copy()
+        other.side_border_width = self.side_border_width.copy()
+        other.dynamic_clearance = self.dynamic_clearance.copy()
+        other.substrate_thickness = self.substrate_thickness.copy()
+        return other
 
     def apply_gregorian_layout(
             self,
