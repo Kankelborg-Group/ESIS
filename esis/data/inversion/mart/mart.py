@@ -9,7 +9,7 @@ from . import antialias, Result, SimpleMART, LGOFMART
 
 
 # Looking for Charles' original MART? it is located at:
-# KSO/kso/science/software/ksopy/kso/ctis/moses/sampling_issue/moses.py
+# KSO/kso/science/software/ksopy/kso/ctis/moses-mart/sampling_issue/moses-mart.py
 
 @dataclasses.dataclass
 class MART:

@@ -28,21 +28,21 @@ __all__ = ['ov_Level3_initial', 'default_aia_path', 'ov_Level3_updated', 'mgx_ma
 default_aia_path = pathlib.Path(aia.__file__).parent / 'data/'
 
 # intermediate pickles for testing
-ov_Level3_initial = pathlib.Path(__file__).parent / 'ov_Level3.pickle'
-ov_Level3_updated = pathlib.Path(__file__).parent / 'ov_Level3_updated.pickle'
-ov_Level3_transforms = pathlib.Path(__file__).parent / 'esis_Level3_transform.pickle'
-ov_Level3_transforms_updated = pathlib.Path(__file__).parent / 'esis_Level3_transform_updated.pickle'
-ov_Level3_masked = pathlib.Path(__file__).parent / 'ov_Level3_masked.pickle'
+ov_Level3_initial = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3.pickle'
+ov_Level3_updated = pathlib.Path(__file__).parents[1]/ 'flight/ov_Level3_updated.pickle'
+ov_Level3_transforms = pathlib.Path(__file__).parents[1] / 'flight/esis_Level3_transform.pickle'
+ov_Level3_transforms_updated = pathlib.Path(__file__).parents[1] / 'flight/esis_Level3_transform_updated.pickle'
+ov_Level3_masked = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_masked.pickle'
 
-mgx_masks = [pathlib.Path(__file__).parent / 'masks/esis_cam{}_mgx_mask.csv'.format(i+1) for i in range(4)]
-hei_masks = [pathlib.Path(__file__).parent / 'masks/esis_cam{}_hei_mask.csv'.format(i + 1) for i in range(4)]
+mgx_masks = [pathlib.Path(__file__).parents[1] / 'flight/masks/esis_cam{}_mgx_mask.csv'.format(i+1) for i in range(4)]
+hei_masks = [pathlib.Path(__file__).parents[1] / 'flight/masks/esis_cam{}_hei_mask.csv'.format(i + 1) for i in range(4)]
 
-hei_transforms = pathlib.Path(__file__).parent / 'heI_Level3_transform.pickle'
-hei_transforms_updated = pathlib.Path(__file__).parent / 'heI_Level3_transform_updated.pickle'
+hei_transforms = pathlib.Path(__file__).parents[1] / 'flight/heI_Level3_transform.pickle'
+hei_transforms_updated = pathlib.Path(__file__).parents[1] / 'flight/heI_Level3_transform_updated.pickle'
 
 # final pickles
-ov_final_path = pathlib.Path(__file__).parent / 'ov_Level3_final.pickle'
-hei_final_path = pathlib.Path(__file__).parent / 'hei_Level3_final.pickle'
+ov_final_path = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_final.pickle'
+hei_final_path = pathlib.Path(__file__).parents[1] / 'flight/hei_Level3_final.pickle'
 
 
 @dataclass
@@ -73,7 +73,6 @@ class Level3(Pickleable):
         esis = level_1.Level1.from_pickle(level1_path)
 
         aia_channel = [304*u.angstrom]
-        print(esis.start_time.shape)
         start_time = esis.start_time[0,0]
         end_time = esis.start_time[-1,0]
         print(start_time)
@@ -197,7 +196,7 @@ class Level3(Pickleable):
                              ])
         lev_3_wcs = wcs.WCS(lev_3_header)
 
-        meta = dict([("Description", "Level3 was formed via a co-alignment of ESIS level1 and AIA 304"),
+        meta = dict([("Description", "Level3 was formed via a linear co-alignment of ESIS level1 and AIA 304"),
                      ])
         lev_3_ndcube = ndcube.NDCube(lev_3_data,lev_3_wcs,meta = meta)
 
@@ -217,7 +216,7 @@ class Level3(Pickleable):
                    lev1_sequences=sequence,lev1_cameras=camera)
 
     def update_internal_alignment(self,ref_channel = 1, heI = False) -> 'Level3':
-        lev1 = level_1.Level1.from_pickle(level_1.default_pickle_path)
+        lev1 = level_1.Level1.from_pickle(level_1.Level1.default_pickle_path())
         print(self.transformation_objects)
         lev1_transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
 
@@ -312,7 +311,7 @@ class Level3(Pickleable):
 
         self.observation.mask = mask_cube
 
-        return
+        return self
 
     def correct_vignetting(self,scale_factor,fudge_angle = np.array([0,0,0,0])) -> np.ndarray:
 

@@ -5,7 +5,7 @@ import astropy.units as u
 import astropy.io.fits
 import astropy.wcs
 import dataclasses
-
+import esis.data.inversion
 from . import mart
 from kgpy.observatories.iris import mosaics
 
@@ -152,7 +152,7 @@ def generate_projections(
     projections = []
 
     for angle in angles:
-        proj = esis.inversion.mart.forward.model(
+        proj = esis.data.inversion.mart.forward.model(
             cube=data,
             projection_azimuth=angle,
             spectral_order=spectral_order,

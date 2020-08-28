@@ -29,7 +29,7 @@ class SimpleMART:
     @staticmethod
     def channel_is_not_converged(goodness_of_fit: np.ndarray) -> bool:
         chisq = np.nanmean(goodness_of_fit)
-        return chisq > 1
+        return chisq > .5
 
     @staticmethod
     def correction_exponent(goodness_of_fit: np.ndarray) -> np.ndarray:
@@ -109,6 +109,7 @@ class SimpleMART:
 
                     goodness_of_fit = np.square(test_projection - projection) / (1 + test_projection)
                     chisq = np.nanmean(goodness_of_fit)
+                    # print('Starting Chi Squared= ',chisq)
                     # Notes on "reduced chisquare"
                     #    (0) assumes data units are 'counts', with shot noise.
                     #    (1) assumes read noise of order 1 count: sigma**2 = 1+test_projection.
@@ -117,6 +118,7 @@ class SimpleMART:
                     r.mart_type_history.append(self.type_int)
 
                     if self.channel_is_not_converged(goodness_of_fit):
+                        # print('correcting')
                         # this if-statement runs if if the mean of `goodness_of_fit` is greater than 1
                         n_converged -= 1
                         exponent = self.correction_exponent(goodness_of_fit)
@@ -143,6 +145,26 @@ class SimpleMART:
                         r.cube *= deprojection
                         if self.track_cube_history:
                             r.cube_history.append(r.cube.copy())
+
+                        # test_projection = forward.model(
+                        #     cube=r.cube,
+                        #     projection_azimuth=projections_azimuth[a],
+                        #     spectral_order=spectral_order[m],
+                        #     projection_shape=projection.shape,
+                        #     projection_spatial_offset=(projections_offset_x[m, a], projections_offset_y[m, a]),
+                        #     cube_spatial_offset=(cube_offset_x[m, a], cube_offset_y[m, a]),
+                        #     x_axis=x_axis,
+                        #     y_axis=y_axis,
+                        #     w_axis=w_axis,
+                        #     rotation_kwargs=self.rotation_kwargs
+                        # )
+                        # test_projection[test_projection <= 0] = 0
+                        #
+                        # goodness_of_fit = np.square(test_projection - projection) / (1 + test_projection)
+                        # chisq = np.nanmean(goodness_of_fit)
+                        # print('Corrected Chi Squared= ',chisq)
+
+
             if n_converged == n_channels:
                 break
 
