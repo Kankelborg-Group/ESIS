@@ -8,11 +8,17 @@ from .. import Grating
 
 __all__ = ['Detector']
 
-SurfT = optics.surface.Standard[None, optics.aperture.Rectangular, optics.aperture.AsymmetricRectangular]
+SurfaceT = optics.Surface[
+    None,
+    None,
+    optics.aperture.Rectangular,
+    optics.aperture.AsymmetricRectangular,
+    None,
+]
 
 
 @dataclasses.dataclass
-class Detector(optics.component.CylindricalComponent[SurfT]):
+class Detector(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
     inclination: u.Quantity = 0 * u.deg
     pixel_width: u.Quantity = 0 * u.um
@@ -50,7 +56,7 @@ class Detector(optics.component.CylindricalComponent[SurfT]):
         ])
 
     @property
-    def surface(self) -> SurfT:
+    def surface(self) -> SurfaceT:
         surface = super().surface
         surface.aperture = optics.aperture.Rectangular(
             half_width_x=self.clear_half_width,

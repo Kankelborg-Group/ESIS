@@ -7,7 +7,7 @@ from kgpy import Name, transform, optics, format
 
 __all__ = ['Filter']
 
-SurfT = optics.surface.Standard[None, optics.aperture.Circular, optics.aperture.Circular]
+SurfT = optics.Surface[None, None, optics.aperture.Circular, optics.aperture.Circular, None]
 
 
 @dataclasses.dataclass

@@ -76,11 +76,11 @@ def final(
     )
     grating.tangential_radius = grating.sagittal_radius
     grating.aper_decenter_x = -grating.cylindrical_radius
-    d0 = 1 / grating.groove_density
+    d0 = 1 / grating.ruling_density
     d_c1 = -3.3849e-5 * (u.um / u.mm)
     d_c2 = -1.3625e-7 * (u.um / u.mm ** 2)
-    grating.groove_density_coeff_linear = -d_c1 / np.square(d0)
-    grating.groove_density_coeff_quadratic = (np.square(d_c1) - d0 * d_c2) / np.power(d0, 3)
+    grating.ruling_density_coeff_linear = -d_c1 / np.square(d0)
+    grating.ruling_density_coeff_quadratic = (np.square(d_c1) - d0 * d_c2) / np.power(d0, 3)
     grating.inner_clear_radius = grating.cylindrical_radius - (13.02 * u.mm - grating.inner_border_width)
     grating.outer_clear_radius = grating.cylindrical_radius + (10.49 * u.mm - grating.outer_border_width)
 

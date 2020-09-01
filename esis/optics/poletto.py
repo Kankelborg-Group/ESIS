@@ -215,7 +215,7 @@ def two_point_detector(
     beta_1, beta_2 = grating.diffraction_angle(lambda_1, alpha), grating.diffraction_angle(lambda_2, alpha)
     r_A = entrance_arm_radius
     R = grating.tangential_radius
-    sigma_1 = grating.groove_density_coeff_linear
+    sigma_1 = grating.ruling_density_coeff_linear
 
     r_Bh_1 = spectral_focal_curve(lambda_1, m, alpha, beta_1, r_A, R, sigma_1)
     r_Bh_2 = spectral_focal_curve(lambda_2, m, alpha, beta_2, r_A, R, sigma_1)

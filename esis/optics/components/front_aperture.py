@@ -6,7 +6,7 @@ from kgpy import Name, optics, format
 
 __all__ = ['FrontAperture']
 
-SurfT = optics.surface.Standard[None, optics.aperture.Circular, None]
+SurfT = optics.Surface[None, None, optics.aperture.Circular, None, None]
 
 
 @dataclasses.dataclass

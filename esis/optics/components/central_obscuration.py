@@ -6,7 +6,7 @@ from kgpy import Name, optics, format, transform
 
 __all__ = ['CentralObscuration']
 
-SurfT = optics.surface.Standard[None, optics.aperture.RegularPolygon, None]
+SurfT = optics.Surface[None, None, optics.aperture.RegularPolygon, None, None]
 
 
 @dataclasses.dataclass

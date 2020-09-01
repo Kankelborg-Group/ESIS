@@ -7,11 +7,17 @@ from kgpy import Name, optics, format
 
 __all__ = ['Primary']
 
-SurfT = optics.surface.Standard[optics.material.Mirror, optics.aperture.RegularPolygon, optics.aperture.RegularPolygon]
+SurfaceT = optics.Surface[
+    optics.sag.Standard,
+    optics.material.Mirror,
+    optics.aperture.RegularPolygon,
+    optics.aperture.RegularPolygon,
+    None,
+]
 
 
 @dataclasses.dataclass
-class Primary(optics.component.RelativeComponent[SurfT]):
+class Primary(optics.component.PistonComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('primary'))
     radius: u.Quantity = np.inf * u.mm
     conic: u.Quantity = -1 * u.dimensionless_unscaled
@@ -25,10 +31,12 @@ class Primary(optics.component.RelativeComponent[SurfT]):
         return self.radius / 2
 
     @property
-    def surface(self) -> SurfT:
-        surface = super().surface  # type: SurfT
-        surface.radius = -self.radius
-        surface.conic = self.conic
+    def surface(self) -> SurfaceT:
+        surface = super().surface  # type: SurfaceT
+        surface.sag = optics.sag.Standard(
+            radius=-self.radius,
+            conic=self.conic,
+        )
         surface.material = optics.material.Mirror(thickness=self.substrate_thickness)
         surface.aperture = optics.aperture.RegularPolygon(
             radius=self.clear_radius,

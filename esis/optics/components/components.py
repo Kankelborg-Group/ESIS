@@ -1,15 +1,15 @@
 import typing as typ
 import dataclasses
-import kgpy.optics
+from kgpy import mixin, optics
 from .. import components as cmps
 
 __all__ = ['Components']
 
 
 @dataclasses.dataclass
-class Components:
+class Components(mixin.Copyable):
 
-    dummy_surface: cmps.DummySurface = dataclasses.field(default_factory=cmps.DummySurface)
+    source: cmps.Source = dataclasses.field(default_factory=cmps.Source)
     front_aperture: cmps.FrontAperture = dataclasses.field(default_factory=cmps.FrontAperture)
     central_obscuration: cmps.CentralObscuration = dataclasses.field(default_factory=cmps.CentralObscuration)
     primary: cmps.Primary = dataclasses.field(default_factory=cmps.Primary)
@@ -18,8 +18,7 @@ class Components:
     filter: cmps.Filter = dataclasses.field(default_factory=cmps.Filter)
     detector: cmps.Detector = dataclasses.field(default_factory=cmps.Detector)
 
-    def __iter__(self) -> typ.Iterator[kgpy.optics.component.Component]:
-        yield from self.dummy_surface
+    def __iter__(self) -> typ.Iterator[optics.Component]:
         yield from self.front_aperture
         yield from self.central_obscuration
         yield from self.primary
@@ -27,3 +26,15 @@ class Components:
         yield from self.grating
         yield from self.filter
         yield from self.detector
+
+    def copy(self) -> 'Components':
+        other = super().copy()  # type: Components
+        other.source = self.source.copy()
+        other.front_aperture = self.front_aperture.copy()
+        other.central_obscuration = self.central_obscuration.copy()
+        other.primary = self.primary.copy()
+        other.field_stop = self.field_stop.copy()
+        other.grating = self.grating.copy()
+        other.filter = self.filter.copy()
+        other.detector = self.detector.copy()
+        return other
