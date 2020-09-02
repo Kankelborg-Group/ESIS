@@ -91,17 +91,17 @@ class Optics(mixin.Named):
         wedge_half_angle = c.primary.surface.aperture.half_edge_subtent
 
         primary_clear_radius = c.primary.surface.aperture.min_radius
-        detector_half_width = -c.detector.surface.aperture.width_x_neg + c.detector.dynamic_clearance
-        c.detector.channel_radius = primary_clear_radius + detector_half_width
+        detector_half_width = -c.detector.surface.aperture_mechanical.width_x_neg + c.detector.dynamic_clearance
+        c.detector.cylindrical_radius = primary_clear_radius + detector_half_width
         if detector_is_opposite_grating:
-            c.detector.channel_radius = -c.detector.channel_radius
+            c.detector.cylindrical_radius = -c.detector.cylindrical_radius
 
         c.grating = c.grating.apply_gregorian_layout(
             magnification=magnification,
             primary_focal_length=c.primary.focal_length,
             primary_clear_radius=c.primary.clear_radius,
             back_focal_length=other.back_focal_length,
-            detector_cylindrical_radius=c.detector.channel_radius,
+            detector_cylindrical_radius=c.detector.cylindrical_radius,
             obscuration_margin=obscuration_margin,
         )
         c.grating = c.grating.apply_poletto_prescription(
@@ -109,7 +109,7 @@ class Optics(mixin.Named):
             wavelength_2=wavelength_2,
             magnification=magnification,
             primary_focal_length=c.primary.focal_length,
-            detector_cylindrical_radius=c.detector.channel_radius,
+            detector_cylindrical_radius=c.detector.cylindrical_radius,
             is_toroidal=use_toroidal_grating,
             is_vls=use_vls_grating,
         )
@@ -132,8 +132,8 @@ class Optics(mixin.Named):
         c.field_stop.piston = c.primary.focal_length
         c.field_stop.num_sides = num_sides
 
-        c.source.half_width_x = fov_min_radius
-        c.source.half_width_y = fov_min_radius
+        c.source.half_width_x = fov_min_radius.to(u.arcmin)
+        c.source.half_width_y = fov_min_radius.to(u.arcmin)
 
         output_angle = c.grating.inclination + c.grating.nominal_output_angle
         piston_fg = (c.filter.piston - c.grating.piston)

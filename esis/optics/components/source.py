@@ -1,7 +1,8 @@
 import typing
 import dataclasses
 import astropy.units as u
-from kgpy import Name, transform, optics
+import pandas
+from kgpy import Name, format, transform, optics
 
 __all__ = ['Source']
 
@@ -29,3 +30,10 @@ class Source(optics.component.PistonComponent):
         other.half_width_x = self.half_width_x.copy()
         other.half_width_y = self.half_width_y.copy()
         return other
+
+    @property
+    def dataframe(self) -> pandas.DataFrame:
+        dataframe = super().dataframe
+        dataframe['half width'] = [format.quantity(self.half_width_x.to(u.arcmin))]
+        dataframe['half height'] = [format.quantity(self.half_width_y.to(u.arcmin))]
+        return dataframe

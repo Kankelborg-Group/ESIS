@@ -29,11 +29,6 @@ class FrontAperture(optics.component.PistonComponent[SurfT]):
 
     @property
     def dataframe(self) -> pandas.DataFrame:
-        return pandas.DataFrame.from_dict(
-            data={
-                'piston': format.quantity(self.piston),
-                'clear radius': format.quantity(self.clear_radius),
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['clear radius'] = [format.quantity(self.clear_radius.to(u.mm))]
+        return dataframe

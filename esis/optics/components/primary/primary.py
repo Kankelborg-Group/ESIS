@@ -62,15 +62,11 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
 
     @property
     def dataframe(self) -> pandas:
-        return pandas.DataFrame.from_dict(
-            data={
-                'radius': format.quantity(self.radius.to(u.mm)),
-                'conic constant': format.quantity(self.conic),
-                'number of sides': self.num_sides,
-                'clear radius': format.quantity(self.clear_radius.to(u.mm)),
-                'border width': format.quantity(self.border_width.to(u.mm)),
-                'substrate thickness': format.quantity(self.substrate_thickness.to(u.mm)),
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['radius'] = [format.quantity(self.radius.to(u.mm))]
+        dataframe['conic constant'] = [format.quantity(self.conic)]
+        dataframe['number of sides'] = [self.num_sides]
+        dataframe['clear radius'] = [format.quantity(self.clear_radius.to(u.mm))]
+        dataframe['border width'] = [format.quantity(self.border_width.to(u.mm))]
+        dataframe['substrate thickness'] = [format.quantity(self.substrate_thickness.to(u.mm))]
+        return dataframe

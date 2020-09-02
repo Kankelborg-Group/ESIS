@@ -38,13 +38,8 @@ class FieldStop(optics.component.PistonComponent[SurfaceT]):
 
     @property
     def dataframe(self) -> pandas.DataFrame:
-        return pandas.DataFrame.from_dict(
-            data={
-                'piston': format.quantity(self.piston.to(u.mm)),
-                'clear radius': format.quantity(self.clear_radius.to(u.mm)),
-                'mechanical radius': format.quantity(self.mech_radius.to(u.mm)),
-                'number of sides': self.num_sides,
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['clear radius'] = [format.quantity(self.clear_radius.to(u.mm))]
+        dataframe['mechanical radius'] = [format.quantity(self.mech_radius.to(u.mm))]
+        dataframe['number of sides'] = [self.num_sides]
+        return dataframe

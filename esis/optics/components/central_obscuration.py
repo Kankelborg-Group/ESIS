@@ -6,18 +6,18 @@ from kgpy import Name, optics, format, transform
 
 __all__ = ['CentralObscuration']
 
-SurfT = optics.Surface[None, None, optics.aperture.RegularPolygon, None, None]
+SurfaceT = optics.Surface[None, None, optics.aperture.RegularPolygon, None, None]
 
 
 @dataclasses.dataclass
-class CentralObscuration(optics.component.PistonComponent[SurfT]):
+class CentralObscuration(optics.component.PistonComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('obscuration'))
     obscured_radius: u.Quantity = 0 * u.mm
     num_sides: int = 0
 
     @property
-    def surface(self) -> SurfT:
-        surface = super().surface  # type: SurfT
+    def surface(self) -> SurfaceT:
+        surface = super().surface  # type: SurfaceT
         surface.aperture = optics.aperture.RegularPolygon(
             is_obscuration=True,
             radius=self.obscured_radius,
@@ -34,12 +34,7 @@ class CentralObscuration(optics.component.PistonComponent[SurfT]):
 
     @property
     def dataframe(self) -> pandas.DataFrame:
-        return pandas.DataFrame.from_dict(
-            data={
-                'piston': format.quantity(self.piston.to(u.mm)),
-                'obscured radius': format.quantity(self.obscured_radius.to(u.mm)),
-                'number of sides': self.num_sides,
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['obscured radius'] = [format.quantity(self.obscured_radius.to(u.mm))]
+        dataframe['number of sides'] = [self.num_sides]
+        return dataframe

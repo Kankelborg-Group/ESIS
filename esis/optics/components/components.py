@@ -19,13 +19,13 @@ class Components(mixin.Copyable):
     detector: cmps.Detector = dataclasses.field(default_factory=cmps.Detector)
 
     def __iter__(self) -> typ.Iterator[optics.Component]:
-        yield from self.front_aperture
-        yield from self.central_obscuration
-        yield from self.primary
-        yield from self.field_stop
-        yield from self.grating
-        yield from self.filter
-        yield from self.detector
+        yield self.front_aperture.surface
+        yield self.central_obscuration.surface
+        yield self.primary.surface
+        yield self.field_stop.surface
+        yield self.grating.surface
+        yield self.filter.surface
+        yield self.detector.surface
 
     def copy(self) -> 'Components':
         other = super().copy()  # type: Components

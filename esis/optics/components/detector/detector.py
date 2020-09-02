@@ -84,25 +84,16 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
 
     @property
     def dataframe(self) -> pandas.DataFrame:
-        return pandas.DataFrame.from_dict(
-            data={
-                'piston': format.quantity(self.piston.to(u.mm)),
-                'channel radius': format.quantity(self.channel_radius.to(u.mm)),
-                'channel angle': format.quantity(self.channel_angle.to(u.deg)),
-                'inclination': format.quantity(self.inclination.to(u.deg)),
-                'pixel x half-width': format.quantity(self.pix_half_width_x.to(u.um)),
-                'pixel y half-width': format.quantity(self.pix_half_width_y.to(u.um)),
-                'number of pixels along x': self.npix_x,
-                'number of pixels along y': self.npix_y,
-                'right border width': format.quantity(self.border_width_right.to(u.mm)),
-                'left border width': format.quantity(self.border_width_left.to(u.mm)),
-                'top border width': format.quantity(self.border_width_top.to(u.mm)),
-                'bottom border width': format.quantity(self.border_width_bottom.to(u.mm)),
-                'dynamic clearance': format.quantity(self.dynamic_clearance.to(u.mm)),
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
+        dataframe['pixel width'] = [format.quantity(self.pixel_width.to(u.um))]
+        dataframe['pixel array shape'] = [self.num_pixels]
+        dataframe['right border width'] = [format.quantity(self.border_width_right.to(u.mm))]
+        dataframe['left border width'] = [format.quantity(self.border_width_left.to(u.mm))]
+        dataframe['top border width'] = [format.quantity(self.border_width_top.to(u.mm))]
+        dataframe['bottom border width'] = [format.quantity(self.border_width_bottom.to(u.mm))]
+        dataframe['dynamic clearance'] = [format.quantity(self.dynamic_clearance.to(u.mm))]
+        return dataframe
 
     def apply_poletto_prescription(
             self,
@@ -118,11 +109,11 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
             M = magnification
             alpha = grating.nominal_input_angle
             beta = grating.diffraction_angle(wavelength, alpha)
-            r_A = np.sqrt(np.square(grating.channel_radius) + np.square(grating.piston - f))
+            r_A = np.sqrt(np.square(grating.cylindrical_radius) + np.square(grating.piston - f))
             r_B = M * r_A
             R = grating.tangential_radius
             x_g = grating.piston
-            r_g = grating.channel_radius
+            r_g = grating.cylindrical_radius
 
             sin_alpha, cos_alpha, tan_alpha = np.sin(alpha), np.cos(alpha), np.tan(alpha)
             sin_beta, cos_beta, tan_beta = np.sin(beta), np.cos(beta), np.tan(beta)
