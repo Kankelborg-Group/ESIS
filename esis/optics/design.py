@@ -29,9 +29,9 @@ def final(
     primary = components.Primary()
     primary.radius = 2000 * u.mm
     primary.num_sides = num_sides
-    primary.clear_radius = 77.9 * u.mm
+    primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
     primary.substrate_thickness = 30 * u.mm
-    primary.border_width = 83.7 * u.mm - primary.clear_radius
+    primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
 
     front_aperture = components.FrontAperture()
     front_aperture.piston = primary.focal_length + 500 * u.mm
@@ -44,7 +44,7 @@ def final(
     tuffet_radius = tuffet_y1 - tuffet_slope * tuffet_x1
     central_obscuration = components.CentralObscuration()
     central_obscuration.piston = 1404.270 * u.mm
-    central_obscuration.obscured_radius = tuffet_radius
+    central_obscuration.obscured_half_width = tuffet_radius * np.cos(deg_per_channel / 2)
     central_obscuration.num_sides = num_sides
 
     field_stop = components.FieldStop()
@@ -58,27 +58,24 @@ def final(
     grating.cylindrical_radius = 2.074999998438000e1 * u.mm
     grating.cylindrical_azimuth = channel_angle.copy()
     grating.sagittal_radius = 597.830 * u.mm
+    grating.tangential_radius = grating.sagittal_radius
     grating.nominal_input_angle = 1.301 * u.deg
     grating.nominal_output_angle = 8.057 * u.deg
     grating.ruling_density = 2.586608603456000 / u.um
     grating.inclination = -4.469567242792327 * u.deg
-    grating.aper_half_angle = deg_per_channel / 2
+    grating.aper_wedge_angle = deg_per_channel
     grating.diffraction_order = 1 * u.dimensionless_unscaled
-    grating.inner_border_width = 4.86 * u.mm
-    grating.outer_border_width = 2 * u.mm
-    grating.side_border_width = 2 * u.mm
-    grating.dynamic_clearance = 1.25 * u.mm
-    grating.substrate_thickness = 10 * u.mm
-
-    grating.tangential_radius = grating.sagittal_radius
-    grating.aper_cylindrical_radius = -grating.cylindrical_radius
     d0 = 1 / grating.ruling_density
     d_c1 = -3.3849e-5 * (u.um / u.mm)
     d_c2 = -1.3625e-7 * (u.um / u.mm ** 2)
     grating.ruling_density_coeff_linear = -d_c1 / np.square(d0)
     grating.ruling_density_coeff_quadratic = (np.square(d_c1) - d0 * d_c2) / np.power(d0, 3)
-    grating.inner_clear_radius = grating.cylindrical_radius - (13.02 * u.mm - grating.inner_border_width)
-    grating.outer_clear_radius = grating.cylindrical_radius + (10.49 * u.mm - grating.outer_border_width)
+    grating.border_width = 2 * u.mm
+    grating.inner_border_width = 4.86 * u.mm
+    grating.inner_half_width = 13.02 * u.mm - grating.inner_border_width
+    grating.outer_half_width = 10.49 * u.mm - grating.border_width
+    grating.dynamic_clearance = 1.25 * u.mm
+    grating.substrate_thickness = 10 * u.mm
 
     filter = components.Filter()
     filter.piston = grating.piston - 1.301661998854058 * u.m
@@ -138,8 +135,10 @@ def final_from_poletto(
     """
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
-    obs_thickness = esis.components.central_obscuration.piston - esis.components.grating.piston
-    obs_margin = esis.components.central_obscuration.obscured_radius - esis.components.grating.outer_clear_radius
+    obscuration = esis.components.central_obscuration
+    grating = esis.components.grating
+    obs_thickness = obscuration.piston - grating.piston
+    obs_margin = obscuration.obscured_half_width - (grating.cylindrical_radius + grating.outer_half_width)
     primary_clear_radius = esis.components.primary.surface.aperture.min_radius
     detector = esis.components.detector
     detector_radius = detector.cylindrical_radius - detector.surface.aperture.half_width_x

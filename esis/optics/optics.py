@@ -95,6 +95,7 @@ class Optics(mixin.Named):
         c.detector.cylindrical_radius = primary_clear_radius + detector_half_width
         if detector_is_opposite_grating:
             c.detector.cylindrical_radius = -c.detector.cylindrical_radius
+            c.grating.diffraction_order = -c.grating.diffraction_order
 
         c.grating = c.grating.apply_gregorian_layout(
             magnification=magnification,
@@ -123,10 +124,10 @@ class Optics(mixin.Named):
             grating=c.grating,
         )
 
-        detector_half_height = c.detector.surface.aperture.half_width_y
-        undersize_factor = (detector_half_height - image_margin) / detector_half_height
-        fov_min_radius = other.pixel_subtent * undersize_factor * c.detector.num_pixels[vector.iy] / 2
-        pixel_klooge = 4
+        detector_quarter_width = c.detector.surface.aperture.half_width_x / 2
+        undersize_factor = (detector_quarter_width - image_margin) / detector_quarter_width
+        fov_min_radius = other.pixel_subtent * undersize_factor * c.detector.num_pixels[vector.ix] / 4
+        pixel_klooge = 8
         fs_half_radius = fov_min_radius + pixel_klooge * other.pixel_subtent
         c.field_stop.clear_radius = c.primary.focal_length * np.tan(fs_half_radius) / np.cos(wedge_half_angle)
         c.field_stop.piston = c.primary.focal_length
@@ -136,18 +137,21 @@ class Optics(mixin.Named):
         c.source.half_width_y = fov_min_radius.to(u.arcmin)
 
         output_angle = c.grating.inclination + c.grating.nominal_output_angle
+        c.filter.piston = c.detector.piston + 200 * u.mm
         piston_fg = (c.filter.piston - c.grating.piston)
         c.filter.cylindrical_radius = c.grating.cylindrical_radius - piston_fg * np.tan(output_angle)
         c.filter.inclination = -output_angle
 
         c.central_obscuration.piston = c.grating.piston + obscuration_thickness
-        c.central_obscuration.obscured_radius = c.grating.outer_clear_radius + obscuration_margin
+        grating_outer_radius = c.grating.cylindrical_radius + c.grating.outer_half_width
+        c.central_obscuration.obscured_half_width = grating_outer_radius + obscuration_margin
         c.central_obscuration.num_sides = num_sides
 
         c.front_aperture.piston = c.central_obscuration.piston + 100 * u.mm
         # c.front_aperture.clear_radius = c.detector.channel_radius + c.detector.main_surface.aperture.width_x_pos
 
-        other.wavelengths = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
+        # other.wavelengths = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
+        other.wavelengths = u.Quantity([wavelength_1, wavelength_2])
 
         other.update()
 

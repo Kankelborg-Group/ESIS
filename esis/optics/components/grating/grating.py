@@ -31,13 +31,11 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     ruling_density_coeff_linear: u.Quantity = 0 / (u.mm ** 2)
     ruling_density_coeff_quadratic: u.Quantity = 0 / (u.mm ** 3)
     ruling_density_coeff_cubic: u.Quantity = 0 / (u.mm ** 4)
-    aper_half_angle: u.Quantity = 0 * u.deg
-    aper_cylindrical_radius: u.Quantity = 0 * u.mm
-    inner_clear_radius: u.Quantity = 0 * u.mm
-    outer_clear_radius: u.Quantity = 0 * u.mm
+    aper_wedge_angle: u.Quantity = 0 * u.deg
+    inner_half_width: u.Quantity = 0 * u.mm
+    outer_half_width: u.Quantity = 0 * u.mm
+    border_width: u.Quantity = 0 * u.mm
     inner_border_width: u.Quantity = 0 * u.mm
-    outer_border_width: u.Quantity = 0 * u.mm
-    side_border_width: u.Quantity = 0 * u.mm
     dynamic_clearance: u.Quantity = 0 * u.mm
     substrate_thickness: u.Quantity = 0 * u.mm
 
@@ -57,46 +55,14 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
             format.quantity(self.ruling_density_coeff_quadratic.to(1 / u.mm ** 3), scientific_notation=True)]
         dataframe['cubic ruling coefficient'] = [
             format.quantity(self.ruling_density_coeff_cubic.to(1 / u.mm ** 4), scientific_notation=True)]
-        dataframe['aperture wedge half-angle'] = [format.quantity(self.aper_half_angle.to(u.deg))]
-        dataframe['aperture cylindrical radius'] = [format.quantity(self.aper_cylindrical_radius.to(u.mm))]
-        dataframe['inner clear radius'] = [format.quantity(self.inner_clear_radius.to(u.mm))]
-        dataframe['outer clear radius'] = [format.quantity(self.outer_clear_radius.to(u.mm))]
+        dataframe['aperture wedge angle'] = [format.quantity(self.aper_wedge_angle.to(u.deg))]
+        dataframe['inner half-width'] = [format.quantity(self.inner_half_width.to(u.mm))]
+        dataframe['outer half-width'] = [format.quantity(self.outer_half_width.to(u.mm))]
+        dataframe['border width'] = [format.quantity(self.border_width.to(u.mm))]
         dataframe['inner border width'] = [format.quantity(self.inner_border_width.to(u.mm))]
-        dataframe['outer border width'] = [format.quantity(self.outer_border_width.to(u.mm))]
-        dataframe['side border width'] = [format.quantity(self.side_border_width.to(u.mm))]
         dataframe['dynamic clearance'] = [format.quantity(self.dynamic_clearance.to(u.mm))]
         dataframe['substrate thickness'] = [format.quantity(self.substrate_thickness.to(u.mm))]
         return dataframe
-        # c1 = format.quantity(self.ruling_density_coeff_linear.to(1 / u.um ** 2), scientific_notation=True)
-        # c2 = format.quantity(self.ruling_density_coeff_quadratic.to(1 / u.um ** 3), scientific_notation=True)
-        # return pandas.DataFrame.from_dict(
-        #     data={
-        #         'tangential radius': format.quantity(self.tangential_radius.to(u.mm)),
-        #         'sagittal radius': format.quantity(self.sagittal_radius.to(u.mm)),
-        #         'nominal alpha': format.quantity(self.nominal_input_angle.to(u.deg)),
-        #         'nominal beta': format.quantity(self.nominal_output_angle.to(u.deg)),
-        #         'diffraction order': format.quantity(self.diffraction_order, digits_after_decimal=0),
-        #         'nominal groove density': format.quantity(self.ruling_density.to(1 / u.um)),
-        #         'groove density linear coefficient': c1,
-        #         'groove density quadratic coefficient': c2,
-        #         'groove density cubic coefficient': format.quantity(self.ruling_density_coeff_cubic.to(1 / u.um ** 4)),
-        #         'piston': format.quantity(self.piston.to(u.mm)),
-        #         'channel radius': format.quantity(self.channel_radius.to(u.mm)),
-        #         'channel angle': format.quantity(self.channel_angle.to(u.deg)),
-        #         'inclination': format.quantity(self.inclination.to(u.deg)),
-        #         'aperture wedge half-angle': format.quantity(self.aper_half_angle.to(u.deg)),
-        #         'aperture x decenter': format.quantity(self.aper_cylindrical_radius.to(u.mm)),
-        #         'inner clear radius': format.quantity(self.inner_clear_radius.to(u.mm)),
-        #         'outer clear radius': format.quantity(self.outer_clear_radius.to(u.mm)),
-        #         'inner border width': format.quantity(self.inner_border_width.to(u.mm)),
-        #         'outer border width': format.quantity(self.outer_border_width.to(u.mm)),
-        #         'side border width': format.quantity(self.side_border_width.to(u.mm)),
-        #         'dynamic clearance': format.quantity(self.dynamic_clearance.to(u.mm)),
-        #         'substrate thickness': format.quantity(self.substrate_thickness.to(u.mm)),
-        #     },
-        #     orient='index',
-        #     columns=[str(self.name)]
-        # )
 
     @property
     def is_toroidal(self) -> bool:
@@ -110,8 +76,12 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         return a or b or c
 
     @property
+    def aper_wedge_half_angle(self) -> u.Quantity:
+        return self.aper_wedge_angle / 2
+
+    @property
     def dynamic_clearance_x(self):
-        return self.dynamic_clearance / np.sin(self.aper_half_angle)
+        return self.dynamic_clearance / np.sin(self.aper_wedge_half_angle)
 
     def diffraction_angle(self, wavelength: u.Quantity, input_angle: u.Quantity = 0 * u.deg):
         return self.surface.rulings.diffraction_angle(wavelength=wavelength, input_angle=input_angle)
@@ -138,23 +108,24 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
             ruling_density_cubic=self.ruling_density_coeff_cubic,
         )
         surface.material = optics.material.Mirror(thickness=-self.substrate_thickness)
-        side_border_x = self.side_border_width / np.sin(self.aper_half_angle) + self.dynamic_clearance_x
+        side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
         surface.aperture = optics.aperture.IsoscelesTrapezoid(
-            decenter=transform.rigid.Translate.from_components(x=self.aper_cylindrical_radius + side_border_x),
-            inner_radius=self.inner_clear_radius - side_border_x,
-            outer_radius=self.outer_clear_radius - side_border_x,
-            wedge_half_angle=self.aper_half_angle,
+            apex_offset=-(self.cylindrical_radius - side_border_x),
+            half_width_left=self.inner_half_width,
+            half_width_right=self.outer_half_width,
+            wedge_half_angle=self.aper_wedge_half_angle,
         )
         surface.aperture_mechanical = optics.aperture.IsoscelesTrapezoid(
-            decenter=transform.rigid.Translate.from_components(x=self.aper_cylindrical_radius + self.dynamic_clearance_x),
-            inner_radius=self.inner_clear_radius - self.inner_border_width - self.dynamic_clearance_x,
-            outer_radius=self.outer_clear_radius + self.outer_border_width - self.dynamic_clearance_x,
-            wedge_half_angle=self.aper_half_angle,
+            apex_offset=-(self.cylindrical_radius - self.dynamic_clearance_x),
+            half_width_left=self.inner_half_width + self.inner_border_width,
+            half_width_right=self.outer_half_width + self.border_width,
+            wedge_half_angle=self.aper_wedge_half_angle,
         )
         return surface
 
     def copy(self) -> 'Grating':
         other = super().copy()      # type: Grating
+        other.inclination = self.inclination.copy()
         other.tangential_radius = self.tangential_radius.copy()
         other.sagittal_radius = self.sagittal_radius.copy()
         other.nominal_input_angle = self.nominal_input_angle.copy()
@@ -164,14 +135,11 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.ruling_density_coeff_linear = self.ruling_density_coeff_linear.copy()
         other.ruling_density_coeff_quadratic = self.ruling_density_coeff_quadratic.copy()
         other.ruling_density_coeff_cubic = self.ruling_density_coeff_cubic.copy()
-        other.inclination = self.inclination.copy()
-        other.aper_half_angle = self.aper_half_angle.copy()
-        other.aper_cylindrical_radius = self.aper_cylindrical_radius.copy()
-        other.inner_clear_radius = self.inner_clear_radius.copy()
-        other.outer_clear_radius = self.outer_clear_radius.copy()
+        other.aper_wedge_angle = self.aper_wedge_angle.copy()
+        other.inner_half_width = self.inner_half_width.copy()
+        other.outer_half_width = self.outer_half_width.copy()
+        other.border_width = self.border_width.copy()
         other.inner_border_width = self.inner_border_width.copy()
-        other.outer_border_width = self.outer_border_width.copy()
-        other.side_border_width = self.side_border_width.copy()
         other.dynamic_clearance = self.dynamic_clearance.copy()
         other.substrate_thickness = self.substrate_thickness.copy()
         return other
@@ -199,7 +167,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         """
         M = magnification
         f = primary_focal_length.to(u.mm).value
-        D_p = 2 * primary_clear_radius.to(u.mm).value * np.cos(self.aper_half_angle)
+        D_p = 2 * primary_clear_radius.to(u.mm).value * np.cos(self.aper_wedge_half_angle)
         r_d = detector_cylindrical_radius.to(u.mm).value
         x_d = -back_focal_length.to(u.mm).value
         m_g = obscuration_margin.to(u.mm).value
@@ -222,9 +190,11 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other = self.copy()
         other.piston = x_g
         other.cylindrical_radius = r_g
-        other.aper_cylindrical_radius = -r_g
-        other.inner_clear_radius = (D_g / 2 - h_g) / np.cos(self.aper_half_angle)
-        other.outer_clear_radius = (D_g / 2) / np.cos(self.aper_half_angle)
+        other.inner_half_width = h_g / 2
+        other.outer_half_width = h_g / 2
+        # other.aper_cylindrical_radius = -r_g
+        # other.inner_clear_radius = (D_g / 2 - h_g) / np.cos(self.aper_half_angle)
+        # other.outer_clear_radius = (D_g / 2) / np.cos(self.aper_half_angle)
 
         return other
 
@@ -241,8 +211,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
 
         other = self.copy()
 
-        m = 1 * u.dimensionless_unscaled
-        other.diffraction_order = m
+        m = other.diffraction_order
 
         lambda_1 = wavelength_1
         lambda_2 = wavelength_2
