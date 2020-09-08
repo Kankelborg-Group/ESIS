@@ -92,7 +92,7 @@ def final(
     detector.pixel_width = 15 * u.um
     detector.num_pixels = (2048, 1024)
 
-    field_limit = (0.09561 * u.deg).to(u.arcmin)
+    field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = components.Source()
     source.piston = front_aperture.piston + 100 * u.mm
     source.half_width_x = field_limit

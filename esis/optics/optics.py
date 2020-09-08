@@ -150,8 +150,8 @@ class Optics(mixin.Named):
         c.front_aperture.piston = c.central_obscuration.piston + 100 * u.mm
         # c.front_aperture.clear_radius = c.detector.channel_radius + c.detector.main_surface.aperture.width_x_pos
 
-        # other.wavelengths = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
-        other.wavelengths = u.Quantity([wavelength_1, wavelength_2])
+        other.wavelengths = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
+        # other.wavelengths = u.Quantity([wavelength_1, wavelength_2])
 
         other.update()
 
