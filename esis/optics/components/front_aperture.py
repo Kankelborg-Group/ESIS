@@ -17,9 +17,9 @@ class FrontAperture(optics.component.PistonComponent[SurfT]):
     @property
     def surface(self) -> SurfT:
         surface = super().surface
-        surface.aperture = optics.aperture.Circular(
-                radius=self.clear_radius
-        )
+        # surface.aperture = optics.aperture.Circular(
+        #         radius=self.clear_radius
+        # )
         return surface
 
     def copy(self) -> 'FrontAperture':

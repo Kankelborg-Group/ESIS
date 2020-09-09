@@ -11,6 +11,7 @@ __all__ = ['final', 'final_from_poletto']
 def final(
         pupil_samples: int = 10,
         field_samples: int = 10,
+        all_channels: bool = True,
 ) -> Optics:
     """
     Final ESIS optical design prepared by Charles Kankelborg and Hans Courrier.
@@ -21,10 +22,12 @@ def final(
     num_sides = 8
     num_channels = 4
     deg_per_channel = 360 * u.deg / num_sides
-    channel_offset_angle = deg_per_channel / 2
+    channel_offset_angle = deg_per_channel
     channel_angle = np.linspace(0 * u.deg, num_channels * deg_per_channel, num_channels, endpoint=False)
-    # channel_angle += channel_offset_angle
-    channel_angle = 180 * u.deg
+    channel_angle += channel_offset_angle
+    channel_angle = channel_angle[::-1]
+    if not all_channels:
+        channel_angle = channel_angle[0]
 
     primary = components.Primary()
     primary.radius = 2000 * u.mm
@@ -94,7 +97,7 @@ def final(
 
     field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = components.Source()
-    source.piston = front_aperture.piston + 100 * u.mm
+    source.piston = front_aperture.piston + 400 * u.mm
     source.half_width_x = field_limit
     source.half_width_y = field_limit
 
@@ -110,7 +113,7 @@ def final(
             filter=filter,
             detector=detector,
         ),
-        wavelengths=[629.7, 609.8, 584.3, ] * u.AA,
+        wavelengths=[584.3, 609.8, 629.7, ] * u.AA,
         pupil_samples=pupil_samples,
         field_samples=field_samples,
     )
