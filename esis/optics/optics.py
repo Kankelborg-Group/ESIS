@@ -2,23 +2,20 @@ import typing as typ
 import dataclasses
 import numpy as np
 import astropy.units as u
-from kgpy import Name, optics, vector
+from kgpy import Name, mixin, vector, optics
 from . import components as comps
 
 __all__ = ['Optics']
 
-default_name = Name('ESIS')
-
 
 @dataclasses.dataclass
-class Optics:
+class Optics(mixin.Named):
     """
     Add test docstring to see if this is the problem.
     """
-    name: Name = dataclasses.field(default_factory=lambda: default_name)
+    name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
     components: comps.Components = dataclasses.field(default_factory=lambda: comps.Components())
     wavelengths: u.Quantity = 0 * u.nm
-    field_half_width: u.Quantity = 0 * u.deg
     pupil_samples: int = 10
     field_samples: int = 10
 
@@ -36,15 +33,20 @@ class Optics:
 
     def _calc_system(self) -> optics.System:
         return optics.System(
-            object_surface=optics.surface.ObjectSurface(thickness=np.inf * u.mm),
-            surfaces=self.components,
-            stop_surface=self.components.grating.surface,
+            object_surface=self.components.source.surface,
+            surfaces=optics.SurfaceList(self.components),
             wavelengths=self.wavelengths,
             pupil_samples=self.pupil_samples,
-            field_min=-self.field_half_width,
-            field_max=self.field_half_width,
             field_samples=self.field_samples,
         )
+
+    @property
+    def rays_output(self) -> optics.Rays:
+        rays = self.system.rays_output.copy()
+        rays.position = rays.position / self.components.detector.pixel_width.to(u.mm) * u.pix
+        rays.position[vector.x] = rays.position[vector.x] + self.components.detector.num_pixels[vector.ix] * u.pix / 2
+        rays.position[vector.y] = rays.position[vector.y] + self.components.detector.num_pixels[vector.iy] * u.pix / 2
+        return rays
 
     @property
     def back_focal_length(self) -> u.Quantity:
@@ -55,8 +57,8 @@ class Optics:
         grating = self.components.grating
         detector = self.components.detector
         source_pos = vector.from_components(self.components.primary.focal_length)
-        grating_pos = vector.from_components(grating.piston, grating.channel_radius)
-        detector_pos = vector.from_components(detector.piston, detector.channel_radius)
+        grating_pos = vector.from_components(grating.piston, grating.cylindrical_radius)
+        detector_pos = vector.from_components(detector.piston, detector.cylindrical_radius)
         entrance_arm = grating_pos - source_pos
         exit_arm = detector_pos - grating_pos
         return vector.length(exit_arm, keepdims=False) / vector.length(entrance_arm, keepdims=False)
@@ -67,17 +69,15 @@ class Optics:
 
     @property
     def pixel_subtent(self):
-        return 2 * np.arctan2(self.components.detector.pix_half_width_x, self.effective_focal_length) << u.rad
+        return np.arctan2(self.components.detector.pixel_width, self.effective_focal_length) << u.rad
 
-    def copy(self):
-        return type(self)(
-            name=self.name.copy(),
-            components=self.components.copy(),
-            wavelengths=self.wavelengths.copy(),
-            field_half_width=self.field_half_width.copy(),
-            pupil_samples=self.pupil_samples,
-            field_samples=self.field_samples,
-        )
+    def copy(self) -> 'Optics':
+        other = super().copy()  # type: Optics
+        other.components = self.components.copy()
+        other.wavelengths = self.wavelengths.copy()
+        other.pupil_samples = self.pupil_samples
+        other.field_samples = self.field_samples
+        return other
 
     def apply_poletto_layout(
             self,
@@ -99,17 +99,18 @@ class Optics:
         wedge_half_angle = c.primary.surface.aperture.half_edge_subtent
 
         primary_clear_radius = c.primary.surface.aperture.min_radius
-        detector_half_width = -c.detector.main_surface.aperture.width_x_neg + c.detector.dynamic_clearance
-        c.detector.channel_radius = primary_clear_radius + detector_half_width
+        detector_half_width = -c.detector.surface.aperture_mechanical.width_x_neg + c.detector.dynamic_clearance
+        c.detector.cylindrical_radius = primary_clear_radius + detector_half_width
         if detector_is_opposite_grating:
-            c.detector.channel_radius = -c.detector.channel_radius
+            c.detector.cylindrical_radius = -c.detector.cylindrical_radius
+            c.grating.diffraction_order = -c.grating.diffraction_order
 
         c.grating = c.grating.apply_gregorian_layout(
             magnification=magnification,
             primary_focal_length=c.primary.focal_length,
             primary_clear_radius=c.primary.clear_radius,
             back_focal_length=other.back_focal_length,
-            detector_channel_radius=c.detector.channel_radius,
+            detector_cylindrical_radius=c.detector.cylindrical_radius,
             obscuration_margin=obscuration_margin,
         )
         c.grating = c.grating.apply_poletto_prescription(
@@ -117,7 +118,7 @@ class Optics:
             wavelength_2=wavelength_2,
             magnification=magnification,
             primary_focal_length=c.primary.focal_length,
-            detector_channel_radius=c.detector.channel_radius,
+            detector_cylindrical_radius=c.detector.cylindrical_radius,
             is_toroidal=use_toroidal_grating,
             is_vls=use_vls_grating,
         )
@@ -131,29 +132,34 @@ class Optics:
             grating=c.grating,
         )
 
-        detector_half_height = c.detector.surface.aperture.half_width_y
-        undersize_factor = (detector_half_height - image_margin) / detector_half_height
-        fov_min_radius = other.pixel_subtent * undersize_factor * c.detector.npix_y / 2
-        pixel_klooge = 4
+        detector_quarter_width = c.detector.surface.aperture.half_width_x / 2
+        undersize_factor = (detector_quarter_width - image_margin) / detector_quarter_width
+        fov_min_radius = other.pixel_subtent * undersize_factor * c.detector.num_pixels[vector.ix] / 4
+        pixel_klooge = 8
         fs_half_radius = fov_min_radius + pixel_klooge * other.pixel_subtent
         c.field_stop.clear_radius = c.primary.focal_length * np.tan(fs_half_radius) / np.cos(wedge_half_angle)
-
         c.field_stop.piston = c.primary.focal_length
         c.field_stop.num_sides = num_sides
-        other.field_half_width = vector.from_components(fov_min_radius, fov_min_radius, use_z=False).to(u.arcmin)
+
+        c.source.half_width_x = fov_min_radius.to(u.arcmin)
+        c.source.half_width_y = fov_min_radius.to(u.arcmin)
 
         output_angle = c.grating.inclination + c.grating.nominal_output_angle
-        c.filter.channel_radius = c.grating.channel_radius - (c.filter.piston - c.grating.piston) * np.tan(output_angle)
+        c.filter.piston = c.detector.piston + 200 * u.mm
+        piston_fg = (c.filter.piston - c.grating.piston)
+        c.filter.cylindrical_radius = c.grating.cylindrical_radius - piston_fg * np.tan(output_angle)
         c.filter.inclination = -output_angle
 
         c.central_obscuration.piston = c.grating.piston + obscuration_thickness
-        c.central_obscuration.obscured_radius = c.grating.outer_clear_radius + obscuration_margin
+        grating_outer_radius = c.grating.cylindrical_radius + c.grating.outer_half_width
+        c.central_obscuration.obscured_half_width = grating_outer_radius + obscuration_margin
         c.central_obscuration.num_sides = num_sides
 
         c.front_aperture.piston = c.central_obscuration.piston + 100 * u.mm
         # c.front_aperture.clear_radius = c.detector.channel_radius + c.detector.main_surface.aperture.width_x_pos
 
         other.wavelengths = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
+        # other.wavelengths = u.Quantity([wavelength_1, wavelength_2])
 
         other.update()
 

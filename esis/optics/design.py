@@ -11,6 +11,7 @@ __all__ = ['final', 'final_from_poletto']
 def final(
         pupil_samples: int = 10,
         field_samples: int = 10,
+        all_channels: bool = True,
 ) -> Optics:
     """
     Final ESIS optical design prepared by Charles Kankelborg and Hans Courrier.
@@ -21,90 +22,89 @@ def final(
     num_sides = 8
     num_channels = 4
     deg_per_channel = 360 * u.deg / num_sides
-    channel_offset_angle = deg_per_channel / 2
+    channel_offset_angle = deg_per_channel
     channel_angle = np.linspace(0 * u.deg, num_channels * deg_per_channel, num_channels, endpoint=False)
-    # channel_angle += channel_offset_angle
-    channel_angle = 180 * u.deg
+    channel_angle += channel_offset_angle
+    channel_angle = channel_angle[::-1]
+    if not all_channels:
+        channel_angle = channel_angle[0]
 
-    primary = components.Primary(
-        radius=2000 * u.mm,
-        num_sides=num_sides,
-        clear_radius=77.9 * u.mm,
-        substrate_thickness=30 * u.mm,
-    )
-    primary.border_width = 83.7 * u.mm - primary.clear_radius
+    primary = components.Primary()
+    primary.radius = 2000 * u.mm
+    primary.num_sides = num_sides
+    primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
+    primary.substrate_thickness = 30 * u.mm
+    primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
 
-    front_aperture = components.FrontAperture(
-        piston=primary.focal_length + 500 * u.mm,
-        clear_radius=100 * u.mm,
-    )
+    front_aperture = components.FrontAperture()
+    front_aperture.piston = primary.focal_length + 500 * u.mm
+    front_aperture.clear_radius = 100 * u.mm
 
     tuffet_x1, tuffet_y1 = 2.54 * u.mm, 37.1707 * u.mm
     tuffet_x2, tuffet_y2 = 24.4876 * u.mm, 28.0797 * u.mm
     tuffet_dx, tuffet_dy = tuffet_x2 - tuffet_x1, tuffet_y2 - tuffet_y1
     tuffet_slope = tuffet_dy / tuffet_dx
     tuffet_radius = tuffet_y1 - tuffet_slope * tuffet_x1
-    central_obscuration = components.CentralObscuration(
-        piston=1404.270 * u.mm,
-        obscured_radius=tuffet_radius,
-        num_sides=num_sides,
-    )
+    central_obscuration = components.CentralObscuration()
+    central_obscuration.piston = 1404.270 * u.mm
+    central_obscuration.obscured_half_width = tuffet_radius * np.cos(deg_per_channel / 2)
+    central_obscuration.num_sides = num_sides
 
-    field_stop = components.FieldStop(
-        piston=primary.focal_length.copy(),
-        clear_radius=1.82 * u.mm,
-        mech_radius=2.81 * u.mm,
-        num_sides=num_sides,
-    )
+    field_stop = components.FieldStop()
+    field_stop.piston = primary.focal_length.copy()
+    field_stop.clear_radius = 1.82 * u.mm
+    field_stop.mech_radius = 2.81 * u.mm
+    field_stop.num_sides = num_sides
 
-    grating = components.Grating(
-        piston=primary.focal_length + 374.7 * u.mm,
-        cylindrical_radius=2.074999998438000e1 * u.mm,
-        cylindrical_azimuth=channel_angle.copy(),
-        sagittal_radius=597.830 * u.mm,
-        nominal_input_angle=1.301 * u.deg,
-        nominal_output_angle=8.057 * u.deg,
-        groove_density=2.586608603456000 / u.um,
-        inclination=-4.469567242792327 * u.deg,
-        aper_half_angle=deg_per_channel / 2,
-        diffraction_order=1 << u.dimensionless_unscaled,
-        inner_border_width=4.86 * u.mm,
-        outer_border_width=2 * u.mm,
-        side_border_width=2 * u.mm,
-        dynamic_clearance=1.25 * u.mm,
-        substrate_thickness=10 * u.mm,
-    )
+    grating = components.Grating()
+    grating.piston = primary.focal_length + 374.7 * u.mm
+    grating.cylindrical_radius = 2.074999998438000e1 * u.mm
+    grating.cylindrical_azimuth = channel_angle.copy()
+    grating.sagittal_radius = 597.830 * u.mm
     grating.tangential_radius = grating.sagittal_radius
-    grating.aper_decenter_x = -grating.cylindrical_radius
-    d0 = 1 / grating.groove_density
+    grating.nominal_input_angle = 1.301 * u.deg
+    grating.nominal_output_angle = 8.057 * u.deg
+    grating.ruling_density = 2.586608603456000 / u.um
+    grating.inclination = -4.469567242792327 * u.deg
+    grating.aper_wedge_angle = deg_per_channel
+    grating.diffraction_order = 1 * u.dimensionless_unscaled
+    d0 = 1 / grating.ruling_density
     d_c1 = -3.3849e-5 * (u.um / u.mm)
     d_c2 = -1.3625e-7 * (u.um / u.mm ** 2)
-    grating.groove_density_coeff_linear = -d_c1 / np.square(d0)
-    grating.groove_density_coeff_quadratic = (np.square(d_c1) - d0 * d_c2) / np.power(d0, 3)
-    grating.inner_clear_radius = grating.cylindrical_radius - (13.02 * u.mm - grating.inner_border_width)
-    grating.outer_clear_radius = grating.cylindrical_radius + (10.49 * u.mm - grating.outer_border_width)
+    grating.ruling_density_coeff_linear = -d_c1 / np.square(d0)
+    grating.ruling_density_coeff_quadratic = (np.square(d_c1) - d0 * d_c2) / np.power(d0, 3)
+    grating.border_width = 2 * u.mm
+    grating.inner_border_width = 4.86 * u.mm
+    grating.inner_half_width = 13.02 * u.mm - grating.inner_border_width
+    grating.outer_half_width = 10.49 * u.mm - grating.border_width
+    grating.dynamic_clearance = 1.25 * u.mm
+    grating.substrate_thickness = 10 * u.mm
 
-    filter = components.Filter(
-        piston=grating.piston - 1.301661998854058 * u.m,
-        cylindrical_radius=95.9 * u.mm,
-        cylindrical_azimuth=channel_angle.copy(),
-        inclination=-3.45 * u.deg,
-        clear_radius=15.9 * u.mm,
-    )
+    filter = components.Filter()
+    filter.piston = grating.piston - 1.301661998854058 * u.m
+    filter.cylindrical_radius = 95.9 * u.mm
+    filter.cylindrical_azimuth = channel_angle.copy()
+    filter.inclination = -3.45 * u.deg
+    filter.clear_radius = 15.9 * u.mm
 
-    detector = components.Detector(
-        piston=filter.piston - 200 * u.mm,
-        cylindrical_radius=108 * u.mm,
-        cylindrical_azimuth=channel_angle.copy(),
-        inclination=-12.252 * u.deg,
-        pixel_width=15 * u.um,
-        num_pixels=(2048, 1024),
-    )
+    detector = components.Detector()
+    detector.piston = filter.piston - 200 * u.mm
+    detector.cylindrical_radius = 108 * u.mm
+    detector.cylindrical_azimuth = channel_angle.copy()
+    detector.inclination = -12.252 * u.deg
+    detector.pixel_width = 15 * u.um
+    detector.num_pixels = (2048, 1024)
 
-    field_limit = 0.09561 * u.deg
+    field_limit = (0.09561 * u.deg).to(u.arcsec)
+    source = components.Source()
+    source.piston = front_aperture.piston + 400 * u.mm
+    source.half_width_x = field_limit
+    source.half_width_y = field_limit
+
     return Optics(
         name=Name('ESIS'),
         components=components.Components(
+            source=source,
             front_aperture=front_aperture,
             central_obscuration=central_obscuration,
             primary=primary,
@@ -113,8 +113,7 @@ def final(
             filter=filter,
             detector=detector,
         ),
-        wavelengths=[629.7, 609.8, 584.3, ] * u.AA,
-        field_half_width=vector.from_components(field_limit, field_limit).to(u.arcmin),
+        wavelengths=[584.3, 609.8, 629.7, ] * u.AA,
         pupil_samples=pupil_samples,
         field_samples=field_samples,
     )
@@ -139,18 +138,21 @@ def final_from_poletto(
     """
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
-    obs_thickness = esis.components.central_obscuration.piston - esis.components.grating.piston
-    obs_margin = esis.components.central_obscuration.obscured_radius - esis.components.grating.outer_clear_radius
+    obscuration = esis.components.central_obscuration
+    grating = esis.components.grating
+    obs_thickness = obscuration.piston - grating.piston
+    obs_margin = obscuration.obscured_half_width - (grating.cylindrical_radius + grating.outer_half_width)
     primary_clear_radius = esis.components.primary.surface.aperture.min_radius
-    detector_radius = esis.components.detector.channel_radius - esis.components.detector.surface.aperture.half_width_x
-    esis.components.detector.dynamic_clearance = detector_radius - primary_clear_radius
+    detector = esis.components.detector
+    detector_radius = detector.cylindrical_radius - detector.surface.aperture.half_width_x
+    detector.dynamic_clearance = detector_radius - primary_clear_radius
     return esis.apply_poletto_layout(
         wavelength_1=esis.wavelengths[..., 0],
         wavelength_2=esis.wavelengths[..., ~0],
         magnification=4 * u.dimensionless_unscaled,
         obscuration_margin=obs_margin,
         obscuration_thickness=obs_thickness,
-        image_margin=67 * 2 * esis.components.detector.pix_half_width_x,
+        image_margin=67 * detector.pixel_width,
         detector_is_opposite_grating=False,
         use_toroidal_grating=use_toroidal_grating,
         use_vls_grating=use_vls_grating,

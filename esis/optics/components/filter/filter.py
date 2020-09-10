@@ -7,7 +7,7 @@ from kgpy import Name, transform, optics, format
 
 __all__ = ['Filter']
 
-SurfT = optics.surface.Standard[None, optics.aperture.Circular, optics.aperture.Circular]
+SurfT = optics.Surface[None, None, optics.aperture.Circular, optics.aperture.Circular, None]
 
 
 @dataclasses.dataclass
@@ -43,15 +43,8 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
 
     @property
     def dataframe(self) -> pandas.DataFrame:
-        return pandas.DataFrame.from_dict(
-            data={
-                'piston': format.quantity(self.piston.to(u.mm)),
-                'channel radius': format.quantity(self.channel_radius.to(u.mm)),
-                'channel angle': format.quantity(self.channel_angle.to(u.deg)),
-                'inclination': format.quantity(self.inclination.to(u.deg)),
-                'clear radius': format.quantity(self.clear_radius.to(u.mm)),
-                'border width': format.quantity(self.border_width.to(u.mm)),
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
+        dataframe['clear radius'] = [format.quantity(self.clear_radius.to(u.mm))]
+        dataframe['border width'] = [format.quantity(self.border_width.to(u.mm))]
+        return dataframe

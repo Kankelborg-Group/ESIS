@@ -6,7 +6,7 @@ from kgpy import Name, optics, format
 
 __all__ = ['FrontAperture']
 
-SurfT = optics.surface.Standard[None, optics.aperture.Circular, None]
+SurfT = optics.Surface[None, None, optics.aperture.Circular, None, None]
 
 
 @dataclasses.dataclass
@@ -17,9 +17,9 @@ class FrontAperture(optics.component.PistonComponent[SurfT]):
     @property
     def surface(self) -> SurfT:
         surface = super().surface
-        surface.aperture = optics.aperture.Circular(
-                radius=self.clear_radius
-        )
+        # surface.aperture = optics.aperture.Circular(
+        #         radius=self.clear_radius
+        # )
         return surface
 
     def copy(self) -> 'FrontAperture':
@@ -29,11 +29,6 @@ class FrontAperture(optics.component.PistonComponent[SurfT]):
 
     @property
     def dataframe(self) -> pandas.DataFrame:
-        return pandas.DataFrame.from_dict(
-            data={
-                'piston': format.quantity(self.piston),
-                'clear radius': format.quantity(self.clear_radius),
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['clear radius'] = [format.quantity(self.clear_radius.to(u.mm))]
+        return dataframe

@@ -6,18 +6,18 @@ from kgpy import Name, transform, optics, format
 
 __all__ = ['FieldStop']
 
-SurfT = optics.surface.Standard[None, optics.aperture.RegularPolygon, optics.aperture.Circular]
+SurfaceT = optics.Surface[None, None, optics.aperture.RegularPolygon, optics.aperture.Circular, None]
 
 
 @dataclasses.dataclass
-class FieldStop(optics.component.PistonComponent[SurfT]):
+class FieldStop(optics.component.PistonComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('field stop'))
     clear_radius: u.Quantity = 0 * u.mm
     mech_radius: u.Quantity = 0 * u.mm
     num_sides: int = 0
 
     @property
-    def surface(self) -> SurfT:
+    def surface(self) -> SurfaceT:
         surface = super().surface
         surface.aperture = optics.aperture.RegularPolygon(
             radius=self.clear_radius,
@@ -38,13 +38,8 @@ class FieldStop(optics.component.PistonComponent[SurfT]):
 
     @property
     def dataframe(self) -> pandas.DataFrame:
-        return pandas.DataFrame.from_dict(
-            data={
-                'piston': format.quantity(self.piston.to(u.mm)),
-                'clear radius': format.quantity(self.clear_radius.to(u.mm)),
-                'mechanical radius': format.quantity(self.mech_radius.to(u.mm)),
-                'number of sides': self.num_sides,
-            },
-            orient='index',
-            columns=[str(self.name)],
-        )
+        dataframe = super().dataframe
+        dataframe['clear radius'] = [format.quantity(self.clear_radius.to(u.mm))]
+        dataframe['mechanical radius'] = [format.quantity(self.mech_radius.to(u.mm))]
+        dataframe['number of sides'] = [self.num_sides]
+        return dataframe
