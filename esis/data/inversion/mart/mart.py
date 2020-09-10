@@ -9,7 +9,7 @@ from . import antialias, Result, SimpleMART, LGOFMART
 
 
 # Looking for Charles' original MART? it is located at:
-# KSO/kso/science/software/ksopy/kso/ctis/moses-mart/sampling_issue/moses-mart.py
+# KSO/kso/science/software/ksopy/kso/ctis/moses_mart/sampling_issue/moses_mart.py
 
 @dataclasses.dataclass
 class MART:
@@ -78,7 +78,6 @@ class MART:
         probability = unique_counts / signal.size
         # print(probability)
         entropy = np.nansum(probability * np.log2(1 / probability))
-        print(entropy)
         return -entropy
 
     @staticmethod
@@ -138,6 +137,7 @@ class MART:
             projections: 'np.ndarray[float]',
             projections_azimuth: u.Quantity = None,
             spectral_order: 'np.ndarray[int]' = None,
+            wavelen_ref_pix: typ.Optional[int] = None,
             cube_shape: typ.Tuple[int, ...] = None,
             cube_guess: 'typ.Optional[np.ndarray[float]]' = None,
             projections_offset_x: 'np.ndarray[int]' = np.array(0),
@@ -189,6 +189,7 @@ class MART:
             'projections': projections,
             'projections_azimuth': projections_azimuth,
             'spectral_order': spectral_order,
+            'wavelen_ref_pix': wavelen_ref_pix,
             'cube_shape': cube_shape,
             'cube_guess': cube_guess,
             'cube_offset_x': cube_offset_x,
@@ -251,32 +252,34 @@ class MART:
             w_axis=w_axis
         )
 
-        for filtering_iter in range(self.max_filtering_iterations):
+        for filtering_iter in range(max(self.max_filtering_iterations, 1)):
 
             if self.use_filter:
                 r.cube = self.filter(r.cube, kernel=filtering_kernel)
 
-            self.simple_mart(r, projections, projections_azimuth, spectral_order, self.max_multiplicative_iteration,
+            self.simple_mart(r, projections, projections_azimuth, spectral_order, wavelen_ref_pix, self.max_multiplicative_iteration,
                              cube_shape, projections_offset_x, projections_offset_y, cube_offset_x, cube_offset_y,
                              m_axis, a_axis, x_axis, y_axis, w_axis, )
 
             if self.use_lgof:
-                self.lgof_mart(r, projections, projections_azimuth, spectral_order, self.max_multiplicative_iteration,
+                self.lgof_mart(r, projections, projections_azimuth, spectral_order, wavelen_ref_pix, self.max_multiplicative_iteration,
                                cube_shape, projections_offset_x, projections_offset_y, cube_offset_x, cube_offset_y,
                                m_axis, a_axis, x_axis, y_axis, w_axis, )
 
             if self.use_maximize:
                 norm = self.maximize(np.sqrt(r.cube))
+
                 if filtering_iter > 0:
                     if norm > np.max(r.norm_history):
                         r.best_cube = r.cube
                         r.best_filtering_iteration = filtering_iter
+                else:
+                    r.best_cube = r.cube
+
                 r.norm_history.append(norm)
 
 
 
-
-
-
-
+        if not self.use_maximize:
+            r.best_cube = r.cube
         return r

@@ -30,6 +30,7 @@ def model(
         cube: np.ndarray,
         projection_azimuth: u.Quantity,
         spectral_order: int,
+        wavelen_ref_pix: typ.Optional[int] = None,
         projection_shape: typ.Tuple[int, ...] = None,
         cube_spatial_offset: typ.Tuple[int, int] = (0, 0),
         projection_spatial_offset: typ.Tuple[int, int] = (0, 0),
@@ -52,6 +53,8 @@ def model(
     :param rotation_kwargs: kwargs for `scipy.ndimage.rotate` to be used during rotation portion of forward model
     :return: list of arrays to which the forward model has been applied
     """
+    if wavelen_ref_pix is None:
+        wavelen_ref_pix = cube.shape[w_axis] // 2
 
     if rotation_kwargs is None:
         rotation_kwargs = {'reshape': False, 'prefilter': False, 'order': 3, 'mode': 'nearest', }
@@ -116,6 +119,7 @@ def deproject(
         projection: np.ndarray,
         projection_azimuth: u.Quantity,
         spectral_order: int,
+        wavelen_ref_pix: typ.Optional[int] = None,
         cube_shape: typ.Tuple[int, ...] = None,
         cube_spatial_offset: typ.Tuple[int, int] = (0, 0),
         projection_spatial_offset: typ.Tuple[int, int] = (0, 0),
@@ -124,6 +128,10 @@ def deproject(
         w_axis: int = ~0,
         rotation_kwargs: typ.Dict = None
 ) -> np.ndarray:
+
+    if wavelen_ref_pix is None:
+        wavelen_ref_pix = cube_shape[w_axis] // 2
+
     if rotation_kwargs is None:
         rotation_kwargs = {'reshape': False, 'prefilter': False, 'order': 3, 'mode': 'nearest', }
 
@@ -159,7 +167,7 @@ def deproject(
 
     out_sl = [slice(None)] * shifted_projection.ndim
     in_sl = [slice(None)] * shifted_projection.ndim
-    out_sl[x_axis], out_sl[y_axis], out_sl[w_axis] = x - spectral_order * l, y, l
+    out_sl[x_axis], out_sl[y_axis], out_sl[w_axis] = x - spectral_order * (l), y, l
     in_sl[x_axis], in_sl[y_axis], in_sl[w_axis] = x, y, l
 
     backprojected_cube[out_sl] = shifted_projection[in_sl]
