@@ -2,18 +2,19 @@ import typing as typ
 import dataclasses
 import pathlib
 import numpy as np
-import pickle
 from astropy.io import fits
 import tarfile
 
-from esis.data import data
 from esis.data import level_0
 from kgpy.img.masks import mask as img_mask
 from kgpy.mixin import Pickleable
 
+import scipy.stats
+import esis.optics
+from kgpy.img import spikes
+
 
 __all__ = ['Level1', 'calc_level_1']
-
 
 
 @dataclasses.dataclass
@@ -27,24 +28,174 @@ class Level1(Pickleable):
     analog_metadata: np.ndarray = None
 
     @classmethod
-    def from_level_0(cls, obs: level_0.Level0, despike = False) -> 'Level1':
+    def from_level_0(cls, obs: level_0.Level0, detector: esis.optics.components.Detector, despike = False) -> 'Level1':
 
-        start_ind, end_ind = data.signal_indices(obs.data)
+        start_ind, end_ind = Level1.signal_indices(obs.data)
 
-        npix_overscan = 2
-        npix_blank = 50
-        lev1 = calc_level_1(obs.data,npix_overscan, npix_blank, start_ind, end_ind, despike = despike)
-        frames, darks = lev1
+        frames = Level1.remove_bias(obs.data, detector.npix_blank)
+        frames = Level1.remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
+        frames, darks = Level1.organize_array(frames, start_ind, end_ind)
+        frames = Level1.remove_dark(frames,darks)
 
+        if despike == True:
+            print('Despiking data, this will take a while ...')
+            frames, mask, stats = Level1.despike(frames)
+
+        #orient to observer
+        frames = np.flip(frames, axis=-2)
+
+        start_time = Level1.organize_array(obs.times, start_ind, end_ind)[0]
+        exposure_length = Level1.organize_array(obs.requested_exposure_time, start_ind, end_ind)[0]
+        cam_id = Level1.organize_array(obs.cam_id, start_ind, end_ind)[0]
         return cls(
             frames,
             darks,
-            data.organize_array(obs.times, start_ind, end_ind)[0],
-            data.organize_array(obs.requested_exposure_time, start_ind, end_ind)[0],
-            data.organize_array(obs.cam_id, start_ind, end_ind)[0],
+            start_time,
+            exposure_length,
+            cam_id,
         )
 
+    @staticmethod
+    def signal_indices(frames: np.ndarray) -> typ.Tuple[int, int]:
+        m = np.percentile(frames, 99, axis=(-2, -1))
+        g = np.gradient(m, axis=0)
 
+        num_border_frames = 4
+
+        start_ind = np.argmax(g, axis=0) - num_border_frames
+        end_ind = np.argmin(g, axis=0) + num_border_frames
+
+        start_ind = scipy.stats.mode(start_ind)[0][0]
+        end_ind = scipy.stats.mode(end_ind)[0][0]
+
+        return start_ind, end_ind
+    @staticmethod
+    def remove_bias(frames: np.ndarray, n_blank_pix):
+        s = [slice(None)] * frames.ndim
+        s[-1] = slice(n_blank_pix, ~(n_blank_pix - 1))
+        s = tuple(s)
+
+        half_height = frames.shape[2] // 2
+        half_width = frames.shape[3] // 2
+
+        # make a slice for each ESIS quad
+        quad_1 = tuple([slice(None), slice(None), slice(half_height), slice(half_width)])
+        quad_2 = tuple([slice(None), slice(None), slice(half_height, None), slice(half_width)])
+        quad_3 = tuple([slice(None), slice(None), slice(half_height), slice(half_width, None)])
+        quad_4 = tuple([slice(None), slice(None), slice(half_height, None), slice(half_width, None)])
+
+        # find a bias for each quadrant
+        b_1 = np.median(frames[quad_1][:, :, :, 0:s[-1].start], axis=(-2, -1), keepdims=True)
+        b_2 = np.median(frames[quad_2][:, :, :, 0:s[-1].start], axis=(-2, -1), keepdims=True)
+        b_3 = np.median(frames[quad_3][:, :, :, s[-1].stop:], axis=(-2, -1), keepdims=True)
+        b_4 = np.median(frames[quad_4][:, :, :, s[-1].stop:], axis=(-2, -1), keepdims=True)
+
+        # subtract bias from each quadrant
+        frames[quad_1] -= b_1
+        frames[quad_2] -= b_2
+        frames[quad_3] -= b_3
+        frames[quad_4] -= b_4
+
+        return frames
+
+    @staticmethod
+    def remove_inactive_pixels(frames: np.ndarray, n_overscan_pix, n_blank_pix, axis: int = ~0):
+        frames = Level1.remove_overscan_pixels(frames, n_overscan_pix, ccd_long_axis=axis)
+
+        frames = Level1.remove_blank_pixels(frames, n_blank_pix, axis=axis)
+
+        return frames
+
+    @staticmethod
+    def remove_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
+        s = Level1.identify_blank_pixels(frames, n_blank_pixels, axis)
+
+        return frames[s]
+
+    @staticmethod
+    def identify_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
+        s = [slice(None)] * frames.ndim
+        s[-1] = slice(n_blank_pixels, ~(n_blank_pixels - 1))
+        s = tuple(s)
+
+        return s
+
+    @staticmethod
+    def identify_overscan_pixels(
+            frames: np.ndarray,
+            n_overscan_pix: int,
+            ccd_long_axis: int = ~0
+    ) -> typ.Tuple[typ.Tuple[typ.Union[slice, int], ...], ...]:
+        """
+
+        :param frames:
+        :param n_overscan_pix:
+        :param ccd_long_axis:
+        :return:
+        """
+        s0 = [slice(None)] * frames.ndim
+        s1 = [slice(None)] * frames.ndim
+
+        half_len = frames.shape[ccd_long_axis] // 2
+        new_half_len = half_len - n_overscan_pix
+
+        s0[ccd_long_axis] = slice(None, new_half_len)
+        s1[ccd_long_axis] = slice(~(new_half_len - 1), None)
+
+        s0 = tuple(s0)
+        s1 = tuple(s1)
+
+        return s0, s1
+
+    @staticmethod
+    def remove_overscan_pixels(frames: np.ndarray, n_overscan_pix: int, ccd_long_axis: int = ~0):
+        """
+        Trim the overscan pixels from an array of ESIS images.
+        The overscan pixels are in the center of the images, running perpendicular to the long axis of the CCD.
+        They are the last pixels to be read out on each row of each quadrant.
+        :param frames: A sequence of ESIS images
+        :param n_overscan_pix: The number of overscan pixels to remove from each quadrant.
+        :param ccd_long_axis: Axis index of the CCD's long axis.
+        :return: A copy of the `frames` array with the overscan pixels removed.
+        """
+
+        s0, s1 = Level1.identify_overscan_pixels(frames, n_overscan_pix, ccd_long_axis)
+
+        return np.concatenate([frames[s0], frames[s1]], axis=ccd_long_axis)
+
+    @staticmethod
+    def organize_array(frames: np.ndarray, start_ind: int, end_ind: int) -> typ.Tuple[np.ndarray, np.ndarray]:
+        dark1 = frames[:start_ind, ...]
+        signal = frames[start_ind:end_ind, ...]
+        dark2 = frames[end_ind:, ...]
+        dark2 = dark2[:dark1.shape[0]]
+
+        darks = np.concatenate([dark1, dark2], axis=0)
+
+        return signal, darks
+
+
+    @staticmethod
+    def remove_dark(signal: np.ndarray, darks: np.ndarray,
+                    axis: typ.Optional[typ.Union[int, typ.Tuple[int]]] = 0) -> np.ndarray:
+        """
+        Using a sequence of signal frames and a sequence of dark frames, update the signal frames with the average dark
+        frame removed.
+        :param signal: An array of signal frames
+        :param darks: An array of dark frames
+        :param axis: Axis index or indices to average over
+        :return: The `signal` array with the average dark frame removed
+        """
+
+        dark = np.percentile(darks, 50, axis=axis, keepdims=True)
+
+        signal = signal - dark
+
+        return signal
+
+    def despike(frames: np.ndarray) -> typ.Tuple[np.ndarray, np.ndarray, typ.List[spikes.Stats]]:
+
+        return spikes.identify_and_fix(frames, axis=(0, 2, 3), percentile_threshold=(0, 99.9), poly_deg=1, )
 
 
     def create_mask(self, sequence):
@@ -109,10 +260,14 @@ class Level1(Pickleable):
         return
 
 
+
+
+
+
+
 def calc_level_1(
         frames: np.ndarray,
-        n_overscan_pix: int,
-        n_blank_pix: int,
+        detector: esis.optics.components.Detector,
         start_ind: int,
         end_ind: int,
         despike = False,
@@ -129,13 +284,16 @@ def calc_level_1(
      - Despike the data to remove high-energy particle hits.
      - Reorient the frames so that they are displayed the same way an observer would see the sun.
     :param frames: The input ESIS frames.
-    :param n_overscan_pix: Number of overscan
-    :param n_blank_pix:
+    :param
     :param start_ind:
     :param end_ind:
     :return:
     """
-    frames, darks = data.basic_prep(frames, n_overscan_pix, n_blank_pix, start_ind, end_ind)
+
+    frames = Level1.remove_bias(frames, detector.npix_overscan, detector.npix_blank)
+    frames = remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
+    frames, darks = organize_array(frames, start_ind, end_ind)
+    frames = remove_dark(frames, darks)
 
     if despike == True:
         print('Despiking data, this will take a while ...')

@@ -8,6 +8,7 @@ import astropy.units as u
 import matplotlib.pyplot as plt
 import matplotlib.animation
 from kgpy.io import fits
+import esis.optics
 
 from kgpy.img import spikes
 
@@ -330,11 +331,13 @@ def animate(frames: np.ndarray, figsize=(24, 12), subplot_kw = None, **kwargs) -
     return matplotlib.animation.FuncAnimation(fig, anim_func, frames=frames.shape[0], interval=200)
 
 
-def basic_prep(frames: np.ndarray, n_overscan_pix: int, n_blank_pix: int, start_ind: int, end_ind: int):
-    frames = remove_bias(frames, n_overscan_pix, n_blank_pix)
-    frames = remove_inactive_pixels(frames, n_overscan_pix, n_blank_pix)
+def basic_prep(frames: np.ndarray, detector: esis.optics.components.Detector, start_ind: int, end_ind: int):
+
+    frames = remove_bias(frames, detector.npix_overscan, detector.npix_blank)
+    frames = remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
     frames, darks = organize_array(frames, start_ind, end_ind)
     frames = remove_dark(frames, darks)
+
     return frames, darks
 
 

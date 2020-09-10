@@ -28,6 +28,19 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     border_width_top: u.Quantity = 0 * u.mm
     border_width_bottom: u.Quantity = 0 * u.mm
     dynamic_clearance: u.Quantity = 0 * u.mm
+    npix_overscan: int = 0
+    npix_blank: int = 0
+    gain_tap1: u.Quantity = 0 * u.electron
+    gain_tap2: u.Quantity = 0 * u.electron
+    gain_tap3: u.Quantity = 0 * u.electron
+    gain_tap4: u.Quantity = 0 * u.electron
+    readout_noise_tap1 = 0
+    readout_noise_tap2 = 0
+    readout_noise_tap3 = 0
+    readout_noise_tap4 = 0
+
+
+
 
     @property
     def pixel_half_width(self) -> u.Quantity:
@@ -133,3 +146,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
 
         else:
             raise ValueError('Only SVLS supported')
+
+        def dn_to_photon(wavelength: u.Quantity):
+
+            photon_en

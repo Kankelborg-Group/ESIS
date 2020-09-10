@@ -1,5 +1,4 @@
 import numpy as np
-import astropy.units as u
 from astropy import units as u
 
 from kgpy import Name, vector
@@ -94,6 +93,17 @@ def final(
     detector.inclination = -12.252 * u.deg
     detector.pixel_width = 15 * u.um
     detector.num_pixels = (2048, 1024)
+    detector.npix_overscan = 2
+    detector.npix_blank = 50
+    detector.gain_tap1 = 1 * u.electron
+    detector.gain_tap2 = 1 * u.electron
+    detector.gain_tap3 = 1 * u.electron
+    detector.gain_tap4 = 1 * u.electron
+    detector.readout_noise_tap1 = 4 # DN, hope there is a unit for this soon
+    detector.readout_noise_tap2 = 4
+    detector.readout_noise_tap3 = 4
+    detector.readout_noise_tap4 = 4
+
 
     field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = components.Source()

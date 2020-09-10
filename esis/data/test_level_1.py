@@ -1,6 +1,6 @@
 import numpy as np
 import pathlib
-
+import esis.optics.design
 from esis.data import data, level_1, level_0
 
 def test_to_pickle():
@@ -9,7 +9,9 @@ def test_to_pickle():
     """
 
     lev0 = level_0.Level0.from_path(data.raw_path)
-    lev1 = level_1.Level1.from_level_0(lev0)
+    optics = esis.optics.design.final()
+    detector = optics.components.detector
+    lev1 = level_1.Level1.from_level_0(lev0,detector)
 
     path = pathlib.Path('test.pickle')
     lev1.to_pickle(path)
