@@ -2,6 +2,7 @@ import typing as typ
 import numpy as np
 import astropy.units as u
 import dataclasses
+import matplotlib.pyplot as plt
 
 from . import Result, antialias, forward
 
@@ -19,17 +20,23 @@ class SimpleMART:
 
     """ `SimpleMART` is the basic unit of mart, and encompasses a single "filtering iteration".
     
-    :param track_cube_history: if True, a copy of the cube after each iteration will be stored. Very memory intensive,
-    and not currently working.
+    :param track_cube_history: if 'multiplicative', a copy of the cube after each multiplicative iteration will be stored. Very memory intensive.
+                               if 'filter', a copy is saved each time MART converges (or exceeds max multiplicative iterations) 
     """
 
     # if rotation_kwargs is None:
     #     rotation_kwargs = {'reshape': False, 'prefilter': False, 'order': 3, 'mode': 'nearest', }
 
     @staticmethod
+    def chisq(goodness_of_fit: np.ndarray) -> float:
+        return np.nanmean(goodness_of_fit[goodness_of_fit != 0])
+
+
+
+    @staticmethod
     def channel_is_not_converged(goodness_of_fit: np.ndarray) -> bool:
-        chisq = np.nanmean(goodness_of_fit)
-        return chisq > .5
+        chisq = SimpleMART.chisq(goodness_of_fit)
+        return chisq > 1
 
     @staticmethod
     def correction_exponent(goodness_of_fit: np.ndarray) -> np.ndarray:
@@ -41,6 +48,7 @@ class SimpleMART:
             projections: 'np.ndarray[float]',
             projections_azimuth: u.Quantity,
             spectral_order: 'np.ndarray[int]',
+            wavelen_ref_pix: typ.Optional[int] = None,
             max_multiplicative_iteration: int = 40,
             cube_shape: typ.Tuple[int, ...] = None,
             projections_offset_x: 'np.ndarray[int]' = np.array(0),
@@ -75,8 +83,12 @@ class SimpleMART:
         :param w_axis: in the data-cube, the index of the axis long which wavelength varies
         :return: `Result` object containing the results.
         """
+
         n_channels = projections.shape[m_axis] * projections.shape[a_axis]
         r = results
+
+        if wavelen_ref_pix is None:
+            wavelen_ref_pix = r.cube.shape[w_axis] // 2
 
         projections_azimuth, spectral_order = np.broadcast_arrays(projections_azimuth, spectral_order, subok=True)
 
@@ -90,10 +102,12 @@ class SimpleMART:
                     sl[m_axis] = slice(m, m + 1)
                     sl[a_axis] = slice(a, a + 1)
                     projection = projections[tuple(sl)]  # type: np.ndarray[float]
+
                     test_projection = forward.model(
                         cube=r.cube,
                         projection_azimuth=projections_azimuth[a],
                         spectral_order=spectral_order[m],
+                        wavelen_ref_pix= wavelen_ref_pix,
                         projection_shape=projection.shape,
                         projection_spatial_offset=(projections_offset_x[m, a], projections_offset_y[m, a]),
                         cube_spatial_offset=(cube_offset_x[m, a], cube_offset_y[m, a]),
@@ -103,12 +117,17 @@ class SimpleMART:
                         rotation_kwargs=self.rotation_kwargs
                     )
                     test_projection[test_projection <= 0] = 0
-                    # plt.imshow(test_projection[0, 0, :, :, 0] < 0)
+
                     if self.anti_aliasing == 'post':
                         test_projection = antialias.apply(test_projection, x_axis_index=x_axis, y_axis_index=y_axis)
 
                     goodness_of_fit = np.square(test_projection - projection) / (1 + test_projection)
-                    chisq = np.nanmean(goodness_of_fit)
+                    chisq = SimpleMART.chisq(goodness_of_fit)
+                    # fig, ax = plt.subplots()
+                    # im = ax.imshow(goodness_of_fit[0,0,:,:,0])
+                    # fig.colorbar(im)
+
+                    print(chisq)
                     # print('Starting Chi Squared= ',chisq)
                     # Notes on "reduced chisquare"
                     #    (0) assumes data units are 'counts', with shot noise.
@@ -118,7 +137,7 @@ class SimpleMART:
                     r.mart_type_history.append(self.type_int)
 
                     if self.channel_is_not_converged(goodness_of_fit):
-                        # print('correcting')
+                        print('correcting')
                         # this if-statement runs if if the mean of `goodness_of_fit` is greater than 1
                         n_converged -= 1
                         exponent = self.correction_exponent(goodness_of_fit)
@@ -132,6 +151,7 @@ class SimpleMART:
                             projection=correction,
                             projection_azimuth=projections_azimuth[a],
                             spectral_order=spectral_order[m],
+                            wavelen_ref_pix=wavelen_ref_pix,
                             cube_shape=cube_shape,
                             projection_spatial_offset=(projections_offset_x[m, a], projections_offset_y[m, a]),
                             cube_spatial_offset=(cube_offset_x[m, a], cube_offset_y[m, a]),
@@ -143,13 +163,14 @@ class SimpleMART:
                         deprojection[deprojection <= 0] = 0
 
                         r.cube *= deprojection
-                        if self.track_cube_history:
+                        if self.track_cube_history == 'multiplicative':
                             r.cube_history.append(r.cube.copy())
 
                         # test_projection = forward.model(
                         #     cube=r.cube,
                         #     projection_azimuth=projections_azimuth[a],
                         #     spectral_order=spectral_order[m],
+                        #     wavelen_ref_pix=wavelen_ref_pix,
                         #     projection_shape=projection.shape,
                         #     projection_spatial_offset=(projections_offset_x[m, a], projections_offset_y[m, a]),
                         #     cube_spatial_offset=(cube_offset_x[m, a], cube_offset_y[m, a]),
@@ -166,8 +187,12 @@ class SimpleMART:
 
 
             if n_converged == n_channels:
+                if self.track_cube_history == 'filter':
+                    r.cube_history.append(r.cube.copy())
                 break
 
         if n_converged != n_channels:
+            if self.track_cube_history == 'filter':
+                r.cube_history.append(r.cube.copy())
             # warnings.warn('MART failed to converge, maximum number of iterations exceeded!')
             print('MART failed to converge, maximum number of iterations exceeded!')

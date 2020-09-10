@@ -4,7 +4,7 @@ import numpy as np
 
 
 
-def generate_level3(line = 'ov',overwrite = True):
+def generate_level3(line = 'ov',overwrite = False):
     if level_1.Level1.default_pickle_path().exists() is False:
         print('Generating Despiked Level1 Object')
         lev1 = generate_level1()
@@ -26,10 +26,16 @@ def generate_level3(line = 'ov',overwrite = True):
             lev3_masked = lev3_updated.add_mask(line = 'mgx')
             lev3_masked.to_pickle(level_3.ov_Level3_masked)
 
-            scales = np.array([0.43610222, 0.33961842, 0.38185936, 0.49515337]) #hard coded for speed, could be found easily.
+            scales = np.array([0.43610222, 0.33961842, 0.38185936, 0.49515337]) # hard coded for speed, can be found
             vignetting_correction = lev3_masked.correct_vignetting(scale_factor=scales)
             lev3_masked.observation.data[...] /= vignetting_correction
-            lev3_masked.observation.data[...] /= lev3_masked.masked_mean_normalization()
+
+            #Equalize intensity to favorite channel
+            means = lev3_masked.masked_mean_normalization()
+            my_favorite_channel = 1
+            for i in lev3_masked.lev1_cameras:
+                lev3_masked.observation.data[:,i,:,:] *= means[:,my_favorite_channel,:,:]/means[:,i,:,:]
+
 
             lev3_masked.to_pickle(level_3.ov_final_path)
 

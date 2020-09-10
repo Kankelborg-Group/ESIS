@@ -33,7 +33,7 @@ def multinv(D1, D2, m1, m2, Nlambda, j0, compact=True):
     for i in range(Nlambda):
         inverse[:,i] *= np.roll( D1, m1*(j0-i) )
         inverse[:,i] *= np.roll( D2, m2*(j0-i) )
-    #print('diagnostics: moses-mart.py normalization')
+    #print('diagnostics: moses_mart.py normalization')
     #print(inverse.sum())
     N = np.sqrt( D1.sum() * D2.sum() ) # total counts, geometric mean of two data integrals.
     if compact:

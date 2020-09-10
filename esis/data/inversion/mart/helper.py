@@ -98,7 +98,7 @@ def image_setup(
     data = data.transpose()
     data = data[:1000, :6000, :40]
     sh = data.shape
-    print(sh)
+
 
     # Especially confused about these next three lines:
     data = data.reshape(
@@ -109,10 +109,7 @@ def image_setup(
     region = data[x_range[0]:x_range[1], y_range[0]:y_range[1]]
 
     # Add a border
-    region[:border, :, :] = cval
-    region[~border:, :, :] = cval
-    region[:, :border, :] = cval
-    region[:, ~border:, :] = cval
+    region = np.pad(region,[(border,border),(border,border),(0,0)])
 
     return region, wcs
 
