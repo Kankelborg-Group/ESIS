@@ -5,6 +5,8 @@ import pandas
 import astropy.units as u
 from kgpy import Name, vector, transform, optics, format
 from .. import Grating
+from astropy import constants as const
+
 
 __all__ = ['Detector']
 
@@ -147,6 +149,75 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         else:
             raise ValueError('Only SVLS supported')
 
-        def dn_to_photon(wavelength: u.Quantity):
+    def dn_to_photon(self,data: np.ndarray, wavelength: u.Quantity) -> np.ndarray:
+        """
+        For a given wavelength return a detector size array with units of photon / DN
+        """
+        photon_energy = const.c * const.h / wavelength
+        Si_e_hole_pair = 3.6 * u.eV
 
-            photon_en
+    @staticmethod
+    def remove_inactive_pixels(frames: np.ndarray, n_overscan_pix, n_blank_pix, axis: int = ~0):
+        frames = Level_1.remove_overscan_pixels(frames, n_overscan_pix, ccd_long_axis=axis)
+
+        frames = Level_1.remove_blank_pixels(frames, n_blank_pix, axis=axis)
+
+        return frames
+
+    @staticmethod
+    def remove_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
+        s = Level_1.identify_blank_pixels(frames, n_blank_pixels, axis)
+
+        return frames[s]
+
+    @staticmethod
+    def identify_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
+        s = [slice(None)] * frames.ndim
+        s[-1] = slice(n_blank_pixels, ~(n_blank_pixels - 1))
+        s = tuple(s)
+
+        return s
+
+    @staticmethod
+    def identify_overscan_pixels(
+            self,
+            frames: np.ndarray,
+            ccd_long_axis: int = ~0
+    ) -> typ.Tuple[typ.Tuple[typ.Union[slice, int], ...], ...]:
+        """
+
+        :param frames:
+        :param n_overscan_pix:
+        :param ccd_long_axis:
+        :return:
+        """
+        s0 = [slice(None)] * frames.ndim
+        s1 = [slice(None)] * frames.ndim
+
+        half_len = frames.shape[ccd_long_axis] // 2
+        new_half_len = half_len - self.n_overscan_pix
+
+        s0[ccd_long_axis] = slice(None, new_half_len)
+        s1[ccd_long_axis] = slice(~(new_half_len - 1), None)
+
+        s0 = tuple(s0)
+        s1 = tuple(s1)
+
+        return s0, s1
+
+
+    def remove_overscan_pixels(self,frames: np.ndarray int, ccd_long_axis: int = ~0):
+        """
+        Trim the overscan pixels from an array of ESIS images.
+        The overscan pixels are in the center of the images, running perpendicular to the long axis of the CCD.
+        They are the last pixels to be read out on each row of each quadrant.
+        :param frames: A sequence of ESIS images
+        :param n_overscan_pix: The number of overscan pixels to remove from each quadrant.
+        :param ccd_long_axis: Axis index of the CCD's long axis.
+        :return: A copy of the `frames` array with the overscan pixels removed.
+        """
+
+        s0, s1 = self.identify_overscan_pixels(self, frames, ccd_long_axis)
+
+        return np.concatenate([frames[s0], frames[s1]], axis=ccd_long_axis)
+

@@ -156,7 +156,7 @@ def test_prep_to_view():
     # frame_list = data.find_frames(data.raw_path, data.num_channels)
     # frames = data.load_frames(frame_list)
     path = pathlib.Path(__file__).parent / 'esis_Level1.pickle'
-    esis = level_1.Level1.from_pickle(path)
+    esis = level_1.Level_1.from_pickle(path)
 
     theta = 12.252
 

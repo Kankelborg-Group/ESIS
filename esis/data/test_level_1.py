@@ -11,7 +11,7 @@ def test_to_pickle():
     lev0 = level_0.Level0.from_path(data.raw_path)
     optics = esis.optics.design.final()
     detector = optics.components.detector
-    lev1 = level_1.Level1.from_level_0(lev0,detector)
+    lev1 = level_1.Level_1.from_level_0(lev0, detector)
 
     path = pathlib.Path('test.pickle')
     lev1.to_pickle(path)
@@ -21,7 +21,7 @@ def test_to_pickle():
 
 
 def test_from_pickle():
-    esis_fp = level_1.Level1.from_pickle()
+    esis_fp = level_1.Level_1.from_pickle()
 
     assert esis_fp.intensity.sum() > 0
 

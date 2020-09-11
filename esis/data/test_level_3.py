@@ -81,7 +81,7 @@ def test_vignetting_correction(capsys):
 
 def test_transform_image():
 
-    lev1 = level_1.Level1.from_pickle()
+    lev1 = level_1.Level_1.from_pickle()
     lev3 = level_3.Level3.from_pickle(level_3.ov_Level3_masked)
     transform_path = lev3.transformation_objects
 

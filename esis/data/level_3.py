@@ -60,7 +60,7 @@ class Level3(Pickleable):
 
     @classmethod
     def from_aia_level1(cls, aia_path: pathlib.Path = default_aia_path,
-                        level1_path: pathlib.Path = level_1.Level1.default_pickle_path(), hei = False) -> 'Level3':
+                        level1_path: pathlib.Path = level_1.Level_1.default_pickle_path(), hei = False) -> 'Level3':
 
         """
         Create a Level3 Obj through a linear co-alignment of ESIS Level1 to AIA 304.
@@ -70,7 +70,7 @@ class Level3(Pickleable):
         trick.
         """
 
-        esis = level_1.Level1.from_pickle(level1_path)
+        esis = level_1.Level_1.from_pickle(level1_path)
 
         aia_channel = [304*u.angstrom]
         start_time = esis.start_time[0,0]
@@ -216,7 +216,7 @@ class Level3(Pickleable):
                    lev1_sequences=sequence,lev1_cameras=camera)
 
     def update_internal_alignment(self,ref_channel = 1, heI = False) -> 'Level3':
-        lev1 = level_1.Level1.from_pickle(level_1.Level1.default_pickle_path())
+        lev1 = level_1.Level_1.from_pickle(level_1.Level_1.default_pickle_path())
         print(self.transformation_objects)
         lev1_transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
 
@@ -273,7 +273,7 @@ class Level3(Pickleable):
         '''
         Transform masks created for Level1 data into Level3 coordinates and add to Level3 NDCube
         '''
-        lev1 = level_1.Level1.from_pickle()
+        lev1 = level_1.Level_1.from_pickle()
         if line == 'mgx':
             mask_coords = [np.genfromtxt(path,delimiter=',') for path in mgx_masks]
         if line == 'hei':
@@ -380,12 +380,12 @@ class Level3(Pickleable):
         with tarfile.open(path.parent / output_file, "w:gz") as tar:
             tar.add(path, arcname=path.name)
 
-    def to_test_object(self, aia_path: pathlib.Path = default_aia_path, level1_path: pathlib.Path = level_1.Level1.default_pickle_path()) -> 'Level3':
+    def to_test_object(self, aia_path: pathlib.Path = default_aia_path, level1_path: pathlib.Path = level_1.Level_1.default_pickle_path()) -> 'Level3':
         '''
         Replace all images in a Level 3 object with co-temporal AIA 304 images for testing.
         '''
 
-        esis = level_1.Level1.from_pickle(level1_path)
+        esis = level_1.Level_1.from_pickle(level1_path)
         aia_304 = aia.AIA.from_path('aia_304', aia_path)
         transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
         for l3_seq, l1_seq in enumerate(self.lev1_sequences):

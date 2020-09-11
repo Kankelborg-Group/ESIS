@@ -14,11 +14,11 @@ import esis.optics
 from kgpy.img import spikes
 
 
-__all__ = ['Level1', 'calc_level_1']
+__all__ = ['Level_1', 'calc_level_1']
 
 
 @dataclasses.dataclass
-class Level1(Pickleable):
+class Level_1(Pickleable):
     intensity: np.ndarray
     darks: np.ndarray
     start_time: np.ndarray
@@ -28,25 +28,25 @@ class Level1(Pickleable):
     analog_metadata: np.ndarray = None
 
     @classmethod
-    def from_level_0(cls, obs: level_0.Level0, detector: esis.optics.components.Detector, despike = False) -> 'Level1':
+    def from_level_0(cls, obs: level_0.Level_0, detector: esis.optics.components.Detector, despike = False) -> 'Level_1':
 
-        start_ind, end_ind = Level1.signal_indices(obs.data)
+        start_ind, end_ind = Level_1.signal_indices(obs.data)
 
-        frames = Level1.remove_bias(obs.data, detector.npix_blank)
-        frames = Level1.remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
-        frames, darks = Level1.organize_array(frames, start_ind, end_ind)
-        frames = Level1.remove_dark(frames,darks)
+        frames = Level_1.remove_bias(obs.data, detector.npix_blank)
+        frames = Level_1.remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
+        frames, darks = Level_1.organize_array(frames, start_ind, end_ind)
+        frames = Level_1.remove_dark(frames, darks)
 
         if despike == True:
             print('Despiking data, this will take a while ...')
-            frames, mask, stats = Level1.despike(frames)
+            frames, mask, stats = Level_1.despike(frames)
 
         #orient to observer
         frames = np.flip(frames, axis=-2)
 
-        start_time = Level1.organize_array(obs.times, start_ind, end_ind)[0]
-        exposure_length = Level1.organize_array(obs.requested_exposure_time, start_ind, end_ind)[0]
-        cam_id = Level1.organize_array(obs.cam_id, start_ind, end_ind)[0]
+        start_time = Level_1.organize_array(obs.times, start_ind, end_ind)[0]
+        exposure_length = Level_1.organize_array(obs.requested_exposure_time, start_ind, end_ind)[0]
+        cam_id = Level_1.organize_array(obs.cam_id, start_ind, end_ind)[0]
         return cls(
             frames,
             darks,
@@ -69,6 +69,7 @@ class Level1(Pickleable):
         end_ind = scipy.stats.mode(end_ind)[0][0]
 
         return start_ind, end_ind
+
     @staticmethod
     def remove_bias(frames: np.ndarray, n_blank_pix):
         s = [slice(None)] * frames.ndim
@@ -99,71 +100,6 @@ class Level1(Pickleable):
         return frames
 
     @staticmethod
-    def remove_inactive_pixels(frames: np.ndarray, n_overscan_pix, n_blank_pix, axis: int = ~0):
-        frames = Level1.remove_overscan_pixels(frames, n_overscan_pix, ccd_long_axis=axis)
-
-        frames = Level1.remove_blank_pixels(frames, n_blank_pix, axis=axis)
-
-        return frames
-
-    @staticmethod
-    def remove_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
-        s = Level1.identify_blank_pixels(frames, n_blank_pixels, axis)
-
-        return frames[s]
-
-    @staticmethod
-    def identify_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
-        s = [slice(None)] * frames.ndim
-        s[-1] = slice(n_blank_pixels, ~(n_blank_pixels - 1))
-        s = tuple(s)
-
-        return s
-
-    @staticmethod
-    def identify_overscan_pixels(
-            frames: np.ndarray,
-            n_overscan_pix: int,
-            ccd_long_axis: int = ~0
-    ) -> typ.Tuple[typ.Tuple[typ.Union[slice, int], ...], ...]:
-        """
-
-        :param frames:
-        :param n_overscan_pix:
-        :param ccd_long_axis:
-        :return:
-        """
-        s0 = [slice(None)] * frames.ndim
-        s1 = [slice(None)] * frames.ndim
-
-        half_len = frames.shape[ccd_long_axis] // 2
-        new_half_len = half_len - n_overscan_pix
-
-        s0[ccd_long_axis] = slice(None, new_half_len)
-        s1[ccd_long_axis] = slice(~(new_half_len - 1), None)
-
-        s0 = tuple(s0)
-        s1 = tuple(s1)
-
-        return s0, s1
-
-    @staticmethod
-    def remove_overscan_pixels(frames: np.ndarray, n_overscan_pix: int, ccd_long_axis: int = ~0):
-        """
-        Trim the overscan pixels from an array of ESIS images.
-        The overscan pixels are in the center of the images, running perpendicular to the long axis of the CCD.
-        They are the last pixels to be read out on each row of each quadrant.
-        :param frames: A sequence of ESIS images
-        :param n_overscan_pix: The number of overscan pixels to remove from each quadrant.
-        :param ccd_long_axis: Axis index of the CCD's long axis.
-        :return: A copy of the `frames` array with the overscan pixels removed.
-        """
-
-        s0, s1 = Level1.identify_overscan_pixels(frames, n_overscan_pix, ccd_long_axis)
-
-        return np.concatenate([frames[s0], frames[s1]], axis=ccd_long_axis)
-
-    @staticmethod
     def organize_array(frames: np.ndarray, start_ind: int, end_ind: int) -> typ.Tuple[np.ndarray, np.ndarray]:
         dark1 = frames[:start_ind, ...]
         signal = frames[start_ind:end_ind, ...]
@@ -192,6 +128,10 @@ class Level1(Pickleable):
         signal = signal - dark
 
         return signal
+
+    def dn_to_photon(self):
+
+        return
 
     def despike(frames: np.ndarray) -> typ.Tuple[np.ndarray, np.ndarray, typ.List[spikes.Stats]]:
 
@@ -228,7 +168,7 @@ class Level1(Pickleable):
         return pathlib.Path(__file__).parents[1] / 'flight/esis_Level1.pickle'
 
     @classmethod
-    def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level1':
+    def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level_1':
         lev1 = super().from_pickle(path)
         return lev1
 
@@ -290,7 +230,7 @@ def calc_level_1(
     :return:
     """
 
-    frames = Level1.remove_bias(frames, detector.npix_overscan, detector.npix_blank)
+    frames = Level_1.remove_bias(frames, detector.npix_overscan, detector.npix_blank)
     frames = remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
     frames, darks = organize_array(frames, start_ind, end_ind)
     frames = remove_dark(frames, darks)
