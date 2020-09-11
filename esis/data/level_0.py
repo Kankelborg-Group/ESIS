@@ -205,7 +205,7 @@ class Level_0:
         return ax
 
     def plot_total_intensity(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return  self.plot_quantity_vs_time(a=self.data.sum((~1, ~0)), a_name='Total DN', ax=ax)
+        return self.plot_quantity_vs_time(a=self.data.sum((~1, ~0)), a_name='Total DN', ax=ax)
 
     def plot_exposure_time(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
         return self.plot_quantity_vs_time(a=self.requested_exposure_time, a_name='Requested exposure time', ax=ax)
