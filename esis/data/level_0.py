@@ -11,11 +11,22 @@ import astropy.time
 import astropy.io.fits
 import astropy.visualization
 import scipy.stats
+from kgpy import AutoAxis
 import esis
+
+
+class Axis(AutoAxis):
+    def __init__(self):
+        super().__init__()
+        self.x = self.auto_axis_index()
+        self.y = self.auto_axis_index()
+        self.chan = self.auto_axis_index()
+        self.time = self.auto_axis_index()
 
 
 @dataclasses.dataclass
 class Level_0:
+    axis: typ.ClassVar[Axis] = Axis()
     data: u.Quantity
     time: astropy.time.Time
     cam_id: u.Quantity
@@ -35,13 +46,15 @@ class Level_0:
     adc_temp_3: u.Quantity
     adc_temp_4: u.Quantity
     detector: esis.optics.components.Detector
+    num_dark_safety_frames: int = 4
 
     @classmethod
     def from_directory(cls, directory: pathlib.Path, detector: esis.optics.components.Detector):
         fits_list = np.array(list(directory.glob('*.fit*')))
         fits_list.sort()
 
-        channels = np.array([int(f.name[4]) for f in fits_list])
+        chan_str_ind = 4
+        channels = np.array([int(f.name[chan_str_ind]) for f in fits_list])
         channels = np.unique(channels)
         num_channels = len(channels)
 
@@ -76,8 +89,6 @@ class Level_0:
                 self.adc_temp_2[i, c] = float(header['ADCTEMP2']) * u.ct
                 self.adc_temp_3[i, c] = float(header['ADCTEMP3']) * u.ct
                 self.adc_temp_4[i, c] = float(header['ADCTEMP4']) * u.ct
-
-
         return self
 
     @classmethod
@@ -106,18 +117,17 @@ class Level_0:
         )
 
     @property
+    def axes_spatial(self) -> typ.Tuple[int, int]:
+        return self.axis.x, self.axis.y
+
+    @property
     def signal_indices(self) -> typ.Tuple[int, int]:
-
-        threshold = 99
-        num_border_frames = 4
-
-        m = np.percentile(self.data, threshold, axis=(-2, -1))
-        g = np.gradient(m, axis=0)
-        start_ind = np.argmax(g, axis=0) - num_border_frames
-        end_ind = np.argmin(g, axis=0) + num_border_frames
+        m = np.percentile(self.data, 99, axis=(-2, -1))
+        g = np.gradient(m, axis=self.axis.time)
+        start_ind = np.argmax(g, axis=self.axis.time) - self.num_dark_safety_frames
+        end_ind = np.argmin(g, axis=0) + self.num_dark_safety_frames
         start_ind = scipy.stats.mode(start_ind)[0][0]
         end_ind = scipy.stats.mode(end_ind)[0][0]
-
         return start_ind, end_ind
 
     @property
@@ -138,55 +148,51 @@ class Level_0:
         """
         frames = self.data.copy()
 
-        s = [slice(None)] * frames.ndim
-        s[-1] = slice(self.detector.npix_blank, ~(self.detector.npix_blank - 1))
-        s = tuple(s)
+        s1 = [slice(None)] * frames.ndim
+        s2 = [slice(None)] * frames.ndim
 
-        quadrants = self.detector.quadrants
-        # find a bias for each quadrant
-        b_1 = np.median(frames[(...,) + quadrants[0]][..., 0:s[-1].start], axis=(-2, -1), keepdims=True)
-        b_2 = np.median(frames[(...,) + quadrants[1]][..., 0:s[-1].start], axis=(-2, -1), keepdims=True)
-        b_3 = np.median(frames[(...,) + quadrants[2]][..., s[-1].stop:], axis=(-2, -1), keepdims=True)
-        b_4 = np.median(frames[(...,) + quadrants[3]][..., s[-1].stop:], axis=(-2, -1), keepdims=True)
+        s1[self.axis.x] = slice(0, self.detector.npix_blank)
+        s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), None)
+
+        qsl = [(..., ) + q for q in self.detector.quadrants]
 
         # subtract bias from each quadrant
-        frames[(...,) + quadrants[0]] -= b_1
-        frames[(...,) + quadrants[1]] -= b_2
-        frames[(...,) + quadrants[2]] -= b_3
-        frames[(...,) + quadrants[3]] -= b_4
+        frames[qsl[0]] -= np.median(frames[qsl[0]][s1], axis=self.axes_spatial, keepdims=True)
+        frames[qsl[1]] -= np.median(frames[qsl[1]][s1], axis=self.axes_spatial, keepdims=True)
+        frames[qsl[2]] -= np.median(frames[qsl[2]][s2], axis=self.axes_spatial, keepdims=True)
+        frames[qsl[3]] -= np.median(frames[qsl[3]][s2], axis=self.axes_spatial, keepdims=True)
 
         return frames
 
     @property
-    def data_light_dark(self) -> typ.Tuple[u.Quantity, u.Quantity]:
-
-        start_ind, end_ind = self.signal_indices
+    def data_nobias_nodark(self) -> u.Quantity:
         frames = self.data_nobias_active
-
-        return Level_0.organize_array(frames, start_ind, end_ind)
-
-    @staticmethod
-    def organize_array(frames: np.ndarray, start_ind: int, end_ind: int) -> typ.Tuple[np.ndarray, np.ndarray]:
-        dark1 = frames[:start_ind, ...]
-        signal = frames[start_ind:end_ind, ...]
-        dark2 = frames[end_ind:, ...]
-        dark2 = dark2[:dark1.shape[0]]
-
-        darks = np.concatenate([dark1, dark2], axis=0)
-
-        return signal, darks
+        start_ind, end_ind = self.signal_indices
+        signal = frames[start_ind:end_ind]
+        dark1, dark2 = frames[:start_ind], frames[end_ind:]
+        dark2 = dark2[:dark1.shape[self.axis.time]]
+        darks = np.concatenate([dark1, dark2], axis=self.axis.time)
+        return signal - np.median(darks, axis=self.axis.time, keepdims=True)
 
     @property
     def data_final(self) -> u.Quantity:
-        data, darks = self.data_light_dark
-        data = data - np.median(darks, axis=0, keepdims=True)
-        return np.flip(data, axis=-2)
+        return np.flip(self.data_nobias_nodark, axis=self.axis.y)
 
+    @property
+    def time_nodark(self) -> astropy.time.Time:
+        return self.time[slice(*self.signal_indices)]
 
+    @property
+    def requested_exposure_time_nodark(self) -> u.Quantity:
+        return self.requested_exposure_time[slice(*self.signal_indices)]
+
+    @property
+    def cam_id_nodark(self) -> u.Quantity:
+        return self.cam_id[slice(*self.signal_indices)]
 
     @property
     def num_channels(self) -> int:
-        return self.data.shape[1]
+        return self.data.shape[self.axis.chan]
 
     @property
     def channel_labels(self) -> typ.List[str]:
@@ -244,6 +250,7 @@ class Level_0:
             vmax=vmax,
             origin='lower',
         )
+
         def title_text(i: int) -> str:
             return time[i].to_value('iso') + ', channel ' + str(int(chan[i].value)) + ', frame ' + str(int(ind[i]))
 
@@ -259,7 +266,7 @@ class Level_0:
         return matplotlib.animation.FuncAnimation(
             fig=fig,
             func=func,
-            frames=data.shape[0],
+            frames=data.shape[self.axis.time],
             interval=frame_interval.to(u.ms).value,
         )
 

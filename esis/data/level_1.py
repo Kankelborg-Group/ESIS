@@ -1,25 +1,23 @@
 import typing as typ
 import dataclasses
+import warnings
 import pathlib
 import numpy as np
 from astropy.io import fits
 import tarfile
 import astropy.units as u
 import astropy.time
-
-from . import Level_0
+from kgpy import mixin, img
 from kgpy.img.masks import mask as img_mask
-from kgpy.mixin import Pickleable
-
 import esis.optics
-from kgpy.img import spikes
+from . import Level_0
 
 
 __all__ = ['Level_1']
 
 
 @dataclasses.dataclass
-class Level_1(Pickleable):
+class Level_1(mixin.Pickleable):
     intensity: u.Quantity
     start_time: astropy.time.Time
     exposure_length: u.Quantity
@@ -30,35 +28,25 @@ class Level_1(Pickleable):
 
     @classmethod
     def from_level_0(cls, lev0: Level_0, despike: bool = False) -> 'Level_1':
+        intensity = lev0.data_final
+        if despike:
+            warnings.warn('Despiking data, this will take a while ...')
+            intensity, mask, stats = img.spikes.identify_and_fix(
+                intensity, axis=(0, 2, 3),
+                percentile_threshold=(0, 99.9),
+                poly_deg=1,
+            )
 
-        start_ind, end_ind = lev0.signal_indices
-        frames = lev0.data_final
-
-        if despike == True:
-            print('Despiking data, this will take a while ...')
-            frames, mask, stats = Level_1.despike(frames)
-
-
-        start_time = Level_0.organize_array(lev0.time, start_ind, end_ind)[0]
-        exposure_length = Level_0.organize_array(lev0.requested_exposure_time, start_ind, end_ind)[0]
-        cam_id = Level_0.organize_array(lev0.cam_id, start_ind, end_ind)[0]
         return cls(
-            frames,
-            start_time,
-            exposure_length,
-            cam_id,
-            lev0.detector
+            intensity=intensity,
+            start_time=lev0.time_nodark,
+            exposure_length=lev0.requested_exposure_time_nodark,
+            cam_id=lev0.cam_id_nodark,
+            detector=lev0.detector
         )
 
     def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
-        data = self.detector.dn_to_photon(self.intensity,wavelength)
-
-        return data
-
-    def despike(frames: np.ndarray) -> typ.Tuple[np.ndarray, np.ndarray, typ.List[spikes.Stats]]:
-
-        return spikes.identify_and_fix(frames, axis=(0, 2, 3), percentile_threshold=(0, 99.9), poly_deg=1, )
-
+        return self.detector.dn_to_photon(self.intensity,wavelength)
 
     def create_mask(self, sequence):
         import matplotlib.pyplot as plt

@@ -192,7 +192,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
 
         return frames[s]
 
-    def identify_blank_pixels(self,frames: np.ndarray, axis: int = ~0):
+    def identify_blank_pixels(self, frames: np.ndarray, axis: int = ~0):
         s = [slice(None)] * frames.ndim
         s[-1] = slice(self.npix_blank, ~(self.npix_blank - 1))
         s = tuple(s)
@@ -224,7 +224,6 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         s1 = tuple(s1)
 
         return s0, s1
-
 
     def remove_overscan_pixels(self,frames: np.ndarray, ccd_long_axis: int = ~0):
         """
