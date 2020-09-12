@@ -168,18 +168,18 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         """
         For a given wavelength return a detector size array with units of photon / DN
         """
-        data = data.copy()
+        photon_data = data.value * u.photon
+
         channel_gains = self.gain
         quadrants = self.quadrants
-        photon_energy = const.c * const.h / wavelength
+        photon_energy = const.c * const.h / wavelength / u.photon
         Si_e_hole_pair = 3.6 * u.eV / u.electron
 
         print(channel_gains)
         for channel,channel_gain in enumerate(channel_gains):
             for i, quad in enumerate(quadrants):
-                data[(...,channel)+quad] *= channel_gain[i] * Si_e_hole_pair / photon_energy
-
-        return data
+                photon_data[(...,channel)+quad] = data[(...,channel)+quad] * channel_gain[i] * Si_e_hole_pair / photon_energy
+        return photon_data
 
     def remove_inactive_pixels(self, frames: np.ndarray, axis: int = ~0):
         frames = self.remove_overscan_pixels(frames, ccd_long_axis=axis)

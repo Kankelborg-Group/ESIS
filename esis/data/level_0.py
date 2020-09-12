@@ -16,7 +16,7 @@ import esis
 
 @dataclasses.dataclass
 class Level_0:
-    data: np.ndarray
+    data: u.Quantity
     time: astropy.time.Time
     cam_id: u.Quantity
     cam_sn: np.ndarray
@@ -58,7 +58,7 @@ class Level_0:
             for c in range(num_channels):
                 hdu = astropy.io.fits.open(fits_list[bad_exposures + i, c])[0]
                 header = hdu.header
-                self.data[i, c] = hdu.data
+                self.data[i, c] = hdu.data * u.ct
                 self.time[i, c] = astropy.time.Time(header['IMG_TS'])
                 self.cam_id[i, c] = int(header['CAM_ID'][~0]) * u.chan
                 self.cam_sn[i, c] = int(header['CAM_SN'])
@@ -84,7 +84,7 @@ class Level_0:
     def zeros(cls, shape: typ.Sequence[int]):
         sh = shape[:2]
         return cls(
-            data=np.zeros(shape),
+            data=np.zeros(shape) * u.ct,
             time=astropy.time.Time(np.zeros(sh), format='unix'),
             cam_id=np.zeros(sh, dtype=np.int) * u.chan,
             cam_sn=np.zeros(sh, dtype=np.int),

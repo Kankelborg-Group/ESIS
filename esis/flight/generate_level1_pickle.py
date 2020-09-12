@@ -11,13 +11,10 @@ def generate_level1():
 
     lev1 = Level_1.from_level_0(lev0, despike = False)
     print(lev1.intensity[0,0,0,0])
-    fig,ax = plt.subplots()
-    ax.imshow(lev1.intensity[15,1,...])
 
-    lev1.intensity[...] = lev1.intensity_photons(630 * u.AA)
+    lev1.intensity = lev1.intensity_photons(630 * u.AA)
     print(lev1.intensity[0, 0, 0, 0])
 
-    plt.show()
 
     return lev1
 
