@@ -4,134 +4,56 @@ import pathlib
 import numpy as np
 from astropy.io import fits
 import tarfile
+import astropy.units as u
+import astropy.time
 
-from esis.data import level_0
+from . import Level_0
 from kgpy.img.masks import mask as img_mask
 from kgpy.mixin import Pickleable
 
-import scipy.stats
 import esis.optics
 from kgpy.img import spikes
 
 
-__all__ = ['Level_1', 'calc_level_1']
+__all__ = ['Level_1']
 
 
 @dataclasses.dataclass
 class Level_1(Pickleable):
-    intensity: np.ndarray
-    darks: np.ndarray
-    start_time: np.ndarray
-    exposure_length: np.ndarray
-    cam_id: np.ndarray
+    intensity: u.Quantity
+    start_time: astropy.time.Time
+    exposure_length: u.Quantity
+    cam_id: u.Quantity
+    detector: esis.optics.components.Detector
     sequence_metadata: np.ndarray = None
     analog_metadata: np.ndarray = None
 
     @classmethod
-    def from_level_0(cls, obs: level_0.Level_0, detector: esis.optics.components.Detector, despike = False) -> 'Level_1':
+    def from_level_0(cls, lev0: Level_0, despike: bool = False) -> 'Level_1':
 
-        start_ind, end_ind = Level_1.signal_indices(obs.data)
-
-        frames = Level_1.remove_bias(obs.data, detector.npix_blank)
-        frames = Level_1.remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
-        frames, darks = Level_1.organize_array(frames, start_ind, end_ind)
-        frames = Level_1.remove_dark(frames, darks)
+        start_ind, end_ind = lev0.signal_indices
+        frames = lev0.data_final
 
         if despike == True:
             print('Despiking data, this will take a while ...')
             frames, mask, stats = Level_1.despike(frames)
 
-        #orient to observer
-        frames = np.flip(frames, axis=-2)
 
-        start_time = Level_1.organize_array(obs.times, start_ind, end_ind)[0]
-        exposure_length = Level_1.organize_array(obs.requested_exposure_time, start_ind, end_ind)[0]
-        cam_id = Level_1.organize_array(obs.cam_id, start_ind, end_ind)[0]
+        start_time = Level_0.organize_array(lev0.time, start_ind, end_ind)[0]
+        exposure_length = Level_0.organize_array(lev0.requested_exposure_time, start_ind, end_ind)[0]
+        cam_id = Level_0.organize_array(lev0.cam_id, start_ind, end_ind)[0]
         return cls(
             frames,
-            darks,
             start_time,
             exposure_length,
             cam_id,
+            lev0.detector
         )
 
-    @staticmethod
-    def signal_indices(frames: np.ndarray) -> typ.Tuple[int, int]:
-        m = np.percentile(frames, 99, axis=(-2, -1))
-        g = np.gradient(m, axis=0)
+    def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
+        data = self.detector.dn_to_photon(self.intensity,wavelength)
 
-        num_border_frames = 4
-
-        start_ind = np.argmax(g, axis=0) - num_border_frames
-        end_ind = np.argmin(g, axis=0) + num_border_frames
-
-        start_ind = scipy.stats.mode(start_ind)[0][0]
-        end_ind = scipy.stats.mode(end_ind)[0][0]
-
-        return start_ind, end_ind
-
-    @staticmethod
-    def remove_bias(frames: np.ndarray, n_blank_pix):
-        s = [slice(None)] * frames.ndim
-        s[-1] = slice(n_blank_pix, ~(n_blank_pix - 1))
-        s = tuple(s)
-
-        half_height = frames.shape[2] // 2
-        half_width = frames.shape[3] // 2
-
-        # make a slice for each ESIS quad
-        quad_1 = tuple([slice(None), slice(None), slice(half_height), slice(half_width)])
-        quad_2 = tuple([slice(None), slice(None), slice(half_height, None), slice(half_width)])
-        quad_3 = tuple([slice(None), slice(None), slice(half_height), slice(half_width, None)])
-        quad_4 = tuple([slice(None), slice(None), slice(half_height, None), slice(half_width, None)])
-
-        # find a bias for each quadrant
-        b_1 = np.median(frames[quad_1][:, :, :, 0:s[-1].start], axis=(-2, -1), keepdims=True)
-        b_2 = np.median(frames[quad_2][:, :, :, 0:s[-1].start], axis=(-2, -1), keepdims=True)
-        b_3 = np.median(frames[quad_3][:, :, :, s[-1].stop:], axis=(-2, -1), keepdims=True)
-        b_4 = np.median(frames[quad_4][:, :, :, s[-1].stop:], axis=(-2, -1), keepdims=True)
-
-        # subtract bias from each quadrant
-        frames[quad_1] -= b_1
-        frames[quad_2] -= b_2
-        frames[quad_3] -= b_3
-        frames[quad_4] -= b_4
-
-        return frames
-
-    @staticmethod
-    def organize_array(frames: np.ndarray, start_ind: int, end_ind: int) -> typ.Tuple[np.ndarray, np.ndarray]:
-        dark1 = frames[:start_ind, ...]
-        signal = frames[start_ind:end_ind, ...]
-        dark2 = frames[end_ind:, ...]
-        dark2 = dark2[:dark1.shape[0]]
-
-        darks = np.concatenate([dark1, dark2], axis=0)
-
-        return signal, darks
-
-
-    @staticmethod
-    def remove_dark(signal: np.ndarray, darks: np.ndarray,
-                    axis: typ.Optional[typ.Union[int, typ.Tuple[int]]] = 0) -> np.ndarray:
-        """
-        Using a sequence of signal frames and a sequence of dark frames, update the signal frames with the average dark
-        frame removed.
-        :param signal: An array of signal frames
-        :param darks: An array of dark frames
-        :param axis: Axis index or indices to average over
-        :return: The `signal` array with the average dark frame removed
-        """
-
-        dark = np.percentile(darks, 50, axis=axis, keepdims=True)
-
-        signal = signal - dark
-
-        return signal
-
-    def dn_to_photon(self):
-
-        return
+        return data
 
     def despike(frames: np.ndarray) -> typ.Tuple[np.ndarray, np.ndarray, typ.List[spikes.Stats]]:
 
@@ -199,48 +121,5 @@ class Level_1(Pickleable):
 
         return
 
-
-
-
-
-
-
-def calc_level_1(
-        frames: np.ndarray,
-        detector: esis.optics.components.Detector,
-        start_ind: int,
-        end_ind: int,
-        despike = False,
-) -> typ.Tuple[np.ndarray, np.ndarray]:
-    """
-    Apply the Level-1 correction to a sequence of ESIS frames.
-    The sequence of frames is assumed to contain a set of dark frames, followed by a set of light frames, followed by
-    another set of dark frames.
-    The Level-1 correction consists of the following steps:
-     - Basic preparation
-      - Use some of the inactive pixels to subtract a bias value from all frames
-      - Organize the frames into light and dark frames.
-      - Subtract an average dark frame from all the light frames.
-     - Despike the data to remove high-energy particle hits.
-     - Reorient the frames so that they are displayed the same way an observer would see the sun.
-    :param frames: The input ESIS frames.
-    :param
-    :param start_ind:
-    :param end_ind:
-    :return:
-    """
-
-    frames = Level_1.remove_bias(frames, detector.npix_overscan, detector.npix_blank)
-    frames = remove_inactive_pixels(frames, detector.npix_overscan, detector.npix_blank)
-    frames, darks = organize_array(frames, start_ind, end_ind)
-    frames = remove_dark(frames, darks)
-
-    if despike == True:
-        print('Despiking data, this will take a while ...')
-        frames, mask, stats = data.despike(frames)
-
-    frames = data.orient_to_observer(frames)
-
-    return frames, darks
 
 

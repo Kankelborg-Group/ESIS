@@ -1,11 +1,23 @@
-from esis.data import data, level_0, level_1
+from esis.data import Level_0, Level_1
 import esis.flight.optics
+import astropy.units as u
+import matplotlib.pyplot as plt
+
 def generate_level1():
-    lev0 = level_0.Level0.from_path(esis.flight.raw_img_dir)
     optics = esis.flight.optics.as_measured()
     detector = optics.components.detector
+    lev0 = Level_0.from_directory(esis.flight.raw_img_dir,detector)
 
-    lev1 = level_1.Level_1.from_level_0(lev0, detector, despike = True)
+
+    lev1 = Level_1.from_level_0(lev0, despike = False)
+    print(lev1.intensity[0,0,0,0])
+    fig,ax = plt.subplots()
+    ax.imshow(lev1.intensity[15,1,...])
+
+    lev1.intensity[...] = lev1.intensity_photons(630 * u.AA)
+    print(lev1.intensity[0, 0, 0, 0])
+
+    plt.show()
 
     return lev1
 

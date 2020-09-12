@@ -32,17 +32,28 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     dynamic_clearance: u.Quantity = 0 * u.mm
     npix_overscan: int = 0
     npix_blank: int = 0
-    gain_tap1: u.Quantity = 0 * u.electron
-    gain_tap2: u.Quantity = 0 * u.electron
-    gain_tap3: u.Quantity = 0 * u.electron
-    gain_tap4: u.Quantity = 0 * u.electron
-    readout_noise_tap1 = 0
-    readout_noise_tap2 = 0
-    readout_noise_tap3 = 0
-    readout_noise_tap4 = 0
+    gain_tap1: u.Quantity = 0 * u.electron / u.ct
+    gain_tap2: u.Quantity = 0 * u.electron / u.ct
+    gain_tap3: u.Quantity = 0 * u.electron / u.ct
+    gain_tap4: u.Quantity = 0 * u.electron / u.ct
+    readout_noise_tap1: u.Quantity = 0 * u.ct
+    readout_noise_tap2: u.Quantity = 0 * u.ct
+    readout_noise_tap3: u.Quantity = 0 * u.ct
+    readout_noise_tap4: u.Quantity = 0 * u.ct
 
+    @property
+    def num_pixels_all(self) -> typ.Tuple[int,int]:
+        return (self.num_pixels[vector.ix]+ 2 * self.npix_overscan + 2 * self.npix_blank , self.num_pixels[vector.iy] )
 
-
+    @property
+    def quadrants(self) -> typ.Tuple[typ.Tuple[slice, slice], ...]:
+        half_height = self.num_pixels_all[vector.ix] // 2
+        half_width = self.num_pixels_all[vector.iy] // 2
+        quad_1 = slice(half_height), slice(half_width)
+        quad_2 = slice(half_height, None), slice(half_width)
+        quad_3 = slice(half_height, None), slice(half_width, None)
+        quad_4 = slice(half_height), slice(half_width, None)
+        return quad_1, quad_2, quad_3, quad_4
 
     @property
     def pixel_half_width(self) -> u.Quantity:
@@ -149,36 +160,45 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         else:
             raise ValueError('Only SVLS supported')
 
-    def dn_to_photon(self,data: np.ndarray, wavelength: u.Quantity) -> np.ndarray:
+    @property
+    def gain(self) -> u.Quantity:
+        return u.Quantity([self.gain_tap1, self.gain_tap2, self.gain_tap3, self.gain_tap4])
+
+    def dn_to_photon(self, data: u.Quantity, wavelength: u.Quantity) -> u.Quantity:
         """
         For a given wavelength return a detector size array with units of photon / DN
         """
+        data = data.copy()
+        channel_gains = self.gain
+        quadrants = self.quadrants
         photon_energy = const.c * const.h / wavelength
-        Si_e_hole_pair = 3.6 * u.eV
+        Si_e_hole_pair = 3.6 * u.eV / u.electron
 
-    @staticmethod
-    def remove_inactive_pixels(frames: np.ndarray, n_overscan_pix, n_blank_pix, axis: int = ~0):
-        frames = Level_1.remove_overscan_pixels(frames, n_overscan_pix, ccd_long_axis=axis)
+        print(channel_gains)
+        for channel,channel_gain in enumerate(channel_gains):
+            for i, quad in enumerate(quadrants):
+                data[(...,channel)+quad] *= channel_gain[i] * Si_e_hole_pair / photon_energy
 
-        frames = Level_1.remove_blank_pixels(frames, n_blank_pix, axis=axis)
+        return data
+
+    def remove_inactive_pixels(self, frames: np.ndarray, axis: int = ~0):
+        frames = self.remove_overscan_pixels(frames, ccd_long_axis=axis)
+        frames = self.remove_blank_pixels(frames, axis=axis)
 
         return frames
 
-    @staticmethod
-    def remove_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
-        s = Level_1.identify_blank_pixels(frames, n_blank_pixels, axis)
+    def remove_blank_pixels(self, frames: np.ndarray, axis: int = ~0):
+        s = self.identify_blank_pixels(frames, axis)
 
         return frames[s]
 
-    @staticmethod
-    def identify_blank_pixels(frames: np.ndarray, n_blank_pixels: int, axis: int = ~0):
+    def identify_blank_pixels(self,frames: np.ndarray, axis: int = ~0):
         s = [slice(None)] * frames.ndim
-        s[-1] = slice(n_blank_pixels, ~(n_blank_pixels - 1))
+        s[-1] = slice(self.npix_blank, ~(self.npix_blank - 1))
         s = tuple(s)
 
         return s
 
-    @staticmethod
     def identify_overscan_pixels(
             self,
             frames: np.ndarray,
@@ -195,7 +215,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         s1 = [slice(None)] * frames.ndim
 
         half_len = frames.shape[ccd_long_axis] // 2
-        new_half_len = half_len - self.n_overscan_pix
+        new_half_len = half_len - self.npix_overscan
 
         s0[ccd_long_axis] = slice(None, new_half_len)
         s1[ccd_long_axis] = slice(~(new_half_len - 1), None)
@@ -206,7 +226,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         return s0, s1
 
 
-    def remove_overscan_pixels(self,frames: np.ndarray int, ccd_long_axis: int = ~0):
+    def remove_overscan_pixels(self,frames: np.ndarray, ccd_long_axis: int = ~0):
         """
         Trim the overscan pixels from an array of ESIS images.
         The overscan pixels are in the center of the images, running perpendicular to the long axis of the CCD.
@@ -217,7 +237,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         :return: A copy of the `frames` array with the overscan pixels removed.
         """
 
-        s0, s1 = self.identify_overscan_pixels(self, frames, ccd_long_axis)
+        s0, s1 = self.identify_overscan_pixels(frames, ccd_long_axis)
 
         return np.concatenate([frames[s0], frames[s1]], axis=ccd_long_axis)
 

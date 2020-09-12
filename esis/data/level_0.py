@@ -10,6 +10,8 @@ import astropy.units as u
 import astropy.time
 import astropy.io.fits
 import astropy.visualization
+import scipy.stats
+import esis
 
 
 @dataclasses.dataclass
@@ -32,33 +34,10 @@ class Level_0:
     adc_temp_2: u.Quantity
     adc_temp_3: u.Quantity
     adc_temp_4: u.Quantity
+    detector: esis.optics.components.Detector
 
     @classmethod
-    def zeros(cls, shape: typ.Sequence[int]):
-        sh = shape[:2]
-        return cls(
-            data=np.zeros(shape),
-            time=astropy.time.Time(np.zeros(sh), format='unix'),
-            cam_id=np.zeros(sh, dtype=np.int) * u.chan,
-            cam_sn=np.zeros(sh, dtype=np.int),
-            global_index=np.zeros(sh, dtype=np.int),
-            sequence_index=np.zeros(sh),
-            requested_exposure_time=np.zeros(sh) * u.s,
-            measured_exposure_time=np.zeros(sh) * u.ct,
-            run_mode=np.zeros(sh, dtype='S20'),
-            status=np.zeros(sh, dtype='S20'),
-            fpga_temp=np.zeros(sh) * u.ct,
-            fpga_vccint_voltage=np.zeros(sh) * u.ct,
-            fpga_vccaux_voltage=np.zeros(sh) * u.ct,
-            fpga_vccbram_voltage=np.zeros(sh) * u.ct,
-            adc_temp_1=np.zeros(sh) * u.ct,
-            adc_temp_2=np.zeros(sh) * u.ct,
-            adc_temp_3=np.zeros(sh) * u.ct,
-            adc_temp_4=np.zeros(sh) * u.ct,
-        )
-
-    @classmethod
-    def from_directory(cls, directory: pathlib.Path):
+    def from_directory(cls, directory: pathlib.Path, detector: esis.optics.components.Detector):
         fits_list = np.array(list(directory.glob('*.fit*')))
         fits_list.sort()
 
@@ -73,6 +52,7 @@ class Level_0:
 
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
+        self.detector = detector
 
         for i in range(num_exposures):
             for c in range(num_channels):
@@ -97,7 +77,112 @@ class Level_0:
                 self.adc_temp_3[i, c] = float(header['ADCTEMP3']) * u.ct
                 self.adc_temp_4[i, c] = float(header['ADCTEMP4']) * u.ct
 
+
         return self
+
+    @classmethod
+    def zeros(cls, shape: typ.Sequence[int]):
+        sh = shape[:2]
+        return cls(
+            data=np.zeros(shape),
+            time=astropy.time.Time(np.zeros(sh), format='unix'),
+            cam_id=np.zeros(sh, dtype=np.int) * u.chan,
+            cam_sn=np.zeros(sh, dtype=np.int),
+            global_index=np.zeros(sh, dtype=np.int),
+            sequence_index=np.zeros(sh),
+            requested_exposure_time=np.zeros(sh) * u.s,
+            measured_exposure_time=np.zeros(sh) * u.ct,
+            run_mode=np.zeros(sh, dtype='S20'),
+            status=np.zeros(sh, dtype='S20'),
+            fpga_temp=np.zeros(sh) * u.ct,
+            fpga_vccint_voltage=np.zeros(sh) * u.ct,
+            fpga_vccaux_voltage=np.zeros(sh) * u.ct,
+            fpga_vccbram_voltage=np.zeros(sh) * u.ct,
+            adc_temp_1=np.zeros(sh) * u.ct,
+            adc_temp_2=np.zeros(sh) * u.ct,
+            adc_temp_3=np.zeros(sh) * u.ct,
+            adc_temp_4=np.zeros(sh) * u.ct,
+            detector=esis.optics.components.Detector()
+        )
+
+    @property
+    def signal_indices(self) -> typ.Tuple[int, int]:
+
+        threshold = 99
+        num_border_frames = 4
+
+        m = np.percentile(self.data, threshold, axis=(-2, -1))
+        g = np.gradient(m, axis=0)
+        start_ind = np.argmax(g, axis=0) - num_border_frames
+        end_ind = np.argmin(g, axis=0) + num_border_frames
+        start_ind = scipy.stats.mode(start_ind)[0][0]
+        end_ind = scipy.stats.mode(end_ind)[0][0]
+
+        return start_ind, end_ind
+
+    @property
+    def data_nobias_active(self) -> u.Quantity:
+        """
+        Returns
+        -------
+        Bias subtracted data with inactive pixels removed
+        """
+        return self.detector.remove_inactive_pixels(self.data_nobias)
+
+    @property
+    def data_nobias(self) -> u.Quantity:
+        """
+        Returns
+        -------
+        Bias subtracted data
+        """
+        frames = self.data.copy()
+
+        s = [slice(None)] * frames.ndim
+        s[-1] = slice(self.detector.npix_blank, ~(self.detector.npix_blank - 1))
+        s = tuple(s)
+
+        quadrants = self.detector.quadrants
+        # find a bias for each quadrant
+        b_1 = np.median(frames[(...,) + quadrants[0]][..., 0:s[-1].start], axis=(-2, -1), keepdims=True)
+        b_2 = np.median(frames[(...,) + quadrants[1]][..., 0:s[-1].start], axis=(-2, -1), keepdims=True)
+        b_3 = np.median(frames[(...,) + quadrants[2]][..., s[-1].stop:], axis=(-2, -1), keepdims=True)
+        b_4 = np.median(frames[(...,) + quadrants[3]][..., s[-1].stop:], axis=(-2, -1), keepdims=True)
+
+        # subtract bias from each quadrant
+        frames[(...,) + quadrants[0]] -= b_1
+        frames[(...,) + quadrants[1]] -= b_2
+        frames[(...,) + quadrants[2]] -= b_3
+        frames[(...,) + quadrants[3]] -= b_4
+
+        return frames
+
+    @property
+    def data_light_dark(self) -> typ.Tuple[u.Quantity, u.Quantity]:
+
+        start_ind, end_ind = self.signal_indices
+        frames = self.data_nobias_active
+
+        return Level_0.organize_array(frames, start_ind, end_ind)
+
+    @staticmethod
+    def organize_array(frames: np.ndarray, start_ind: int, end_ind: int) -> typ.Tuple[np.ndarray, np.ndarray]:
+        dark1 = frames[:start_ind, ...]
+        signal = frames[start_ind:end_ind, ...]
+        dark2 = frames[end_ind:, ...]
+        dark2 = dark2[:dark1.shape[0]]
+
+        darks = np.concatenate([dark1, dark2], axis=0)
+
+        return signal, darks
+
+    @property
+    def data_final(self) -> u.Quantity:
+        data, darks = self.data_light_dark
+        data = data - np.median(darks, axis=0, keepdims=True)
+        return np.flip(data, axis=-2)
+
+
 
     @property
     def num_channels(self) -> int:
