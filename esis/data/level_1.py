@@ -37,7 +37,7 @@ class Level_1(mixin.Pickleable):
                 percentile_threshold=(0, 99.9),
                 poly_deg=1,
             )
-            intensity  = intensity << intensity_unit
+            intensity = intensity << intensity_unit
         return cls(
             intensity=intensity,
             start_time=lev0.start_time_signal,

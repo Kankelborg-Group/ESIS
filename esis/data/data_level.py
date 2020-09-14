@@ -51,37 +51,40 @@ class DataLevel:
     def channel_labels(self) -> typ.List[str]:
         return ['Ch' + str(int(c.value)) for c in self.channel[0]]
 
-    def plot_quantity_vs_time(
+    def plot_quantity_vs_index(
             self,
             a: u.Quantity,
             a_name: str = '',
             ax: typ.Optional[plt.Axes] = None,
-            legend_ncol: int = 1
-    ):
+            legend_ncol: int = 1,
+            drawstyle: str = 'steps',
+    ) -> plt.Axes:
         if ax is None:
             fig, ax = plt.subplots()
         with astropy.visualization.quantity_support():
-            with astropy.visualization.time_support(format='iso'):
-                for c in range(self.num_channels):
-                    if c == 0:
-                        color = None
-                    else:
-                        color = line[0].get_color()
-                    line = ax.plot(
-                        self.start_time[:, c],
-                        a[:, c],
-                        color=color,
-                        linestyle=list(matplotlib.lines.lineStyles.keys())[c],
-                        label=a_name + ', ' + self.channel_labels[c],
-                    )
-        ax.legend(fontsize='xx-small', ncol=legend_ncol, loc='right')
+            for c in range(self.num_channels):
+                if c == 0:
+                    color = None
+                else:
+                    color = line[0].get_color()
+                line = ax.plot(
+                    self.sequence_index[:, c],
+                    a[:, c],
+                    color=color,
+                    linestyle=list(matplotlib.lines.lineStyles.keys())[c],
+                    label=a_name + ', ' + self.channel_labels[c],
+                    drawstyle=drawstyle,
+                )
+            ax.set_xlabel('sequence index')
+            ax.legend(fontsize='xx-small', ncol=legend_ncol, loc='right')
         return ax
 
     def plot_intensity_total_vs_time(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.intensity.sum(self.axis.xy), a_name='Total intensity', ax=ax)
+        return self.plot_quantity_vs_index(
+            a=self.intensity.sum(self.axis.xy), a_name='Total intensity', ax=ax)
 
     def plot_exposure_length(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.exposure_length, a_name='Exposure length', ax=ax)
+        return self.plot_quantity_vs_index(a=self.exposure_length, a_name='Exposure length', ax=ax)
 
     def plot_channel(
             self,
@@ -285,6 +288,7 @@ class DataLevel:
     def animate(
             self,
             data: u.Quantity,
+            time_slice: slice = slice(None),
             axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
             thresh_min: u.Quantity = 0.01 * u.percent,
             thresh_max: u.Quantity = 99.9 * u.percent,
@@ -297,9 +301,13 @@ class DataLevel:
         else:
             fig = axs[0].figure
 
+        data = data[time_slice]
+        start_time = self.start_time[time_slice]
+        sequence_index = self.sequence_index[time_slice]
+
         def title_text(i: int) -> str:
-            time_str = self.start_time[i, 0].to_value('iso')
-            frame_str = ', frame ' + str(int(self.sequence_index[i, 0]))
+            time_str = start_time[i, 0].to_value('iso')
+            frame_str = ', frame ' + str(int(sequence_index[i, 0]))
             return time_str + frame_str
 
         title = fig.suptitle(title_text(0))
