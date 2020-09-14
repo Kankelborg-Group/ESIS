@@ -3,38 +3,22 @@ import pathlib
 import dataclasses
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.lines
-import matplotlib.colors
-import matplotlib.animation
 import astropy.units as u
 import astropy.time
 import astropy.io.fits
 import astropy.visualization
 import scipy.stats
-from kgpy import AutoAxis
 import esis
+from . import DataLevel
 
-
-class Axis(AutoAxis):
-    def __init__(self):
-        super().__init__()
-        self.x = self.auto_axis_index()
-        self.y = self.auto_axis_index()
-        self.chan = self.auto_axis_index()
-        self.time = self.auto_axis_index()
+__all__ = ['Level_0']
 
 
 @dataclasses.dataclass
-class Level_0:
-    axis: typ.ClassVar[Axis] = Axis()
-    data: u.Quantity
-    time: astropy.time.Time
-    cam_id: u.Quantity
+class Level_0(DataLevel):
     cam_sn: np.ndarray
     global_index: np.ndarray
-    sequence_index: np.ndarray
     requested_exposure_time: u.Quantity
-    measured_exposure_time: u.Quantity
     run_mode: np.ndarray
     status: np.ndarray
     fpga_temp: u.Quantity
@@ -47,6 +31,15 @@ class Level_0:
     adc_temp_4: u.Quantity
     detector: esis.optics.components.Detector
     num_dark_safety_frames: int = 4
+
+    def __post_init__(self):
+        self.update()
+
+    def update(self) -> typ.NoReturn:
+        self._intensity_derivative = None
+        self._intensity_nobias = None
+        self._intensity_nobias_nodark = None
+        self._dark_nobias = None
 
     @classmethod
     def from_directory(cls, directory: pathlib.Path, detector: esis.optics.components.Detector):
@@ -71,14 +64,14 @@ class Level_0:
             for c in range(num_channels):
                 hdu = astropy.io.fits.open(fits_list[bad_exposures + i, c])[0]
                 header = hdu.header
-                self.data[i, c] = hdu.data * u.ct
-                self.time[i, c] = astropy.time.Time(header['IMG_TS'])
-                self.cam_id[i, c] = int(header['CAM_ID'][~0]) * u.chan
+                self.intensity[i, c] = hdu.data * u.ct
+                self.start_time[i, c] = astropy.time.Time(header['IMG_TS'])
+                self.exposure_length[i, c] = float(header['MEAS_EXP']) * u.ct
+                self.channel[i, c] = int(header['CAM_ID'][~0]) * u.chan
+                self.sequence_index[i, c] = int(header['IMG_CNT'])
                 self.cam_sn[i, c] = int(header['CAM_SN'])
                 self.global_index[i, c] = int(header['IMG_ISN'])
-                self.sequence_index[i, c] = int(header['IMG_CNT'])
                 self.requested_exposure_time[i, c] = float(header['IMG_EXP']) * u.ms
-                self.measured_exposure_time[i, c] = float(header['MEAS_EXP']) * u.ct
                 self.run_mode[i, c] = header['RUN_MODE']
                 self.status[i, c] = header['IMG_STAT']
                 self.fpga_temp[i, c] = float(header['FPGATEMP']) * u.ct
@@ -95,14 +88,14 @@ class Level_0:
     def zeros(cls, shape: typ.Sequence[int]):
         sh = shape[:2]
         return cls(
-            data=np.zeros(shape) * u.ct,
-            time=astropy.time.Time(np.zeros(sh), format='unix'),
-            cam_id=np.zeros(sh, dtype=np.int) * u.chan,
+            intensity=np.zeros(shape) * u.ct,
+            start_time=astropy.time.Time(np.zeros(sh), format='unix'),
+            exposure_length=np.zeros(sh) * u.ct,
+            channel=np.zeros(sh, dtype=np.int) * u.chan,
+            sequence_index=np.zeros(sh),
             cam_sn=np.zeros(sh, dtype=np.int),
             global_index=np.zeros(sh, dtype=np.int),
-            sequence_index=np.zeros(sh),
             requested_exposure_time=np.zeros(sh) * u.s,
-            measured_exposure_time=np.zeros(sh) * u.ct,
             run_mode=np.zeros(sh, dtype='S20'),
             status=np.zeros(sh, dtype='S20'),
             fpga_temp=np.zeros(sh) * u.ct,
@@ -113,194 +106,92 @@ class Level_0:
             adc_temp_2=np.zeros(sh) * u.ct,
             adc_temp_3=np.zeros(sh) * u.ct,
             adc_temp_4=np.zeros(sh) * u.ct,
-            detector=esis.optics.components.Detector()
+            detector=esis.optics.components.Detector(),
         )
 
     @property
-    def axes_spatial(self) -> typ.Tuple[int, int]:
-        return self.axis.x, self.axis.y
+    def intensity_derivative(self) -> u.Quantity:
+        if self._intensity_derivative is None:
+            m = np.percentile(self.intensity, 99, axis=self.axis.xy)
+            self._intensity_derivative = np.gradient(m, axis=self.axis.time)
+        return self._intensity_derivative
 
     @property
-    def signal_indices(self) -> typ.Tuple[int, int]:
-        m = np.percentile(self.data, 99, axis=(-2, -1))
-        g = np.gradient(m, axis=self.axis.time)
-        start_ind = np.argmax(g, axis=self.axis.time) - self.num_dark_safety_frames
-        end_ind = np.argmin(g, axis=0) + self.num_dark_safety_frames
-        start_ind = scipy.stats.mode(start_ind)[0][0]
-        end_ind = scipy.stats.mode(end_ind)[0][0]
-        return start_ind, end_ind
+    def signal_index_first(self) -> int:
+        indices = np.argmax(self.intensity_derivative, axis=self.axis.time) - self.num_dark_safety_frames
+        return scipy.stats.mode(indices)[0][0]
 
     @property
-    def data_nobias_active(self) -> u.Quantity:
-        """
-        Returns
-        -------
-        Bias subtracted data with inactive pixels removed
-        """
-        return self.detector.remove_inactive_pixels(self.data_nobias)
+    def signal_index_last(self) -> int:
+        indices = np.argmin(self.intensity_derivative, axis=0) + self.num_dark_safety_frames
+        return scipy.stats.mode(indices)[0][0]
 
     @property
-    def data_nobias(self) -> u.Quantity:
+    def signal_slice(self) -> slice:
+        return slice(self.signal_index_first, self.signal_index_last + 1)
+
+    @property
+    def bias(self) -> u.Quantity:
+        s1, s2 = [slice(None)] * self.axis.ndim, [slice(None)] * self.axis.ndim
+        s1[self.axis.x] = slice(0, self.detector.npix_blank)
+        s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), None)
+        blank_pix = 2 * [s1] + 2 * [s2]
+        quadrants = self.detector.quadrants
+        bias = np.empty((self.shape[self.axis.time], self.shape[self.axis.chan], len(quadrants))) << self.intensity.unit
+        for q in range(len(quadrants)):
+            data_quadrant = self.intensity[(...,) + quadrants[q]]
+            bias[..., q] = np.median(a=data_quadrant[blank_pix[q]], axis=self.axis.xy)
+        return bias
+
+    @property
+    def intensity_nobias(self) -> u.Quantity:
         """
         Returns
         -------
         Bias subtracted data
         """
-        frames = self.data.copy()
-
-        s1 = [slice(None)] * frames.ndim
-        s2 = [slice(None)] * frames.ndim
-
-        s1[self.axis.x] = slice(0, self.detector.npix_blank)
-        s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), None)
-
-        qsl = [(..., ) + q for q in self.detector.quadrants]
-
-        # subtract bias from each quadrant
-        frames[qsl[0]] -= np.median(frames[qsl[0]][s1], axis=self.axes_spatial, keepdims=True)
-        frames[qsl[1]] -= np.median(frames[qsl[1]][s1], axis=self.axes_spatial, keepdims=True)
-        frames[qsl[2]] -= np.median(frames[qsl[2]][s2], axis=self.axes_spatial, keepdims=True)
-        frames[qsl[3]] -= np.median(frames[qsl[3]][s2], axis=self.axes_spatial, keepdims=True)
-
-        return frames
+        if self._intensity_nobias is None:
+            self._intensity_nobias = self.intensity.copy()
+            quadrants = self.detector.quadrants
+            bias = self.bias
+            for q in range(len(quadrants)):
+                self._intensity_nobias[(..., ) + quadrants[q]] -= bias[..., q, None, None]
+        return self._intensity_nobias
 
     @property
-    def data_nobias_nodark(self) -> u.Quantity:
-        frames = self.data_nobias_active
-        start_ind, end_ind = self.signal_indices
-        signal = frames[start_ind:end_ind]
-        dark1, dark2 = frames[:start_ind], frames[end_ind:]
-        dark2 = dark2[:dark1.shape[self.axis.time]]
-        darks = np.concatenate([dark1, dark2], axis=self.axis.time)
-        return signal - np.median(darks, axis=self.axis.time, keepdims=True)
+    def dark_nobias(self) -> u.Quantity:
+        if self._dark_nobias is None:
+            intensity = self.intensity_nobias
+            first_ind, last_ind = self.signal_index_first, self.signal_index_last + 1
+            darks = u.Quantity([intensity[:first_ind], intensity[last_ind:last_ind + first_ind]])
+            self._dark_nobias = np.median(darks, axis=(0, 1))
+        return self._dark_nobias
 
     @property
-    def data_final(self) -> u.Quantity:
-        return np.flip(self.data_nobias_nodark, axis=self.axis.y)
+    def intensity_nobias_nodark(self) -> u.Quantity:
+        if self._intensity_nobias_nodark is None:
+            self._intensity_nobias_nodark = self.intensity_nobias - self.dark_nobias
+        return self._intensity_nobias_nodark
 
     @property
-    def time_nodark(self) -> astropy.time.Time:
-        return self.time[slice(*self.signal_indices)]
+    def intensity_nobias_nodark_active(self):
+        return self.detector.remove_inactive_pixels(self.intensity_nobias_nodark)
 
     @property
-    def requested_exposure_time_nodark(self) -> u.Quantity:
-        return self.requested_exposure_time[slice(*self.signal_indices)]
+    def intensity_signal(self) -> u.Quantity:
+        return self.intensity_nobias_nodark_active[self.signal_slice]
 
     @property
-    def cam_id_nodark(self) -> u.Quantity:
-        return self.cam_id[slice(*self.signal_indices)]
+    def start_time_signal(self) -> astropy.time.Time:
+        return self.start_time[self.signal_slice]
 
     @property
-    def num_channels(self) -> int:
-        return self.data.shape[self.axis.chan]
+    def requested_exposure_time_signal(self) -> u.Quantity:
+        return self.requested_exposure_time[self.signal_slice]
 
     @property
-    def channel_labels(self) -> typ.List[str]:
-        return ['Ch' + str(int(c.value)) for c in self.cam_id[0]]
-
-    def plot_frame(
-            self,
-            ax: typ.Optional[plt.Axes] = None,
-            exposure_index: int = 0,
-            channel_index: int = 0,
-            percentile_max: float = 99.9,
-    ) -> plt.Axes:
-        if ax is None:
-            fig, ax = plt.subplots()
-        else:
-            fig = ax.figure
-        data = self.data[exposure_index, channel_index]
-        img = ax.imshow(
-            X=data,
-            vmax=np.percentile(data, percentile_max),
-            origin='lower',
-        )
-        ax.set_xlabel('detector $x$ (pix)')
-        ax.set_ylabel('detextor $y$ (pix)')
-        fig.colorbar(img, ax=ax, label='DN')
-        return ax
-
-    def animate_channel(
-            self,
-            ax: typ.Optional[plt.Axes],
-            exposure_slice: typ.Optional[slice] = None,
-            channel_index: int = 0,
-            percentile_max: u.Quantity = 99.9 * u.percent,
-            norm_gamma: float = 1,
-            frame_interval: u.Quantity = 100 * u.ms,
-    ) -> matplotlib.animation.FuncAnimation:
-
-        if ax is None:
-            fig, ax = plt.subplots()
-        else:
-            fig = ax.figure
-
-        if exposure_slice is None:
-            exposure_slice = slice(None)
-
-        data = self.data[exposure_slice, channel_index]
-        time = self.time[exposure_slice, channel_index]
-        ind = self.sequence_index[exposure_slice, channel_index]
-        chan = self.cam_id[exposure_slice, channel_index]
-
-        vmax = np.percentile(data, percentile_max.value)
-        img = ax.imshow(
-            X=data[0],
-            norm=matplotlib.colors.PowerNorm(gamma=norm_gamma),
-            vmax=vmax,
-            origin='lower',
-        )
-
-        def title_text(i: int) -> str:
-            return time[i].to_value('iso') + ', channel ' + str(int(chan[i].value)) + ', frame ' + str(int(ind[i]))
-
-        title = ax.set_title(title_text(0))
-        ax.set_xlabel('detector $x$ (pix)')
-        ax.set_ylabel('detextor $y$ (pix)')
-        fig.colorbar(img, ax=ax, label='DN')
-
-        def func(i: int):
-            img.set_data(data[i])
-            title.set_text(title_text(i))
-
-        return matplotlib.animation.FuncAnimation(
-            fig=fig,
-            func=func,
-            frames=data.shape[self.axis.time],
-            interval=frame_interval.to(u.ms).value,
-        )
-
-    def plot_quantity_vs_time(
-            self,
-            a: u.Quantity,
-            a_name: str = '',
-            ax: typ.Optional[plt.Axes] = None,
-            legend_ncol: int = 1
-    ):
-        if ax is None:
-            fig, ax = plt.subplots()
-        with astropy.visualization.quantity_support():
-            with astropy.visualization.time_support(format='iso'):
-                for c in range(self.num_channels):
-                    if c == 0:
-                        color = None
-                    else:
-                        color = line[0].get_color()
-                    line = ax.plot(
-                        self.time[:, c],
-                        a[:, c],
-                        color=color,
-                        linestyle=list(matplotlib.lines.lineStyles.keys())[c],
-                        label=a_name + ', ' + self.channel_labels[c],
-                    )
-        ax.legend(fontsize='xx-small', ncol=legend_ncol)
-        return ax
-
-    def plot_total_intensity(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.data.sum((~1, ~0)), a_name='Total DN', ax=ax)
-
-    def plot_exposure_time(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.requested_exposure_time, a_name='Requested exposure time', ax=ax)
+    def channel_signal(self) -> u.Quantity:
+        return self.channel[self.signal_slice]
 
     def plot_fpga_temp(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
         return self.plot_quantity_vs_time(a=self.fpga_temp, a_name='FPGA temp.', ax=ax)
@@ -318,19 +209,65 @@ class Level_0:
         ax = self.plot_quantity_vs_time(a=self.adc_temp_1, a_name='ADC temp 1', ax=ax)
         ax = self.plot_quantity_vs_time(a=self.adc_temp_2, a_name='ADC temp 2', ax=ax)
         ax = self.plot_quantity_vs_time(a=self.adc_temp_3, a_name='ADC temp 3', ax=ax)
-        ax = self.plot_quantity_vs_time(a=self.adc_temp_4, a_name='ADC temp 4', ax=ax, legend_ncol=4)
+        ax = self.plot_quantity_vs_time(a=self.adc_temp_4, a_name='ADC temp 4', ax=ax, legend_ncol=2)
         return ax
+
+    def plot_bias(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
+        bias = self.bias
+        num_quadrants = bias.shape[~0]
+        for q in range(num_quadrants):
+            name = 'bias, q' + str(q)
+            ax = self.plot_quantity_vs_time(a=bias[..., q], a_name=name, ax=ax, legend_ncol=num_quadrants // 2)
+        return ax
+
+    def plot_dark(self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None) -> typ.MutableSequence[plt.Axes]:
+        axs[0].figure.suptitle('Median dark images')
+        return self.plot_time(images=self.dark_nobias, image_names=self.channel_labels, axs=axs, )
 
     def plot_all_vs_time(
             self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
     ) -> typ.MutableSequence[plt.Axes]:
         if axs is None:
             fig, axs = plt.subplots(nrows=7, sharex=True)
-        self.plot_total_intensity(ax=axs[0])
-        self.plot_exposure_time(ax=axs[1])
-        self.plot_fpga_temp(ax=axs[2])
-        self.plot_adc_temperature(ax=axs[3])
-        self.plot_fpga_vccint(ax=axs[4])
+        self.plot_intensity_total_vs_time(ax=axs[0])
+        self.plot_exposure_length(ax=axs[1])
+        self.plot_bias(ax=axs[2])
+        self.plot_fpga_temp(ax=axs[3])
+        self.plot_adc_temperature(ax=axs[4])
+        self.plot_fpga_vccint(ax=axs[6])
         self.plot_fpga_vccaux(ax=axs[5])
         self.plot_fpga_vccbram(ax=axs[6])
         return axs
+
+    def blink_intensity_nobias_nodark(
+            self,
+            time_index: int = 0,
+            channel_index: int = 0,
+            ax: typ.Optional[plt.Axes] = None,
+            thresh_min: u.Quantity = 0.01 * u.percent,
+            thresh_max: u.Quantity = 99.9 * u.percent,
+            norm_gamma: float = 1,
+            frame_interval: u.Quantity = 1 * u.s,
+    ):
+        frames = u.Quantity([
+            self.intensity[time_index, channel_index],
+            self.intensity_nobias[time_index, channel_index],
+            self.intensity_nobias_nodark[time_index, channel_index],
+        ])
+
+        time = self.start_time[time_index, channel_index]
+        chan = self.channel[time_index, channel_index]
+        seq_index = self.sequence_index[time_index, channel_index]
+
+        base_title = time.to_value('iso') + ', frame ' + str(int(seq_index)) + ', channel ' + str(int(chan.value))
+
+        frame_names = [
+            base_title + '\n raw',
+            base_title + '\n bias subtracted',
+            base_title + '\n bias and dark subtracted',
+        ]
+
+        return self.animate_channel(
+            images=frames, image_names=frame_names,
+            ax=ax, thresh_min=thresh_min, thresh_max=thresh_max, norm_gamma=norm_gamma, frame_interval=frame_interval,
+        )

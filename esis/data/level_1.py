@@ -28,7 +28,7 @@ class Level_1(mixin.Pickleable):
 
     @classmethod
     def from_level_0(cls, lev0: Level_0, despike: bool = False) -> 'Level_1':
-        intensity = lev0.data_final
+        intensity = lev0.intensity_signal
         if despike:
             warnings.warn('Despiking data, this will take a while ...')
             intensity, mask, stats = img.spikes.identify_and_fix(
@@ -39,9 +39,9 @@ class Level_1(mixin.Pickleable):
 
         return cls(
             intensity=intensity,
-            start_time=lev0.time_nodark,
-            exposure_length=lev0.requested_exposure_time_nodark,
-            cam_id=lev0.cam_id_nodark,
+            start_time=lev0.start_time_signal,
+            exposure_length=lev0.requested_exposure_time_signal,
+            cam_id=lev0.channel,
             detector=lev0.detector
         )
 

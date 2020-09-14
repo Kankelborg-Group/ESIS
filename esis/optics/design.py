@@ -92,7 +92,7 @@ def final(
     detector.cylindrical_azimuth = channel_angle.copy()
     detector.inclination = -12.252 * u.deg
     detector.pixel_width = 15 * u.um
-    detector.num_pixels = (2048, 1024)
+    detector.num_pixels = (2048, 1040)
     detector.npix_overscan = 2
     detector.npix_blank = 50
     detector.gain_tap1 = 1 * u.electron / u.ct
