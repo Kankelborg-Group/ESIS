@@ -30,7 +30,9 @@ class Level_0(DataLevel):
     adc_temp_3: u.Quantity
     adc_temp_4: u.Quantity
     detector: esis.optics.components.Detector
-    num_dark_safety_frames: int = 4
+    caching: bool = False
+    num_dark_safety_frames: int = 1
+    num_ignored_bias_columns: int = 5
 
     def __post_init__(self):
         self.update()
@@ -42,7 +44,7 @@ class Level_0(DataLevel):
         self._dark_nobias = None
 
     @classmethod
-    def from_directory(cls, directory: pathlib.Path, detector: esis.optics.components.Detector):
+    def from_directory(cls, directory: pathlib.Path, detector: esis.optics.components.Detector, caching: bool = False):
         fits_list = np.array(list(directory.glob('*.fit*')))
         fits_list.sort()
 
@@ -59,6 +61,7 @@ class Level_0(DataLevel):
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
         self.detector = detector
+        self.caching = caching
 
         for i in range(num_exposures):
             for c in range(num_channels):
@@ -133,8 +136,8 @@ class Level_0(DataLevel):
     @property
     def bias(self) -> u.Quantity:
         s1, s2 = [slice(None)] * self.axis.ndim, [slice(None)] * self.axis.ndim
-        s1[self.axis.x] = slice(0, self.detector.npix_blank)
-        s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), None)
+        s1[self.axis.x] = slice(self.num_ignored_bias_columns + 1, self.detector.npix_blank)
+        s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), ~(self.num_ignored_bias_columns - 1))
         blank_pix = 2 * [s1] + 2 * [s2]
         quadrants = self.detector.quadrants
         bias = np.empty((self.shape[self.axis.time], self.shape[self.axis.chan], len(quadrants))) << self.intensity.unit
@@ -150,13 +153,16 @@ class Level_0(DataLevel):
         -------
         Bias subtracted data
         """
-        if self._intensity_nobias is None:
-            self._intensity_nobias = self.intensity.copy()
+        intensity_nobias = self._intensity_nobias
+        if intensity_nobias is None:
+            intensity_nobias = self.intensity.copy()
             quadrants = self.detector.quadrants
             bias = self.bias
             for q in range(len(quadrants)):
-                self._intensity_nobias[(..., ) + quadrants[q]] -= bias[..., q, None, None]
-        return self._intensity_nobias
+                intensity_nobias[(..., ) + quadrants[q]] -= bias[..., q, None, None]
+            if self.caching:
+                self._intensity_nobias = intensity_nobias
+        return intensity_nobias
 
     @property
     def dark_nobias(self) -> u.Quantity:
@@ -164,14 +170,17 @@ class Level_0(DataLevel):
             intensity = self.intensity_nobias
             first_ind, last_ind = self.signal_index_first, self.signal_index_last + 1
             darks = u.Quantity([intensity[:first_ind], intensity[last_ind:last_ind + first_ind]])
-            self._dark_nobias = np.median(darks, axis=(0, 1))
+            self._dark_nobias  = np.median(darks, axis=(0, 1))
         return self._dark_nobias
 
     @property
     def intensity_nobias_nodark(self) -> u.Quantity:
-        if self._intensity_nobias_nodark is None:
-            self._intensity_nobias_nodark = self.intensity_nobias - self.dark_nobias
-        return self._intensity_nobias_nodark
+        intensity_nobias_nodark = self._intensity_nobias_nodark
+        if intensity_nobias_nodark is None:
+            intensity_nobias_nodark = self.intensity_nobias - self.dark_nobias
+            if self.caching:
+                self._intensity_nobias_nodark = intensity_nobias_nodark
+        return intensity_nobias_nodark
 
     @property
     def intensity_nobias_nodark_active(self):
