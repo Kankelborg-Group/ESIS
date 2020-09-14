@@ -30,13 +30,14 @@ class Level_1(mixin.Pickleable):
     def from_level_0(cls, lev0: Level_0, despike: bool = False) -> 'Level_1':
         intensity = lev0.intensity_signal
         if despike:
+            intensity_unit = intensity.unit
             warnings.warn('Despiking data, this will take a while ...')
             intensity, mask, stats = img.spikes.identify_and_fix(
-                intensity, axis=(0, 2, 3),
+                intensity.value, axis=(0, 2, 3),
                 percentile_threshold=(0, 99.9),
                 poly_deg=1,
             )
-
+            intensity  = intensity << intensity_unit
         return cls(
             intensity=intensity,
             start_time=lev0.start_time_signal,

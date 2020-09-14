@@ -72,6 +72,9 @@ class Level3(Pickleable):
 
         esis = level_1.Level_1.from_pickle(level1_path)
 
+        #undo flip about short axis from optical system
+        esis.intensity = np.flip(esis.intensity, axis=-2)
+
         aia_channel = [304*u.angstrom]
         start_time = esis.start_time[0,0]
         end_time = esis.start_time[-1,0]

@@ -9,13 +9,8 @@ def generate_level1():
     lev0 = Level_0.from_directory(esis.flight.raw_img_dir,detector)
 
 
-    lev1 = Level_1.from_level_0(lev0, despike = False)
-    print(lev1.intensity[0,0,0,0])
-
+    lev1 = Level_1.from_level_0(lev0, despike = True)
     lev1.intensity = lev1.intensity_photons(630 * u.AA)
-    print(lev1.intensity[0, 0, 0, 0])
-
-
     return lev1
 
 if __name__ == "__main__":
