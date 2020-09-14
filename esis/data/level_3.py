@@ -78,8 +78,6 @@ class Level3(Pickleable):
         aia_channel = [304*u.angstrom]
         start_time = esis.start_time[0,0]
         end_time = esis.start_time[-1,0]
-        print(start_time)
-        print(end_time)
 
         aia_304_files = aia.fetch_from_time(start_time, end_time, default_aia_path, aia_channels=aia_channel)
         aia_304_lev15 = aia.aiaprep_from_paths(aia_304_files)
@@ -110,7 +108,7 @@ class Level3(Pickleable):
 
         camera = np.array([0, 1, 2, 3])
         # camera = np.array([3])
-        sequence = np.arange(cropped_imgs.shape[0])[4:-3]
+        sequence = np.arange(cropped_imgs.shape[0])[2:~2]
         # sequence = np.array([15,16])
 
 
