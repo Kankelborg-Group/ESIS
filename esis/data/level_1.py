@@ -28,7 +28,7 @@ class Level_1(mixin.Pickleable):
 
     @classmethod
     def from_level_0(cls, lev0: Level_0, despike: bool = False) -> 'Level_1':
-        intensity = lev0.intensity_signal
+        intensity = lev0.intensity_signal.copy()
         if despike:
             intensity_unit = intensity.unit
             warnings.warn('Despiking data, this will take a while ...')
