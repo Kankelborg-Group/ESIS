@@ -1,6 +1,7 @@
 import typing as typ
 import dataclasses
 import numpy as np
+import scipy.optimize
 import astropy.units as u
 from kgpy import Name, mixin, vector, optics
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
@@ -35,26 +36,23 @@ class Optics(mixin.Named):
     @property
     def system(self) -> optics.System:
         if self._system is None:
-            self._system = self._calc_system()
+            self._system = optics.System(
+                object_surface=self.source.surface,
+                surfaces=optics.SurfaceList([
+                    self.front_aperture.surface,
+                    self.central_obscuration.surface,
+                    self.central_obscuration.surface,
+                    self.primary.surface,
+                    self.field_stop.surface,
+                    self.grating.surface,
+                    self.filter.surface,
+                    self.detector.surface,
+                ]),
+                wavelengths=self.wavelengths,
+                pupil_samples=self.pupil_samples,
+                field_samples=self.field_samples,
+            )
         return self._system
-
-    def _calc_system(self) -> optics.System:
-        return optics.System(
-            object_surface=self.source.surface,
-            surfaces=optics.SurfaceList([
-                self.front_aperture.surface,
-                self.central_obscuration.surface,
-                self.central_obscuration.surface,
-                self.primary.surface,
-                self.field_stop.surface,
-                self.grating.surface,
-                self.filter.surface,
-                self.detector.surface,
-            ]),
-            wavelengths=self.wavelengths,
-            pupil_samples=self.pupil_samples,
-            field_samples=self.field_samples,
-        )
 
     @property
     def rays_output(self) -> optics.Rays:
@@ -101,6 +99,36 @@ class Optics(mixin.Named):
         other.filter = self.filter.copy()
         other.detector = self.detector.copy()
         return other
+
+    def fit_to_images(self, images: u.Quantity):
+
+        for i in self.system.shape[0]:
+
+            # det_i = self.detector.copy()
+            # det_i.cylindrical_azimuth = self.detector.cylindrical_azimuth[i]
+
+            def func(
+                    grating_roll: u.Quantity,
+                    detector_radius: u.Quantity,
+                    detector_azimuth: u.Quantity,
+                    detector_piston: u.Quantity,
+                    detector_inclination: u.Quantity,
+                    detector_roll: u.Quantity,
+                    detector_twist: u.Quantity
+            ):
+                other = self.copy()
+                other.grating.roll = grating_roll
+                other.detector.cylindrical_radius = detector_radius
+                other.detector.cylindrical_azimuth = detector_azimuth
+                other.detector.piston = detector_piston
+                other.detector.inclination = detector_inclination
+                other.detector.roll = detector_roll
+                other.detector.twist = detector_twist
+
+                distortion = other.rays_output.distortion(polynomial_degree=2)
+
+
+
 
     def apply_poletto_layout(
             self,
@@ -185,4 +213,3 @@ class Optics(mixin.Named):
         other.update()
 
         return other
-
