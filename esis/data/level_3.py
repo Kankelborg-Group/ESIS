@@ -13,6 +13,7 @@ import ndcube
 import kgpy.img.coalignment.image_coalignment as img_align
 import kgpy.img.masks.mask as img_mask
 from esis.data import level_1
+import esis
 from kgpy.observatories.aia import aia
 from kgpy.mixin import Pickleable
 
@@ -70,14 +71,14 @@ class Level3(Pickleable):
         trick.
         """
 
-        esis = level_1.Level_1.from_pickle(level1_path)
+        lev_1 = level_1.Level_1.from_pickle(level1_path)
 
         #undo flip about short axis from optical system
-        esis.intensity = np.flip(esis.intensity, axis=-2)
+        lev_1.intensity = np.flip(lev_1.intensity, axis=-2)
 
         aia_channel = [304*u.angstrom]
-        start_time = esis.start_time[0,0]
-        end_time = esis.start_time[-1,0]
+        start_time = lev_1.start_time[0,0]
+        end_time = lev_1.start_time[-1,0]
 
         aia_304_files = aia.fetch_from_time(start_time, end_time, default_aia_path, aia_channels=aia_channel)
         aia_304_lev15 = aia.aiaprep_from_paths(aia_304_files)
@@ -85,11 +86,11 @@ class Level3(Pickleable):
         aia_304 = aia.AIA.from_path('aia_304', aia_304_lev15)
 
         if hei == False:
-            inital_cropping = (slice(None),slice(esis.intensity.shape[-1] // 2 - 25, None))
+            inital_cropping = (slice(None),slice(lev_1.intensity.shape[-1] // 2 - 25, None))
         else:
-            inital_cropping = (slice(None), slice(esis.intensity.shape[-1] // 2-225))
+            inital_cropping = (slice(None), slice(lev_1.intensity.shape[-1] // 2-225))
 
-        cropped_imgs = esis.intensity[(slice(None), slice(None)) + inital_cropping]
+        cropped_imgs = lev_1.intensity[(slice(None), slice(None)) + inital_cropping]
 
         pad_pix = 400
         initial_pad = ((pad_pix, pad_pix), (pad_pix, pad_pix))
@@ -106,9 +107,11 @@ class Level3(Pickleable):
         slice2 = slice(1435, 2705)
         pos = (slice1, slice2)
 
+        safety_frames = esis.flight.num_dark_safety_frames - 1
+
         camera = np.array([0, 1, 2, 3])
         # camera = np.array([3])
-        sequence = np.arange(cropped_imgs.shape[0])[2:~2]
+        sequence = np.arange(cropped_imgs.shape[0])[safety_frames:~safety_frames]
         # sequence = np.array([15,16])
 
 
@@ -125,7 +128,7 @@ class Level3(Pickleable):
                 start = time.time()
                 print('Fit in Progress: Camera = ',j,' Sequence = ',i)
 
-                td = aia_304.exposure_start_time - esis.start_time[i, 0]  # should be the same for every camera
+                td = aia_304.exposure_start_time - lev_1.start_time[i, 0]  # should be the same for every camera
                 best_im = np.abs(td.sec).argmin()
                 aia_im = aia_304.intensity[best_im, ...]
 
@@ -182,8 +185,8 @@ class Level3(Pickleable):
                 print('Fit Duration = ', time.time()-start)
             lev_3_transforms.append(transform_per_camera)
         aia_wcs = aia_304.wcs[0].slice(pos)
-        date_obs = esis.start_time[sequence[0], 0]
-        time_delta = esis.start_time[sequence[1], 0] - date_obs
+        date_obs = lev_1.start_time[sequence[0], 0]
+        time_delta = lev_1.start_time[sequence[1], 0] - date_obs
 
         # Axis 3 and 4 of the WCS object are camera and sequence respectively to match the Level1 ndarray
         # For future runs of ESIS with additional cameras CRVAL3 will require modification.

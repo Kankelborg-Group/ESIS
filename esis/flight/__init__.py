@@ -4,7 +4,8 @@ Package is for code and information relating to the 2019 flight
 __all__ = [
     'optics',
     'raw_img_dir',
-    'level_0'
+    'level_0',
+    'num_dark_safety_frames'
 ]
 
 import pathlib
