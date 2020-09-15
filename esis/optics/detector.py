@@ -4,7 +4,7 @@ import numpy as np
 import pandas
 import astropy.units as u
 from kgpy import Name, vector, transform, optics, format
-from .. import Grating
+from . import Grating
 from astropy import constants as const
 
 

@@ -2,7 +2,7 @@ import numpy as np
 from astropy import units as u
 
 from kgpy import Name, vector
-from . import components, Optics, poletto
+from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
 
 __all__ = ['final', 'final_from_poletto']
 
@@ -28,14 +28,14 @@ def final(
     if not all_channels:
         channel_angle = channel_angle[0]
 
-    primary = components.Primary()
+    primary = Primary()
     primary.radius = 2000 * u.mm
     primary.num_sides = num_sides
     primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
     primary.substrate_thickness = 30 * u.mm
     primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
 
-    front_aperture = components.FrontAperture()
+    front_aperture = FrontAperture()
     front_aperture.piston = primary.focal_length + 500 * u.mm
     front_aperture.clear_radius = 100 * u.mm
 
@@ -44,18 +44,18 @@ def final(
     tuffet_dx, tuffet_dy = tuffet_x2 - tuffet_x1, tuffet_y2 - tuffet_y1
     tuffet_slope = tuffet_dy / tuffet_dx
     tuffet_radius = tuffet_y1 - tuffet_slope * tuffet_x1
-    central_obscuration = components.CentralObscuration()
+    central_obscuration = CentralObscuration()
     central_obscuration.piston = 1404.270 * u.mm
     central_obscuration.obscured_half_width = tuffet_radius * np.cos(deg_per_channel / 2)
     central_obscuration.num_sides = num_sides
 
-    field_stop = components.FieldStop()
+    field_stop = FieldStop()
     field_stop.piston = primary.focal_length.copy()
     field_stop.clear_radius = 1.82 * u.mm
     field_stop.mech_radius = 2.81 * u.mm
     field_stop.num_sides = num_sides
 
-    grating = components.Grating()
+    grating = Grating()
     grating.piston = primary.focal_length + 374.7 * u.mm
     grating.cylindrical_radius = 2.074999998438000e1 * u.mm
     grating.cylindrical_azimuth = channel_angle.copy()
@@ -79,14 +79,14 @@ def final(
     grating.dynamic_clearance = 1.25 * u.mm
     grating.substrate_thickness = 10 * u.mm
 
-    filter = components.Filter()
+    filter = Filter()
     filter.piston = grating.piston - 1.301661998854058 * u.m
     filter.cylindrical_radius = 95.9 * u.mm
     filter.cylindrical_azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
     filter.clear_radius = 15.9 * u.mm
 
-    detector = components.Detector()
+    detector = Detector()
     detector.piston = filter.piston - 200 * u.mm
     detector.cylindrical_radius = 108 * u.mm
     detector.cylindrical_azimuth = channel_angle.copy()
@@ -106,26 +106,24 @@ def final(
 
 
     field_limit = (0.09561 * u.deg).to(u.arcsec)
-    source = components.Source()
+    source = Source()
     source.piston = front_aperture.piston + 400 * u.mm
     source.half_width_x = field_limit
     source.half_width_y = field_limit
 
     return Optics(
         name=Name('ESIS'),
-        components=components.Components(
-            source=source,
-            front_aperture=front_aperture,
-            central_obscuration=central_obscuration,
-            primary=primary,
-            field_stop=field_stop,
-            grating=grating,
-            filter=filter,
-            detector=detector,
-        ),
         wavelengths=[584.3, 609.8, 629.7, ] * u.AA,
         pupil_samples=pupil_samples,
         field_samples=field_samples,
+        source=source,
+        front_aperture=front_aperture,
+        central_obscuration=central_obscuration,
+        primary=primary,
+        field_stop=field_stop,
+        grating=grating,
+        filter=filter,
+        detector=detector,
     )
 
 

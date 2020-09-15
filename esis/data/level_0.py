@@ -29,7 +29,7 @@ class Level_0(DataLevel):
     adc_temp_2: u.Quantity
     adc_temp_3: u.Quantity
     adc_temp_4: u.Quantity
-    detector: esis.optics.components.Detector
+    detector: esis.optics.Detector
     caching: bool = False
     num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 5
@@ -44,7 +44,12 @@ class Level_0(DataLevel):
         self._dark_nobias = None
 
     @classmethod
-    def from_directory(cls, directory: pathlib.Path, detector: esis.optics.components.Detector, caching: bool = False):
+    def from_directory(
+            cls, directory: pathlib.Path,
+            detector: esis.optics.Detector,
+            caching: bool = False,
+            num_dark_safety_frames: int = 1,
+    ) -> 'Level_0':
         fits_list = np.array(list(directory.glob('*.fit*')))
         fits_list.sort()
 
@@ -62,6 +67,7 @@ class Level_0(DataLevel):
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
         self.detector = detector
         self.caching = caching
+        self.num_dark_safety_frames = num_dark_safety_frames
 
         for i in range(num_exposures):
             for c in range(num_channels):
@@ -109,7 +115,7 @@ class Level_0(DataLevel):
             adc_temp_2=np.zeros(sh) * u.ct,
             adc_temp_3=np.zeros(sh) * u.ct,
             adc_temp_4=np.zeros(sh) * u.ct,
-            detector=esis.optics.components.Detector(),
+            detector=esis.optics.Detector(),
         )
 
     @property
@@ -202,23 +208,44 @@ class Level_0(DataLevel):
     def channel_signal(self) -> u.Quantity:
         return self.channel[self.signal_slice]
 
+    @property
+    def sequence_index_signal(self) -> u.Quantity:
+        return self.sequence_index[self.signal_slice]
+
+    def plot_quantity_vs_index(
+            self,
+            a: u.Quantity,
+            a_name: str = '',
+            ax: typ.Optional[plt.Axes] = None,
+            legend_ncol: int = 1,
+            drawstyle: str = 'steps',
+    ) -> plt.Axes:
+        ax = super().plot_quantity_vs_index(a=a, a_name=a_name, ax=ax, legend_ncol=legend_ncol, drawstyle=drawstyle)
+        ax.axvline(self.sequence_index[self.signal_index_first, 0], color='black')
+        ax.axvline(self.sequence_index[self.signal_index_last + 1, 0], color='black')
+        return ax
+
+    def plot_intensity_nobias_mean(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
+        return self.plot_quantity_vs_index(
+            a=self.intensity_nobias.mean(self.axis.xy), a_name='mean intensity, no bias', ax=ax)
+
     def plot_fpga_temp(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.fpga_temp, a_name='FPGA temp.', ax=ax)
+        return self.plot_quantity_vs_index(a=self.fpga_temp, a_name='FPGA temp.', ax=ax)
 
     def plot_fpga_vccint(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.fpga_vccint_voltage, a_name='FPGA VCCint', ax=ax)
+        return self.plot_quantity_vs_index(a=self.fpga_vccint_voltage, a_name='FPGA VCCint', ax=ax)
 
     def plot_fpga_vccaux(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.fpga_vccaux_voltage, a_name='FPGA VCCaux', ax=ax)
+        return self.plot_quantity_vs_index(a=self.fpga_vccaux_voltage, a_name='FPGA VCCaux', ax=ax)
 
     def plot_fpga_vccbram(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_time(a=self.fpga_vccbram_voltage, a_name='FPGA BRAM', ax=ax)
+        return self.plot_quantity_vs_index(a=self.fpga_vccbram_voltage, a_name='FPGA BRAM', ax=ax)
 
     def plot_adc_temperature(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        ax = self.plot_quantity_vs_time(a=self.adc_temp_1, a_name='ADC temp 1', ax=ax)
-        ax = self.plot_quantity_vs_time(a=self.adc_temp_2, a_name='ADC temp 2', ax=ax)
-        ax = self.plot_quantity_vs_time(a=self.adc_temp_3, a_name='ADC temp 3', ax=ax)
-        ax = self.plot_quantity_vs_time(a=self.adc_temp_4, a_name='ADC temp 4', ax=ax, legend_ncol=2)
+        ax = self.plot_quantity_vs_index(a=self.adc_temp_1, a_name='ADC temp 1', ax=ax)
+        ax = self.plot_quantity_vs_index(a=self.adc_temp_2, a_name='ADC temp 2', ax=ax)
+        ax = self.plot_quantity_vs_index(a=self.adc_temp_3, a_name='ADC temp 3', ax=ax)
+        ax = self.plot_quantity_vs_index(a=self.adc_temp_4, a_name='ADC temp 4', ax=ax, legend_ncol=2)
         return ax
 
     def plot_bias(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
@@ -226,19 +253,19 @@ class Level_0(DataLevel):
         num_quadrants = bias.shape[~0]
         for q in range(num_quadrants):
             name = 'bias, q' + str(q)
-            ax = self.plot_quantity_vs_time(a=bias[..., q], a_name=name, ax=ax, legend_ncol=num_quadrants // 2)
+            ax = self.plot_quantity_vs_index(a=bias[..., q], a_name=name, ax=ax, legend_ncol=num_quadrants // 2)
         return ax
 
     def plot_dark(self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None) -> typ.MutableSequence[plt.Axes]:
         axs[0].figure.suptitle('Median dark images')
         return self.plot_time(images=self.dark_nobias, image_names=self.channel_labels, axs=axs, )
 
-    def plot_all_vs_time(
+    def plot_all_vs_index(
             self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
     ) -> typ.MutableSequence[plt.Axes]:
         if axs is None:
             fig, axs = plt.subplots(nrows=7, sharex=True)
-        self.plot_intensity_total_vs_time(ax=axs[0])
+        self.plot_intensity_nobias_mean(ax=axs[0])
         self.plot_exposure_length(ax=axs[1])
         self.plot_bias(ax=axs[2])
         self.plot_fpga_temp(ax=axs[3])
