@@ -29,7 +29,7 @@ class Level_0(DataLevel):
     adc_temp_2: u.Quantity
     adc_temp_3: u.Quantity
     adc_temp_4: u.Quantity
-    detector: esis.optics.components.Detector
+    detector: esis.optics.Detector
     caching: bool = False
     num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 5
@@ -46,7 +46,7 @@ class Level_0(DataLevel):
     @classmethod
     def from_directory(
             cls, directory: pathlib.Path,
-            detector: esis.optics.components.Detector,
+            detector: esis.optics.Detector,
             caching: bool = False,
             num_dark_safety_frames: int = 1,
     ) -> 'Level_0':
@@ -115,7 +115,7 @@ class Level_0(DataLevel):
             adc_temp_2=np.zeros(sh) * u.ct,
             adc_temp_3=np.zeros(sh) * u.ct,
             adc_temp_4=np.zeros(sh) * u.ct,
-            detector=esis.optics.components.Detector(),
+            detector=esis.optics.Detector(),
         )
 
     @property
@@ -208,6 +208,10 @@ class Level_0(DataLevel):
     def channel_signal(self) -> u.Quantity:
         return self.channel[self.signal_slice]
 
+    @property
+    def sequence_index_signal(self) -> u.Quantity:
+        return self.sequence_index[self.signal_slice]
+
     def plot_quantity_vs_index(
             self,
             a: u.Quantity,
@@ -220,6 +224,10 @@ class Level_0(DataLevel):
         ax.axvline(self.sequence_index[self.signal_index_first, 0], color='black')
         ax.axvline(self.sequence_index[self.signal_index_last + 1, 0], color='black')
         return ax
+
+    def plot_intensity_nobias_mean(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
+        return self.plot_quantity_vs_index(
+            a=self.intensity_nobias.mean(self.axis.xy), a_name='mean intensity, no bias', ax=ax)
 
     def plot_fpga_temp(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
         return self.plot_quantity_vs_index(a=self.fpga_temp, a_name='FPGA temp.', ax=ax)
@@ -257,7 +265,7 @@ class Level_0(DataLevel):
     ) -> typ.MutableSequence[plt.Axes]:
         if axs is None:
             fig, axs = plt.subplots(nrows=7, sharex=True)
-        self.plot_intensity_total_vs_time(ax=axs[0])
+        self.plot_intensity_nobias_mean(ax=axs[0])
         self.plot_exposure_length(ax=axs[1])
         self.plot_bias(ax=axs[2])
         self.plot_fpga_temp(ax=axs[3])

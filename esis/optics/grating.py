@@ -5,7 +5,7 @@ import pandas
 import scipy.optimize
 import astropy.units as u
 from kgpy import Name, optics, format, transform
-from ... import poletto
+from . import poletto
 
 __all__ = ['Grating']
 

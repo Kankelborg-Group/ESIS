@@ -18,7 +18,7 @@ num_dark_safety_frames = 3
 def level_0(caching: bool = False):
     return data.Level_0.from_directory(
         directory=raw_img_dir,
-        detector=optics.as_measured().components.detector,
+        detector=optics.as_measured().detector,
         caching=caching,
         num_dark_safety_frames=num_dark_safety_frames,
     )

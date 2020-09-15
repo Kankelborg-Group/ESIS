@@ -10,19 +10,15 @@ import astropy.time
 from kgpy import mixin, img
 from kgpy.img.masks import mask as img_mask
 import esis.optics
-from . import Level_0
+from . import DataLevel, Level_0
 
 
 __all__ = ['Level_1']
 
 
 @dataclasses.dataclass
-class Level_1(mixin.Pickleable):
-    intensity: u.Quantity
-    start_time: astropy.time.Time
-    exposure_length: u.Quantity
-    cam_id: u.Quantity
-    detector: esis.optics.components.Detector
+class Level_1(DataLevel, mixin.Pickleable):
+    detector: esis.optics.Detector
     sequence_metadata: np.ndarray = None
     analog_metadata: np.ndarray = None
 
@@ -42,12 +38,13 @@ class Level_1(mixin.Pickleable):
             intensity=intensity,
             start_time=lev0.start_time_signal,
             exposure_length=lev0.requested_exposure_time_signal,
-            cam_id=lev0.channel,
+            channel=lev0.channel_signal,
+            sequence_index=lev0.sequence_index_signal,
             detector=lev0.detector
         )
 
     def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
-        return self.detector.dn_to_photon(self.intensity,wavelength)
+        return self.detector.dn_to_photon(self.intensity, wavelength)
 
     def create_mask(self, sequence):
         import matplotlib.pyplot as plt
@@ -93,7 +90,7 @@ class Level_1(mixin.Pickleable):
                 filename = path / name
 
                 hdr = fits.Header()
-                hdr['CAM_ID'] = self.cam_id[sequence, camera]
+                hdr['CAM_ID'] = self.channel[sequence, camera]
                 hdr['DATE_OBS'] = str(self.start_time[sequence, camera])
                 hdr['IMG_EXP'] = self.exposure_length[sequence, camera]
 
