@@ -181,7 +181,6 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         photon_energy = const.c * const.h / wavelength / u.photon
         Si_e_hole_pair = 3.6 * u.eV / u.electron
 
-        print(channel_gains)
         for channel,channel_gain in enumerate(channel_gains):
             for i, quad in enumerate(quadrants):
                 photon_data[(...,channel)+quad] = data[(...,channel)+quad] * channel_gain[i] * Si_e_hole_pair / photon_energy
