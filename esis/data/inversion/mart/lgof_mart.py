@@ -9,7 +9,11 @@ class LGOFMART(SimpleMART):
 
     @staticmethod
     def channel_is_not_converged(goodness_of_fit: np.ndarray) -> bool:
-        return np.any(goodness_of_fit > 1)
+        # return np.any(goodness_of_fit > 1)
+
+        return np.percentile(goodness_of_fit, 99.9) > 1
+
+
 
     @staticmethod
     def correction_exponent(goodness_of_fit: np.ndarray) -> np.ndarray:

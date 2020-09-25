@@ -9,7 +9,7 @@ from . import antialias, Result, SimpleMART, LGOFMART
 
 
 # Looking for Charles' original MART? it is located at:
-# KSO/kso/science/software/ksopy/kso/ctis/moses_mart/sampling_issue/moses_mart.py
+# esis.data.inversion.moses_mart.moses
 
 @dataclasses.dataclass
 class MART:
@@ -20,12 +20,13 @@ class MART:
     contrast_exponent: float = 0.2
     max_filtering_iterations: int = 10
     max_multiplicative_iteration: int = 40
+    photon_read_noise: float = 1,
     simple_mart: SimpleMART = None
     lgof_mart: LGOFMART = None
     track_cube_history: bool = False
     rotation_kwargs: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {})
 
-    """ MART is the Multiplicative Algerbraic Reconstruction Technique, developed here for use and application in 
+    """ MART is the Multiplicative Algebraic Reconstruction Technique, developed here for use and application in 
     general slitless imaging spectrograph, such as the Multi-Order Solar EUV Spectrograph (MOSES) and the EUV Snapshot
     Snapshot Imaging Spectrograph (ESIS) instruments constructed and launched by the Kankelborg Group at Montana State
     University, Bozeman. MART was originally developed to reconstruct images in MOSES, and has since been generalized.
@@ -137,7 +138,6 @@ class MART:
             projections: 'np.ndarray[float]',
             projections_azimuth: u.Quantity = None,
             spectral_order: 'np.ndarray[int]' = None,
-            wavelen_ref_pix: typ.Optional[int] = None,
             cube_shape: typ.Tuple[int, ...] = None,
             cube_guess: 'typ.Optional[np.ndarray[float]]' = None,
             projections_offset_x: 'np.ndarray[int]' = np.array(0),
@@ -189,10 +189,8 @@ class MART:
             'projections': projections,
             'projections_azimuth': projections_azimuth,
             'spectral_order': spectral_order,
-            'wavelen_ref_pix': wavelen_ref_pix,
             'cube_shape': cube_shape,
             'cube_guess': cube_guess,
-            'cube_offset_x': cube_offset_x,
             'projections_offset_x': projections_offset_x,
             'projections_offset_y': projections_offset_y,
             'cube_offset_x': cube_offset_x,
@@ -209,6 +207,7 @@ class MART:
             'anti_aliasing': self.anti_aliasing,
             'use_lgof': self.use_lgof,
             'contrast_exponent': self.contrast_exponent,
+            'photon_read_noise': self.photon_read_noise,
             'max_filtering_iterations': self.max_filtering_iterations,
             'max_multiplicative_iterations': self.max_multiplicative_iteration,
             'simple_mart': self.simple_mart,
@@ -253,16 +252,20 @@ class MART:
         )
 
         for filtering_iter in range(max(self.max_filtering_iterations, 1)):
+            print('---------------------------------------------')
+            print('Filtering Iteration Number ', filtering_iter)
 
             if self.use_filter:
                 r.cube = self.filter(r.cube, kernel=filtering_kernel)
 
-            self.simple_mart(r, projections, projections_azimuth, spectral_order, wavelen_ref_pix, self.max_multiplicative_iteration,
+            self.simple_mart(r, projections, projections_azimuth, spectral_order,
+                             self.photon_read_noise,  self.max_multiplicative_iteration,
                              cube_shape, projections_offset_x, projections_offset_y, cube_offset_x, cube_offset_y,
                              m_axis, a_axis, x_axis, y_axis, w_axis, )
 
             if self.use_lgof:
-                self.lgof_mart(r, projections, projections_azimuth, spectral_order, wavelen_ref_pix, self.max_multiplicative_iteration,
+                self.lgof_mart(r, projections, projections_azimuth, spectral_order,
+                               self.photon_read_noise, self.max_multiplicative_iteration,
                                cube_shape, projections_offset_x, projections_offset_y, cube_offset_x, cube_offset_y,
                                m_axis, a_axis, x_axis, y_axis, w_axis, )
 

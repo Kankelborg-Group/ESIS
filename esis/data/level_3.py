@@ -224,6 +224,9 @@ class Level3(Pickleable):
         print(self.transformation_objects)
         lev1_transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
 
+        # undo flip about short axis from optical system
+        lev1.intensity = np.flip(lev1.intensity, axis=-2)
+
 
         for lev3_seq, seq in enumerate(self.lev1_sequences):
             for lev3_cam, cam in enumerate(self.lev1_cameras):
