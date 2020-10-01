@@ -76,7 +76,7 @@ class Level3(Pickleable):
         #undo flip about short axis from optical system
         lev_1.intensity = np.flip(lev_1.intensity, axis=-2)
 
-        aia_channel = [304*u.angstrom]
+        aia_channel = [304*u.AA]
         start_time = lev_1.start_time[0,0]
         end_time = lev_1.start_time[-1,0]
 
