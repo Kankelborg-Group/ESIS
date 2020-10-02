@@ -105,6 +105,8 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     def copy(self) -> 'Detector':
         other = super().copy()  # type: Detector
         other.inclination = self.inclination.copy()
+        other.roll = self.roll.copy()
+        other.twist = self.twist.copy()
         other.pixel_width = self.pixel_width.copy()
         other.num_pixels = self.num_pixels
         other.border_width_right = self.border_width_right.copy()

@@ -10,10 +10,14 @@ def as_measured(
         field_samples: int = 10,
         all_channels: bool = True
 ) -> Optics:
-    esis_as_measured = esis.optics.design.final(pupil_samples, field_samples, all_channels)
+    opt = esis.optics.design.final(pupil_samples, field_samples, all_channels)
+
+    # opt.grating.tangential_radius = (597.46 * u.mm + 597.08 * u.mm) / 2
+    # opt.grating.sagittal_radius = opt.grating.tangential_radius
+    # opt.grating.ruling_density = 2585.5 / u.mm
 
     # numbers sourced from ESIS instrument paper as of 09/10/20
-    detector = esis_as_measured.detector
+    detector = opt.detector
     detector.gain_tap1 = [2.57, 2.55, 2.57, 2.60] * u.electron / u.ct
     detector.gain_tap2 = [2.50, 2.58, 2.53, 2.60] * u.electron / u.ct
     detector.gain_tap3 = [2.52, 2.57, 2.52, 2.54] * u.electron / u.ct
@@ -24,7 +28,9 @@ def as_measured(
     detector.readout_noise_tap3 = [4.1, 4.0, 4.1, 4.2] * u.ct
     detector.readout_noise_tap4 = [3.7, 4.0, 4.3, 4.1] * u.ct
 
-    return esis_as_measured
+    # opt.update()
+
+    return opt
 
 
 def as_flown(

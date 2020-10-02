@@ -63,7 +63,7 @@ def final(
     grating.tangential_radius = grating.sagittal_radius
     grating.nominal_input_angle = 1.301 * u.deg
     grating.nominal_output_angle = 8.057 * u.deg
-    grating.ruling_density = 2.586608603456000 / u.um
+    grating.ruling_density = (2.586608603456000 / u.um).to(1 / u.mm)
     grating.inclination = -4.469567242792327 * u.deg
     grating.aper_wedge_angle = deg_per_channel
     grating.diffraction_order = 1 * u.dimensionless_unscaled

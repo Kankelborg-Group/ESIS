@@ -23,6 +23,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('grating'))
     inclination: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
+    twist: u.Quantity = 0 * u.deg
     tangential_radius: u.Quantity = np.inf * u.mm
     sagittal_radius: u.Quantity = np.inf * u.mm
     nominal_input_angle: u.Quantity = 0 * u.deg
@@ -91,6 +92,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     def transform(self) -> transform.rigid.TransformList:
         return super().transform + transform.rigid.TransformList([
             transform.rigid.TiltY(self.inclination),
+            transform.rigid.TiltX(self.twist),
             transform.rigid.TiltZ(self.roll),
         ])
 
@@ -128,6 +130,8 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     def copy(self) -> 'Grating':
         other = super().copy()      # type: Grating
         other.inclination = self.inclination.copy()
+        other.roll = self.roll.copy()
+        other.twist = self.twist.copy()
         other.tangential_radius = self.tangential_radius.copy()
         other.sagittal_radius = self.sagittal_radius.copy()
         other.nominal_input_angle = self.nominal_input_angle.copy()
