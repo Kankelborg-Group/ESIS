@@ -176,7 +176,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         """
         For a given wavelength return a detector size array with units of photon / DN
         """
-        photon_data = data.value * u.photon
+        photon_data = np.empty(data.shape) * u.photon
 
         channel_gains = self.gain
         quadrants = self.quadrants

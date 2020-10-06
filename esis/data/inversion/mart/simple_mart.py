@@ -3,7 +3,7 @@ import numpy as np
 import astropy.units as u
 import dataclasses
 import matplotlib.pyplot as plt
-
+import time
 from . import Result, antialias, forward
 
 
@@ -32,11 +32,12 @@ class SimpleMART:
         return np.nanmean(goodness_of_fit[goodness_of_fit != 0])
 
 
-
     @staticmethod
     def channel_is_not_converged(goodness_of_fit: np.ndarray) -> bool:
         chisq = SimpleMART.chisq(goodness_of_fit)
         return chisq > 1
+        # return np.percentile(goodness_of_fit,99.9) > 1
+
 
     @staticmethod
     def correction_exponent(goodness_of_fit: np.ndarray) -> np.ndarray:
@@ -48,7 +49,7 @@ class SimpleMART:
             projections: 'np.ndarray[float]',
             projections_azimuth: u.Quantity,
             spectral_order: 'np.ndarray[int]',
-            wavelen_ref_pix: typ.Optional[int] = None,
+            photon_read_noise: float = 1,
             max_multiplicative_iteration: int = 40,
             cube_shape: typ.Tuple[int, ...] = None,
             projections_offset_x: 'np.ndarray[int]' = np.array(0),
@@ -87,13 +88,12 @@ class SimpleMART:
         n_channels = projections.shape[m_axis] * projections.shape[a_axis]
         r = results
 
-        if wavelen_ref_pix is None:
-            wavelen_ref_pix = r.cube.shape[w_axis] // 2
+
 
         projections_azimuth, spectral_order = np.broadcast_arrays(projections_azimuth, spectral_order, subok=True)
 
+        print('Starting MART Iterations')
         for multiplicative_iter in range(max_multiplicative_iteration):
-            print('MART Iteration')
             n_converged = n_channels
             corrections = np.ones_like(r.cube)
             for m in range(projections.shape[m_axis]):
@@ -110,7 +110,6 @@ class SimpleMART:
                         cube=r.cube,
                         projection_azimuth=projections_azimuth[a],
                         spectral_order=spectral_order[m],
-                        wavelen_ref_pix= wavelen_ref_pix,
                         projection_shape=projection.shape,
                         projection_spatial_offset=(projections_offset_x[m, a], projections_offset_y[m, a]),
                         cube_spatial_offset=(cube_offset_x[m, a], cube_offset_y[m, a]),
@@ -124,26 +123,23 @@ class SimpleMART:
                     if self.anti_aliasing == 'post':
                         test_projection = antialias.apply(test_projection, x_axis_index=x_axis, y_axis_index=y_axis)
 
-                    goodness_of_fit = np.square(test_projection - projection) / (4 + test_projection)
+                    goodness_of_fit = np.square(test_projection - projection) / (np.square(photon_read_noise) + test_projection)
                     chisq = SimpleMART.chisq(goodness_of_fit)
                     # fig, ax = plt.subplots()
                     # im = ax.imshow(goodness_of_fit[0,0,:,:,0])
                     # fig.colorbar(im)
 
-                    print(chisq)
-                    # print('Starting Chi Squared= ',chisq)
-                    # Notes on "reduced chisquare"
-                    #    (0) assumes data units are 'counts', with shot noise.
-                    #    (1) assumes read noise of order 2 photons: sigma**2 = 4+test_projection.
-                    #    (2) normalizes by number of data elements, not proper DoF.
+                    # print(chisq,np.max(goodness_of_fit),goodness_of_fit[goodness_of_fit>1].size)
+
                     r.chisq_history.append(chisq)
                     r.mart_type_history.append(self.type_int)
 
                     if self.channel_is_not_converged(goodness_of_fit):
-                        print('Calculating Correction')
+                        # print('Calculating Correction')
                         # this if-statement runs if if the mean of `goodness_of_fit` is greater than 1
                         n_converged -= 1
                         exponent = self.correction_exponent(goodness_of_fit)
+
                         # Adding this logic to protect against divide by zero errors
                         ratio = projection / test_projection
                         zeroes_loc = (test_projection == 0)
@@ -154,7 +150,6 @@ class SimpleMART:
                             projection=correction,
                             projection_azimuth=projections_azimuth[a],
                             spectral_order=spectral_order[m],
-                            wavelen_ref_pix=wavelen_ref_pix,
                             cube_shape=cube_shape,
                             projection_spatial_offset=(projections_offset_x[m, a], projections_offset_y[m, a]),
                             cube_spatial_offset=(cube_offset_x[m, a], cube_offset_y[m, a]),
@@ -172,12 +167,12 @@ class SimpleMART:
                             r.cube_history.append(r.cube.copy())
 
             if n_converged == n_channels:
-                print('MART Converged')
+                print('MART Converged at iteration ', multiplicative_iter)
                 if self.track_cube_history == 'filter':
                     r.cube_history.append(r.cube.copy())
                 break
 
-            print('Correcting Guess Cube')
+            # print('Correcting Guess Cube')
             r.cube *= corrections ** (1 / (n_channels - n_converged))
 
         if n_converged != n_channels:

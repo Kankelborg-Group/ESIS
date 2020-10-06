@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def generate_level1():
     optics = esis.flight.optics.as_measured()
-    detector = optics.components.detector
+    detector = optics.detector
     lev0 = Level_0.from_directory(esis.flight.raw_img_dir,detector)
 
 
