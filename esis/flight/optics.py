@@ -14,7 +14,7 @@ def as_measured(
 
     # opt.grating.tangential_radius = (597.46 * u.mm + 597.08 * u.mm) / 2
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
-    # opt.grating.ruling_density = 2585.5 / u.mm
+    opt.grating.ruling_density = 2585.5 / u.mm
 
     # numbers sourced from ESIS instrument paper as of 09/10/20
     detector = opt.detector

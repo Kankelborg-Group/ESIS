@@ -82,8 +82,8 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     @property
     def transform(self) -> transform.rigid.Transform:
         return super().transform + transform.rigid.TransformList([
-            transform.rigid.TiltY(self.inclination),
             transform.rigid.TiltZ(self.roll),
+            transform.rigid.TiltY(self.inclination),
             transform.rigid.TiltX(self.twist),
         ])
 

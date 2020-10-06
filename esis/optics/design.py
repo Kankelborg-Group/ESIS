@@ -47,7 +47,6 @@ def final(
     central_obscuration = CentralObscuration()
     central_obscuration.piston = 1404.270 * u.mm
     central_obscuration.obscured_half_width = tuffet_radius * np.cos(deg_per_channel / 2)
-    central_obscuration.num_sides = num_sides
 
     field_stop = FieldStop()
     field_stop.piston = primary.focal_length.copy()
