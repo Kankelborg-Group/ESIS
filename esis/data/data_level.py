@@ -76,7 +76,7 @@ class DataLevel:
                     drawstyle=drawstyle,
                 )
             ax.set_xlabel('sequence index')
-            ax.legend(fontsize='xx-small', ncol=legend_ncol, loc='right')
+            ax.legend(fontsize='x-small', ncol=legend_ncol, loc='right')
         return ax
 
     def plot_intensity_total_vs_time(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:

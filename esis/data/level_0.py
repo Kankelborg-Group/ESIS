@@ -149,7 +149,10 @@ class Level_0(DataLevel):
         bias = np.empty((self.shape[self.axis.time], self.shape[self.axis.chan], len(quadrants))) << self.intensity.unit
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
-            bias[..., q] = np.median(a=data_quadrant[blank_pix[q]], axis=self.axis.xy)
+            a = data_quadrant[blank_pix[q]]
+            a = np.percentile(a, 95, axis=self.axis.xy, keepdims=True)
+            a = np.percentile(a, 5, axis=self.axis.xy, keepdims=True)
+            bias[..., q] = np.median(a=a, axis=self.axis.xy)
         return bias
 
     @property
@@ -260,19 +263,26 @@ class Level_0(DataLevel):
         axs[0].figure.suptitle('Median dark images')
         return self.plot_time(images=self.dark_nobias, image_names=self.channel_labels, axs=axs, )
 
-    def plot_all_vs_index(
+    def plot_exposure_stats_vs_index(
             self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
     ) -> typ.MutableSequence[plt.Axes]:
         if axs is None:
-            fig, axs = plt.subplots(nrows=7, sharex=True)
+            fig, axs = plt.subplots(nrows=3)
         self.plot_intensity_nobias_mean(ax=axs[0])
         self.plot_exposure_length(ax=axs[1])
         self.plot_bias(ax=axs[2])
-        self.plot_fpga_temp(ax=axs[3])
-        self.plot_adc_temperature(ax=axs[4])
-        self.plot_fpga_vccint(ax=axs[6])
-        self.plot_fpga_vccaux(ax=axs[5])
-        self.plot_fpga_vccbram(ax=axs[6])
+        return axs
+
+    def plot_fpga_stats_vs_index(
+            self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
+    ) -> typ.MutableSequence[plt.Axes]:
+        if axs is None:
+            fig, axs = plt.subplots(nrows=5)
+        self.plot_fpga_temp(ax=axs[0])
+        self.plot_adc_temperature(ax=axs[1])
+        self.plot_fpga_vccint(ax=axs[2])
+        self.plot_fpga_vccaux(ax=axs[3])
+        self.plot_fpga_vccbram(ax=axs[4])
         return axs
 
     def blink_intensity_nobias_nodark(

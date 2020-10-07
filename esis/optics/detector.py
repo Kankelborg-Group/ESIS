@@ -23,6 +23,8 @@ SurfaceT = optics.Surface[
 class Detector(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
     inclination: u.Quantity = 0 * u.deg
+    roll: u.Quantity = 0 * u.deg
+    twist: u.Quantity = 0 * u.deg
     pixel_width: u.Quantity = 0 * u.um
     num_pixels: typ.Tuple[int, int] = (0, 0)
     border_width_right: u.Quantity = 0 * u.mm
@@ -80,7 +82,9 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     @property
     def transform(self) -> transform.rigid.Transform:
         return super().transform + transform.rigid.TransformList([
+            transform.rigid.TiltZ(self.roll),
             transform.rigid.TiltY(self.inclination),
+            transform.rigid.TiltX(self.twist),
         ])
 
     @property
@@ -101,6 +105,8 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     def copy(self) -> 'Detector':
         other = super().copy()  # type: Detector
         other.inclination = self.inclination.copy()
+        other.roll = self.roll.copy()
+        other.twist = self.twist.copy()
         other.pixel_width = self.pixel_width.copy()
         other.num_pixels = self.num_pixels
         other.border_width_right = self.border_width_right.copy()
