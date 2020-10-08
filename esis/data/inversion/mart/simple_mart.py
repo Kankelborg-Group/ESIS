@@ -17,6 +17,7 @@ class SimpleMART:
     track_cube_history: bool = False
     anti_aliasing: str = None
     rotation_kwargs: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {})
+    verbose: bool = False
 
     """ `SimpleMART` is the basic unit of mart, and encompasses a single "filtering iteration".
     
@@ -92,7 +93,8 @@ class SimpleMART:
 
         projections_azimuth, spectral_order = np.broadcast_arrays(projections_azimuth, spectral_order, subok=True)
 
-        print('Starting MART Iterations')
+        if self.verbose:
+            print('Starting MART Iterations')
         for multiplicative_iter in range(max_multiplicative_iteration):
             n_converged = n_channels
             corrections = np.ones_like(r.cube)
@@ -167,7 +169,8 @@ class SimpleMART:
                             r.cube_history.append(r.cube.copy())
 
             if n_converged == n_channels:
-                print('MART Converged at iteration ', multiplicative_iter)
+                if self.verbose:
+                    print('MART Converged at iteration ', multiplicative_iter)
                 if self.track_cube_history == 'filter':
                     r.cube_history.append(r.cube.copy())
                 break

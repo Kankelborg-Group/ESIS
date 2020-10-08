@@ -1,5 +1,4 @@
 import pathlib
-import pickle
 from astropy.io import fits
 from astropy import wcs
 import astropy.units as u
@@ -435,7 +434,7 @@ class Level3(Pickleable):
 
 
 
-def vignetting_correction_quality(x,lev3: 'Level3'):
+def vignetting_correction_quality(x, lev3: 'Level3'):
 
     scale_factor = x[0:4]
     vignetting = lev3.correct_vignetting(scale_factor)
@@ -494,7 +493,7 @@ def vignetting_correction_quality(x,lev3: 'Level3'):
     print(least_squares)
     return least_squares
 
-def find_vignetting_correction(lev3:'Level3'):
+def find_vignetting_correction(lev3: 'Level3'):
     # bounds = [(.2,.6),(.2,.6),(.2,.6),(.2,.6),(-10,10),(-10,10),(-10,10),(-10,10)]
     # bounds = [(.3, .5), (.3, .5), (.3, .5), (.3, .5), (-0, 0), (-0, 0), (-0, 0), (-0, 0)]
     # guess = np.array([0.38815087, 0.33319833, 0.32219223, 0.4400179 , 0.        ,

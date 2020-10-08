@@ -24,7 +24,8 @@ class MART:
     simple_mart: SimpleMART = None
     lgof_mart: LGOFMART = None
     track_cube_history: bool = False
-    rotation_kwargs: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {})
+    rotation_kwargs: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {},)
+    verbose: bool = False
 
     """ MART is the Multiplicative Algebraic Reconstruction Technique, developed here for use and application in 
     general slitless imaging spectrograph, such as the Multi-Order Solar EUV Spectrograph (MOSES) and the EUV Snapshot
@@ -54,14 +55,16 @@ class MART:
         #     self.rotation_kwargs = {'reshape': False, 'prefilter': False, 'order': 3, 'mode': 'nearest', }
 
         if self.simple_mart is None:
-            self.simple_mart = SimpleMART(track_cube_history=self.track_cube_history,
-                                          anti_aliasing=self.anti_aliasing,
-                                          rotation_kwargs=self.rotation_kwargs)
+            self.simple_mart = SimpleMART(track_cube_history = self.track_cube_history,
+                                          anti_aliasing = self.anti_aliasing,
+                                          rotation_kwargs=  self.rotation_kwargs,
+                                          verbose = self.verbose)
 
         if self.lgof_mart is None:
-            self.lgof_mart = LGOFMART(track_cube_history=self.track_cube_history,
-                                      anti_aliasing=self.anti_aliasing,
-                                      rotation_kwargs=self.rotation_kwargs)
+            self.lgof_mart = LGOFMART(track_cube_history = self.track_cube_history,
+                                      anti_aliasing = self.anti_aliasing,
+                                      rotation_kwargs = self.rotation_kwargs,
+                                      verbose = self.verbose)
 
     @staticmethod
     def maximize(
@@ -214,6 +217,7 @@ class MART:
             'lgof_mart': self.lgof_mart,
             'track_cue_history': self.track_cube_history,
             'rotation_kwargs': self.rotation_kwargs,
+            'verbose': self.verbose
         }
 
         projection_shape = (projections.shape[m_axis], projections.shape[a_axis])
@@ -252,8 +256,10 @@ class MART:
         )
 
         for filtering_iter in range(max(self.max_filtering_iterations, 1)):
-            print('---------------------------------------------')
-            print('Filtering Iteration Number ', filtering_iter)
+
+            if self.verbose:
+                print('---------------------------------------------')
+                print('Filtering Iteration Number ', filtering_iter)
 
             if self.use_filter:
                 r.cube = self.filter(r.cube, kernel=filtering_kernel)

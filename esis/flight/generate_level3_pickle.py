@@ -12,7 +12,7 @@ def generate_level3(line = 'ov',overwrite = False):
 
 
     if line == 'ov':
-        print('Generating OV Level_3 Object')
+        print('Generating OV Level3 Object')
         if level_3.ov_Level3_initial.is_file() == False or overwrite == True:
             lev3 = level_3.Level3.from_aia_level1()
             lev3.to_pickle(level_3.ov_Level3_initial)
