@@ -1,5 +1,5 @@
 import numpy as np
-from esis.data import level_3
+from esis.data import level_3, level_4
 import matplotlib.pyplot as plt
 import scipy.ndimage
 from esis.data.inversion import mart
@@ -40,10 +40,10 @@ event = [slice(None),slice(None)]
 
 # event = [slice(80,1120),slice(80,1120)]
 pad = 0
+# #
 #
-#
-event = [slice(400,700),slice(550,850)]
-pad = 20
+# event = [slice(400,700),slice(550,850)]
+# pad = 20
 
 region = ov_data[:,:,event[0],event[1]]
 
@@ -78,7 +78,7 @@ mart_obj = mart.MART(
     max_filtering_iterations=50,
     photon_read_noise = 2,
     # track_cube_history='filter',
-    contrast_exponent=.3,
+    contrast_exponent=.4,
     # rotation_kwargs=rotation_kwargs
 )
 
@@ -106,9 +106,8 @@ for seq in seqs:
 
 
 
-
-p = mp.Pool(len(seqs))
-
+p = mp.Pool(4)
+# p = mp.Pool(len(seqs))
 args_iter = zip(projections_list,repeat(angles),repeat(np.array(spectral_order)))
 kwargs_iter = repeat(dict(cube_offset_x=ref_wavelen,cube_guess=guess))
 
@@ -139,5 +138,7 @@ inverted_results = np.array([recovered_list[i].best_cube for i in range(len(reco
 inverted_results_wcs = [result_wcs for i in range(len(recovered_list))]
 
 
+lev4 = level_4.Level_4(recovered_list,inverted_results_wcs)
+lev4.to_pickle(path = 'lev4_mart.pickle')
 
 

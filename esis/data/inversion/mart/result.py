@@ -17,3 +17,5 @@ class Result:
     total_intensity_history: typ.List[np.ndarray] = dataclasses.field(default_factory=lambda: [])
     object_parameters: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {})
     call_parameters: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {})
+
+
