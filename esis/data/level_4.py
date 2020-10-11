@@ -4,6 +4,7 @@ from esis.data.inversion.mart import Result
 import typing as typ
 from astropy import wcs
 import pathlib
+from kgpy.plot import HypercubeSlicer
 
 all = ['default_path']
 
@@ -17,3 +18,6 @@ class Level_4(Pickleable):
     @staticmethod
     def default_pickle_path() -> pathlib.Path:
         return default_path
+
+    def plot(self):
+        return HypercubeSlicer(self.cube_list,self.wcs_list)

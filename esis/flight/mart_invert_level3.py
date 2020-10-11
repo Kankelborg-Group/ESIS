@@ -75,19 +75,20 @@ mart_obj = mart.MART(
     use_lgof = True,
     anti_aliasing=None,
     max_multiplicative_iteration=100,
-    max_filtering_iterations=50,
+    max_filtering_iterations=75,
     photon_read_noise = 2,
     # track_cube_history='filter',
     contrast_exponent=.4,
     # rotation_kwargs=rotation_kwargs
+
 )
 
 ref_wavelen = guess.shape[-1] // 2
 recovered_list = []
 
 # for seq in range(ov.observation.data.shape[0]-3):
-seqs = [i for i in range(ov.observation.data.shape[0])]
-# seqs = [0,1,2,3,4,5,6,7]
+# seqs = [i for i in range(ov.observation.data.shape[0])]
+seqs = [0,1]
 
 projections_list = []
 for seq in seqs:
@@ -106,7 +107,7 @@ for seq in seqs:
 
 
 
-p = mp.Pool(4)
+p = mp.Pool(mp.cpu_count()//2)
 # p = mp.Pool(len(seqs))
 args_iter = zip(projections_list,repeat(angles),repeat(np.array(spectral_order)))
 kwargs_iter = repeat(dict(cube_offset_x=ref_wavelen,cube_guess=guess))
@@ -138,7 +139,10 @@ inverted_results = np.array([recovered_list[i].best_cube for i in range(len(reco
 inverted_results_wcs = [result_wcs for i in range(len(recovered_list))]
 
 
-lev4 = level_4.Level_4(recovered_list,inverted_results_wcs)
+lev4 = level_4.Level_4(inverted_results,inverted_results_wcs)
 lev4.to_pickle(path = 'lev4_mart.pickle')
+
+# test = lev4.plot()
+# plt.show()
 
 
