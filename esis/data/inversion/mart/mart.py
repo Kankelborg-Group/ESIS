@@ -4,7 +4,7 @@ import numpy as np
 import astropy.units as u
 import scipy
 
-from . import antialias, Result, SimpleMART, LGOFMART
+from . import antialias, Result, SimpleMART, LGOFMART, forward
 
 
 
@@ -287,8 +287,9 @@ class MART:
 
                 r.norm_history.append(norm)
 
-
-
         if not self.use_maximize:
             r.best_cube = r.cube
         return r
+
+
+

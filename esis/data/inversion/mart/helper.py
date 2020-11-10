@@ -134,7 +134,8 @@ def generate_projections(
         angles: u.Quantity,
         spectral_order: int = 1,
         poisson_noise: bool = False,
-        rotation_kwargs: typ.Dict = default_rotation_kwargs
+        rotation_kwargs: typ.Dict = default_rotation_kwargs,
+        projection_shape = None
 ) -> np.ndarray:
     """
     Given a data cube a list of angles, create a projection through the cube for each of those angles at the given
@@ -153,7 +154,8 @@ def generate_projections(
             cube=data,
             projection_azimuth=angle,
             spectral_order=spectral_order,
-            rotation_kwargs=rotation_kwargs
+            rotation_kwargs=rotation_kwargs,
+            projection_shape = projection_shape
         )
         if poisson_noise:
             proj[proj <= 0] = 0

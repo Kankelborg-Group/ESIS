@@ -20,30 +20,23 @@ ov = level_3.Level3.from_pickle(level_3.ov_final_path)
 ov_data = ov.observation.data
 test_seq = 15
 
-rotation_kwargs = {
-    'reshape': False,
-    'prefilter': False,
-    'order': 1,
-    'mode': 'constant',
-    'cval': 0,
-}
+# rotation_kwargs = {
+#     'reshape': False,
+#     'prefilter': False,
+#     'order': 1,
+#     'mode': 'constant',
+#     'cval': 0,
+# }
 
 angles = (np.arange(4)*45 - 22.5 + 45 - 90)* u.deg
-# fig,axs = plt.subplots(2,2)
-# for i, ax in enumerate(axs.flat):
-#     projection = scipy.ndimage.rotate(ov_data[test_seq,i],angles[i],**rotation_kwargs)
-#     ax.imshow(projection,origin = 'lower',vmax = np.percentile(projection,90))
+# event = [slice(None),slice(None)]
 #
-#
-
-event = [slice(None),slice(None)]
-
-# event = [slice(80,1120),slice(80,1120)]
-pad = 0
+# # event = [slice(80,1120),slice(80,1120)]
+# pad = 0
+# # #
 # #
-#
-# event = [slice(400,700),slice(550,850)]
-# pad = 20
+event = [slice(400,700),slice(550,850)]
+pad = 20
 
 region = ov_data[:,:,event[0],event[1]]
 
@@ -55,9 +48,6 @@ window = np.exp(-(np.sqrt(np.square(x-x0) + np.square(y-y0))/len_scl)**(6))
 window=window.T
 # window = np.ones_like(region[0])
 
-
-
-fig,ax = plt.subplots()
 guess = np.ones_like(region[0,0])*window
 guess = np.pad(guess,((pad,pad),(pad,pad)))
 
@@ -65,7 +55,6 @@ guess = guess[None,:,:]
 
 guess = np.resize(guess,(41,guess.shape[-2],guess.shape[-1]))
 guess = np.moveaxis(guess,0,-1)
-test = ax.imshow(guess[:,:,2],origin = 'lower')
 
 
 spectral_order = 1
@@ -87,8 +76,8 @@ ref_wavelen = guess.shape[-1] // 2
 recovered_list = []
 
 # for seq in range(ov.observation.data.shape[0]-3):
-# seqs = [i for i in range(ov.observation.data.shape[0])]
-seqs = [0,1]
+seqs = [i for i in range(ov.observation.data.shape[0])]
+seqs = [0,1,2,3,4,5,6,7]
 
 projections_list = []
 for seq in seqs:
@@ -125,9 +114,9 @@ header['ctype1'] = 'Solar Y'
 header['ctype2'] = 'Solar X'
 header['naxis'] = 3
 header['ctype3'] = 'pix'
-header['crval3'] = -1
+header['crval3'] = -18
 header['crpix3'] = ref_wavelen
-header['cdelt3'] = 1
+header['cdelt3'] = 18
 header['naxis3'] = guess.shape[-1]
 
 result_wcs = wcs.WCS(header)
@@ -140,9 +129,9 @@ inverted_results_wcs = [result_wcs for i in range(len(recovered_list))]
 
 
 lev4 = level_4.Level_4(inverted_results,inverted_results_wcs)
-lev4.to_pickle(path = 'lev4_mart.pickle')
+lev4.to_pickle(path = 'lev4_mainevent_mart.pickle')
 
-# test = lev4.plot()
-# plt.show()
+test = lev4.plot()
+plt.show()
 
 
