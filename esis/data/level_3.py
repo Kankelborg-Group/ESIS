@@ -13,7 +13,7 @@ import kgpy.img.coalignment.image_coalignment as img_align
 import kgpy.img.masks.mask as img_mask
 from esis.data import level_1
 import esis
-from kgpy.observatories.aia import aia
+from kgpy.observatories import AIA
 from kgpy.mixin import Pickleable
 
 import scipy.optimize
@@ -22,10 +22,12 @@ import scipy.signal
 
 from matplotlib.patches import Polygon
 
-__all__ = ['ov_Level3_initial', 'default_aia_path', 'ov_Level3_updated', 'mgx_masks', 'ov_Level3_transforms',
+__all__ = ['ov_Level3_initial',
+           # 'default_aia_path',
+           'ov_Level3_updated', 'mgx_masks', 'ov_Level3_transforms',
            'ov_Level3_masked', 'hei_transforms', 'ov_final_path', 'hei_final_path']
 
-default_aia_path = pathlib.Path(aia.__file__).parent / 'data/'
+# default_aia_path = pathlib.Path(aia.__file__).parent / 'data/'
 
 # intermediate pickles for testing
 ov_Level3_initial = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3.pickle'
@@ -59,8 +61,12 @@ class Level3(Pickleable):
 
 
     @classmethod
-    def from_aia_level1(cls, aia_path: pathlib.Path = default_aia_path,
-                        level1_path: pathlib.Path = level_1.Level_1.default_pickle_path(), hei = False) -> 'Level3':
+    def from_aia_level1(
+            cls,
+            aia_path: typ.Optional[pathlib.Path] = None,
+            level1_path: pathlib.Path = level_1.Level_1.default_pickle_path(),
+            hei: bool = False
+    ) -> 'Level3':
 
         """
         Create a Level3 Obj through a linear co-alignment of ESIS Level1 to AIA 304.
@@ -75,14 +81,17 @@ class Level3(Pickleable):
         #undo flip about short axis from optical system
         lev_1.intensity = np.flip(lev_1.intensity, axis=-2)
 
-        aia_channel = [304*u.AA]
-        start_time = lev_1.start_time[0,0]
-        end_time = lev_1.start_time[-1,0]
-
-        aia_304_files = aia.fetch_from_time(start_time, end_time, default_aia_path, aia_channels=aia_channel)
-        aia_304_lev15 = aia.aiaprep_from_paths(aia_304_files)
-
-        aia_304 = aia.AIA.from_path('aia_304', aia_304_lev15)
+        # aia_304_files = aia.fetch_from_time(start_time, end_time, default_aia_path, aia_channels=aia_channel)
+        # aia_304_lev15 = aia.aiaprep_from_paths(aia_304_files)
+        #
+        # aia_304 = aia.AIA.from_path('aia_304', aia_304_lev15)
+        aia_304 = AIA.from_time_range(
+            time_start=lev_1.start_time[0, 0],
+            time_end=lev_1.start_time[-1, 0],
+            download_path=aia_path,
+            channels=[304] * u.AA,
+            user_email='jacobdparker@gmail.com'
+        )
 
         if hei == False:
             inital_cropping = (slice(None),slice(lev_1.intensity.shape[-1] // 2 - 25, None))
