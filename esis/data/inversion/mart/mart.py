@@ -20,7 +20,7 @@ class MART:
     contrast_exponent: float = 0.2
     max_filtering_iterations: int = 10
     max_multiplicative_iteration: int = 40
-    photon_read_noise: float = 1,
+    photon_read_noise: float = 1
     simple_mart: SimpleMART = None
     lgof_mart: LGOFMART = None
     track_cube_history: bool = False

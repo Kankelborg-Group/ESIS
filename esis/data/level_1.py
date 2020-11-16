@@ -12,7 +12,6 @@ from kgpy.img.masks import mask as img_mask
 import esis.optics
 from . import DataLevel, Level_0
 
-
 __all__ = ['Level_1']
 
 
@@ -29,7 +28,8 @@ class Level_1(DataLevel, mixin.Pickleable):
             intensity_unit = intensity.unit
             warnings.warn('Despiking data, this will take a while ...')
             intensity, mask, stats = img.spikes.identify_and_fix(
-                intensity.value, axis=(0, 2, 3),
+                data=intensity.value,
+                axis=(0, 2, 3),
                 percentile_threshold=(0, 99.9),
                 poly_deg=1,
             )
@@ -44,7 +44,7 @@ class Level_1(DataLevel, mixin.Pickleable):
         )
 
     def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
-        return self.detector.dn_to_photon(self.intensity, wavelength)
+        return self.detector.convert_adu_to_photons(self.intensity, wavelength)
 
     def create_mask(self, sequence):
         import matplotlib.pyplot as plt
@@ -54,7 +54,7 @@ class Level_1(DataLevel, mixin.Pickleable):
         shp = self.intensity.shape
         poly_list = []
         for i in range(shp[1]):
-            img = self.intensity[sequence,i]
+            img = self.intensity[sequence, i]
             fig, ax = plt.subplots()
             ax.imshow(img, cmap='gray_r', norm=colors.SymLogNorm(1))
 
@@ -106,6 +106,3 @@ class Level_1(DataLevel, mixin.Pickleable):
             tar.add(path, arcname=path.name)
 
         return
-
-
-

@@ -13,6 +13,7 @@ import kgpy.img.coalignment.image_coalignment as img_align
 import kgpy.img.masks.mask as img_mask
 from esis.data import level_1
 import esis
+from kgpy.observatories import aia
 from kgpy.observatories import AIA
 from kgpy.mixin import Pickleable
 
@@ -27,7 +28,7 @@ __all__ = ['ov_Level3_initial',
            'ov_Level3_updated', 'mgx_masks', 'ov_Level3_transforms',
            'ov_Level3_masked', 'hei_transforms', 'ov_final_path', 'hei_final_path']
 
-# default_aia_path = pathlib.Path(aia.__file__).parent / 'data/'
+default_aia_path = pathlib.Path(aia.__file__).parent / 'data/'
 
 # intermediate pickles for testing
 ov_Level3_initial = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3.pickle'
@@ -136,7 +137,7 @@ class Level3(Pickleable):
                 start = time.time()
                 print('Fit in Progress: Camera = ',j,' Sequence = ',i)
 
-                td = aia_304.exposure_start_time - lev_1.start_time[i, 0]  # should be the same for every camera
+                td = aia_304.time - lev_1.start_time[i, 0]  # should be the same for every camera
                 best_im = np.abs(td.sec).argmin()
                 aia_im = aia_304.intensity[best_im, ...]
 
