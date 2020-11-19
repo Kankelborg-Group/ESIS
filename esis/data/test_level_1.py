@@ -3,27 +3,25 @@ import pathlib
 import esis.optics.design
 from esis.data import Level_1, Level_0
 
-def test_to_pickle():
+
+def test_to_from_pickle():
     """
     This tests from_level_0 which calls calc_level_1 and then creates and deletes a test.pickle
     """
     optics = esis.flight.optics.as_measured()
     detector = optics.detector
-    lev0 = Level_0.from_directory(esis.flight.raw_img_dir,detector)
-
+    lev0 = Level_0.from_directory(esis.flight.raw_img_dir, detector)
     lev1 = Level_1.from_level_0(lev0)
 
     path = pathlib.Path('test.pickle')
     lev1.to_pickle(path)
-
     assert path.exists()
+
+    esis_fp = Level_1.from_pickle(path)
+    assert esis_fp.intensity.sum() > 0
+
     path.unlink()
 
-
-def test_from_pickle():
-    esis_fp = Level_1.from_pickle()
-
-    assert esis_fp.intensity.sum() > 0
 
 
 # These aren't tests but driver programs ... where to put these?

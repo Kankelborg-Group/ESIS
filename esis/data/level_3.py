@@ -14,7 +14,6 @@ import kgpy.img.masks.mask as img_mask
 from esis.data import level_1
 import esis
 from kgpy.observatories import aia
-from kgpy.observatories import AIA
 from kgpy.mixin import Pickleable
 
 import scipy.optimize
@@ -86,9 +85,9 @@ class Level3(Pickleable):
         # aia_304_lev15 = aia.aiaprep_from_paths(aia_304_files)
         #
         # aia_304 = aia.AIA.from_path('aia_304', aia_304_lev15)
-        aia_304 = AIA.from_time_range(
-            time_start=lev_1.start_time[0, 0],
-            time_end=lev_1.start_time[-1, 0],
+        aia_304 = aia.AIA.from_time_range(
+            time_start=lev_1.time[0, 0],
+            time_end=lev_1.time[-1, 0],
             download_path=aia_path,
             channels=[304] * u.AA,
             user_email='jacobdparker@gmail.com'
@@ -137,7 +136,7 @@ class Level3(Pickleable):
                 start = time.time()
                 print('Fit in Progress: Camera = ',j,' Sequence = ',i)
 
-                td = aia_304.time - lev_1.start_time[i, 0]  # should be the same for every camera
+                td = aia_304.time - lev_1.time[i, 0]  # should be the same for every camera
                 best_im = np.abs(td.sec).argmin()
                 aia_im = aia_304.intensity[best_im, ...]
 
@@ -194,8 +193,8 @@ class Level3(Pickleable):
                 print('Fit Duration = ', time.time()-start)
             lev_3_transforms.append(transform_per_camera)
         aia_wcs = aia_304.wcs[0].slice(pos)
-        date_obs = lev_1.start_time[sequence[0], 0]
-        time_delta = lev_1.start_time[sequence[1], 0] - date_obs
+        date_obs = lev_1.time[sequence[0], 0]
+        time_delta = lev_1.time[sequence[1], 0] - date_obs
 
         # Axis 3 and 4 of the WCS object are camera and sequence respectively to match the Level1 ndarray
         # For future runs of ESIS with additional cameras CRVAL3 will require modification.
@@ -406,7 +405,7 @@ class Level3(Pickleable):
         transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
         for l3_seq, l1_seq in enumerate(self.lev1_sequences):
             for l3_cam, l1_cam in enumerate(self.lev1_cameras):
-                td = aia_304.exposure_start_time - esis.start_time[l1_seq, 0]  # should be the same for every camera
+                td = aia_304.exposure_start_time - esis.time[l1_seq, 0]  # should be the same for every camera
                 best_im = np.abs(td.sec).argmin()
                 aia_im = aia_304.intensity[best_im, ...]
                 crop = transforms.transform_cube[l3_seq][l3_cam].post_transform_crop
@@ -427,6 +426,7 @@ class Level3(Pickleable):
         for i in self.lev1_cameras:
             super_mask *= self.observation.mask[:, i]
 
+        super_mask = np.resize(super_mask[:,None],self.observation.mask.shape)
         super_mask = np.resize(super_mask[:,None],self.observation.mask.shape)
         masked_cube = self.observation.data * super_mask
         masked_cube[masked_cube == 0] = np.nan

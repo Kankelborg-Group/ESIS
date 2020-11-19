@@ -7,7 +7,7 @@ from kgpy import Name, transform, optics, format
 
 __all__ = ['Filter']
 
-SurfT = optics.Surface[None, None, optics.aperture.Circular, optics.aperture.Circular, None]
+SurfT = optics.surface.Surface[None, None, optics.surface.aperture.Circular, optics.surface.aperture.Circular, None]
 
 
 @dataclasses.dataclass
@@ -26,10 +26,10 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
     @property
     def surface(self) -> SurfT:
         surface = super().surface
-        surface.aperture = optics.aperture.Circular(
+        surface.aperture = optics.surface.aperture.Circular(
             radius=self.clear_radius
         )
-        surface.aperture_mechanical = optics.aperture.Circular(
+        surface.aperture_mechanical = optics.surface.aperture.Circular(
             radius=self.clear_radius + self.border_width,
         )
         return surface

@@ -7,7 +7,7 @@ from kgpy import Name, optics, format, transform, vector
 
 __all__ = ['CentralObscuration']
 
-SurfaceT = optics.Surface[None, None, optics.aperture.RegularPolygon, None, None]
+SurfaceT = optics.surface.Surface[None, None, optics.surface.aperture.RegularPolygon, None, None]
 
 
 @dataclasses.dataclass
@@ -25,7 +25,7 @@ class CentralObscuration(optics.component.PistonComponent[SurfaceT]):
         surface = super().surface  # type: SurfaceT
         offset_angle = 360 * u.deg / 8 / 2
         angles = np.linspace(0, 360 * u.deg, 8, endpoint=False)[:~0] - offset_angle
-        surface.aperture = optics.aperture.IrregularPolygon(
+        surface.aperture = optics.surface.aperture.IrregularPolygon(
         # surface.aperture = optics.aperture.RegularPolygon(
             is_obscuration=True,
             decenter=transform.rigid.Translate(self.position_error),
@@ -47,5 +47,5 @@ class CentralObscuration(optics.component.PistonComponent[SurfaceT]):
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe
         dataframe['obscured half-width'] = [format.quantity(self.obscured_half_width.to(u.mm))]
-        dataframe['number of sides'] = [self.num_sides]
+        # dataframe['number of sides'] = [self.num_sides]
         return dataframe

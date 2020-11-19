@@ -7,11 +7,11 @@ from kgpy import Name, optics, format
 
 __all__ = ['Primary']
 
-SurfaceT = optics.Surface[
-    optics.sag.Standard,
-    optics.material.Mirror,
-    optics.aperture.RegularPolygon,
-    optics.aperture.RegularPolygon,
+SurfaceT = optics.surface.Surface[
+    optics.surface.sag.Standard,
+    optics.surface.material.Mirror,
+    optics.surface.aperture.RegularPolygon,
+    optics.surface.aperture.RegularPolygon,
     None,
 ]
 
@@ -41,17 +41,17 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
     @property
     def surface(self) -> SurfaceT:
         surface = super().surface  # type: SurfaceT
-        surface.sag = optics.sag.Standard(
+        surface.sag = optics.surface.sag.Standard(
             radius=-self.radius,
             conic=self.conic,
         )
-        surface.material = optics.material.Mirror(thickness=self.substrate_thickness)
-        surface.aperture = optics.aperture.RegularPolygon(
+        surface.material = optics.surface.material.Mirror(thickness=self.substrate_thickness)
+        surface.aperture = optics.surface.aperture.RegularPolygon(
             radius=self.clear_radius,
             num_sides=self.num_sides,
             offset_angle=180 * u.deg / self.num_sides,
         )
-        surface.aperture_mechanical = optics.aperture.RegularPolygon(
+        surface.aperture_mechanical = optics.surface.aperture.RegularPolygon(
             radius=self.mech_radius,
             num_sides=self.num_sides,
             offset_angle=180 * u.deg / self.num_sides,

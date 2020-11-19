@@ -9,14 +9,14 @@ import astropy.wcs
 import astropy.io.fits
 import astropy.visualization
 import scipy.stats
-import kgpy
+import kgpy.observatories
 import esis
 
 __all__ = ['Level_0']
 
 
 @dataclasses.dataclass
-class Level_0(kgpy.Obs):
+class Level_0(kgpy.observatories.Obs):
     cam_sn: typ.Optional[np.ndarray] = None
     global_index: typ.Optional[np.ndarray] = None
     requested_exposure_time: typ.Optional[u.Quantity] = None
@@ -67,33 +67,35 @@ class Level_0(kgpy.Obs):
 
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
+        self.exposure_length = self.exposure_length * u.adu / u.s
         self.detector = detector
         self.caching = caching
         self.num_dark_safety_frames = num_dark_safety_frames
 
         for i in range(num_exposures):
+            self.intensity_uncertainty[i] = detector.readout_noise_image(num_channels)
             for c in range(num_channels):
                 hdu = astropy.io.fits.open(fits_list[bad_exposures + i, c])[0]
-                header = hdu.header
                 self.intensity[i, c] = hdu.data * u.adu
-                self.intensity_uncertainty[i, c] = detector.readout_noise_image
-                self.time[i, c] = astropy.time.Time(header['IMG_TS'])
-                self.exposure_length[i, c] = float(header['MEAS_EXP']) * u.adu
-                self.channel[i, c] = int(header['CAM_ID'][~0]) * u.chan
-                self.time_index[i, c] = int(header['IMG_CNT'])
-                self.cam_sn[i, c] = int(header['CAM_SN'])
-                self.global_index[i, c] = int(header['IMG_ISN'])
-                self.requested_exposure_time[i, c] = float(header['IMG_EXP']) * u.ms
-                self.run_mode[i, c] = header['RUN_MODE']
-                self.status[i, c] = header['IMG_STAT']
-                self.fpga_temp[i, c] = float(header['FPGATEMP']) * u.adu
-                self.fpga_vccint_voltage[i, c] = float(header['FPGAVINT']) * u.adu
-                self.fpga_vccaux_voltage[i, c] = float(header['FPGAVAUX']) * u.adu
-                self.fpga_vccbram_voltage[i, c] = float(header['FPGAVBRM']) * u.adu
-                self.adc_temp_1[i, c] = float(header['ADCTEMP1']) * u.adu
-                self.adc_temp_2[i, c] = float(header['ADCTEMP2']) * u.adu
-                self.adc_temp_3[i, c] = float(header['ADCTEMP3']) * u.adu
-                self.adc_temp_4[i, c] = float(header['ADCTEMP4']) * u.adu
+                self.time[i, c] = astropy.time.Time(hdu.header['IMG_TS'])
+                self.exposure_length[i, c] = float(hdu.header['MEAS_EXP']) * u.adu
+                if i == 0:
+                    self.channel[c] = int(hdu.header['CAM_ID'][~0]) * u.chan
+                if c == 0:
+                    self.time_index[i] = int(hdu.header['IMG_CNT'])
+                self.cam_sn[i, c] = int(hdu.header['CAM_SN'])
+                self.global_index[i, c] = int(hdu.header['IMG_ISN'])
+                self.requested_exposure_time[i, c] = float(hdu.header['IMG_EXP']) * u.ms
+                self.run_mode[i, c] = hdu.header['RUN_MODE']
+                self.status[i, c] = hdu.header['IMG_STAT']
+                self.fpga_temp[i, c] = float(hdu.header['FPGATEMP']) * u.adu
+                self.fpga_vccint_voltage[i, c] = float(hdu.header['FPGAVINT']) * u.adu
+                self.fpga_vccaux_voltage[i, c] = float(hdu.header['FPGAVAUX']) * u.adu
+                self.fpga_vccbram_voltage[i, c] = float(hdu.header['FPGAVBRM']) * u.adu
+                self.adc_temp_1[i, c] = float(hdu.header['ADCTEMP1']) * u.adu
+                self.adc_temp_2[i, c] = float(hdu.header['ADCTEMP2']) * u.adu
+                self.adc_temp_3[i, c] = float(hdu.header['ADCTEMP3']) * u.adu
+                self.adc_temp_4[i, c] = float(hdu.header['ADCTEMP4']) * u.adu
         return self
 
     @classmethod
@@ -144,7 +146,8 @@ class Level_0(kgpy.Obs):
         s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), ~(self.num_ignored_bias_columns - 1))
         blank_pix = 2 * [s1] + 2 * [s2]
         quadrants = self.detector.quadrants
-        bias = np.empty((self.shape[self.axis.time], self.shape[self.axis.chan], len(quadrants))) << self.intensity.unit
+        bias = np.empty(
+            (self.shape[self.axis.time], self.shape[self.axis.channel], len(quadrants))) << self.intensity.unit
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
@@ -222,8 +225,8 @@ class Level_0(kgpy.Obs):
             drawstyle: str = 'steps',
     ) -> plt.Axes:
         ax = super().plot_quantity_vs_index(a=a, a_name=a_name, ax=ax, legend_ncol=legend_ncol, drawstyle=drawstyle)
-        ax.axvline(self.time_index[self.signal_index_first, 0], color='black')
-        ax.axvline(self.time_index[self.signal_index_last + 1, 0], color='black')
+        ax.axvline(self.time_index[self.signal_index_first], color='black')
+        ax.axvline(self.time_index[self.signal_index_last + 1], color='black')
         return ax
 
     def plot_intensity_nobias_mean(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
@@ -300,8 +303,8 @@ class Level_0(kgpy.Obs):
         ])
 
         time = self.time[time_index, channel_index]
-        chan = self.channel[time_index, channel_index]
-        seq_index = self.time_index[time_index, channel_index]
+        chan = self.channel[channel_index]
+        seq_index = self.time_index[time_index]
 
         base_title = time.to_value('iso') + ', frame ' + str(int(seq_index)) + ', channel ' + str(int(chan.value))
 

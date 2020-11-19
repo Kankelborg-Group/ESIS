@@ -1,6 +1,6 @@
 import numpy as np
-
-from esis.inversion.mart import antialias
+import matplotlib.pyplot as plt
+from . import antialias
 
 
 def test_calc_anti_alias_kernel():
@@ -17,8 +17,8 @@ def test_calc_anti_alias_kernel():
 
 def test_apply_anti_aliasing():
     n = 16
-    d = np.zeros((1, 1, n, n))
-    px = 0, 0, n//2, n//2
+    d = np.zeros((1, n, n, 1))
+    px = 0, n//2, n//2, 0
     d[px] = 1
     f = antialias.apply(d)
     assert f[px] < 1

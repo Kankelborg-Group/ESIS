@@ -7,17 +7,17 @@ from astropy.io import fits
 import tarfile
 import astropy.units as u
 import astropy.time
-from kgpy import mixin, img
+from kgpy import mixin, img, observatories
 from kgpy.img.masks import mask as img_mask
 import esis.optics
-from . import DataLevel, Level_0
+from . import Level_0
 
 __all__ = ['Level_1']
 
 
 @dataclasses.dataclass
-class Level_1(DataLevel, mixin.Pickleable):
-    detector: esis.optics.Detector
+class Level_1(observatories.Obs, mixin.Pickleable):
+    detector: typ.Optional[esis.optics.Detector] = None
     sequence_metadata: np.ndarray = None
     analog_metadata: np.ndarray = None
 
@@ -36,10 +36,10 @@ class Level_1(DataLevel, mixin.Pickleable):
             intensity = intensity << intensity_unit
         return cls(
             intensity=intensity,
-            start_time=lev0.start_time_signal,
+            time=lev0.time_signal,
             exposure_length=lev0.requested_exposure_time_signal,
             channel=lev0.channel_signal,
-            sequence_index=lev0.sequence_index_signal,
+            time_index=lev0.time_index_signal,
             detector=lev0.detector
         )
 
@@ -84,14 +84,14 @@ class Level_1(DataLevel, mixin.Pickleable):
 
         path.mkdir(parents=True, exist_ok=True)
 
-        for sequence in range(self.start_time.shape[0]):
-            for camera in range(self.start_time.shape[1]):
-                name = 'ESIS_Level1_' + str(self.start_time[sequence, camera]) + '_' + str(camera + 1) + '.fits'
+        for sequence in range(self.time.shape[0]):
+            for camera in range(self.time.shape[1]):
+                name = 'ESIS_Level1_' + str(self.time[sequence, camera]) + '_' + str(camera + 1) + '.fits'
                 filename = path / name
 
                 hdr = fits.Header()
                 hdr['CAM_ID'] = self.channel[sequence, camera]
-                hdr['DATE_OBS'] = str(self.start_time[sequence, camera])
+                hdr['DATE_OBS'] = str(self.time[sequence, camera])
                 hdr['IMG_EXP'] = self.exposure_length[sequence, camera]
 
                 hdul = fits.HDUList()

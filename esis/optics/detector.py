@@ -10,11 +10,11 @@ from astropy import constants as const
 
 __all__ = ['Detector']
 
-SurfaceT = optics.Surface[
+SurfaceT = optics.surface.Surface[
     None,
     None,
-    optics.aperture.Rectangular,
-    optics.aperture.AsymmetricRectangular,
+    optics.surface.aperture.Rectangular,
+    optics.surface.aperture.AsymmetricRectangular,
     None,
 ]
 
@@ -103,11 +103,11 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     @property
     def surface(self) -> SurfaceT:
         surface = super().surface
-        surface.aperture = optics.aperture.Rectangular(
+        surface.aperture = optics.surface.aperture.Rectangular(
             half_width_x=self.clear_half_width,
             half_width_y=self.clear_half_height,
         )
-        surface.aperture_mechanical = optics.aperture.AsymmetricRectangular(
+        surface.aperture_mechanical = optics.surface.aperture.AsymmetricRectangular(
             width_x_neg=-(self.clear_half_width + self.border_width_left),
             width_x_pos=self.clear_half_width + self.border_width_right,
             width_y_neg=-(self.clear_half_height + self.border_width_bottom),
@@ -267,9 +267,8 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         data_active[..., half_width:] = data[..., half_width_all + self.npix_overscan:-self.npix_blank]
         return data_active
 
-    @property
     @u.quantity_input
-    def readout_noise_image(self) -> u.adu:
+    def readout_noise_image(self, num_channels: int) -> u.adu:
         """
         Calculate an image where each pixel contains the expected readout noise at that location
 
@@ -277,9 +276,9 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         -------
         Image representing the readout noise at every pixel location.
         """
-        num_channels = self.readout_noise.shape[0]
-        img = np.zeros((num_channels, ) + self.num_pixels_all[::-1]) * u.adu
+        readout_noise = np.broadcast_to(self.readout_noise, (num_channels, 4), subok=True)
+        img = np.zeros((num_channels, ) + self.num_pixels_all[::-1]) << u.adu
         for c in range(num_channels):
             for q, quad in enumerate(self.quadrants):
-                img[(..., c) + quad] = self.readout_noise[c, q]
+                img[(..., c) + quad] = readout_noise[c, q]
         return img

@@ -9,7 +9,7 @@ __all__ = []
 
 
 @pytest.fixture
-def test_detector() -> Detector:
+def detector_example() -> Detector:
     return Detector(
         inclination=5 * u.deg,
         roll=.2 * u.deg,
@@ -40,62 +40,61 @@ def test_detector() -> Detector:
 
 class TestDetector:
 
-    def test_num_pixels_all(self, test_detector: Detector):
-        assert test_detector.num_pixels_all[vector.ix] > test_detector.num_pixels[vector.ix]
-        assert test_detector.num_pixels_all[vector.iy] == test_detector.num_pixels[vector.iy]
+    def test_num_pixels_all(self, detector_example):
+        assert detector_example.num_pixels_all[vector.ix] > detector_example.num_pixels[vector.ix]
+        assert detector_example.num_pixels_all[vector.iy] == detector_example.num_pixels[vector.iy]
 
-    def test_quadrants(self, test_detector: Detector):
-        assert len(test_detector.quadrants) == 4
-        for quad in test_detector.quadrants:
-            img = np.zeros(test_detector.num_pixels_all[::-1])
+    def test_quadrants(self, detector_example):
+        assert len(detector_example.quadrants) == 4
+        for quad in detector_example.quadrants:
+            img = np.zeros(detector_example.num_pixels_all[::-1])
             img[quad] = 1
             assert img.mean() == 1/4
 
+    def test_pixel_half_width(self, detector_example):
+        assert detector_example.pixel_half_width > 0
 
-    def test_pixel_half_width(self, test_detector: Detector):
-        assert test_detector.pixel_half_width > 0
+    def test_clear_width(self, detector_example):
+        assert detector_example.clear_width > 0
 
-    def test_clear_width(self, test_detector: Detector):
-        assert test_detector.clear_width > 0
+    def test_clear_height(self, detector_example):
+        assert detector_example.clear_height > 0
 
-    def test_clear_height(self, test_detector: Detector):
-        assert test_detector.clear_height > 0
+    def test_clear_half_width(self, detector_example):
+        assert detector_example.clear_half_width > 0
 
-    def test_clear_half_width(self, test_detector: Detector):
-        assert test_detector.clear_half_width > 0
+    def test_clear_half_height(self, detector_example):
+        assert detector_example.clear_half_height > 0
 
-    def test_clear_half_height(self, test_detector: Detector):
-        assert test_detector.clear_half_height > 0
+    def test_transform(self, detector_example):
+        assert isinstance(detector_example.transform, transform.rigid.Transform)
 
-    def test_transform(self, test_detector: Detector):
-        assert isinstance(test_detector.transform, transform.rigid.Transform)
+    def test_surface(self, detector_example):
+        assert isinstance(detector_example.surface, optics.surface.Surface)
+        assert isinstance(detector_example.surface.aperture, optics.surface.aperture.Aperture)
+        assert isinstance(detector_example.surface.aperture_mechanical, optics.surface.aperture.Aperture)
 
-    def test_surface(self, test_detector: Detector):
-        assert isinstance(test_detector.surface, optics.Surface)
-        assert isinstance(test_detector.surface.aperture, optics.Aperture)
-        assert isinstance(test_detector.surface.aperture_mechanical, optics.Aperture)
-
-    def test_convert_adu_to_electrons(self, test_detector: Detector):
-        data = np.random.random(test_detector.gain.shape[:1] + test_detector.num_pixels) * u.adu
-        data = test_detector.convert_adu_to_electrons(data)
+    def test_convert_adu_to_electrons(self, detector_example):
+        data = np.random.random(detector_example.gain.shape[:1] + detector_example.num_pixels) * u.adu
+        data = detector_example.convert_adu_to_electrons(data)
         assert data.sum() > 0
 
-    def test_convert_electrons_to_photons(self, test_detector: Detector):
-        data = np.random.random(test_detector.gain.shape[:1] + test_detector.num_pixels) * u.electron
-        data = test_detector.convert_electrons_to_photons(data, 171 * u.AA)
+    def test_convert_electrons_to_photons(self, detector_example):
+        data = np.random.random(detector_example.gain.shape[:1] + detector_example.num_pixels) * u.electron
+        data = detector_example.convert_electrons_to_photons(data, 171 * u.AA)
         assert data.sum() > 0
 
-    def test_convert_adu_to_photons(self, test_detector: Detector):
-        data = np.random.random(test_detector.gain.shape[:1] + test_detector.num_pixels) * u.adu
-        data = test_detector.convert_adu_to_photons(data, 171 * u.AA)
+    def test_convert_adu_to_photons(self, detector_example):
+        data = np.random.random(detector_example.gain.shape[:1] + detector_example.num_pixels) * u.adu
+        data = detector_example.convert_adu_to_photons(data, 171 * u.AA)
         assert data.sum() > 0
 
-    def test_remove_inactive_pixels(self, test_detector: Detector):
-        data = np.random.random(test_detector.num_pixels_all[::-1]) * u.adu
-        data = test_detector.remove_inactive_pixels(data)
-        assert data.shape == test_detector.num_pixels[::-1]
+    def test_remove_inactive_pixels(self, detector_example):
+        data = np.random.random(detector_example.num_pixels_all[::-1]) * u.adu
+        data = detector_example.remove_inactive_pixels(data)
+        assert data.shape == detector_example.num_pixels[::-1]
         assert data.sum() > 0
 
-    def test_readout_noise_image(self, test_detector: Detector):
-        img = test_detector.readout_noise_image
-        assert np.isclose(img.mean(), test_detector.readout_noise.mean())
+    def test_readout_noise_image(self, detector_example):
+        img = detector_example.readout_noise_image
+        assert np.isclose(img.mean(), detector_example.readout_noise.mean())

@@ -145,12 +145,12 @@ def final_from_poletto(
     """
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
-    obscuration = esis.components.central_obscuration
-    grating = esis.components.grating
+    obscuration = esis.central_obscuration
+    grating = esis.grating
     obs_thickness = obscuration.piston - grating.piston
     obs_margin = obscuration.obscured_half_width - (grating.cylindrical_radius + grating.outer_half_width)
-    primary_clear_radius = esis.components.primary.surface.aperture.min_radius
-    detector = esis.components.detector
+    primary_clear_radius = esis.primary.surface.aperture.min_radius
+    detector = esis.detector
     detector_radius = detector.cylindrical_radius - detector.surface.aperture.half_width_x
     detector.dynamic_clearance = detector_radius - primary_clear_radius
     return esis.apply_poletto_layout(

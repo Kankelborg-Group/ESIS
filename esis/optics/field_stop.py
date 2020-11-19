@@ -6,7 +6,8 @@ from kgpy import Name, transform, optics, format
 
 __all__ = ['FieldStop']
 
-SurfaceT = optics.Surface[None, None, optics.aperture.RegularPolygon, optics.aperture.Circular, None]
+SurfaceT = optics.surface.Surface[
+    None, None, optics.surface.aperture.RegularPolygon, optics.surface.aperture.Circular, None]
 
 
 @dataclasses.dataclass
@@ -19,12 +20,12 @@ class FieldStop(optics.component.PistonComponent[SurfaceT]):
     @property
     def surface(self) -> SurfaceT:
         surface = super().surface
-        surface.aperture = optics.aperture.RegularPolygon(
+        surface.aperture = optics.surface.aperture.RegularPolygon(
             radius=self.clear_radius,
             num_sides=self.num_sides,
             offset_angle=180 * u.deg / self.num_sides,
         )
-        surface.aperture_mechanical = optics.aperture.Circular(
+        surface.aperture_mechanical = optics.surface.aperture.Circular(
             radius=self.mech_radius,
         )
         return surface
