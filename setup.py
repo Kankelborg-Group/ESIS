@@ -10,6 +10,7 @@ setup(
         'matplotlib',
         'scipy',
         'astropy',
+        'ndcube',
         'sphinx-autodoc-typehints',
         'astropy-sphinx-theme',
         'kgpy @ git+https://github.com/Kankelborg-Group/kgpy.git#egg=kgpy',
