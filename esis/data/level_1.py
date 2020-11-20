@@ -8,7 +8,7 @@ import tarfile
 import astropy.units as u
 import astropy.time
 from kgpy import mixin, img, observatories
-from kgpy.img.masks import mask as img_mask
+from kgpy.img import mask as img_mask
 import esis.optics
 from . import Level_0
 

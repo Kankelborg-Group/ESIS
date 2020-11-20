@@ -33,7 +33,7 @@ class Level_0(kgpy.observatories.Obs):
     detector: typ.Optional[esis.optics.Detector] = None
     caching: bool = False
     num_dark_safety_frames: int = 1
-    num_ignored_bias_columns: int = 5
+    num_ignored_bias_columns: int = 20
 
     def __post_init__(self):
         self.update()
@@ -151,6 +151,9 @@ class Level_0(kgpy.observatories.Obs):
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
+            print(q)
+            plt.figure()
+            plt.imshow(a[0, 0].value)
             a = np.percentile(a, 95, axis=self.axis.xy, keepdims=True)
             a = np.percentile(a, 5, axis=self.axis.xy, keepdims=True)
             bias[..., q] = np.median(a=a, axis=self.axis.xy)
