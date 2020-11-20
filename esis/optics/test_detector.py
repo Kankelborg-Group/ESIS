@@ -96,5 +96,5 @@ class TestDetector:
         assert data.sum() > 0
 
     def test_readout_noise_image(self, detector_example):
-        img = detector_example.readout_noise_image
+        img = detector_example.readout_noise_image(4)
         assert np.isclose(img.mean(), detector_example.readout_noise.mean())

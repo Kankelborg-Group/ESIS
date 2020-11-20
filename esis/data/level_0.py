@@ -151,7 +151,6 @@ class Level_0(kgpy.observatories.Obs):
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
-            print(q)
             plt.figure()
             plt.imshow(a[0, 0].value)
             a = np.percentile(a, 95, axis=self.axis.xy, keepdims=True)
