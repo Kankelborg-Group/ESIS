@@ -10,7 +10,7 @@ import tarfile
 from dataclasses import dataclass
 import ndcube
 import kgpy.img.coalignment.image_coalignment as img_align
-import kgpy.img.masks.mask as img_mask
+import kgpy.img.mask as img_mask
 from esis.data import level_1
 import esis
 from kgpy.observatories import aia
