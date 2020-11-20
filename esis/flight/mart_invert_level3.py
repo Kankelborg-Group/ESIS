@@ -5,7 +5,6 @@ import scipy.ndimage
 from esis.data.inversion import mart
 import astropy.units as u
 import kgpy.img.coalignment.image_coalignment as kgpy_img
-from kgpy.plot import hypercube_slicer
 import astropy.wcs as wcs
 import multiprocessing as mp
 import skimage.transform
