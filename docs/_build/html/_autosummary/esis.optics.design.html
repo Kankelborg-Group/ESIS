@@ -85,6 +85,7 @@
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span>
 <span class="kn">from</span> <span class="nn">kgpy</span> <span class="kn">import</span> <span class="n">vector</span><span class="p">,</span> <span class="n">optics</span>
 <span class="kn">import</span> <span class="nn">esis</span>
 </pre></div>
@@ -122,14 +123,15 @@ bottom-right and dispersed according to their wavelength.</p>
 </div>
 <div class="jupyter_cell jupyter_container docutils container">
 <div class="cell_input code_cell docutils container">
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fig_bore</span><span class="p">,</span> <span class="n">ax_bore</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">ax_bore</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
-<span class="n">esis</span><span class="o">.</span><span class="n">optics</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">final</span><span class="p">()</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
-    <span class="n">ax</span><span class="o">=</span><span class="n">ax_bore</span><span class="p">,</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">ax_side</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax_side</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
+<span class="n">opt</span> <span class="o">=</span> <span class="n">esis</span><span class="o">.</span><span class="n">optics</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">final</span><span class="p">()</span>
+<span class="n">opt</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax_side</span><span class="p">,</span>
     <span class="n">plot_rays</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="n">_</span> <span class="o">=</span> <span class="n">ax_bore</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Front View&#39;</span><span class="p">)</span>
-<span class="n">ax_bore</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">ax_side</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Front View&#39;</span><span class="p">)</span>
+<span class="n">ax_side</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -140,6 +142,30 @@ bottom-right and dispersed according to their wavelength.</p>
 </div>
 <div class="section" id="ideal-point-spread-function">
 <h2>Ideal Point-spread Function<a class="headerlink" href="#ideal-point-spread-function" title="Permalink to this headline">¶</a></h2>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rays_psf</span> <span class="o">=</span> <span class="n">esis</span><span class="o">.</span><span class="n">optics</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">final</span><span class="p">(</span>
+    <span class="n">pupil_samples</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span>
+    <span class="n">field_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">all_channels</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span><span class="o">.</span><span class="n">rays_output</span>
+<span class="n">bins</span> <span class="o">=</span> <span class="n">rays_psf</span><span class="o">.</span><span class="n">input_pupil_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">~</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+
+<span class="n">fig_630</span> <span class="o">=</span> <span class="n">rays_psf</span><span class="o">.</span><span class="n">plot_pupil_hist2d_vs_field</span><span class="p">(</span><span class="n">wavlen_index</span><span class="o">=~</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">PowerNorm</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">fig_630</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">fig_630</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="mf">9.5</span><span class="p">)</span>
+
+<span class="n">fig_584</span> <span class="o">=</span> <span class="n">rays_psf</span><span class="o">.</span><span class="n">plot_pupil_hist2d_vs_field</span><span class="p">(</span><span class="n">wavlen_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">PowerNorm</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">fig_584</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">fig_584</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="mf">9.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/esis.optics.design_3_1.png" src="../_images/esis.optics.design_3_1.png" />
+<img alt="../_images/esis.optics.design_3_2.png" src="../_images/esis.optics.design_3_2.png" />
+</div>
+</div>
 </div>
 <div class="section" id="vignetting">
 <h2>Vignetting<a class="headerlink" href="#vignetting" title="Permalink to this headline">¶</a></h2>

@@ -3,6 +3,7 @@
 .. jupyter-execute::
 
     import matplotlib.pyplot as plt
+    import matplotlib.colors
     from kgpy import vector, optics
     import esis
 
@@ -21,7 +22,6 @@ After the field stop, the rays reflect off the grating on the left, and are refo
 bottom-right and dispersed according to their wavelength.
 
 
-
 .. jupyter-execute::
 
     _, ax_top = plt.subplots(figsize=(9.5, 4), constrained_layout=True)
@@ -36,18 +36,38 @@ bottom-right and dispersed according to their wavelength.
 
 .. jupyter-execute::
 
-    fig_bore, ax_bore = plt.subplots(figsize=(6, 6), constrained_layout=True)
-    ax_bore.invert_xaxis()
-    esis.optics.design.final().system.plot(
-        ax=ax_bore,
+    _, ax_side = plt.subplots(figsize=(6, 6), constrained_layout=True)
+    ax_side.invert_xaxis()
+    opt = esis.optics.design.final()
+    opt.system.plot(
+        ax=ax_side,
         plot_rays=False,
     )
-    _ = ax_bore.set_title('Front View')
-    ax_bore.set_aspect('equal')
+    _ = ax_side.set_title('Front View')
+    ax_side.set_aspect('equal')
 
 
 Ideal Point-spread Function
 ---------------------------
+
+.. jupyter-execute::
+
+    rays_psf = esis.optics.design.final(
+        pupil_samples=101,
+        field_samples=5,
+        all_channels=False
+    ).rays_output
+    bins = rays_psf.input_pupil_x.shape[~0] // 2
+
+    fig_630 = rays_psf.plot_pupil_hist2d_vs_field(wavlen_index=~0, norm=matplotlib.colors.PowerNorm(1/2), bins=bins, )
+    fig_630.set_figheight(4)
+    fig_630.set_figwidth(9.5)
+
+    fig_584 = rays_psf.plot_pupil_hist2d_vs_field(wavlen_index=0, norm=matplotlib.colors.PowerNorm(1/2), bins=bins, )
+    fig_584.set_figheight(4)
+    fig_584.set_figwidth(9.5)
+
+
 
 Vignetting
 ----------
