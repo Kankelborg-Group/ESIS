@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Filter &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="front_aperture" href="esis.optics.front_aperture.html" />
+    <link rel="prev" title="filter" href="esis.optics.filter.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.front_aperture.html" title="front_aperture">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.filter.html" title="filter">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" >optics</a> &#187;</li>
+      <li><a href="esis.optics.filter.html" accesskey="U">filter</a> &#187;</li>
+      
+      <li>Filter</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="filter">
+<h1>Filter<a class="headerlink" href="#filter" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.optics.filter.Filter">
+<em class="property">class </em><code class="sig-prename descclassname">esis.optics.filter.</code><code class="sig-name descname">Filter</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_azimuth=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inclination=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">clear_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width=&lt;Quantity 0. mm&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.filter.Filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.component.CylindricalComponent.html#kgpy.optics.component.CylindricalComponent" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.component.CylindricalComponent</span></code></a></p>
+<dl class="py method">
+<dt id="esis.optics.filter.Filter.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_azimuth=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inclination=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">clear_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width=&lt;Quantity 0. mm&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.filter.Filter.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)"><em>kgpy.Name</em></a>) – </p></li>
+<li><p><strong>piston</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>cylindrical_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>cylindrical_azimuth</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>inclination</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>clear_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>border_width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.border_width" title="esis.optics.filter.Filter.border_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">border_width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.clear_radius" title="esis.optics.filter.Filter.clear_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_radius</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.cylindrical_azimuth" title="esis.optics.filter.Filter.cylindrical_azimuth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cylindrical_azimuth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.cylindrical_radius" title="esis.optics.filter.Filter.cylindrical_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cylindrical_radius</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.dataframe" title="esis.optics.filter.Filter.dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataframe</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.inclination" title="esis.optics.filter.Filter.inclination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inclination</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.piston" title="esis.optics.filter.Filter.piston"><code class="xref py py-obj docutils literal notranslate"><span class="pre">piston</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.surface" title="esis.optics.filter.Filter.surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">surface</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.Circular.html#kgpy.optics.surface.aperture.Circular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.Circular</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.Circular.html#kgpy.optics.surface.aperture.Circular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.Circular</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.transform" title="esis.optics.filter.Filter.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.TransformList.html#kgpy.transform.rigid.TransformList" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.TransformList</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.__init__" title="esis.optics.filter.Filter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([name, piston, cylindrical_radius, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.filter.Filter.copy" title="esis.optics.filter.Filter.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.filter.Filter" title="esis.optics.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.filter.Filter</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-a1fd133a2e1c746b3798b450a5c6f106b9a2403c.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.optics.filter.Filter</p></object></div>
+<dl class="py method">
+<dt id="esis.optics.filter.Filter.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.filter.Filter.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.filter.Filter" title="esis.optics.filter.Filter"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.filter.Filter</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.filter.Filter.border_width">
+<code class="sig-name descname">border_width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.filter.Filter.border_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.filter.Filter.clear_radius">
+<code class="sig-name descname">clear_radius</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.filter.Filter.clear_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.filter.Filter.cylindrical_azimuth">
+<code class="sig-name descname">cylindrical_azimuth</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.filter.Filter.cylindrical_azimuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.filter.Filter.cylindrical_radius">
+<code class="sig-name descname">cylindrical_radius</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.filter.Filter.cylindrical_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.filter.Filter.dataframe">
+<em class="property">property </em><code class="sig-name descname">dataframe</code><a class="headerlink" href="#esis.optics.filter.Filter.dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.filter.Filter.inclination">
+<code class="sig-name descname">inclination</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.filter.Filter.inclination" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.filter.Filter.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)">kgpy.Name</a></em><a class="headerlink" href="#esis.optics.filter.Filter.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.filter.Filter.piston">
+<code class="sig-name descname">piston</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.filter.Filter.piston" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.filter.Filter.surface">
+<em class="property">property </em><code class="sig-name descname">surface</code><a class="headerlink" href="#esis.optics.filter.Filter.surface" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.Circular.html#kgpy.optics.surface.aperture.Circular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.Circular</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.Circular.html#kgpy.optics.surface.aperture.Circular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.Circular</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.filter.Filter.transform">
+<em class="property">property </em><code class="sig-name descname">transform</code><a class="headerlink" href="#esis.optics.filter.Filter.transform" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.TransformList.html#kgpy.transform.rigid.TransformList" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.TransformList</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.design.html">design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.detector.html">detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="esis.optics.filter.html">filter</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Filter</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.grating.html">grating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.optics.html">optics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.poletto.html">poletto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.filter.Filter.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CentralObscuration &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="design" href="esis.optics.design.html" />
+    <link rel="prev" title="central_obscuration" href="esis.optics.central_obscuration.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.design.html" title="design">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.central_obscuration.html" title="central_obscuration">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" >optics</a> &#187;</li>
+      <li><a href="esis.optics.central_obscuration.html" accesskey="U">central_obscuration</a> &#187;</li>
+      
+      <li>CentralObscuration</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="centralobscuration">
+<h1>CentralObscuration<a class="headerlink" href="#centralobscuration" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.optics.central_obscuration.CentralObscuration">
+<em class="property">class </em><code class="sig-prename descclassname">esis.optics.central_obscuration.</code><code class="sig-name descname">CentralObscuration</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">obscured_half_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">position_error=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.component.PistonComponent.html#kgpy.optics.component.PistonComponent" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.component.PistonComponent</span></code></a></p>
+<dl class="py method">
+<dt id="esis.optics.central_obscuration.CentralObscuration.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">obscured_half_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">position_error=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)"><em>kgpy.Name</em></a>) – </p></li>
+<li><p><strong>piston</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>obscured_half_width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>position_error</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.dataframe" title="esis.optics.central_obscuration.CentralObscuration.dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataframe</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.obscured_half_width" title="esis.optics.central_obscuration.CentralObscuration.obscured_half_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obscured_half_width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.obscured_radius" title="esis.optics.central_obscuration.CentralObscuration.obscured_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">obscured_radius</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.piston" title="esis.optics.central_obscuration.CentralObscuration.piston"><code class="xref py py-obj docutils literal notranslate"><span class="pre">piston</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.surface" title="esis.optics.central_obscuration.CentralObscuration.surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">surface</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.RegularPolygon.html#kgpy.optics.surface.aperture.RegularPolygon" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.RegularPolygon</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.transform" title="esis.optics.central_obscuration.CentralObscuration.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.TransformList.html#kgpy.transform.rigid.TransformList" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.TransformList</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.__init__" title="esis.optics.central_obscuration.CentralObscuration.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([name, piston, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration.copy" title="esis.optics.central_obscuration.CentralObscuration.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration" title="esis.optics.central_obscuration.CentralObscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.central_obscuration.CentralObscuration</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-88b9e1d6e463fe8a63ac78d4c837e9b0be2dcad8.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.optics.central_obscuration.CentralObscuration</p></object></div>
+<dl class="py method">
+<dt id="esis.optics.central_obscuration.CentralObscuration.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.central_obscuration.CentralObscuration" title="esis.optics.central_obscuration.CentralObscuration"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.central_obscuration.CentralObscuration</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.central_obscuration.CentralObscuration.dataframe">
+<em class="property">property </em><code class="sig-name descname">dataframe</code><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.central_obscuration.CentralObscuration.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)">kgpy.Name</a></em><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.central_obscuration.CentralObscuration.obscured_half_width">
+<code class="sig-name descname">obscured_half_width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.obscured_half_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.central_obscuration.CentralObscuration.obscured_radius">
+<em class="property">property </em><code class="sig-name descname">obscured_radius</code><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.obscured_radius" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.central_obscuration.CentralObscuration.piston">
+<code class="sig-name descname">piston</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.piston" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.central_obscuration.CentralObscuration.position_error">
+<code class="sig-name descname">position_error</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.position_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.central_obscuration.CentralObscuration.surface">
+<em class="property">property </em><code class="sig-name descname">surface</code><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.surface" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.RegularPolygon.html#kgpy.optics.surface.aperture.RegularPolygon" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.RegularPolygon</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.central_obscuration.CentralObscuration.transform">
+<em class="property">property </em><code class="sig-name descname">transform</code><a class="headerlink" href="#esis.optics.central_obscuration.CentralObscuration.transform" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.TransformList.html#kgpy.transform.rigid.TransformList" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.TransformList</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">CentralObscuration</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.design.html">design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.detector.html">detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.filter.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.grating.html">grating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.optics.html">optics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.poletto.html">poletto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.central_obscuration.CentralObscuration.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

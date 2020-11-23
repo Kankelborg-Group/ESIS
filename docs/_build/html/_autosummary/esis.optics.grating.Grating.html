@@ -1,0 +1,607 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grating &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="optics" href="esis.optics.optics.html" />
+    <link rel="prev" title="grating" href="esis.optics.grating.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.optics.html" title="optics">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.grating.html" title="grating">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" >optics</a> &#187;</li>
+      <li><a href="esis.optics.grating.html" accesskey="U">grating</a> &#187;</li>
+      
+      <li>Grating</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="grating">
+<h1>Grating<a class="headerlink" href="#grating" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.optics.grating.Grating">
+<em class="property">class </em><code class="sig-prename descclassname">esis.optics.grating.</code><code class="sig-name descname">Grating</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_azimuth=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inclination=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">roll=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">twist=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">tangential_radius=&lt;Quantity inf mm&gt;</em>, <em class="sig-param">sagittal_radius=&lt;Quantity inf mm&gt;</em>, <em class="sig-param">nominal_input_angle=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">nominal_output_angle=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">diffraction_order=&lt;Quantity 0.&gt;</em>, <em class="sig-param">ruling_density=&lt;Quantity 0. 1 / mm&gt;</em>, <em class="sig-param">ruling_density_coeff_linear=&lt;Quantity 0. 1 / mm2&gt;</em>, <em class="sig-param">ruling_density_coeff_quadratic=&lt;Quantity 0. 1 / mm3&gt;</em>, <em class="sig-param">ruling_density_coeff_cubic=&lt;Quantity 0. 1 / mm4&gt;</em>, <em class="sig-param">aper_wedge_angle=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inner_half_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">outer_half_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">inner_border_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">dynamic_clearance=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">substrate_thickness=&lt;Quantity 0. mm&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.grating.Grating" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.component.CylindricalComponent.html#kgpy.optics.component.CylindricalComponent" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.component.CylindricalComponent</span></code></a></p>
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_azimuth=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inclination=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">roll=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">twist=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">tangential_radius=&lt;Quantity inf mm&gt;</em>, <em class="sig-param">sagittal_radius=&lt;Quantity inf mm&gt;</em>, <em class="sig-param">nominal_input_angle=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">nominal_output_angle=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">diffraction_order=&lt;Quantity 0.&gt;</em>, <em class="sig-param">ruling_density=&lt;Quantity 0. 1 / mm&gt;</em>, <em class="sig-param">ruling_density_coeff_linear=&lt;Quantity 0. 1 / mm2&gt;</em>, <em class="sig-param">ruling_density_coeff_quadratic=&lt;Quantity 0. 1 / mm3&gt;</em>, <em class="sig-param">ruling_density_coeff_cubic=&lt;Quantity 0. 1 / mm4&gt;</em>, <em class="sig-param">aper_wedge_angle=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inner_half_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">outer_half_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">inner_border_width=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">dynamic_clearance=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">substrate_thickness=&lt;Quantity 0. mm&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.grating.Grating.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)"><em>kgpy.Name</em></a>) – </p></li>
+<li><p><strong>piston</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>cylindrical_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>cylindrical_azimuth</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>inclination</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>roll</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>twist</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>tangential_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>sagittal_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>nominal_input_angle</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>nominal_output_angle</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>diffraction_order</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>ruling_density</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>ruling_density_coeff_linear</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>ruling_density_coeff_quadratic</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>ruling_density_coeff_cubic</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>aper_wedge_angle</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>inner_half_width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>outer_half_width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>border_width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>inner_border_width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>dynamic_clearance</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>substrate_thickness</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.aper_wedge_angle" title="esis.optics.grating.Grating.aper_wedge_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aper_wedge_angle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.aper_wedge_half_angle" title="esis.optics.grating.Grating.aper_wedge_half_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">aper_wedge_half_angle</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.border_width" title="esis.optics.grating.Grating.border_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">border_width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.cylindrical_azimuth" title="esis.optics.grating.Grating.cylindrical_azimuth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cylindrical_azimuth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.cylindrical_radius" title="esis.optics.grating.Grating.cylindrical_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cylindrical_radius</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.dataframe" title="esis.optics.grating.Grating.dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataframe</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.diffraction_order" title="esis.optics.grating.Grating.diffraction_order"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diffraction_order</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.dynamic_clearance" title="esis.optics.grating.Grating.dynamic_clearance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamic_clearance</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.dynamic_clearance_x" title="esis.optics.grating.Grating.dynamic_clearance_x"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamic_clearance_x</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.inclination" title="esis.optics.grating.Grating.inclination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inclination</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.inner_border_width" title="esis.optics.grating.Grating.inner_border_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inner_border_width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.inner_half_width" title="esis.optics.grating.Grating.inner_half_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inner_half_width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.is_toroidal" title="esis.optics.grating.Grating.is_toroidal"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_toroidal</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.is_vls" title="esis.optics.grating.Grating.is_vls"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is_vls</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.nominal_input_angle" title="esis.optics.grating.Grating.nominal_input_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nominal_input_angle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.nominal_output_angle" title="esis.optics.grating.Grating.nominal_output_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nominal_output_angle</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.outer_half_width" title="esis.optics.grating.Grating.outer_half_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">outer_half_width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.piston" title="esis.optics.grating.Grating.piston"><code class="xref py py-obj docutils literal notranslate"><span class="pre">piston</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.roll" title="esis.optics.grating.Grating.roll"><code class="xref py py-obj docutils literal notranslate"><span class="pre">roll</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.ruling_density" title="esis.optics.grating.Grating.ruling_density"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ruling_density</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.ruling_density_coeff_cubic" title="esis.optics.grating.Grating.ruling_density_coeff_cubic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ruling_density_coeff_cubic</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.ruling_density_coeff_linear" title="esis.optics.grating.Grating.ruling_density_coeff_linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ruling_density_coeff_linear</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.ruling_density_coeff_quadratic" title="esis.optics.grating.Grating.ruling_density_coeff_quadratic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ruling_density_coeff_quadratic</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.sagittal_radius" title="esis.optics.grating.Grating.sagittal_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sagittal_radius</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.substrate_thickness" title="esis.optics.grating.Grating.substrate_thickness"><code class="xref py py-obj docutils literal notranslate"><span class="pre">substrate_thickness</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.surface" title="esis.optics.grating.Grating.surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">surface</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.sag.Toroidal.html#kgpy.optics.surface.sag.Toroidal" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.sag.Toroidal</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.material.Mirror.html#kgpy.optics.surface.material.Mirror" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.material.Mirror</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.IsoscelesTrapezoid.html#kgpy.optics.surface.aperture.IsoscelesTrapezoid" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.IsoscelesTrapezoid</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.IsoscelesTrapezoid.html#kgpy.optics.surface.aperture.IsoscelesTrapezoid" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.IsoscelesTrapezoid</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.rulings.CubicPolyDensity.html#kgpy.optics.surface.rulings.CubicPolyDensity" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.rulings.CubicPolyDensity</span></code></a>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.tangential_radius" title="esis.optics.grating.Grating.tangential_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tangential_radius</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.transform" title="esis.optics.grating.Grating.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.TransformList.html#kgpy.transform.rigid.TransformList" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.TransformList</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.twist" title="esis.optics.grating.Grating.twist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">twist</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.__init__" title="esis.optics.grating.Grating.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([name, piston, cylindrical_radius, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.apply_gregorian_layout" title="esis.optics.grating.Grating.apply_gregorian_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_gregorian_layout</span></code></a>(magnification, …)</p></td>
+<td><p>Computes an optimal placement for the grating based on the magnification, the primary location and the detector location.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.apply_poletto_prescription" title="esis.optics.grating.Grating.apply_poletto_prescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_poletto_prescription</span></code></a>(wavelength_1, …)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.grating.Grating" title="esis.optics.grating.Grating"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.grating.Grating</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.copy" title="esis.optics.grating.Grating.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.grating.Grating" title="esis.optics.grating.Grating"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.grating.Grating</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.grating.Grating.diffraction_angle" title="esis.optics.grating.Grating.diffraction_angle"><code class="xref py py-obj docutils literal notranslate"><span class="pre">diffraction_angle</span></code></a>(wavelength[, input_angle])</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-47d3fb60aa52c5c82f27e8166e3e2b605cdab52c.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.optics.grating.Grating</p></object></div>
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.apply_gregorian_layout">
+<code class="sig-name descname">apply_gregorian_layout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">magnification</span></em>, <em class="sig-param"><span class="n">primary_focal_length</span></em>, <em class="sig-param"><span class="n">primary_clear_radius</span></em>, <em class="sig-param"><span class="n">back_focal_length</span></em>, <em class="sig-param"><span class="n">detector_cylindrical_radius</span></em>, <em class="sig-param"><span class="n">obscuration_margin</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.grating.Grating.apply_gregorian_layout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes an optimal placement for the grating based on the magnification, the primary location and the detector
+location.
+Based off of the procedure developed by Charles Kankelborg in SPIDER/spider/optics/design/configurations.ipynb
+:type magnification: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param magnification: Requested magnification of the Gregorian telescope
+:type primary_focal_length: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param primary_focal_length: Focal length of the parabolic primary mirror.
+:type primary_clear_radius: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param primary_clear_radius: Radius of the usable area on the primary mirror
+:type back_focal_length: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param back_focal_length: Distance from apex of primary to center of detector projected on the z-axis.
+:type detector_cylindrical_radius: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param detector_cylindrical_radius: Radial distance from the center of the detector to the axis of symmetry
+:type obscuration_margin: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param obscuration_margin: Size of the unusable border around the outside of the grating.
+:rtype: <a class="reference internal" href="#esis.optics.grating.Grating" title="esis.optics.grating.Grating"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.grating.Grating</span></code></a>
+:return: A new :py:class:esis.optics.components.Grating instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>magnification</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>primary_focal_length</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>primary_clear_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>back_focal_length</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>detector_cylindrical_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>obscuration_margin</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#esis.optics.grating.Grating" title="esis.optics.grating.Grating">esis.optics.grating.Grating</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.apply_poletto_prescription">
+<code class="sig-name descname">apply_poletto_prescription</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelength_1</span></em>, <em class="sig-param"><span class="n">wavelength_2</span></em>, <em class="sig-param"><span class="n">magnification</span></em>, <em class="sig-param"><span class="n">primary_focal_length</span></em>, <em class="sig-param"><span class="n">detector_cylindrical_radius</span></em>, <em class="sig-param"><span class="n">is_toroidal</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">is_vls</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.grating.Grating.apply_poletto_prescription" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.grating.Grating" title="esis.optics.grating.Grating"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.grating.Grating</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>wavelength_1</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>wavelength_2</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>magnification</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>primary_focal_length</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>detector_cylindrical_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>is_toroidal</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>is_vls</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.grating.Grating.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.grating.Grating" title="esis.optics.grating.Grating"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.grating.Grating</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.diffraction_angle">
+<code class="sig-name descname">diffraction_angle</code><span class="sig-paren">(</span><em class="sig-param">wavelength</em>, <em class="sig-param">input_angle=&lt;Quantity 0. deg&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.grating.Grating.diffraction_angle" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>wavelength</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>input_angle</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.aper_wedge_angle">
+<code class="sig-name descname">aper_wedge_angle</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.aper_wedge_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.aper_wedge_half_angle">
+<em class="property">property </em><code class="sig-name descname">aper_wedge_half_angle</code><a class="headerlink" href="#esis.optics.grating.Grating.aper_wedge_half_angle" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.border_width">
+<code class="sig-name descname">border_width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.border_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.cylindrical_azimuth">
+<code class="sig-name descname">cylindrical_azimuth</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.cylindrical_azimuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.cylindrical_radius">
+<code class="sig-name descname">cylindrical_radius</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.cylindrical_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.dataframe">
+<em class="property">property </em><code class="sig-name descname">dataframe</code><a class="headerlink" href="#esis.optics.grating.Grating.dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.diffraction_order">
+<code class="sig-name descname">diffraction_order</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0.&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.diffraction_order" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.dynamic_clearance">
+<code class="sig-name descname">dynamic_clearance</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.dynamic_clearance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.dynamic_clearance_x">
+<em class="property">property </em><code class="sig-name descname">dynamic_clearance_x</code><a class="headerlink" href="#esis.optics.grating.Grating.dynamic_clearance_x" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.inclination">
+<code class="sig-name descname">inclination</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.inclination" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.inner_border_width">
+<code class="sig-name descname">inner_border_width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.inner_border_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.inner_half_width">
+<code class="sig-name descname">inner_half_width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.inner_half_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.is_toroidal">
+<em class="property">property </em><code class="sig-name descname">is_toroidal</code><a class="headerlink" href="#esis.optics.grating.Grating.is_toroidal" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.is_vls">
+<em class="property">property </em><code class="sig-name descname">is_vls</code><a class="headerlink" href="#esis.optics.grating.Grating.is_vls" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)">kgpy.Name</a></em><a class="headerlink" href="#esis.optics.grating.Grating.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.nominal_input_angle">
+<code class="sig-name descname">nominal_input_angle</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.nominal_input_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.nominal_output_angle">
+<code class="sig-name descname">nominal_output_angle</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.nominal_output_angle" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.outer_half_width">
+<code class="sig-name descname">outer_half_width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.outer_half_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.piston">
+<code class="sig-name descname">piston</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.piston" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.roll">
+<code class="sig-name descname">roll</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.roll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.ruling_density">
+<code class="sig-name descname">ruling_density</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. 1 / mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.ruling_density" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.ruling_density_coeff_cubic">
+<code class="sig-name descname">ruling_density_coeff_cubic</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. 1 / mm4&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.ruling_density_coeff_cubic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.ruling_density_coeff_linear">
+<code class="sig-name descname">ruling_density_coeff_linear</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. 1 / mm2&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.ruling_density_coeff_linear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.ruling_density_coeff_quadratic">
+<code class="sig-name descname">ruling_density_coeff_quadratic</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. 1 / mm3&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.ruling_density_coeff_quadratic" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.sagittal_radius">
+<code class="sig-name descname">sagittal_radius</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity inf mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.sagittal_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.substrate_thickness">
+<code class="sig-name descname">substrate_thickness</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.substrate_thickness" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.surface">
+<em class="property">property </em><code class="sig-name descname">surface</code><a class="headerlink" href="#esis.optics.grating.Grating.surface" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.sag.Toroidal.html#kgpy.optics.surface.sag.Toroidal" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.sag.Toroidal</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.material.Mirror.html#kgpy.optics.surface.material.Mirror" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.material.Mirror</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.IsoscelesTrapezoid.html#kgpy.optics.surface.aperture.IsoscelesTrapezoid" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.IsoscelesTrapezoid</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.IsoscelesTrapezoid.html#kgpy.optics.surface.aperture.IsoscelesTrapezoid" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.IsoscelesTrapezoid</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.rulings.CubicPolyDensity.html#kgpy.optics.surface.rulings.CubicPolyDensity" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.rulings.CubicPolyDensity</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.tangential_radius">
+<code class="sig-name descname">tangential_radius</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity inf mm&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.tangential_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.grating.Grating.transform">
+<em class="property">property </em><code class="sig-name descname">transform</code><a class="headerlink" href="#esis.optics.grating.Grating.transform" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.TransformList.html#kgpy.transform.rigid.TransformList" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.TransformList</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.grating.Grating.twist">
+<code class="sig-name descname">twist</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.grating.Grating.twist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.design.html">design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.detector.html">detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.filter.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="esis.optics.grating.html">grating</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Grating</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.optics.html">optics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.poletto.html">poletto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.grating.Grating.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

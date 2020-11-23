@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mart &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multinv" href="esis.data.inversion.moses_mart.sampling_issue.moses.multinv.html" />
+    <link rel="prev" title="fomod" href="esis.data.inversion.moses_mart.sampling_issue.moses.fomod.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.data.inversion.moses_mart.sampling_issue.moses.multinv.html" title="multinv">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.data.inversion.moses_mart.sampling_issue.moses.fomod.html" title="fomod">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.data.html" >data</a> &#187;</li>
+      <li><a href="esis.data.inversion.html" >inversion</a> &#187;</li>
+      <li><a href="esis.data.inversion.moses_mart.html" >moses_mart</a> &#187;</li>
+      <li><a href="esis.data.inversion.moses_mart.sampling_issue.html" >sampling_issue</a> &#187;</li>
+      <li><a href="esis.data.inversion.moses_mart.sampling_issue.moses.html" accesskey="U">moses</a> &#187;</li>
+      
+      <li>mart</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="mart">
+<h1>mart<a class="headerlink" href="#mart" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="esis.data.inversion.moses_mart.sampling_issue.moses.mart">
+<code class="sig-prename descclassname">esis.data.inversion.moses_mart.sampling_issue.moses.</code><code class="sig-name descname">mart</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">DataArr</span></em>, <em class="sig-param"><span class="n">mArr</span></em>, <em class="sig-param"><span class="n">Nlambda</span></em>, <em class="sig-param"><span class="n">j0</span></em>, <em class="sig-param"><span class="n">maxiter</span><span class="o">=</span><span class="default_value">40</span></em>, <em class="sig-param"><span class="n">AntiAlias</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">Verbose</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">InitGuess</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">maxouter</span><span class="o">=</span><span class="default_value">1</span></em>, <em class="sig-param"><span class="n">Filter</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">Maximize</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">LGOF</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.moses_mart.sampling_issue.moses.mart" title="Permalink to this definition">¶</a></dt>
+<dd><p>MART: NEW VERSION WITH OPTIONAL LOCALIZED GOF (LGOF)</p>
+<p>Multiplicative Algebraic Reconstruction Technique, using MOSES-style projections into an
+arbitrary number of spectral orders. Infinite order is not (yet?) supported, but an
+initial guess based on the infinite order can be used.</p>
+<p>When used without the maxouter, Filter, or Maximize keywords, this is the simplest
+possible MART. Up to maxiter multiplicative corrections are performed. The loop
+exits when the reduced “chi square” drops below unity. I say “chi square” in quotes
+because DoFs are not counted honestly (how do you do that when the inversion has
+more degress of freedom than the data?). If we reach maxiter iterations without
+convergence of chisquare, an error is thrown.</p>
+<p>The maxouter and Filter keywords are designed to allow iterative filtering in an
+outer loop (“outeration”) that encloses the MART iterations described above. Before
+each run of MART, the guess is put through the specified Filter function.
+The maxouter value gives the maximum number of outerations.</p>
+<p>The Maximize keyword adds a convergence criterion to the outer loop. Supply the
+name of some figure of merit, perhaps a “norm,” of the guess. The concept
+here is that the Filter drives the “norm” to increase until its maximum is
+reached. If the value of “norm” is seen to decrease, this is interpreted as
+having reached the maximum, and we terminate the outerations.</p>
+<p>Arguments:
+DataArr = (Nx,Nm) array of data in Nm projections.
+mArr = (Nm) array of integer spectral orders.
+Nlambda = integer number of wavelength pixels in the inversion.
+j0 = index of the nominal line center wavelength. This column of the spectrum</p>
+<blockquote>
+<div><p>will not be shifted when projecting in the forward model (see fomod).</p>
+</div></blockquote>
+<p>Keywords:
+maxiter = maximum number of (inner) multiplicative inverse iterations allowed to</p>
+<blockquote>
+<div><p>get the reduced “chi square” down below unity.</p>
+</div></blockquote>
+<dl class="simple">
+<dt>AntiAlias = if true, then antialias filtering is done on the nonzero spectral</dt><dd><p>orders. Recommended for numerical stability, and to prevent the
+nonintersection anomaly which can sometimes cause horrible aliasing and
+unusually bad plaid artifacts.</p>
+</dd>
+<dt>InitGuess = initial guess (by default, a flat initial guess is used). This is</dt><dd><p>useful either for handing off a guess from a previous inversion effort
+or for other preconditioning of the inversion result.</p>
+</dd>
+</dl>
+<p>maxouter = maximum number of outer loop iterations (“outerations”).
+Filter = filter function for iterative filtering of the guess.
+Maximize = criterion (“norm”) function for evaluating the guess and judging</p>
+<blockquote>
+<div><p>convergence of the outerations.</p>
+</div></blockquote>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="esis.data.html">data</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="esis.data.inversion.html">inversion</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.cnn.html">cnn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.inversion.html">inversion</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.mart.html">mart</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="esis.data.inversion.moses_mart.html">moses_mart</a><ul class="current">
+<li class="toctree-l5 current"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.html">sampling_issue</a><ul class="current">
+<li class="toctree-l6 current"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.html">moses</a><ul class="current">
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.Ltenth.html">Ltenth</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.antialias.html">antialias</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.contrast_smooth.html">contrast_smooth</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.contrasty.html">contrasty</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.entropy.html">entropy</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.fomod.html">fomod</a></li>
+<li class="toctree-l7 current"><a class="current reference internal" href="#">mart</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.multinv.html">multinv</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.negentropy.html">negentropy</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.window.html">window</a></li>
+<li class="toctree-l7"><a class="reference internal" href="esis.data.inversion.moses_mart.sampling_issue.moses.zpad.html">zpad</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_0.html">level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_1.html">level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_3.html">level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_4.html">level_4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_0.html">test_level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_1.html">test_level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_3.html">test_level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_4.html">test_level_4</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.optics.html">optics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.data.inversion.moses_mart.sampling_issue.moses.mart.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>
