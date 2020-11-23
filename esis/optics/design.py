@@ -38,8 +38,7 @@ bottom-right and dispersed according to their wavelength.
 
     _, ax_side = plt.subplots(figsize=(6, 6), constrained_layout=True)
     ax_side.invert_xaxis()
-    opt = esis.optics.design.final()
-    opt.system.plot(
+    esis.optics.design.final().system.plot(
         ax=ax_side,
         plot_rays=False,
     )
@@ -71,6 +70,17 @@ Ideal Point-spread Function
 
 Vignetting
 ----------
+
+.. jupyter-execute::
+
+    rays = esis.optics.design.final(
+        pupil_samples=21,
+        field_samples=21,
+        all_channels=False
+    ).rays_output
+
+    vignetting_linear = rays.vignetting(polynomial_degree=1)
+    vignetting_linear.model().dataframe
 
 Distortion
 ----------
