@@ -332,7 +332,7 @@ class Optics(mixin.Named):
                 ),
                 disp=True,
                 polish=False,
-                popsize=10,
+                popsize=20,
                 mutation=(0.5, 1.5),
             )
 
