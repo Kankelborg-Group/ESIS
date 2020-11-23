@@ -1,6 +1,63 @@
+"""
+
+.. jupyter-execute::
+
+    import matplotlib.pyplot as plt
+    from kgpy import vector, optics
+    import esis
+
+Layout
+------
+
+ESIS is an array of slitless spectrographs, each with a different dispersion direction, but all fed from the same
+primary mirror.
+
+Each slitless spectrograph is an off-axis gregorian telescope.
+
+The layout of a single slitless spectrograph (known as a channel) is shown in the figure below.
+In this diagram, rays from the Sun enter on the left-hand side, reflect off the parabolic primary mirror on the
+right-hand side and are focused onto the field stop in the center of the diagram.
+After the field stop, the rays reflect off the grating on the left, and are refocused onto the detector on the
+bottom-right and dispersed according to their wavelength.
+
+
+
+.. jupyter-execute::
+
+    _, ax_top = plt.subplots(figsize=(9.5, 4), constrained_layout=True)
+    opt_top = esis.optics.design.final(field_samples=1, pupil_samples=3, all_channels=False)
+    opt_top.system.plot(
+        ax=ax_top,
+        components=(vector.iz, vector.ix),
+        plot_vignetted=True,
+    )
+    _ = ax_top.set_title('Top View, Channel 0 only')
+
+
+.. jupyter-execute::
+
+    fig_bore, ax_bore = plt.subplots(figsize=(6, 6), constrained_layout=True)
+    ax_bore.invert_xaxis()
+    esis.optics.design.final().system.plot(
+        ax=ax_bore,
+        plot_rays=False,
+    )
+    _ = ax_bore.set_title('Front View')
+    ax_bore.set_aspect('equal')
+
+
+Ideal Point-spread Function
+---------------------------
+
+Vignetting
+----------
+
+Distortion
+----------
+
+"""
 import numpy as np
 from astropy import units as u
-
 from kgpy import Name, vector
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
 

@@ -38,8 +38,9 @@ class MART:
     :param use_maximize: if True, use the `maximize` method during each filtering iteration.
     :param use_filter: if True, apply the `filter` method during each filtering iteration.
     :param anti_aliasing: 'before' means that the test projection is anti-aliased before the goodness of fit is
-    determined in each multiplicative iteration. 'after' means the de-projection is anti-aliased. 'single' means that
-    the indivudual projections are anti-aliased only once, before beginning the multiplicative or filtering iterations.
+        determined in each multiplicative iteration. 'after' means the de-projection is anti-aliased. 'single' means 
+        that the indivudual projections are anti-aliased only once, before beginning the multiplicative or filtering 
+        iterations.
     :param use_lgof: if True, use the Local Goodness of Fit routine.
     :param contrast_exponent: During contrast enhancement, what scalar value is used as the exponent on the data.
     :param max_filtering_iterations: maximum number of filtering iterations to do
@@ -47,7 +48,7 @@ class MART:
     :param simple_mart:
     :param lgof_mart:
     :param track_cube_history: if True, a copy of the cube after each iteration will be stored. Very memory intensive,
-    and not currently working.
+        and not currently working.
     """
 
     def __post_init__(self):

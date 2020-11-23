@@ -69,8 +69,8 @@ def image_setup(
     image (in last axis). This is a very brittle program.
 
     :param roy_rebin_error: Roy, when writing down the SAA regions, apparently introduced a factor of 6 error.
-    Incoming y-values for SAA regions needed to be multiplied by 6 to be correctly applied to the raw data (not
-    reshaped or rebinned) from the FITS file.
+        Incoming y-values for SAA regions needed to be multiplied by 6 to be correctly applied to the raw data (not
+        reshaped or rebinned) from the FITS file.
     :param fits_file: fits file to use
     :param x_range: (x_min, x_max) range to be used in the image.
     :param y_range: (y_min, y_max) range to be used in the image.

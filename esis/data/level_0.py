@@ -151,10 +151,6 @@ class Level_0(kgpy.observatories.Obs):
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
-            plt.figure()
-            plt.imshow(a[0, 0].value)
-            a = np.percentile(a, 95, axis=self.axis.xy, keepdims=True)
-            a = np.percentile(a, 5, axis=self.axis.xy, keepdims=True)
             bias[..., q] = np.median(a=a, axis=self.axis.xy)
         return bias
 
@@ -181,8 +177,8 @@ class Level_0(kgpy.observatories.Obs):
         if self._dark_nobias is None:
             intensity = self.intensity_nobias
             first_ind, last_ind = self.signal_index_first, self.signal_index_last + 1
-            darks = u.Quantity([intensity[:first_ind], intensity[last_ind:last_ind + first_ind]])
-            self._dark_nobias = np.median(darks, axis=(0, 1))
+            darks = np.concatenate([intensity[:first_ind], intensity[last_ind:]])
+            self._dark_nobias = np.median(darks, axis=0)
         return self._dark_nobias
 
     @property
@@ -274,6 +270,16 @@ class Level_0(kgpy.observatories.Obs):
         self.plot_intensity_nobias_mean(ax=axs[0])
         self.plot_exposure_length(ax=axs[1])
         self.plot_bias(ax=axs[2])
+        return axs
+
+    def plot_bias_subtraction_vs_index(
+            self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
+    ) -> typ.MutableSequence[plt.Axes]:
+        if axs is None:
+            fig, axs = plt.subplots(nrows=3)
+        self.plot_intensity_mean_vs_time(ax=axs[0])
+        self.plot_bias(ax=axs[1])
+        self.plot_intensity_nobias_mean(ax=axs[2])
         return axs
 
     def plot_fpga_stats_vs_index(
