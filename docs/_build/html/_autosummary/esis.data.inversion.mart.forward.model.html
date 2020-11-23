@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>model &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="helper" href="esis.data.inversion.mart.helper.html" />
+    <link rel="prev" title="min_projection_shape" href="esis.data.inversion.mart.forward.min_projection_shape.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.data.inversion.mart.helper.html" title="helper">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.data.inversion.mart.forward.min_projection_shape.html" title="min_projection_shape">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.data.html" >data</a> &#187;</li>
+      <li><a href="esis.data.inversion.html" >inversion</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.html" >mart</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.forward.html" accesskey="U">forward</a> &#187;</li>
+      
+      <li>model</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="model">
+<h1>model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="esis.data.inversion.mart.forward.model">
+<code class="sig-prename descclassname">esis.data.inversion.mart.forward.</code><code class="sig-name descname">model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cube</span></em>, <em class="sig-param"><span class="n">projection_azimuth</span></em>, <em class="sig-param"><span class="n">spectral_order</span></em>, <em class="sig-param"><span class="n">projection_shape</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">cube_spatial_offset</span><span class="o">=</span><span class="default_value">(0, 0)</span></em>, <em class="sig-param"><span class="n">projection_spatial_offset</span><span class="o">=</span><span class="default_value">(0, 0)</span></em>, <em class="sig-param"><span class="n">x_axis</span><span class="o">=</span><span class="default_value">- 3</span></em>, <em class="sig-param"><span class="n">y_axis</span><span class="o">=</span><span class="default_value">- 2</span></em>, <em class="sig-param"><span class="n">w_axis</span><span class="o">=</span><span class="default_value">- 1</span></em>, <em class="sig-param"><span class="n">rotation_kwargs</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.forward.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model is a basic forward model of CT imaging spectrograph.
+:type cube: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>
+:param cube: ‘slabs’ which is a <cite>np.ndarray</cite> which have at least an x, y, and wavelength axis.
+:type projection_azimuth: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param projection_azimuth: scalar angle describing dispersion direction in the <cite>data</cite> array.
+:type spectral_order: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param spectral_order: number of indices the array shifted per wavelength bin.
+:type projection_shape: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, …]]
+:param projection_shape: Desired shape of output array, as tuple of integers
+:type projection_spatial_offset: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]
+:param projection_spatial_offset:
+:type cube_spatial_offset: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]
+:param cube_spatial_offset:
+:type x_axis: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param x_axis: axis of the data slabs representing x-axis
+:type y_axis: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param y_axis: axis of the data slabs representing y-axis
+:type w_axis: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param w_axis: axis of the data slabs representing wavelength axis
+:type rotation_kwargs: <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">typing.Dict</span></code></a>]
+:param rotation_kwargs: kwargs for <cite>scipy.ndimage.rotate</cite> to be used during rotation portion of forward model
+:rtype: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>
+:return: list of arrays to which the forward model has been applied</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – </p></li>
+<li><p><strong>projection_azimuth</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>spectral_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>projection_shape</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><em>..</em><em>]</em>) – </p></li>
+<li><p><strong>cube_spatial_offset</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em>) – </p></li>
+<li><p><strong>projection_spatial_offset</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em>) – </p></li>
+<li><p><strong>x_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>y_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>w_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>rotation_kwargs</strong> (<em>Dict</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="esis.data.html">data</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="esis.data.inversion.html">inversion</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.cnn.html">cnn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.inversion.html">inversion</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="esis.data.inversion.mart.html">mart</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.antialias.html">antialias</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="esis.data.inversion.mart.forward.html">forward</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.forward.deproject.html">deproject</a></li>
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.forward.min_projection_shape.html">min_projection_shape</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">model</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.helper.html">helper</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.lgof_mart.html">lgof_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.mart.html">mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.result.html">result</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.simple_mart.html">simple_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.stats.html">stats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.test_antialias.html">test_antialias</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.moses_mart.html">moses_mart</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_0.html">level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_1.html">level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_3.html">level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_4.html">level_4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_0.html">test_level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_1.html">test_level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_3.html">test_level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_4.html">test_level_4</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.optics.html">optics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.data.inversion.mart.forward.model.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

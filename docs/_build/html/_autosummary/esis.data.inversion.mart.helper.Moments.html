@@ -1,0 +1,226 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Moments &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="lgof_mart" href="esis.data.inversion.mart.lgof_mart.html" />
+    <link rel="prev" title="result_to_moments" href="esis.data.inversion.mart.helper.result_to_moments.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.data.inversion.mart.lgof_mart.html" title="lgof_mart">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.data.inversion.mart.helper.result_to_moments.html" title="result_to_moments">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.data.html" >data</a> &#187;</li>
+      <li><a href="esis.data.inversion.html" >inversion</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.html" >mart</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.helper.html" accesskey="U">helper</a> &#187;</li>
+      
+      <li>Moments</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="moments">
+<h1>Moments<a class="headerlink" href="#moments" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.data.inversion.mart.helper.Moments">
+<em class="property">class </em><code class="sig-prename descclassname">esis.data.inversion.mart.helper.</code><code class="sig-name descname">Moments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">intensity</span></em>, <em class="sig-param"><span class="n">shift</span></em>, <em class="sig-param"><span class="n">width</span></em>, <em class="sig-param"><span class="n">skew</span></em>, <em class="sig-param"><span class="n">metadata</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.helper.Moments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt id="esis.data.inversion.mart.helper.Moments.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">intensity</span></em>, <em class="sig-param"><span class="n">shift</span></em>, <em class="sig-param"><span class="n">width</span></em>, <em class="sig-param"><span class="n">skew</span></em>, <em class="sig-param"><span class="n">metadata</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.helper.Moments.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>intensity</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a>) – </p></li>
+<li><p><strong>shift</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>skew</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>metadata</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.helper.Moments.__init__" title="esis.data.inversion.mart.helper.Moments.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(intensity, shift, width, skew, metadata)</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-4645666351c32cfb6a57fbfa85a30ca03d2960e1.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.data.inversion.mart.helper.Moments</p></object></div>
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.helper.Moments.intensity">
+<code class="sig-name descname">intensity</code><em class="property">: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></em><a class="headerlink" href="#esis.data.inversion.mart.helper.Moments.intensity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.helper.Moments.metadata">
+<code class="sig-name descname">metadata</code><em class="property">: Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.helper.Moments.metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>A class to basically just keep moments and the correct MART parameters associated with them together.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.helper.Moments.shift">
+<code class="sig-name descname">shift</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><a class="headerlink" href="#esis.data.inversion.mart.helper.Moments.shift" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.helper.Moments.skew">
+<code class="sig-name descname">skew</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><a class="headerlink" href="#esis.data.inversion.mart.helper.Moments.skew" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.helper.Moments.width">
+<code class="sig-name descname">width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><a class="headerlink" href="#esis.data.inversion.mart.helper.Moments.width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="esis.data.html">data</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="esis.data.inversion.html">inversion</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.cnn.html">cnn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.inversion.html">inversion</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="esis.data.inversion.mart.html">mart</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.antialias.html">antialias</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.forward.html">forward</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="esis.data.inversion.mart.helper.html">helper</a><ul class="current">
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.helper.add_poisson_noise.html">add_poisson_noise</a></li>
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.helper.generate_projections.html">generate_projections</a></li>
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.helper.good_mosaics.html">good_mosaics</a></li>
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.helper.image_setup.html">image_setup</a></li>
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.helper.result_to_moments.html">result_to_moments</a></li>
+<li class="toctree-l6 current"><a class="current reference internal" href="#">Moments</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.lgof_mart.html">lgof_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.mart.html">mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.result.html">result</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.simple_mart.html">simple_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.stats.html">stats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.test_antialias.html">test_antialias</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.moses_mart.html">moses_mart</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_0.html">level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_1.html">level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_3.html">level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_4.html">level_4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_0.html">test_level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_1.html">test_level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_3.html">test_level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_4.html">test_level_4</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.optics.html">optics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.data.inversion.mart.helper.Moments.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

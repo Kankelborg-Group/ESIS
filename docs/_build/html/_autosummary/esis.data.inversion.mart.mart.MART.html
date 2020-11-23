@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MART &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="result" href="esis.data.inversion.mart.result.html" />
+    <link rel="prev" title="mart" href="esis.data.inversion.mart.mart.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.data.inversion.mart.result.html" title="result">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.data.inversion.mart.mart.html" title="mart">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.data.html" >data</a> &#187;</li>
+      <li><a href="esis.data.inversion.html" >inversion</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.html" >mart</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.mart.html" accesskey="U">mart</a> &#187;</li>
+      
+      <li>MART</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="mart">
+<h1>MART<a class="headerlink" href="#mart" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.data.inversion.mart.mart.MART">
+<em class="property">class </em><code class="sig-prename descclassname">esis.data.inversion.mart.mart.</code><code class="sig-name descname">MART</code><span class="sig-paren">(</span><em class="sig-param">use_maximize=True</em>, <em class="sig-param">use_filter=True</em>, <em class="sig-param">anti_aliasing=None</em>, <em class="sig-param">use_lgof=True</em>, <em class="sig-param">contrast_exponent=0.2</em>, <em class="sig-param">max_filtering_iterations=10</em>, <em class="sig-param">max_multiplicative_iteration=40</em>, <em class="sig-param">photon_read_noise=1</em>, <em class="sig-param">simple_mart=None</em>, <em class="sig-param">lgof_mart=None</em>, <em class="sig-param">track_cube_history=False</em>, <em class="sig-param">rotation_kwargs=&lt;factory&gt;</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.mart.MART" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt id="esis.data.inversion.mart.mart.MART.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">use_maximize=True</em>, <em class="sig-param">use_filter=True</em>, <em class="sig-param">anti_aliasing=None</em>, <em class="sig-param">use_lgof=True</em>, <em class="sig-param">contrast_exponent=0.2</em>, <em class="sig-param">max_filtering_iterations=10</em>, <em class="sig-param">max_multiplicative_iteration=40</em>, <em class="sig-param">photon_read_noise=1</em>, <em class="sig-param">simple_mart=None</em>, <em class="sig-param">lgof_mart=None</em>, <em class="sig-param">track_cube_history=False</em>, <em class="sig-param">rotation_kwargs=&lt;factory&gt;</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_maximize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>use_filter</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>anti_aliasing</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a>) – </p></li>
+<li><p><strong>use_lgof</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>contrast_exponent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – </p></li>
+<li><p><strong>max_filtering_iterations</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>max_multiplicative_iteration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>photon_read_noise</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – </p></li>
+<li><p><strong>simple_mart</strong> (<a class="reference internal" href="esis.data.inversion.mart.simple_mart.SimpleMART.html#esis.data.inversion.mart.simple_mart.SimpleMART" title="esis.data.inversion.mart.simple_mart.SimpleMART"><em>esis.data.inversion.mart.simple_mart.SimpleMART</em></a>) – </p></li>
+<li><p><strong>lgof_mart</strong> (<a class="reference internal" href="esis.data.inversion.mart.lgof_mart.LGOFMART.html#esis.data.inversion.mart.lgof_mart.LGOFMART" title="esis.data.inversion.mart.lgof_mart.LGOFMART"><em>esis.data.inversion.mart.lgof_mart.LGOFMART</em></a>) – </p></li>
+<li><p><strong>track_cube_history</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>rotation_kwargs</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – </p></li>
+<li><p><strong>verbose</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.anti_aliasing" title="esis.data.inversion.mart.mart.MART.anti_aliasing"><code class="xref py py-obj docutils literal notranslate"><span class="pre">anti_aliasing</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.contrast_exponent" title="esis.data.inversion.mart.mart.MART.contrast_exponent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">contrast_exponent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.lgof_mart" title="esis.data.inversion.mart.mart.MART.lgof_mart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">lgof_mart</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.max_filtering_iterations" title="esis.data.inversion.mart.mart.MART.max_filtering_iterations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_filtering_iterations</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.max_multiplicative_iteration" title="esis.data.inversion.mart.mart.MART.max_multiplicative_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">max_multiplicative_iteration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.photon_read_noise" title="esis.data.inversion.mart.mart.MART.photon_read_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">photon_read_noise</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.simple_mart" title="esis.data.inversion.mart.mart.MART.simple_mart"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simple_mart</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.track_cube_history" title="esis.data.inversion.mart.mart.MART.track_cube_history"><code class="xref py py-obj docutils literal notranslate"><span class="pre">track_cube_history</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.use_filter" title="esis.data.inversion.mart.mart.MART.use_filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_filter</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.use_lgof" title="esis.data.inversion.mart.mart.MART.use_lgof"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_lgof</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.use_maximize" title="esis.data.inversion.mart.mart.MART.use_maximize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">use_maximize</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.verbose" title="esis.data.inversion.mart.mart.MART.verbose"><code class="xref py py-obj docutils literal notranslate"><span class="pre">verbose</span></code></a></p></td>
+<td><p>MART is the Multiplicative Algebraic Reconstruction Technique, developed here for use and application in general slitless imaging spectrograph, such as the Multi-Order Solar EUV Spectrograph (MOSES) and the EUV Snapshot Snapshot Imaging Spectrograph (ESIS) instruments constructed and launched by the Kankelborg Group at Montana State University, Bozeman.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.__init__" title="esis.data.inversion.mart.mart.MART.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([use_maximize, use_filter, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.filter" title="esis.data.inversion.mart.mart.MART.filter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter</span></code></a>(cube, kernel)</p></td>
+<td><p>Filter for use in MART, developed from CCK’s <cite>contrast_smooth</cite> function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.generate_filtering_kernel" title="esis.data.inversion.mart.mart.MART.generate_filtering_kernel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_filtering_kernel</span></code></a>(dimensions[, …])</p></td>
+<td><p>Generate the kernel used during the filtering iterations.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.mart.MART.maximize" title="esis.data.inversion.mart.mart.MART.maximize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">maximize</span></code></a>(cube)</p></td>
+<td><p>Maximize function for use in MART, developed from CCK’s <cite>entropy</cite> and <cite>negentropy</cite> :param cube: :return:</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-97cd0cf38f458d4d58452388b5f9da3d985f509f.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.data.inversion.mart.mart.MART</p></object></div>
+<dl class="py method">
+<dt id="esis.data.inversion.mart.mart.MART.filter">
+<code class="sig-name descname">filter</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cube</span></em>, <em class="sig-param"><span class="n">kernel</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter for use in MART, developed from CCK’s <cite>contrast_smooth</cite> function.
+:param cube: input array
+:param kernel: the kernel to use for the convolution
+:return: filtered version of input array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>np.ndarray</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – </p></li>
+<li><p><strong>kernel</strong> (<em>np.ndarray</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>np.ndarray[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.data.inversion.mart.mart.MART.generate_filtering_kernel">
+<em class="property">static </em><code class="sig-name descname">generate_filtering_kernel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dimensions</span></em>, <em class="sig-param"><span class="n">x_axis</span><span class="o">=</span><span class="default_value">- 3</span></em>, <em class="sig-param"><span class="n">y_axis</span><span class="o">=</span><span class="default_value">- 2</span></em>, <em class="sig-param"><span class="n">w_axis</span><span class="o">=</span><span class="default_value">- 1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.generate_filtering_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the kernel used during the filtering iterations. Takes standard 1-D kernel of [0.25, 0.5, 0.25] and
+generalizes it to a given number of dimensions.
+:type dimensions: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param dimensions: number of dimensions the kernel needs to be
+:type x_axis: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param x_axis: index of the x-axis
+:type y_axis: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param y_axis: index of the y-axis
+:type w_axis: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param w_axis: index of the wavelength axis
+:rtype: <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>
+:return:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dimensions</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>x_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>y_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>w_axis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.data.inversion.mart.mart.MART.maximize">
+<em class="property">static </em><code class="sig-name descname">maximize</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cube</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.maximize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Maximize function for use in MART, developed from CCK’s <cite>entropy</cite> and <cite>negentropy</cite>
+:param cube:
+:return:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cube</strong> (<em>np.ndarray</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.anti_aliasing">
+<code class="sig-name descname">anti_aliasing</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></em><em class="property"> = None</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.anti_aliasing" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.contrast_exponent">
+<code class="sig-name descname">contrast_exponent</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></em><em class="property"> = 0.2</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.contrast_exponent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.lgof_mart">
+<code class="sig-name descname">lgof_mart</code><em class="property">: <a class="reference internal" href="esis.data.inversion.mart.lgof_mart.LGOFMART.html#esis.data.inversion.mart.lgof_mart.LGOFMART" title="esis.data.inversion.mart.lgof_mart.LGOFMART">esis.data.inversion.mart.lgof_mart.LGOFMART</a></em><em class="property"> = None</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.lgof_mart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.max_filtering_iterations">
+<code class="sig-name descname">max_filtering_iterations</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = 10</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.max_filtering_iterations" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.max_multiplicative_iteration">
+<code class="sig-name descname">max_multiplicative_iteration</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = 40</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.max_multiplicative_iteration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.photon_read_noise">
+<code class="sig-name descname">photon_read_noise</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></em><em class="property"> = 1</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.photon_read_noise" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.rotation_kwargs">
+<code class="sig-name descname">rotation_kwargs</code><em class="property">: Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.rotation_kwargs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.simple_mart">
+<code class="sig-name descname">simple_mart</code><em class="property">: <a class="reference internal" href="esis.data.inversion.mart.simple_mart.SimpleMART.html#esis.data.inversion.mart.simple_mart.SimpleMART" title="esis.data.inversion.mart.simple_mart.SimpleMART">esis.data.inversion.mart.simple_mart.SimpleMART</a></em><em class="property"> = None</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.simple_mart" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.track_cube_history">
+<code class="sig-name descname">track_cube_history</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><em class="property"> = False</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.track_cube_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.use_filter">
+<code class="sig-name descname">use_filter</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><em class="property"> = True</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.use_filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.use_lgof">
+<code class="sig-name descname">use_lgof</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><em class="property"> = True</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.use_lgof" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.use_maximize">
+<code class="sig-name descname">use_maximize</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><em class="property"> = True</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.use_maximize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.mart.MART.verbose">
+<code class="sig-name descname">verbose</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></em><em class="property"> = False</em><a class="headerlink" href="#esis.data.inversion.mart.mart.MART.verbose" title="Permalink to this definition">¶</a></dt>
+<dd><p>MART is the Multiplicative Algebraic Reconstruction Technique, developed here for use and application in
+general slitless imaging spectrograph, such as the Multi-Order Solar EUV Spectrograph (MOSES) and the EUV Snapshot
+Snapshot Imaging Spectrograph (ESIS) instruments constructed and launched by the Kankelborg Group at Montana State
+University, Bozeman. MART was originally developed to reconstruct images in MOSES, and has since been generalized.</p>
+<p>MART is built as a callable object. Parameters determined during construction of a MART object are pertinent to how
+the algorithm will be carried out. When the MART object is called, input data is then specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>use_maximize</strong> – if True, use the <cite>maximize</cite> method during each filtering iteration.</p></li>
+<li><p><strong>use_filter</strong> – if True, apply the <cite>filter</cite> method during each filtering iteration.</p></li>
+<li><p><strong>anti_aliasing</strong> – ‘before’ means that the test projection is anti-aliased before the goodness of fit is
+determined in each multiplicative iteration. ‘after’ means the de-projection is anti-aliased. ‘single’ means
+that the indivudual projections are anti-aliased only once, before beginning the multiplicative or filtering
+iterations.</p></li>
+<li><p><strong>use_lgof</strong> – if True, use the Local Goodness of Fit routine.</p></li>
+<li><p><strong>contrast_exponent</strong> – During contrast enhancement, what scalar value is used as the exponent on the data.</p></li>
+<li><p><strong>max_filtering_iterations</strong> – maximum number of filtering iterations to do</p></li>
+<li><p><strong>max_multiplicative</strong> – maximum number of multiplicative iterations to do within a single filtering iteration.</p></li>
+<li><p><strong>simple_mart</strong> – </p></li>
+<li><p><strong>lgof_mart</strong> – </p></li>
+<li><p><strong>track_cube_history</strong> – if True, a copy of the cube after each iteration will be stored. Very memory intensive,
+and not currently working.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="esis.data.html">data</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="esis.data.inversion.html">inversion</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.cnn.html">cnn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.inversion.html">inversion</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="esis.data.inversion.mart.html">mart</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.antialias.html">antialias</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.forward.html">forward</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.helper.html">helper</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.lgof_mart.html">lgof_mart</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="esis.data.inversion.mart.mart.html">mart</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">MART</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.result.html">result</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.simple_mart.html">simple_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.stats.html">stats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.test_antialias.html">test_antialias</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.moses_mart.html">moses_mart</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_0.html">level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_1.html">level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_3.html">level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_4.html">level_4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_0.html">test_level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_1.html">test_level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_3.html">test_level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_4.html">test_level_4</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.optics.html">optics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.data.inversion.mart.mart.MART.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>
