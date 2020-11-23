@@ -1,0 +1,518 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Optics &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="poletto" href="esis.optics.poletto.html" />
+    <link rel="prev" title="optics" href="esis.optics.optics.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.poletto.html" title="poletto">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.optics.html" title="optics">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" >optics</a> &#187;</li>
+      <li><a href="esis.optics.optics.html" accesskey="U">optics</a> &#187;</li>
+      
+      <li>Optics</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="optics">
+<h1>Optics<a class="headerlink" href="#optics" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.optics.optics.Optics">
+<em class="property">class </em><code class="sig-prename descclassname">esis.optics.optics.</code><code class="sig-name descname">Optics</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">wavelengths=&lt;Quantity 0. nm&gt;</em>, <em class="sig-param">pupil_samples=10</em>, <em class="sig-param">field_samples=10</em>, <em class="sig-param">source=&lt;factory&gt;</em>, <em class="sig-param">front_aperture=&lt;factory&gt;</em>, <em class="sig-param">central_obscuration=&lt;factory&gt;</em>, <em class="sig-param">primary=&lt;factory&gt;</em>, <em class="sig-param">field_stop=&lt;factory&gt;</em>, <em class="sig-param">grating=&lt;factory&gt;</em>, <em class="sig-param">filter=&lt;factory&gt;</em>, <em class="sig-param">detector=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.optics.Optics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.mixin.Named.html#kgpy.mixin.Named" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.mixin.Named</span></code></a></p>
+<p>Add test docstring to see if this is the problem.</p>
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">wavelengths=&lt;Quantity 0. nm&gt;</em>, <em class="sig-param">pupil_samples=10</em>, <em class="sig-param">field_samples=10</em>, <em class="sig-param">source=&lt;factory&gt;</em>, <em class="sig-param">front_aperture=&lt;factory&gt;</em>, <em class="sig-param">central_obscuration=&lt;factory&gt;</em>, <em class="sig-param">primary=&lt;factory&gt;</em>, <em class="sig-param">field_stop=&lt;factory&gt;</em>, <em class="sig-param">grating=&lt;factory&gt;</em>, <em class="sig-param">filter=&lt;factory&gt;</em>, <em class="sig-param">detector=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.optics.Optics.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)"><em>kgpy.Name</em></a>) – </p></li>
+<li><p><strong>wavelengths</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>pupil_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>field_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>source</strong> (<a class="reference internal" href="esis.optics.source.Source.html#esis.optics.source.Source" title="esis.optics.source.Source"><em>esis.optics.source.Source</em></a>) – </p></li>
+<li><p><strong>front_aperture</strong> (<a class="reference internal" href="esis.optics.front_aperture.FrontAperture.html#esis.optics.front_aperture.FrontAperture" title="esis.optics.front_aperture.FrontAperture"><em>esis.optics.front_aperture.FrontAperture</em></a>) – </p></li>
+<li><p><strong>central_obscuration</strong> (<a class="reference internal" href="esis.optics.central_obscuration.CentralObscuration.html#esis.optics.central_obscuration.CentralObscuration" title="esis.optics.central_obscuration.CentralObscuration"><em>esis.optics.central_obscuration.CentralObscuration</em></a>) – </p></li>
+<li><p><strong>primary</strong> (<a class="reference internal" href="esis.optics.primary.Primary.html#esis.optics.primary.Primary" title="esis.optics.primary.Primary"><em>esis.optics.primary.Primary</em></a>) – </p></li>
+<li><p><strong>field_stop</strong> (<a class="reference internal" href="esis.optics.field_stop.FieldStop.html#esis.optics.field_stop.FieldStop" title="esis.optics.field_stop.FieldStop"><em>esis.optics.field_stop.FieldStop</em></a>) – </p></li>
+<li><p><strong>grating</strong> (<a class="reference internal" href="esis.optics.grating.Grating.html#esis.optics.grating.Grating" title="esis.optics.grating.Grating"><em>esis.optics.grating.Grating</em></a>) – </p></li>
+<li><p><strong>filter</strong> (<a class="reference internal" href="esis.optics.filter.Filter.html#esis.optics.filter.Filter" title="esis.optics.filter.Filter"><em>esis.optics.filter.Filter</em></a>) – </p></li>
+<li><p><strong>detector</strong> (<a class="reference internal" href="esis.optics.detector.Detector.html#esis.optics.detector.Detector" title="esis.optics.detector.Detector"><em>esis.optics.detector.Detector</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.back_focal_length" title="esis.optics.optics.Optics.back_focal_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">back_focal_length</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.dataframe" title="esis.optics.optics.Optics.dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataframe</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.effective_focal_length" title="esis.optics.optics.Optics.effective_focal_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">effective_focal_length</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.field_samples" title="esis.optics.optics.Optics.field_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">field_samples</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.magnification" title="esis.optics.optics.Optics.magnification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">magnification</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.num_channels" title="esis.optics.optics.Optics.num_channels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_channels</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.pixel_subtent" title="esis.optics.optics.Optics.pixel_subtent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_subtent</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.pupil_samples" title="esis.optics.optics.Optics.pupil_samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pupil_samples</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.rays_output" title="esis.optics.optics.Optics.rays_output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rays_output</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.rays.Rays.html#kgpy.optics.rays.Rays" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.rays.Rays</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.system" title="esis.optics.optics.Optics.system"><code class="xref py py-obj docutils literal notranslate"><span class="pre">system</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.System.html#kgpy.optics.System" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.System</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.wavelengths" title="esis.optics.optics.Optics.wavelengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">wavelengths</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.__init__" title="esis.optics.optics.Optics.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([name, wavelengths, pupil_samples, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.apply_poletto_layout" title="esis.optics.optics.Optics.apply_poletto_layout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_poletto_layout</span></code></a>(wavelength_1, …[, …])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.copy" title="esis.optics.optics.Optics.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.fit_to_images" title="esis.optics.optics.Optics.fit_to_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fit_to_images</span></code></a>(images[, global_search, …])</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.rough_fit_to_images" title="esis.optics.optics.Optics.rough_fit_to_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rough_fit_to_images</span></code></a>(images, spatial_samples)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.optics.Optics.update" title="esis.optics.optics.Optics.update"><code class="xref py py-obj docutils literal notranslate"><span class="pre">update</span></code></a>()</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.NoReturn" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.NoReturn</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-06337302b71591cdeb3c01bfc34d87609436e978.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.optics.optics.Optics</p></object></div>
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.apply_poletto_layout">
+<code class="sig-name descname">apply_poletto_layout</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelength_1</span></em>, <em class="sig-param"><span class="n">wavelength_2</span></em>, <em class="sig-param"><span class="n">magnification</span></em>, <em class="sig-param"><span class="n">obscuration_margin</span></em>, <em class="sig-param"><span class="n">obscuration_thickness</span></em>, <em class="sig-param"><span class="n">image_margin</span></em>, <em class="sig-param"><span class="n">detector_is_opposite_grating</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_toroidal_grating</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_vls_grating</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.optics.Optics.apply_poletto_layout" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>wavelength_1</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>wavelength_2</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>magnification</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>obscuration_margin</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>obscuration_thickness</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>image_margin</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>detector_is_opposite_grating</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>use_toroidal_grating</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>use_vls_grating</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.optics.Optics.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.fit_to_images">
+<code class="sig-name descname">fit_to_images</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span></em>, <em class="sig-param"><span class="n">global_search</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">local_search</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">global_samples</span><span class="o">=</span><span class="default_value">128</span></em>, <em class="sig-param"><span class="n">local_samples</span><span class="o">=</span><span class="default_value">256</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.optics.Optics.fit_to_images" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>images</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>global_search</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>local_search</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>global_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>local_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.rough_fit_to_images">
+<code class="sig-name descname">rough_fit_to_images</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">images</span></em>, <em class="sig-param"><span class="n">spatial_samples</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.optics.Optics.rough_fit_to_images" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>images</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>spatial_samples</strong> (<em>100</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.optics.Optics.update" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.NoReturn" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.NoReturn</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.back_focal_length">
+<em class="property">property </em><code class="sig-name descname">back_focal_length</code><a class="headerlink" href="#esis.optics.optics.Optics.back_focal_length" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.central_obscuration">
+<code class="sig-name descname">central_obscuration</code><em class="property">: <a class="reference internal" href="esis.optics.central_obscuration.CentralObscuration.html#esis.optics.central_obscuration.CentralObscuration" title="esis.optics.central_obscuration.CentralObscuration">esis.optics.central_obscuration.CentralObscuration</a></em><a class="headerlink" href="#esis.optics.optics.Optics.central_obscuration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.dataframe">
+<em class="property">property </em><code class="sig-name descname">dataframe</code><a class="headerlink" href="#esis.optics.optics.Optics.dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.detector">
+<code class="sig-name descname">detector</code><em class="property">: <a class="reference internal" href="esis.optics.detector.Detector.html#esis.optics.detector.Detector" title="esis.optics.detector.Detector">esis.optics.detector.Detector</a></em><a class="headerlink" href="#esis.optics.optics.Optics.detector" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.effective_focal_length">
+<em class="property">property </em><code class="sig-name descname">effective_focal_length</code><a class="headerlink" href="#esis.optics.optics.Optics.effective_focal_length" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.field_samples">
+<code class="sig-name descname">field_samples</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = 10</em><a class="headerlink" href="#esis.optics.optics.Optics.field_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.field_stop">
+<code class="sig-name descname">field_stop</code><em class="property">: <a class="reference internal" href="esis.optics.field_stop.FieldStop.html#esis.optics.field_stop.FieldStop" title="esis.optics.field_stop.FieldStop">esis.optics.field_stop.FieldStop</a></em><a class="headerlink" href="#esis.optics.optics.Optics.field_stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.filter">
+<code class="sig-name descname">filter</code><em class="property">: <a class="reference internal" href="esis.optics.filter.Filter.html#esis.optics.filter.Filter" title="esis.optics.filter.Filter">esis.optics.filter.Filter</a></em><a class="headerlink" href="#esis.optics.optics.Optics.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.front_aperture">
+<code class="sig-name descname">front_aperture</code><em class="property">: <a class="reference internal" href="esis.optics.front_aperture.FrontAperture.html#esis.optics.front_aperture.FrontAperture" title="esis.optics.front_aperture.FrontAperture">esis.optics.front_aperture.FrontAperture</a></em><a class="headerlink" href="#esis.optics.optics.Optics.front_aperture" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.grating">
+<code class="sig-name descname">grating</code><em class="property">: <a class="reference internal" href="esis.optics.grating.Grating.html#esis.optics.grating.Grating" title="esis.optics.grating.Grating">esis.optics.grating.Grating</a></em><a class="headerlink" href="#esis.optics.optics.Optics.grating" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.magnification">
+<em class="property">property </em><code class="sig-name descname">magnification</code><a class="headerlink" href="#esis.optics.optics.Optics.magnification" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)">kgpy.Name</a></em><a class="headerlink" href="#esis.optics.optics.Optics.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.num_channels">
+<em class="property">property </em><code class="sig-name descname">num_channels</code><a class="headerlink" href="#esis.optics.optics.Optics.num_channels" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.pixel_subtent">
+<em class="property">property </em><code class="sig-name descname">pixel_subtent</code><a class="headerlink" href="#esis.optics.optics.Optics.pixel_subtent" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.primary">
+<code class="sig-name descname">primary</code><em class="property">: <a class="reference internal" href="esis.optics.primary.Primary.html#esis.optics.primary.Primary" title="esis.optics.primary.Primary">esis.optics.primary.Primary</a></em><a class="headerlink" href="#esis.optics.optics.Optics.primary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.pupil_samples">
+<code class="sig-name descname">pupil_samples</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = 10</em><a class="headerlink" href="#esis.optics.optics.Optics.pupil_samples" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.rays_output">
+<em class="property">property </em><code class="sig-name descname">rays_output</code><a class="headerlink" href="#esis.optics.optics.Optics.rays_output" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.rays.Rays.html#kgpy.optics.rays.Rays" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.rays.Rays</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.source">
+<code class="sig-name descname">source</code><em class="property">: <a class="reference internal" href="esis.optics.source.Source.html#esis.optics.source.Source" title="esis.optics.source.Source">esis.optics.source.Source</a></em><a class="headerlink" href="#esis.optics.optics.Optics.source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.optics.Optics.system">
+<em class="property">property </em><code class="sig-name descname">system</code><a class="headerlink" href="#esis.optics.optics.Optics.system" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.System.html#kgpy.optics.System" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.System</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.optics.Optics.wavelengths">
+<code class="sig-name descname">wavelengths</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. nm&gt;</em><a class="headerlink" href="#esis.optics.optics.Optics.wavelengths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.design.html">design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.detector.html">detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.filter.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.grating.html">grating</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="esis.optics.optics.html">optics</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Optics</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.poletto.html">poletto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.optics.Optics.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

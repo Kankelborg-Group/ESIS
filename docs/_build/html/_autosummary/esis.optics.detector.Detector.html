@@ -1,0 +1,670 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detector &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="field_stop" href="esis.optics.field_stop.html" />
+    <link rel="prev" title="detector" href="esis.optics.detector.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.field_stop.html" title="field_stop">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.detector.html" title="detector">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" >optics</a> &#187;</li>
+      <li><a href="esis.optics.detector.html" accesskey="U">detector</a> &#187;</li>
+      
+      <li>Detector</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="detector">
+<h1>Detector<a class="headerlink" href="#detector" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.optics.detector.Detector">
+<em class="property">class </em><code class="sig-prename descclassname">esis.optics.detector.</code><code class="sig-name descname">Detector</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_azimuth=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inclination=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">roll=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">twist=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">pixel_width=&lt;Quantity 0. um&gt;</em>, <em class="sig-param">num_pixels=(0</em>, <em class="sig-param">0)</em>, <em class="sig-param">border_width_right=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width_left=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width_top=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width_bottom=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">dynamic_clearance=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">npix_overscan=0</em>, <em class="sig-param">npix_blank=0</em>, <em class="sig-param">gain=&lt;Quantity 0. electron / adu&gt;</em>, <em class="sig-param">readout_noise=&lt;Quantity 0. adu&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.component.CylindricalComponent.html#kgpy.optics.component.CylindricalComponent" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.component.CylindricalComponent</span></code></a></p>
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name=&lt;factory&gt;</em>, <em class="sig-param">piston=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_radius=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">cylindrical_azimuth=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">inclination=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">roll=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">twist=&lt;Quantity 0. deg&gt;</em>, <em class="sig-param">pixel_width=&lt;Quantity 0. um&gt;</em>, <em class="sig-param">num_pixels=(0</em>, <em class="sig-param">0)</em>, <em class="sig-param">border_width_right=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width_left=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width_top=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">border_width_bottom=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">dynamic_clearance=&lt;Quantity 0. mm&gt;</em>, <em class="sig-param">npix_overscan=0</em>, <em class="sig-param">npix_blank=0</em>, <em class="sig-param">gain=&lt;Quantity 0. electron / adu&gt;</em>, <em class="sig-param">readout_noise=&lt;Quantity 0. adu&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)"><em>kgpy.Name</em></a>) – </p></li>
+<li><p><strong>piston</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>cylindrical_radius</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>cylindrical_azimuth</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>inclination</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>roll</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>twist</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>pixel_width</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>num_pixels</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em>) – </p></li>
+<li><p><strong>border_width_right</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>border_width_left</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>border_width_top</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>border_width_bottom</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>dynamic_clearance</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>npix_overscan</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>npix_blank</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>gain</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>readout_noise</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.border_width_bottom" title="esis.optics.detector.Detector.border_width_bottom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">border_width_bottom</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.border_width_left" title="esis.optics.detector.Detector.border_width_left"><code class="xref py py-obj docutils literal notranslate"><span class="pre">border_width_left</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.border_width_right" title="esis.optics.detector.Detector.border_width_right"><code class="xref py py-obj docutils literal notranslate"><span class="pre">border_width_right</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.border_width_top" title="esis.optics.detector.Detector.border_width_top"><code class="xref py py-obj docutils literal notranslate"><span class="pre">border_width_top</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.clear_half_height" title="esis.optics.detector.Detector.clear_half_height"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_half_height</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.clear_half_width" title="esis.optics.detector.Detector.clear_half_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_half_width</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.clear_height" title="esis.optics.detector.Detector.clear_height"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_height</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.clear_width" title="esis.optics.detector.Detector.clear_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clear_width</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.cylindrical_azimuth" title="esis.optics.detector.Detector.cylindrical_azimuth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cylindrical_azimuth</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.cylindrical_radius" title="esis.optics.detector.Detector.cylindrical_radius"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cylindrical_radius</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.dataframe" title="esis.optics.detector.Detector.dataframe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dataframe</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.dynamic_clearance" title="esis.optics.detector.Detector.dynamic_clearance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dynamic_clearance</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.gain" title="esis.optics.detector.Detector.gain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gain</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.inclination" title="esis.optics.detector.Detector.inclination"><code class="xref py py-obj docutils literal notranslate"><span class="pre">inclination</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.npix_blank" title="esis.optics.detector.Detector.npix_blank"><code class="xref py py-obj docutils literal notranslate"><span class="pre">npix_blank</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.npix_overscan" title="esis.optics.detector.Detector.npix_overscan"><code class="xref py py-obj docutils literal notranslate"><span class="pre">npix_overscan</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.num_pixels" title="esis.optics.detector.Detector.num_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_pixels</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.num_pixels_all" title="esis.optics.detector.Detector.num_pixels_all"><code class="xref py py-obj docutils literal notranslate"><span class="pre">num_pixels_all</span></code></a></p></td>
+<td><p>Number of pixels in each axis including the overscan and blank pixels</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.piston" title="esis.optics.detector.Detector.piston"><code class="xref py py-obj docutils literal notranslate"><span class="pre">piston</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.pixel_half_width" title="esis.optics.detector.Detector.pixel_half_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_half_width</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.pixel_width" title="esis.optics.detector.Detector.pixel_width"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pixel_width</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.quadrants" title="esis.optics.detector.Detector.quadrants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">quadrants</span></code></a></p></td>
+<td><p>Slices for isolating the pixels associated with each tap on the CCD</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.readout_noise" title="esis.optics.detector.Detector.readout_noise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readout_noise</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.roll" title="esis.optics.detector.Detector.roll"><code class="xref py py-obj docutils literal notranslate"><span class="pre">roll</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.surface" title="esis.optics.detector.Detector.surface"><code class="xref py py-obj docutils literal notranslate"><span class="pre">surface</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.Rectangular.html#kgpy.optics.surface.aperture.Rectangular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.Rectangular</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.AsymmetricRectangular.html#kgpy.optics.surface.aperture.AsymmetricRectangular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.AsymmetricRectangular</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.transform" title="esis.optics.detector.Detector.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.Transform.html#kgpy.transform.rigid.Transform" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.Transform</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.twist" title="esis.optics.detector.Detector.twist"><code class="xref py py-obj docutils literal notranslate"><span class="pre">twist</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.__init__" title="esis.optics.detector.Detector.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([name, piston, cylindrical_radius, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.apply_poletto_prescription" title="esis.optics.detector.Detector.apply_poletto_prescription"><code class="xref py py-obj docutils literal notranslate"><span class="pre">apply_poletto_prescription</span></code></a>(wavelength_1, …)</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.detector.Detector" title="esis.optics.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.detector.Detector</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.convert_adu_to_electrons" title="esis.optics.detector.Detector.convert_adu_to_electrons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_adu_to_electrons</span></code></a>(data)</p></td>
+<td><p>Converts data in ADU units to electron units using the gain for each tap in each channel</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.convert_adu_to_photons" title="esis.optics.detector.Detector.convert_adu_to_photons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_adu_to_photons</span></code></a>(data, wavelength)</p></td>
+<td><p>Converts data in ADU units to photon units.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.convert_electrons_to_photons" title="esis.optics.detector.Detector.convert_electrons_to_photons"><code class="xref py py-obj docutils literal notranslate"><span class="pre">convert_electrons_to_photons</span></code></a>(data, wavelength)</p></td>
+<td><p>Converts data in electron units to photon units using the wavelength and the silicon workfunction</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.copy" title="esis.optics.detector.Detector.copy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">copy</span></code></a>()</p></td>
+<td><p><dl class="field-list simple">
+<dt class="field-odd">rtype</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.detector.Detector" title="esis.optics.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.detector.Detector</span></code></a></p>
+</dd>
+</dl>
+</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.readout_noise_image" title="esis.optics.detector.Detector.readout_noise_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">readout_noise_image</span></code></a>(num_channels)</p></td>
+<td><p>Calculate an image where each pixel contains the expected readout noise at that location</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.optics.detector.Detector.remove_inactive_pixels" title="esis.optics.detector.Detector.remove_inactive_pixels"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_inactive_pixels</span></code></a>(data)</p></td>
+<td><p>Given a raw image from the ESIS cameras, trim off the blank and overscan pixels, leaving only the light- sensitive pixels</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-5e3128267d73a48c2a9a5ba50ec325643dfd6c1f.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.optics.detector.Detector</p></object></div>
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.apply_poletto_prescription">
+<code class="sig-name descname">apply_poletto_prescription</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">wavelength_1</span></em>, <em class="sig-param"><span class="n">wavelength_2</span></em>, <em class="sig-param"><span class="n">magnification</span></em>, <em class="sig-param"><span class="n">primary_focal_length</span></em>, <em class="sig-param"><span class="n">grating</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.apply_poletto_prescription" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.detector.Detector" title="esis.optics.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.detector.Detector</span></code></a></p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>wavelength_1</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>wavelength_2</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>magnification</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>primary_focal_length</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>grating</strong> (<a class="reference internal" href="esis.optics.grating.Grating.html#esis.optics.grating.Grating" title="esis.optics.grating.Grating"><em>esis.optics.grating.Grating</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.convert_adu_to_electrons">
+<code class="sig-name descname">convert_adu_to_electrons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.convert_adu_to_electrons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts data in ADU units to electron units using the gain for each tap in each channel</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.IrreducibleUnit</span></code>) – sequence of images in ADU units</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Sequence of images in electron units</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.convert_adu_to_photons">
+<code class="sig-name descname">convert_adu_to_photons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">wavelength</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.convert_adu_to_photons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts data in ADU units to photon units.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.IrreducibleUnit</span></code>) – sequence of images in ADU units</p></li>
+<li><p><strong>wavelength</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code>) – wavelength of incident light. Must be broadcastable with <cite>data</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Sequence of images converted to photon units.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.convert_electrons_to_photons">
+<code class="sig-name descname">convert_electrons_to_photons</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em>, <em class="sig-param"><span class="n">wavelength</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.convert_electrons_to_photons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts data in electron units to photon units using the wavelength and the silicon workfunction</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.IrreducibleUnit</span></code>) – sequence of images in electron units</p></li>
+<li><p><strong>wavelength</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code>) – wavelength of incident light. Must be broadcastable with <cite>data</cite></p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>Sequence of images in photon units</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.copy">
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.copy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#esis.optics.detector.Detector" title="esis.optics.detector.Detector"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.detector.Detector</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.readout_noise_image">
+<code class="sig-name descname">readout_noise_image</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">num_channels</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.readout_noise_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate an image where each pixel contains the expected readout noise at that location</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Image representing the readout noise at every pixel location.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.remove_inactive_pixels">
+<code class="sig-name descname">remove_inactive_pixels</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.detector.Detector.remove_inactive_pixels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a raw image from the ESIS cameras, trim off the blank and overscan pixels, leaving only the light-
+sensitive pixels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.IrreducibleUnit</span></code>) – An array of raw ESIS images with the blank and overscan pixels still present</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A cropped array containing only light-sensitive pixels</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.border_width_bottom">
+<code class="sig-name descname">border_width_bottom</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.border_width_bottom" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.border_width_left">
+<code class="sig-name descname">border_width_left</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.border_width_left" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.border_width_right">
+<code class="sig-name descname">border_width_right</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.border_width_right" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.border_width_top">
+<code class="sig-name descname">border_width_top</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.border_width_top" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.clear_half_height">
+<em class="property">property </em><code class="sig-name descname">clear_half_height</code><a class="headerlink" href="#esis.optics.detector.Detector.clear_half_height" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.clear_half_width">
+<em class="property">property </em><code class="sig-name descname">clear_half_width</code><a class="headerlink" href="#esis.optics.detector.Detector.clear_half_width" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.clear_height">
+<em class="property">property </em><code class="sig-name descname">clear_height</code><a class="headerlink" href="#esis.optics.detector.Detector.clear_height" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.clear_width">
+<em class="property">property </em><code class="sig-name descname">clear_width</code><a class="headerlink" href="#esis.optics.detector.Detector.clear_width" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.cylindrical_azimuth">
+<code class="sig-name descname">cylindrical_azimuth</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.cylindrical_azimuth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.cylindrical_radius">
+<code class="sig-name descname">cylindrical_radius</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.cylindrical_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.dataframe">
+<em class="property">property </em><code class="sig-name descname">dataframe</code><a class="headerlink" href="#esis.optics.detector.Detector.dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.1.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.dynamic_clearance">
+<code class="sig-name descname">dynamic_clearance</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.dynamic_clearance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.gain">
+<code class="sig-name descname">gain</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. electron / adu&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.gain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.inclination">
+<code class="sig-name descname">inclination</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.inclination" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.name">
+<code class="sig-name descname">name</code><em class="property">: <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.Name.html#kgpy.Name" title="(in kgpy)">kgpy.Name</a></em><a class="headerlink" href="#esis.optics.detector.Detector.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.npix_blank">
+<code class="sig-name descname">npix_blank</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = 0</em><a class="headerlink" href="#esis.optics.detector.Detector.npix_blank" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.npix_overscan">
+<code class="sig-name descname">npix_overscan</code><em class="property">: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></em><em class="property"> = 0</em><a class="headerlink" href="#esis.optics.detector.Detector.npix_overscan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.num_pixels">
+<code class="sig-name descname">num_pixels</code><em class="property">: Tuple<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">, </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span></em><em class="property"> = (0, 0)</em><a class="headerlink" href="#esis.optics.detector.Detector.num_pixels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.num_pixels_all">
+<em class="property">property </em><code class="sig-name descname">num_pixels_all</code><a class="headerlink" href="#esis.optics.detector.Detector.num_pixels_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of pixels in each axis including the overscan and blank pixels</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>A tuple containing the total number of pixels along the long axis and short axis.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.piston">
+<code class="sig-name descname">piston</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. mm&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.piston" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.pixel_half_width">
+<em class="property">property </em><code class="sig-name descname">pixel_half_width</code><a class="headerlink" href="#esis.optics.detector.Detector.pixel_half_width" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.core.PrefixUnit</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.pixel_width">
+<code class="sig-name descname">pixel_width</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. um&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.pixel_width" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.quadrants">
+<em class="property">property </em><code class="sig-name descname">quadrants</code><a class="headerlink" href="#esis.optics.detector.Detector.quadrants" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slices for isolating the pixels associated with each tap on the CCD</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>A 4-tuple containing the pixel ranges for each axis of each quadrant on the sensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.readout_noise">
+<code class="sig-name descname">readout_noise</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. adu&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.readout_noise" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.roll">
+<code class="sig-name descname">roll</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.roll" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.surface">
+<em class="property">property </em><code class="sig-name descname">surface</code><a class="headerlink" href="#esis.optics.detector.Detector.surface" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.Surface.html#kgpy.optics.surface.Surface" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.Surface</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.Rectangular.html#kgpy.optics.surface.aperture.Rectangular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.Rectangular</span></code></a>, <a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.optics.surface.aperture.AsymmetricRectangular.html#kgpy.optics.surface.aperture.AsymmetricRectangular" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.optics.surface.aperture.AsymmetricRectangular</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="esis.optics.detector.Detector.transform">
+<em class="property">property </em><code class="sig-name descname">transform</code><a class="headerlink" href="#esis.optics.detector.Detector.transform" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://kgpy.readthedocs.io/en/latest/_autosummary/kgpy.transform.rigid.Transform.html#kgpy.transform.rigid.Transform" title="(in kgpy)"><code class="xref py py-class docutils literal notranslate"><span class="pre">kgpy.transform.rigid.Transform</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.optics.detector.Detector.twist">
+<code class="sig-name descname">twist</code><em class="property">: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></em><em class="property"> = &lt;Quantity 0. deg&gt;</em><a class="headerlink" href="#esis.optics.detector.Detector.twist" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.design.html">design</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="esis.optics.detector.html">detector</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Detector</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.filter.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.grating.html">grating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.optics.html">optics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.poletto.html">poletto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.detector.Detector.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

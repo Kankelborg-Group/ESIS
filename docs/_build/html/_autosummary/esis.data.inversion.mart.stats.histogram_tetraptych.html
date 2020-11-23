@@ -1,0 +1,184 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>histogram_tetraptych &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="multi_tetraptych" href="esis.data.inversion.mart.stats.multi_tetraptych.html" />
+    <link rel="prev" title="stats" href="esis.data.inversion.mart.stats.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.data.inversion.mart.stats.multi_tetraptych.html" title="multi_tetraptych">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.data.inversion.mart.stats.html" title="stats">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.data.html" >data</a> &#187;</li>
+      <li><a href="esis.data.inversion.html" >inversion</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.html" >mart</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.stats.html" accesskey="U">stats</a> &#187;</li>
+      
+      <li>histogram_tetraptych</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="histogram-tetraptych">
+<h1>histogram_tetraptych<a class="headerlink" href="#histogram-tetraptych" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="esis.data.inversion.mart.stats.histogram_tetraptych">
+<code class="sig-prename descclassname">esis.data.inversion.mart.stats.</code><code class="sig-name descname">histogram_tetraptych</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">y</span></em>, <em class="sig-param"><span class="n">percentile_threshold_x</span><span class="o">=</span><span class="default_value">0.1</span></em>, <em class="sig-param"><span class="n">percentile_threshold_y</span><span class="o">=</span><span class="default_value">1.0</span></em>, <em class="sig-param"><span class="n">num_histogram_bins</span><span class="o">=</span><span class="default_value">100</span></em>, <em class="sig-param"><span class="n">x_axis_labels</span><span class="o">=</span><span class="default_value">('', '', '', '')</span></em>, <em class="sig-param"><span class="n">y_axis_labels</span><span class="o">=</span><span class="default_value">('', '', '', '')</span></em>, <em class="sig-param"><span class="n">red_line</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">interquartile_contour</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">min_iqr_count</span><span class="o">=</span><span class="default_value">10</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.stats.histogram_tetraptych" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces a figure with four subplots, each a 2D histogram between corresponding entries in <cite>x</cite> and <cite>y</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>]) – tuple of 4 arrays</p></li>
+<li><p><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.ndarray</span></code></a>]) – tuple of 4 arrays</p></li>
+<li><p><strong>percentile_threshold_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – parameter used to calculate max and min percentile values for arrays in <cite>x</cite></p></li>
+<li><p><strong>percentile_threshold_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>) – parameter used to calculate max and min percentile values for arrays in <cite>y</cite></p></li>
+<li><p><strong>num_histogram_bins</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – how many bins in each the x and y axes for the histogram</p></li>
+<li><p><strong>x_axis_labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – </p></li>
+<li><p><strong>y_axis_labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.9)"><code class="xref py py-data docutils literal notranslate"><span class="pre">typing.Tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]) – </p></li>
+<li><p><strong>red_line</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <cite>True</cite>, plot the “x=y” line in each subplot as a red line</p></li>
+<li><p><strong>interquartile_contour</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>) – if <cite>True</cite>, plots contour of 25th, 50th, and 75th percentile.</p></li>
+<li><p><strong>min_iqr_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>) – minimum number of unique values in a column for that column to be considered in calculating
+the interquartile contour</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://matplotlib.org/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="(in Matplotlib v3.3.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib.figure.Figure</span></code></a></p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="esis.data.html">data</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="esis.data.inversion.html">inversion</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.cnn.html">cnn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.inversion.html">inversion</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="esis.data.inversion.mart.html">mart</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.antialias.html">antialias</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.forward.html">forward</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.helper.html">helper</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.lgof_mart.html">lgof_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.mart.html">mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.result.html">result</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.simple_mart.html">simple_mart</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="esis.data.inversion.mart.stats.html">stats</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">histogram_tetraptych</a></li>
+<li class="toctree-l6"><a class="reference internal" href="esis.data.inversion.mart.stats.multi_tetraptych.html">multi_tetraptych</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.test_antialias.html">test_antialias</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.moses_mart.html">moses_mart</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_0.html">level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_1.html">level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_3.html">level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_4.html">level_4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_0.html">test_level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_1.html">test_level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_3.html">test_level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_4.html">test_level_4</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.optics.html">optics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.data.inversion.mart.stats.histogram_tetraptych.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

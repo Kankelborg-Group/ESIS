@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>diffraction_angle_from_grating_equation &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="spatial_focal_curve" href="esis.optics.poletto.spatial_focal_curve.html" />
+    <link rel="prev" title="poletto" href="esis.optics.poletto.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.poletto.spatial_focal_curve.html" title="spatial_focal_curve">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.poletto.html" title="poletto">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" >optics</a> &#187;</li>
+      <li><a href="esis.optics.poletto.html" accesskey="U">poletto</a> &#187;</li>
+      
+      <li>diffraction_angle_from_grating_equation</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="diffraction-angle-from-grating-equation">
+<h1>diffraction_angle_from_grating_equation<a class="headerlink" href="#diffraction-angle-from-grating-equation" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="esis.optics.poletto.diffraction_angle_from_grating_equation">
+<code class="sig-prename descclassname">esis.optics.poletto.</code><code class="sig-name descname">diffraction_angle_from_grating_equation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">incidence_angle</span></em>, <em class="sig-param"><span class="n">wavelength</span></em>, <em class="sig-param"><span class="n">diffraction_order</span></em>, <em class="sig-param"><span class="n">groove_density</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.poletto.diffraction_angle_from_grating_equation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equation 13 of Poletto and Thomas rearranged to solve for diffraction angle.
+:type incidence_angle: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param incidence_angle: Signed angle between the surface normal and the incident ray
+:type wavelength: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param wavelength: Wavelength of the incident light rays
+:type diffraction_order: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param diffraction_order: Quantum number of diffracted ray.
+:type groove_density: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:param groove_density: Number of grooves per unit length on the grating surface.
+:rtype: <a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">astropy.units.Quantity</span></code></a>
+:return: Signed angle of the diffracted light</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>incidence_angle</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>wavelength</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>diffraction_order</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+<li><p><strong>groove_density</strong> (<a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)"><em>astropy.units.Quantity</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.astropy.org/en/stable/api/astropy.units.Quantity.html#astropy.units.Quantity" title="(in Astropy v4.1)">astropy.units.Quantity</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.design.html">design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.detector.html">detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.filter.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.grating.html">grating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.optics.html">optics</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="esis.optics.poletto.html">poletto</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">diffraction_angle_from_grating_equation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.optics.poletto.spatial_focal_curve.html">spatial_focal_curve</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.optics.poletto.spectral_focal_curve.html">spectral_focal_curve</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.poletto.diffraction_angle_from_grating_equation.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

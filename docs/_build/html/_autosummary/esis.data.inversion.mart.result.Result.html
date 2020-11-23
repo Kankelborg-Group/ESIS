@@ -1,0 +1,268 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Result &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="simple_mart" href="esis.data.inversion.mart.simple_mart.html" />
+    <link rel="prev" title="result" href="esis.data.inversion.mart.result.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.data.inversion.mart.simple_mart.html" title="simple_mart">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.data.inversion.mart.result.html" title="result">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.data.html" >data</a> &#187;</li>
+      <li><a href="esis.data.inversion.html" >inversion</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.html" >mart</a> &#187;</li>
+      <li><a href="esis.data.inversion.mart.result.html" accesskey="U">result</a> &#187;</li>
+      
+      <li>Result</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="result">
+<h1>Result<a class="headerlink" href="#result" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="esis.data.inversion.mart.result.Result">
+<em class="property">class </em><code class="sig-prename descclassname">esis.data.inversion.mart.result.</code><code class="sig-name descname">Result</code><span class="sig-paren">(</span><em class="sig-param">cube=None</em>, <em class="sig-param">best_cube=None</em>, <em class="sig-param">best_filtering_iteration=None</em>, <em class="sig-param">norm_history=&lt;factory&gt;</em>, <em class="sig-param">chisq_history=&lt;factory&gt;</em>, <em class="sig-param">mart_type_history=&lt;factory&gt;</em>, <em class="sig-param">cube_history=&lt;factory&gt;</em>, <em class="sig-param">total_intensity_history=&lt;factory&gt;</em>, <em class="sig-param">object_parameters=&lt;factory&gt;</em>, <em class="sig-param">call_parameters=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.result.Result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt id="esis.data.inversion.mart.result.Result.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">cube=None</em>, <em class="sig-param">best_cube=None</em>, <em class="sig-param">best_filtering_iteration=None</em>, <em class="sig-param">norm_history=&lt;factory&gt;</em>, <em class="sig-param">chisq_history=&lt;factory&gt;</em>, <em class="sig-param">mart_type_history=&lt;factory&gt;</em>, <em class="sig-param">cube_history=&lt;factory&gt;</em>, <em class="sig-param">total_intensity_history=&lt;factory&gt;</em>, <em class="sig-param">object_parameters=&lt;factory&gt;</em>, <em class="sig-param">call_parameters=&lt;factory&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#esis.data.inversion.mart.result.Result.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cube</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>]</em>) – </p></li>
+<li><p><strong>best_cube</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>]</em>) – </p></li>
+<li><p><strong>best_filtering_iteration</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em>) – </p></li>
+<li><p><strong>norm_history</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – </p></li>
+<li><p><strong>chisq_history</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>]</em>) – </p></li>
+<li><p><strong>mart_type_history</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a><em>]</em>) – </p></li>
+<li><p><strong>cube_history</strong> (<em>List</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>]</em>) – </p></li>
+<li><p><strong>total_intensity_history</strong> (<em>List</em><em>[</em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>numpy.ndarray</em></a><em>]</em>) – </p></li>
+<li><p><strong>object_parameters</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – </p></li>
+<li><p><strong>call_parameters</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Attributes</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.result.Result.best_cube" title="esis.data.inversion.mart.result.Result.best_cube"><code class="xref py py-obj docutils literal notranslate"><span class="pre">best_cube</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#esis.data.inversion.mart.result.Result.best_filtering_iteration" title="esis.data.inversion.mart.result.Result.best_filtering_iteration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">best_filtering_iteration</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.result.Result.cube" title="esis.data.inversion.mart.result.Result.cube"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cube</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#esis.data.inversion.mart.result.Result.__init__" title="esis.data.inversion.mart.result.Result.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>([cube, best_cube, …])</p></td>
+<td><p>Initialize self.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Inheritance Diagram</p>
+<div class="graphviz"><object data="../_images/inheritance-3b66fb01609702e418fd4af3a9a94c517795caf4.svg" type="image/svg+xml" class="inheritance graphviz">
+<p class="warning">Inheritance diagram of esis.data.inversion.mart.result.Result</p></object></div>
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.best_cube">
+<code class="sig-name descname">best_cube</code><em class="property">: Optional<span class="p">[</span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a><span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.best_cube" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.best_filtering_iteration">
+<code class="sig-name descname">best_filtering_iteration</code><em class="property">: Optional<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.best_filtering_iteration" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.call_parameters">
+<code class="sig-name descname">call_parameters</code><em class="property">: Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.call_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.chisq_history">
+<code class="sig-name descname">chisq_history</code><em class="property">: List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a><span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.chisq_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.cube">
+<code class="sig-name descname">cube</code><em class="property">: Optional<span class="p">[</span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a><span class="p">]</span></em><em class="property"> = None</em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.cube" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.cube_history">
+<code class="sig-name descname">cube_history</code><em class="property">: List<span class="p">[</span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a><span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.cube_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.mart_type_history">
+<code class="sig-name descname">mart_type_history</code><em class="property">: List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a><span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.mart_type_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.norm_history">
+<code class="sig-name descname">norm_history</code><em class="property">: List<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a><span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.norm_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.object_parameters">
+<code class="sig-name descname">object_parameters</code><em class="property">: Dict<span class="p">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a><span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.object_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="esis.data.inversion.mart.result.Result.total_intensity_history">
+<code class="sig-name descname">total_intensity_history</code><em class="property">: List<span class="p">[</span><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">numpy.ndarray</a><span class="p">]</span></em><a class="headerlink" href="#esis.data.inversion.mart.result.Result.total_intensity_history" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="esis.data.html">data</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="esis.data.inversion.html">inversion</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.cnn.html">cnn</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.inversion.html">inversion</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="esis.data.inversion.mart.html">mart</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.antialias.html">antialias</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.forward.html">forward</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.helper.html">helper</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.lgof_mart.html">lgof_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.mart.html">mart</a></li>
+<li class="toctree-l5 current"><a class="reference internal" href="esis.data.inversion.mart.result.html">result</a><ul class="current">
+<li class="toctree-l6 current"><a class="current reference internal" href="#">Result</a></li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.simple_mart.html">simple_mart</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.stats.html">stats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="esis.data.inversion.mart.test_antialias.html">test_antialias</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="esis.data.inversion.moses_mart.html">moses_mart</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_0.html">level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_1.html">level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_3.html">level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.level_4.html">level_4</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_0.html">test_level_0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_1.html">test_level_1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_3.html">test_level_3</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.data.test_level_4.html">test_level_4</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.optics.html">optics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.data.inversion.mart.result.Result.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>
