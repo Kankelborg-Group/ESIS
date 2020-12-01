@@ -1,0 +1,173 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>final_from_poletto &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="detector" href="esis.optics.detector.html" />
+    <link rel="prev" title="final" href="esis.optics.design.final.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.detector.html" title="detector">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.design.final.html" title="final">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" >optics</a> &#187;</li>
+      <li><a href="esis.optics.design.html" accesskey="U">design</a> &#187;</li>
+      
+      <li>final_from_poletto</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="final-from-poletto">
+<h1>final_from_poletto<a class="headerlink" href="#final-from-poletto" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="esis.optics.design.final_from_poletto">
+<code class="sig-prename descclassname">esis.optics.design.</code><code class="sig-name descname">final_from_poletto</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">pupil_samples</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">field_samples</span><span class="o">=</span><span class="default_value">10</span></em>, <em class="sig-param"><span class="n">use_toroidal_grating</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_vls_grating</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">use_one_wavelength_detector_tilt</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#esis.optics.design.final_from_poletto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Try to reproduce the final ESIS design using infrastructure developed from Thomas and Poletto (2004)
+:type pupil_samples: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param pupil_samples: Number of rays across the pupil in each axis.
+:type field_samples: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>
+:param field_samples: Number of rays across the field in each axis.
+:type use_toroidal_grating: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>
+:param use_toroidal_grating: Flag for choosing a toroidal or spherical grating.
+:type use_vls_grating: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>
+:param use_vls_grating: Flag for choosing uniform line spacing or variable line spacing.
+:type use_one_wavelength_detector_tilt: <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>
+:param use_one_wavelength_detector_tilt: Flag for choosing whether to use one or two wavelengths to compute the
+detector tilt.
+:rtype: <a class="reference internal" href="esis.optics.optics.Optics.html#esis.optics.optics.Optics" title="esis.optics.optics.Optics"><code class="xref py py-class docutils literal notranslate"><span class="pre">esis.optics.optics.Optics</span></code></a>
+:return: Instance of the ESIS optics model where the parameters have been calculated using Thomas and Poletto.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pupil_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>field_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – </p></li>
+<li><p><strong>use_toroidal_grating</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>use_vls_grating</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+<li><p><strong>use_one_wavelength_detector_tilt</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="esis.optics.optics.Optics.html#esis.optics.optics.Optics" title="esis.optics.optics.Optics">esis.optics.optics.Optics</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="esis.optics.design.html">design</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="esis.optics.design.final.html">final</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">final_from_poletto</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.detector.html">detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.filter.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.grating.html">grating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.optics.html">optics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.poletto.html">poletto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.design.final_from_poletto.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>

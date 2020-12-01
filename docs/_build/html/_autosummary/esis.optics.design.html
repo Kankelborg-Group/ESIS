@@ -1,0 +1,294 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>design &#8212; ESIS  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/bootstrap-astropy.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/jupyter-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/thebelab.css" />
+    
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/thebelab-helper.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script type="text/javascript" src="../_static/sidebar.js"></script>
+    <script type="text/javascript" src="../_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="final" href="esis.optics.design.final.html" />
+    <link rel="prev" title="CentralObscuration" href="esis.optics.central_obscuration.CentralObscuration.html" />
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600' rel='stylesheet' type='text/css'/>
+
+  </head><body>
+<div class="topbar">
+  <a class="brand" title="Documentation Home" href="../index.html"><span id="logotext1">ESIS</span><span id="logotext2"></span><span id="logotext3">:docs</span></a>
+  <ul>
+    
+    <li><a class="homelink" title="Astropy Homepage" href="http://www.astropy.org"></a></li>
+    <li><a title="General Index" href="../genindex.html">Index</a></li>
+    <li><a title="Module Index" href="../py-modindex.html">Modules</a></li>
+    <li>
+      
+      
+<form action="../search.html" method="get">
+  <input type="text" name="q" placeholder="Search" />
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+      
+    </li>
+  </ul>
+</div>
+
+<div class="related">
+    <h3>Navigation</h3>
+    <ul>
+      <li class="right">
+	<a href="esis.optics.design.final.html" title="final">
+	  next &raquo;
+	</a>
+      </li>
+      <li class="right">
+	<a href="esis.optics.central_obscuration.CentralObscuration.html" title="CentralObscuration">
+	  &laquo; previous
+	</a>
+	 |
+      </li>
+      <li>
+	<a href="../index.html">ESIS  documentation</a>
+	 &#187;
+      </li>
+      <li><a href="esis.html" >esis</a> &#187;</li>
+      <li><a href="esis.optics.html" accesskey="U">optics</a> &#187;</li>
+      
+      <li>design</li> 
+    </ul>
+</div>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-esis.optics.design">
+<span id="design"></span><h1>design<a class="headerlink" href="#module-esis.optics.design" title="Permalink to this headline">¶</a></h1>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.colors</span>
+<span class="kn">from</span> <span class="nn">kgpy</span> <span class="kn">import</span> <span class="n">vector</span><span class="p">,</span> <span class="n">optics</span>
+<span class="kn">import</span> <span class="nn">esis</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+</div>
+</div>
+<div class="section" id="layout">
+<h2>Layout<a class="headerlink" href="#layout" title="Permalink to this headline">¶</a></h2>
+<p>ESIS is an array of slitless spectrographs, each with a different dispersion direction, but all fed from the same
+primary mirror.</p>
+<p>Each slitless spectrograph is an off-axis gregorian telescope.</p>
+<p>The layout of a single slitless spectrograph (known as a channel) is shown in the figure below.
+In this diagram, rays from the Sun enter on the left-hand side, reflect off the parabolic primary mirror on the
+right-hand side and are focused onto the field stop in the center of the diagram.
+After the field stop, the rays reflect off the grating on the left, and are refocused onto the detector on the
+bottom-right and dispersed according to their wavelength.</p>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">ax_top</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mf">9.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">opt_top</span> <span class="o">=</span> <span class="n">esis</span><span class="o">.</span><span class="n">optics</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">final</span><span class="p">(</span><span class="n">field_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pupil_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">all_channels</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">opt_top</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax_top</span><span class="p">,</span>
+    <span class="n">components</span><span class="o">=</span><span class="p">(</span><span class="n">vector</span><span class="o">.</span><span class="n">iz</span><span class="p">,</span> <span class="n">vector</span><span class="o">.</span><span class="n">ix</span><span class="p">),</span>
+    <span class="n">plot_vignetted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">ax_top</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Top View, Channel 0 only&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/esis.optics.design_1_4.png" src="../_images/esis.optics.design_1_4.png" />
+</div>
+</div>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_</span><span class="p">,</span> <span class="n">ax_side</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax_side</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
+<span class="n">esis</span><span class="o">.</span><span class="n">optics</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">final</span><span class="p">()</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">ax_side</span><span class="p">,</span>
+    <span class="n">plot_rays</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">ax_side</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Front View&#39;</span><span class="p">)</span>
+<span class="n">ax_side</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/esis.optics.design_2_3.png" src="../_images/esis.optics.design_2_3.png" />
+</div>
+</div>
+</div>
+<div class="section" id="ideal-point-spread-function">
+<h2>Ideal Point-spread Function<a class="headerlink" href="#ideal-point-spread-function" title="Permalink to this headline">¶</a></h2>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rays_psf</span> <span class="o">=</span> <span class="n">esis</span><span class="o">.</span><span class="n">optics</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">final</span><span class="p">(</span>
+    <span class="n">pupil_samples</span><span class="o">=</span><span class="mi">101</span><span class="p">,</span>
+    <span class="n">field_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">all_channels</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span><span class="o">.</span><span class="n">rays_output</span>
+<span class="n">bins</span> <span class="o">=</span> <span class="n">rays_psf</span><span class="o">.</span><span class="n">input_pupil_x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">~</span><span class="mi">0</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span>
+
+<span class="n">fig_630</span> <span class="o">=</span> <span class="n">rays_psf</span><span class="o">.</span><span class="n">plot_pupil_hist2d_vs_field</span><span class="p">(</span><span class="n">wavlen_index</span><span class="o">=~</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">PowerNorm</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">fig_630</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">fig_630</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="mf">9.5</span><span class="p">)</span>
+
+<span class="n">fig_584</span> <span class="o">=</span> <span class="n">rays_psf</span><span class="o">.</span><span class="n">plot_pupil_hist2d_vs_field</span><span class="p">(</span><span class="n">wavlen_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">PowerNorm</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="p">)</span>
+<span class="n">fig_584</span><span class="o">.</span><span class="n">set_figheight</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">fig_584</span><span class="o">.</span><span class="n">set_figwidth</span><span class="p">(</span><span class="mf">9.5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/esis.optics.design_3_1.png" src="../_images/esis.optics.design_3_1.png" />
+<img alt="../_images/esis.optics.design_3_2.png" src="../_images/esis.optics.design_3_2.png" />
+</div>
+</div>
+</div>
+<div class="section" id="vignetting">
+<h2>Vignetting<a class="headerlink" href="#vignetting" title="Permalink to this headline">¶</a></h2>
+<div class="jupyter_cell jupyter_container docutils container">
+<div class="cell_input code_cell docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">rays</span> <span class="o">=</span> <span class="n">esis</span><span class="o">.</span><span class="n">optics</span><span class="o">.</span><span class="n">design</span><span class="o">.</span><span class="n">final</span><span class="p">(</span>
+    <span class="n">pupil_samples</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
+    <span class="n">field_samples</span><span class="o">=</span><span class="mi">21</span><span class="p">,</span>
+    <span class="n">all_channels</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span><span class="o">.</span><span class="n">rays_output</span>
+
+<span class="n">vignetting_linear</span> <span class="o">=</span> <span class="n">rays</span><span class="o">.</span><span class="n">vignetting</span><span class="p">(</span><span class="n">polynomial_degree</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">vignetting_linear</span><span class="o">.</span><span class="n">model</span><span class="p">()</span><span class="o">.</span><span class="n">dataframe</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>$C_{   }$</th>
+      <th>$C_{\lambda   }$</th>
+      <th>$C_{ x  }$</th>
+      <th>$C_{  y }$</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>$V$</th>
+      <td>77.593 $\mathrm{\%}$</td>
+      <td>1.043e-05 $\mathrm{\frac{\%}{\mathring{A}}}$</td>
+      <td>-5.163e-02 $\mathrm{\frac{\%}{{}^{\prime\prime...</td>
+      <td>3.228e-17 $\mathrm{\frac{\%}{{}^{\prime\prime}}}$</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</div>
+<div class="section" id="distortion">
+<h2>Distortion<a class="headerlink" href="#distortion" title="Permalink to this headline">¶</a></h2>
+<p class="rubric">Functions</p>
+<table class="longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="esis.optics.design.final.html#esis.optics.design.final" title="esis.optics.design.final"><code class="xref py py-obj docutils literal notranslate"><span class="pre">final</span></code></a>([pupil_samples, field_samples, …])</p></td>
+<td><p>Final ESIS optical design prepared by Charles Kankelborg and Hans Courrier.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="esis.optics.design.final_from_poletto.html#esis.optics.design.final_from_poletto" title="esis.optics.design.final_from_poletto"><code class="xref py py-obj docutils literal notranslate"><span class="pre">final_from_poletto</span></code></a>([pupil_samples, …])</p></td>
+<td><p>Try to reproduce the final ESIS design using infrastructure developed from Thomas and Poletto (2004) :type pupil_samples: <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> :param pupil_samples: Number of rays across the pupil in each axis.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><h3>Table of Contents</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="esis.html">esis</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="esis.data.html">data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="esis.flight.html">flight</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="esis.optics.html">optics</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.central_obscuration.html">central_obscuration</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">design</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="esis.optics.design.final.html">final</a></li>
+<li class="toctree-l4"><a class="reference internal" href="esis.optics.design.final_from_poletto.html">final_from_poletto</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.detector.html">detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.field_stop.html">field_stop</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.filter.html">filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.front_aperture.html">front_aperture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.grating.html">grating</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.optics.html">optics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.poletto.html">poletto</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.primary.html">primary</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.source.html">source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_design.html">test_design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="esis.optics.test_detector.html">test_detector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="esis.science.html">science</a></li>
+</ul>
+</li>
+</ul>
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+<footer class="footer">
+  <p class="pull-right">
+    <a href="../_sources/_autosummary/esis.optics.design.rst.txt"
+       rel="nofollow">Page Source</a> &nbsp;
+    <a href="#">Back to Top</a></p>
+  <p>
+    &copy; Copyright 2020, Roy T. Smart, Charles C. Kankelborg, Jacob D. Parker, Nelson C. Goldsworth.<br/>
+    Created using <a href="http://www.sphinx-doc.org/en/stable/">Sphinx</a> 3.3.1. &nbsp;
+  </p>
+</footer>
+  </body>
+</html>
