@@ -5,34 +5,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.time
+import astropy.wcs
 import astropy.io.fits
 import astropy.visualization
 import scipy.stats
+import kgpy.observatories
 import esis
-from . import DataLevel
 
 __all__ = ['Level_0']
 
 
 @dataclasses.dataclass
-class Level_0(DataLevel):
-    cam_sn: np.ndarray
-    global_index: np.ndarray
-    requested_exposure_time: u.Quantity
-    run_mode: np.ndarray
-    status: np.ndarray
-    fpga_temp: u.Quantity
-    fpga_vccint_voltage: u.Quantity
-    fpga_vccaux_voltage: u.Quantity
-    fpga_vccbram_voltage: u.Quantity
-    adc_temp_1: u.Quantity
-    adc_temp_2: u.Quantity
-    adc_temp_3: u.Quantity
-    adc_temp_4: u.Quantity
-    detector: esis.optics.Detector
+class Level_0(kgpy.observatories.Obs):
+    cam_sn: typ.Optional[np.ndarray] = None
+    global_index: typ.Optional[np.ndarray] = None
+    requested_exposure_time: typ.Optional[u.Quantity] = None
+    run_mode: typ.Optional[np.ndarray] = None
+    status: typ.Optional[np.ndarray] = None
+    fpga_temp: typ.Optional[u.Quantity] = None
+    fpga_vccint_voltage: typ.Optional[u.Quantity] = None
+    fpga_vccaux_voltage: typ.Optional[u.Quantity] = None
+    fpga_vccbram_voltage: typ.Optional[u.Quantity] = None
+    adc_temp_1: typ.Optional[u.Quantity] = None
+    adc_temp_2: typ.Optional[u.Quantity] = None
+    adc_temp_3: typ.Optional[u.Quantity] = None
+    adc_temp_4: typ.Optional[u.Quantity] = None
+    detector: typ.Optional[esis.optics.Detector] = None
     caching: bool = False
     num_dark_safety_frames: int = 1
-    num_ignored_bias_columns: int = 5
+    num_ignored_bias_columns: int = 20
 
     def __post_init__(self):
         self.update()
@@ -45,7 +46,8 @@ class Level_0(DataLevel):
 
     @classmethod
     def from_directory(
-            cls, directory: pathlib.Path,
+            cls,
+            directory: pathlib.Path,
             detector: esis.optics.Detector,
             caching: bool = False,
             num_dark_safety_frames: int = 1,
@@ -65,58 +67,56 @@ class Level_0(DataLevel):
 
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
+        self.exposure_length = self.exposure_length * u.adu / u.s
         self.detector = detector
         self.caching = caching
         self.num_dark_safety_frames = num_dark_safety_frames
 
         for i in range(num_exposures):
+            self.intensity_uncertainty[i] = detector.readout_noise_image(num_channels)
             for c in range(num_channels):
                 hdu = astropy.io.fits.open(fits_list[bad_exposures + i, c])[0]
-                header = hdu.header
-                self.intensity[i, c] = hdu.data * u.ct
-                self.start_time[i, c] = astropy.time.Time(header['IMG_TS'])
-                self.exposure_length[i, c] = float(header['MEAS_EXP']) * u.ct
-                self.channel[i, c] = int(header['CAM_ID'][~0]) * u.chan
-                self.sequence_index[i, c] = int(header['IMG_CNT'])
-                self.cam_sn[i, c] = int(header['CAM_SN'])
-                self.global_index[i, c] = int(header['IMG_ISN'])
-                self.requested_exposure_time[i, c] = float(header['IMG_EXP']) * u.ms
-                self.run_mode[i, c] = header['RUN_MODE']
-                self.status[i, c] = header['IMG_STAT']
-                self.fpga_temp[i, c] = float(header['FPGATEMP']) * u.ct
-                self.fpga_vccint_voltage[i, c] = float(header['FPGAVINT']) * u.ct
-                self.fpga_vccaux_voltage[i, c] = float(header['FPGAVAUX']) * u.ct
-                self.fpga_vccbram_voltage[i, c] = float(header['FPGAVBRM']) * u.ct
-                self.adc_temp_1[i, c] = float(header['ADCTEMP1']) * u.ct
-                self.adc_temp_2[i, c] = float(header['ADCTEMP2']) * u.ct
-                self.adc_temp_3[i, c] = float(header['ADCTEMP3']) * u.ct
-                self.adc_temp_4[i, c] = float(header['ADCTEMP4']) * u.ct
+                self.intensity[i, c] = hdu.data * u.adu
+                self.time[i, c] = astropy.time.Time(hdu.header['IMG_TS'])
+                self.exposure_length[i, c] = float(hdu.header['MEAS_EXP']) * u.adu
+                if i == 0:
+                    self.channel[c] = int(hdu.header['CAM_ID'][~0]) * u.chan
+                if c == 0:
+                    self.time_index[i] = int(hdu.header['IMG_CNT'])
+                self.cam_sn[i, c] = int(hdu.header['CAM_SN'])
+                self.global_index[i, c] = int(hdu.header['IMG_ISN'])
+                self.requested_exposure_time[i, c] = float(hdu.header['IMG_EXP']) * u.ms
+                self.run_mode[i, c] = hdu.header['RUN_MODE']
+                self.status[i, c] = hdu.header['IMG_STAT']
+                self.fpga_temp[i, c] = float(hdu.header['FPGATEMP']) * u.adu
+                self.fpga_vccint_voltage[i, c] = float(hdu.header['FPGAVINT']) * u.adu
+                self.fpga_vccaux_voltage[i, c] = float(hdu.header['FPGAVAUX']) * u.adu
+                self.fpga_vccbram_voltage[i, c] = float(hdu.header['FPGAVBRM']) * u.adu
+                self.adc_temp_1[i, c] = float(hdu.header['ADCTEMP1']) * u.adu
+                self.adc_temp_2[i, c] = float(hdu.header['ADCTEMP2']) * u.adu
+                self.adc_temp_3[i, c] = float(hdu.header['ADCTEMP3']) * u.adu
+                self.adc_temp_4[i, c] = float(hdu.header['ADCTEMP4']) * u.adu
         return self
 
     @classmethod
-    def zeros(cls, shape: typ.Sequence[int]):
+    def zeros(cls, shape: typ.Sequence[int]) -> 'Level_0':
         sh = shape[:2]
-        return cls(
-            intensity=np.zeros(shape) * u.ct,
-            start_time=astropy.time.Time(np.zeros(sh), format='unix'),
-            exposure_length=np.zeros(sh) * u.ct,
-            channel=np.zeros(sh, dtype=np.int) * u.chan,
-            sequence_index=np.zeros(sh),
-            cam_sn=np.zeros(sh, dtype=np.int),
-            global_index=np.zeros(sh, dtype=np.int),
-            requested_exposure_time=np.zeros(sh) * u.s,
-            run_mode=np.zeros(sh, dtype='S20'),
-            status=np.zeros(sh, dtype='S20'),
-            fpga_temp=np.zeros(sh) * u.ct,
-            fpga_vccint_voltage=np.zeros(sh) * u.ct,
-            fpga_vccaux_voltage=np.zeros(sh) * u.ct,
-            fpga_vccbram_voltage=np.zeros(sh) * u.ct,
-            adc_temp_1=np.zeros(sh) * u.ct,
-            adc_temp_2=np.zeros(sh) * u.ct,
-            adc_temp_3=np.zeros(sh) * u.ct,
-            adc_temp_4=np.zeros(sh) * u.ct,
-            detector=esis.optics.Detector(),
-        )
+        self = super().zeros(shape)  # type: Level_0
+        self.cam_sn = np.zeros(sh, dtype=np.int)
+        self.global_index = np.zeros(sh, dtype=np.int)
+        self.requested_exposure_time = np.zeros(sh) * u.s
+        self.run_mode = np.zeros(sh, dtype='S20')
+        self.status = np.zeros(sh, dtype='S20')
+        self.fpga_temp = np.zeros(sh) * u.adu
+        self.fpga_vccint_voltage = np.zeros(sh) * u.adu
+        self.fpga_vccaux_voltage = np.zeros(sh) * u.adu
+        self.fpga_vccbram_voltage = np.zeros(sh) * u.adu
+        self.adc_temp_1 = np.zeros(sh) * u.adu
+        self.adc_temp_2 = np.zeros(sh) * u.adu
+        self.adc_temp_3 = np.zeros(sh) * u.adu
+        self.adc_temp_4 = np.zeros(sh) * u.adu
+        self.detector = esis.optics.Detector()
+        return self
 
     @property
     def intensity_derivative(self) -> u.Quantity:
@@ -146,12 +146,11 @@ class Level_0(DataLevel):
         s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), ~(self.num_ignored_bias_columns - 1))
         blank_pix = 2 * [s1] + 2 * [s2]
         quadrants = self.detector.quadrants
-        bias = np.empty((self.shape[self.axis.time], self.shape[self.axis.chan], len(quadrants))) << self.intensity.unit
+        bias = np.empty(
+            (self.shape[self.axis.time], self.shape[self.axis.channel], len(quadrants))) << self.intensity.unit
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
-            a = np.percentile(a, 95, axis=self.axis.xy, keepdims=True)
-            a = np.percentile(a, 5, axis=self.axis.xy, keepdims=True)
             bias[..., q] = np.median(a=a, axis=self.axis.xy)
         return bias
 
@@ -168,7 +167,7 @@ class Level_0(DataLevel):
             quadrants = self.detector.quadrants
             bias = self.bias
             for q in range(len(quadrants)):
-                intensity_nobias[(..., ) + quadrants[q]] -= bias[..., q, None, None]
+                intensity_nobias[(...,) + quadrants[q]] -= bias[..., q, None, None]
             if self.caching:
                 self._intensity_nobias = intensity_nobias
         return intensity_nobias
@@ -178,8 +177,8 @@ class Level_0(DataLevel):
         if self._dark_nobias is None:
             intensity = self.intensity_nobias
             first_ind, last_ind = self.signal_index_first, self.signal_index_last + 1
-            darks = u.Quantity([intensity[:first_ind], intensity[last_ind:last_ind + first_ind]])
-            self._dark_nobias  = np.median(darks, axis=(0, 1))
+            darks = np.concatenate([intensity[:first_ind], intensity[last_ind:]])
+            self._dark_nobias = np.median(darks, axis=0)
         return self._dark_nobias
 
     @property
@@ -200,8 +199,8 @@ class Level_0(DataLevel):
         return self.intensity_nobias_nodark_active[self.signal_slice]
 
     @property
-    def start_time_signal(self) -> astropy.time.Time:
-        return self.start_time[self.signal_slice]
+    def time_signal(self) -> astropy.time.Time:
+        return self.time[self.signal_slice]
 
     @property
     def requested_exposure_time_signal(self) -> u.Quantity:
@@ -212,8 +211,8 @@ class Level_0(DataLevel):
         return self.channel[self.signal_slice]
 
     @property
-    def sequence_index_signal(self) -> u.Quantity:
-        return self.sequence_index[self.signal_slice]
+    def time_index_signal(self) -> u.Quantity:
+        return self.time_index[self.signal_slice]
 
     def plot_quantity_vs_index(
             self,
@@ -224,8 +223,8 @@ class Level_0(DataLevel):
             drawstyle: str = 'steps',
     ) -> plt.Axes:
         ax = super().plot_quantity_vs_index(a=a, a_name=a_name, ax=ax, legend_ncol=legend_ncol, drawstyle=drawstyle)
-        ax.axvline(self.sequence_index[self.signal_index_first, 0], color='black')
-        ax.axvline(self.sequence_index[self.signal_index_last + 1, 0], color='black')
+        ax.axvline(self.time_index[self.signal_index_first], color='black')
+        ax.axvline(self.time_index[self.signal_index_last + 1], color='black')
         return ax
 
     def plot_intensity_nobias_mean(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
@@ -273,6 +272,16 @@ class Level_0(DataLevel):
         self.plot_bias(ax=axs[2])
         return axs
 
+    def plot_bias_subtraction_vs_index(
+            self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
+    ) -> typ.MutableSequence[plt.Axes]:
+        if axs is None:
+            fig, axs = plt.subplots(nrows=3)
+        self.plot_intensity_mean_vs_time(ax=axs[0])
+        self.plot_bias(ax=axs[1])
+        self.plot_intensity_nobias_mean(ax=axs[2])
+        return axs
+
     def plot_fpga_stats_vs_index(
             self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
     ) -> typ.MutableSequence[plt.Axes]:
@@ -301,9 +310,9 @@ class Level_0(DataLevel):
             self.intensity_nobias_nodark[time_index, channel_index],
         ])
 
-        time = self.start_time[time_index, channel_index]
-        chan = self.channel[time_index, channel_index]
-        seq_index = self.sequence_index[time_index, channel_index]
+        time = self.time[time_index, channel_index]
+        chan = self.channel[channel_index]
+        seq_index = self.time_index[time_index]
 
         base_title = time.to_value('iso') + ', frame ' + str(int(seq_index)) + ', channel ' + str(int(chan.value))
 

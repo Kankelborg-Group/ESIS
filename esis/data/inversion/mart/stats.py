@@ -33,7 +33,7 @@ def histogram_tetraptych(
     :param red_line: if `True`, plot the "x=y" line in each subplot as a red line
     :param interquartile_contour: if `True`, plots contour of 25th, 50th, and 75th percentile.
     :param min_iqr_count: minimum number of unique values in a column for that column to be considered in calculating
-    the interquartile contour
+        the interquartile contour
     :return:
     """
     # Makes assumption that these are already masked!
@@ -167,7 +167,7 @@ def multi_tetraptych(
     :param red_line: if `True`, plot the "x=y" line in each subplot as a red line
     :param contour: if `True`, plots contour of 25th, 50th, and 75th percentile.
     :param min_iqr_count: minimum number of unique values in a column for that column to be considered in calculating
-    the interquartile contour
+        the interquartile contour
     :return:
     """
     # for correctly specifying color:

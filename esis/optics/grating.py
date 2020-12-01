@@ -9,12 +9,12 @@ from . import poletto
 
 __all__ = ['Grating']
 
-SurfaceT = optics.Surface[
-    optics.sag.Toroidal,
-    optics.material.Mirror,
-    optics.aperture.IsoscelesTrapezoid,
-    optics.aperture.IsoscelesTrapezoid,
-    optics.rulings.CubicPolyDensity,
+SurfaceT = optics.surface.Surface[
+    optics.surface.sag.Toroidal,
+    optics.surface.material.Mirror,
+    optics.surface.aperture.IsoscelesTrapezoid,
+    optics.surface.aperture.IsoscelesTrapezoid,
+    optics.surface.rulings.CubicPolyDensity,
 ]
 
 
@@ -100,26 +100,26 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     def surface(self) -> SurfaceT:
         surface = super().surface  # type: SurfaceT
         surface.is_stop = True
-        surface.sag = optics.sag.Toroidal(
+        surface.sag = optics.surface.sag.Toroidal(
             radius=self.sagittal_radius,
             radius_of_rotation=self.tangential_radius
         )
-        surface.rulings = optics.rulings.CubicPolyDensity(
+        surface.rulings = optics.surface.rulings.CubicPolyDensity(
             diffraction_order=self.diffraction_order,
             ruling_density=self.ruling_density,
             ruling_density_linear=self.ruling_density_coeff_linear,
             ruling_density_quadratic=self.ruling_density_coeff_quadratic,
             ruling_density_cubic=self.ruling_density_coeff_cubic,
         )
-        surface.material = optics.material.Mirror(thickness=-self.substrate_thickness)
+        surface.material = optics.surface.material.Mirror(thickness=-self.substrate_thickness)
         side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
-        surface.aperture = optics.aperture.IsoscelesTrapezoid(
+        surface.aperture = optics.surface.aperture.IsoscelesTrapezoid(
             apex_offset=-(self.cylindrical_radius - side_border_x),
             half_width_left=self.inner_half_width,
             half_width_right=self.outer_half_width,
             wedge_half_angle=self.aper_wedge_half_angle,
         )
-        surface.aperture_mechanical = optics.aperture.IsoscelesTrapezoid(
+        surface.aperture_mechanical = optics.surface.aperture.IsoscelesTrapezoid(
             apex_offset=-(self.cylindrical_radius - self.dynamic_clearance_x),
             half_width_left=self.inner_half_width + self.inner_border_width,
             half_width_right=self.outer_half_width + self.border_width,

@@ -1,6 +1,93 @@
+"""
+
+.. jupyter-execute::
+
+    import matplotlib.pyplot as plt
+    import matplotlib.colors
+    from kgpy import vector, optics
+    import esis
+
+Layout
+------
+
+ESIS is an array of slitless spectrographs, each with a different dispersion direction, but all fed from the same
+primary mirror.
+
+Each slitless spectrograph is an off-axis gregorian telescope.
+
+The layout of a single slitless spectrograph (known as a channel) is shown in the figure below.
+In this diagram, rays from the Sun enter on the left-hand side, reflect off the parabolic primary mirror on the
+right-hand side and are focused onto the field stop in the center of the diagram.
+After the field stop, the rays reflect off the grating on the left, and are refocused onto the detector on the
+bottom-right and dispersed according to their wavelength.
+
+
+.. jupyter-execute::
+
+    _, ax_top = plt.subplots(figsize=(9.5, 4), constrained_layout=True)
+    opt_top = esis.optics.design.final(field_samples=1, pupil_samples=3, all_channels=False)
+    opt_top.system.plot(
+        ax=ax_top,
+        components=(vector.iz, vector.ix),
+        plot_vignetted=True,
+    )
+    _ = ax_top.set_title('Top View, Channel 0 only')
+
+
+.. jupyter-execute::
+
+    _, ax_side = plt.subplots(figsize=(6, 6), constrained_layout=True)
+    ax_side.invert_xaxis()
+    esis.optics.design.final().system.plot(
+        ax=ax_side,
+        plot_rays=False,
+    )
+    _ = ax_side.set_title('Front View')
+    ax_side.set_aspect('equal')
+
+
+Ideal Point-spread Function
+---------------------------
+
+.. jupyter-execute::
+
+    rays_psf = esis.optics.design.final(
+        pupil_samples=101,
+        field_samples=5,
+        all_channels=False
+    ).rays_output
+    bins = rays_psf.input_pupil_x.shape[~0] // 2
+
+    fig_630 = rays_psf.plot_pupil_hist2d_vs_field(wavlen_index=~0, norm=matplotlib.colors.PowerNorm(1/2), bins=bins, )
+    fig_630.set_figheight(4)
+    fig_630.set_figwidth(9.5)
+
+    fig_584 = rays_psf.plot_pupil_hist2d_vs_field(wavlen_index=0, norm=matplotlib.colors.PowerNorm(1/2), bins=bins, )
+    fig_584.set_figheight(4)
+    fig_584.set_figwidth(9.5)
+
+
+
+Vignetting
+----------
+
+.. jupyter-execute::
+
+    rays = esis.optics.design.final(
+        pupil_samples=21,
+        field_samples=21,
+        all_channels=False
+    ).rays_output
+
+    vignetting_linear = rays.vignetting(polynomial_degree=1)
+    vignetting_linear.model().dataframe
+
+Distortion
+----------
+
+"""
 import numpy as np
 from astropy import units as u
-
 from kgpy import Name, vector
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
 
@@ -145,12 +232,12 @@ def final_from_poletto(
     """
     esis = final(pupil_samples=pupil_samples, field_samples=field_samples)
 
-    obscuration = esis.components.central_obscuration
-    grating = esis.components.grating
+    obscuration = esis.central_obscuration
+    grating = esis.grating
     obs_thickness = obscuration.piston - grating.piston
     obs_margin = obscuration.obscured_half_width - (grating.cylindrical_radius + grating.outer_half_width)
-    primary_clear_radius = esis.components.primary.surface.aperture.min_radius
-    detector = esis.components.detector
+    primary_clear_radius = esis.primary.surface.aperture.min_radius
+    detector = esis.detector
     detector_radius = detector.cylindrical_radius - detector.surface.aperture.half_width_x
     detector.dynamic_clearance = detector_radius - primary_clear_radius
     return esis.apply_poletto_layout(

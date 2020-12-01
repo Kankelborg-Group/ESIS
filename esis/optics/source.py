@@ -6,7 +6,7 @@ from kgpy import Name, format, transform, optics
 
 __all__ = ['Source']
 
-SurfaceT = optics.Surface[None, None, optics.aperture.Rectangular, None, None]
+SurfaceT = optics.surface.Surface[None, None, optics.surface.aperture.Rectangular, None, None]
 
 
 @dataclasses.dataclass
@@ -18,7 +18,7 @@ class Source(optics.component.PistonComponent):
     @property
     def surface(self) -> SurfaceT:
         surface = super().surface   # type: SurfaceT
-        surface.aperture = optics.aperture.Rectangular(
+        surface.aperture = optics.surface.aperture.Rectangular(
             decenter=transform.rigid.Translate([0, 0, 0] * u.deg),
             half_width_x=self.half_width_x,
             half_width_y=self.half_width_y,
