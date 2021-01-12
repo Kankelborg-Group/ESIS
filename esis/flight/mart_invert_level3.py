@@ -11,13 +11,14 @@ import skimage.transform
 from kgpy.multiprocess_tools.mp_wrapper import starmap_with_kwargs
 from itertools import repeat
 import time
+from esis.flight import l3_events
 
 if __name__ == '__main__':
 
     # plt.rcParams['figure.figsize'] = [20, 20]
 
     ov = level_3.Level3.from_pickle(level_3.ov_final_path)
-    ov_data = ov.observation.data
+    ov_data = ov.observation.data - ov.min_images
     test_seq = 15
 
     # rotation_kwargs = {
@@ -28,15 +29,18 @@ if __name__ == '__main__':
     #     'cval': 0,
     # }
 
-    angles = (np.arange(4)*45 - 22.5 + 45 - 90)* u.deg
-    # event = [slice(None),slice(None)]
-    #
-    # # event = [slice(80,1120),slice(80,1120)]
-    # pad = 0
-    # # #
-    # #
-    event = [slice(400,700),slice(550,850)]
-    pad = 20
+    angles = (np.arange(4)*45 - 22.5 + -45)* u.deg
+
+    l3_event = l3_events.perfectx
+    save_path = 'lev4_' + l3_event.name + '_mart.pickle'
+    event = l3_event.location
+
+    extent_y = event[0].stop - event[0].start
+    extent_x = event[1].stop - event[1].start
+
+    pad = np.max(np.sqrt(extent_x**2 + extent_y**2) - (extent_x , extent_y))
+    pad = int(np.ceil(pad*1.05))
+    print(pad)
 
     region = ov_data[:,:,event[0],event[1]]
 
@@ -46,7 +50,7 @@ if __name__ == '__main__':
     len_scl = min(region.shape[-1],region.shape[-2])/2.5
     window = np.exp(-(np.sqrt(np.square(x-x0) + np.square(y-y0))/len_scl)**(6))
     window=window.T
-    # window = np.ones_like(region[0])
+    window = np.ones_like(window)
 
     guess = np.ones_like(region[0,0])*window
     guess = np.pad(guess,((pad,pad),(pad,pad)))
@@ -59,16 +63,17 @@ if __name__ == '__main__':
 
     spectral_order = 1
     mart_obj = mart.MART(
-        use_maximize=True,
+        use_maximize=False,
         use_filter=True,
         use_lgof = True,
         anti_aliasing=None,
         max_multiplicative_iteration=100,
-        max_filtering_iterations=75,
+        max_filtering_iterations=2,
         photon_read_noise = 2,
         # track_cube_history='filter',
-        contrast_exponent=.4,
+        contrast_exponent=.8,
         # rotation_kwargs=rotation_kwargs
+        verbose = True
 
     )
 
@@ -77,15 +82,22 @@ if __name__ == '__main__':
 
     # for seq in range(ov.observation.data.shape[0]-3):
     seqs = [i for i in range(ov.observation.data.shape[0])]
-    seqs = [0,1,2,3,4,5,6,7]
+    # seqs = [13, 14, 15, 16]
+    # seqs = [15]
+
+    channels = [0,1,2,3]
 
     projections_list = []
     for seq in seqs:
         projections = []
-        for i,angle in enumerate(angles):
+        for chan in channels:
+
             # projection = scipy.ndimage.rotate(np.pad(region[seq,i]*window,((pad,pad),(pad,pad))),angle,**rotation_kwargs)
-            projection = skimage.transform.rotate(np.pad(region[seq,i]*window,((pad,pad),(pad,pad))),angle.value)
+            projection = skimage.transform.rotate(np.pad(region[seq,chan]*window,((pad,pad),(pad,pad))),angles[chan].value)
             projections.append(projection)
+            # fig, ax = plt.subplots()
+            # ax.imshow(projection)
+            # plt.show()
 
 
         projections = np.array(projections)
@@ -93,10 +105,7 @@ if __name__ == '__main__':
         projections[projections<0] = 0
         projections_list.append(projections)
 
-
-
-
-    p = mp.Pool(mp.cpu_count()//2)
+    p = mp.Pool(mp.cpu_count()-2)
     # p = mp.Pool(len(seqs))
     args_iter = zip(projections_list,repeat(angles),repeat(np.array(spectral_order)))
     kwargs_iter = repeat(dict(cube_offset_x=ref_wavelen,cube_guess=guess))
@@ -109,27 +118,30 @@ if __name__ == '__main__':
     image_wcs = image_wcs.dropaxis(-1)
     print(ref_wavelen)
 
+    inverted_results = np.array([recovered_list[i].best_cube[pad:-pad,pad:-pad,...] for i in range(len(recovered_list))])
+
     header = image_wcs.to_header()
     header['ctype1'] = 'Solar Y'
     header['ctype2'] = 'Solar X'
     header['naxis'] = 3
-    header['ctype3'] = 'pix'
+    header['ctype3'] = 'km / s'
     header['crval3'] = -18
     header['crpix3'] = ref_wavelen
     header['cdelt3'] = 18
-    header['naxis3'] = guess.shape[-1]
+    header['naxis3'] = inverted_results[0].shape[-1]
 
     result_wcs = wcs.WCS(header)
     result_wcs = result_wcs.swapaxes(-1,0)
-    result_wcs.array_shape = guess.shape
+    result_wcs.array_shape = inverted_results[0].shape
 
 
-    inverted_results = np.array([recovered_list[i].best_cube for i in range(len(recovered_list))])
+
     inverted_results_wcs = [result_wcs for i in range(len(recovered_list))]
 
 
     lev4 = level_4.Level_4(inverted_results,inverted_results_wcs)
-    lev4.to_pickle(path = 'lev4_mainevent_mart.pickle')
+
+    # lev4.to_pickle(path =save_path)
 
     test = lev4.plot()
     plt.show()

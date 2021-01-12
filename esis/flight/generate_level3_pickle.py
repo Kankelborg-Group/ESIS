@@ -3,7 +3,7 @@ from esis.data import level_1, level_3
 from esis.flight.generate_level1_pickle import generate_level1
 
 
-def generate_level3(line='ov', overwrite=False):
+def generate_level3(line='ov', overwrite=True):
     if level_1.Level_1.default_pickle_path().exists() == False or overwrite == True:
         print('Generating Despiked Level1 Object')
         lev1 = generate_level1()

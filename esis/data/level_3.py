@@ -48,7 +48,7 @@ hei_final_path = pathlib.Path(__file__).parents[1] / 'flight/hei_Level3_final.pi
 
 
 @dataclass
-class Level3(Pickleable):
+class Level_3(Pickleable):
     '''
     The ESIS Level3 data will be stored in an NDCube.
     The NDCube will contain a 4 axis (time, camera_id, solarx, solary) WCS object.
@@ -77,7 +77,7 @@ class Level3(Pickleable):
         """
 
         lev_1 = level_1.Level_1.from_pickle(level1_path)
-
+        lev_1.intensity = lev_1.intensity_photons(630 * u.AA)
         #undo flip about short axis from optical system
         lev_1.intensity = np.flip(lev_1.intensity, axis=-2)
 
@@ -434,11 +434,19 @@ class Level3(Pickleable):
 
         return mean_cube
 
+    @property
+    def time(self):
 
+        shp = self.observation.data.shape[0]
+        time_pix = np.arange(shp)
+        pix = np.zeros(shp)
+        times = self.observation.wcs.pixel_to_world(pix, pix, pix, time_pix)[-1]
+        times.format = 'isot'
+        return times
 
-
-
-
+    @property
+    def min_images(self):
+        return np.min(self.observation.data,axis = 1, keepdims=True)
 
 
 
