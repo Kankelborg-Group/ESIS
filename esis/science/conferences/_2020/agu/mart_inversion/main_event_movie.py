@@ -54,6 +54,8 @@ if __name__ == '__main__':
         aia_304_imgs.append(aia_304_img)
 
         frames.append(seq)
+
+
     #NOTE:  Worst plotting ever.  If there is a solution that makes all 6 of these the same size PLEASE tell me.
     fig = plt.figure(figsize = (7,14))
     gs = fig.add_gridspec(3, 2)

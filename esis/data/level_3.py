@@ -48,7 +48,7 @@ hei_final_path = pathlib.Path(__file__).parents[1] / 'flight/hei_Level3_final.pi
 
 
 @dataclass
-class Level_3(Pickleable):
+class Level3(Pickleable):
     '''
     The ESIS Level3 data will be stored in an NDCube.
     The NDCube will contain a 4 axis (time, camera_id, solarx, solary) WCS object.
@@ -370,49 +370,56 @@ class Level_3(Pickleable):
         obs.observation.wcs.array_shape = obs.observation.data.shape
         return obs
 
-    def to_fits(self, path: pathlib.Path):
+    def to_fits(self, path: pathlib.Path, label = 'ESIS_Level3_'):
         '''
         In need of a rework since moving to NDCube.  Note that WCS.to_header does not output naxis keywords
         '''
 
         path.mkdir(parents=True, exist_ok=True)
-
-        for sequence in range(self.start_time.shape[0]):
-            for camera in range(self.start_time.shape[1]):
-                name = 'ESIS_Level3_' + str(self.start_time[sequence, camera]) + '_' + str(camera + 1) + '.fits'
+        len1 = self.observation.data.shape[0]
+        len2 = self.observation.data.shape[1]
+        for sequence in range(len1):
+            for camera in range(len2):
+                date_obs = self.observation.meta['times'][sequence].to_value('isot')
+                name = label + str(sequence) + '_' + date_obs + '_' + str(camera + 1) + '.fits'
                 filename = path / name
+                print(filename)
 
-                hdr = self.wcs[sequence].to_header()
+                hdr = self.observation[sequence,camera].wcs.dropaxis(-1).dropaxis(-1).to_header()
                 # hdr['CAM_ID'] = self.cam_id[sequence, camera]
-                hdr['CAM_ID'] = camera+1  #place holder since I didn't add the real cam id to the current pickel
-                hdr['DATE_OBS'] = str(self.start_time[sequence, camera])
+
+                hdr['DATE_OBS'] = date_obs
 
                 hdul = fits.HDUList()
-                hdul.append(fits.PrimaryHDU(np.array(self.intensity[sequence, camera, ...]), hdr))
+                hdul.append(fits.PrimaryHDU(np.array(self.observation.data[sequence, camera, ...]), hdr))
                 hdul.writeto(filename, overwrite=True)
 
         output_file = path.name + '.tar.gz'
         with tarfile.open(path.parent / output_file, "w:gz") as tar:
             tar.add(path, arcname=path.name)
 
-    def to_test_object(self, aia_path: pathlib.Path = default_aia_path, level1_path: pathlib.Path = level_1.Level_1.default_pickle_path()) -> 'Level3':
+    def to_aia_object(self, aia_channel = 304 * u.AA) -> 'Level3':
         '''
-        Replace all images in a Level 3 object with co-temporal AIA 304 images for testing.
+        Replace all images in a Level 3 object with co-temporal AIA images.
         '''
 
-        esis = level_1.Level_1.from_pickle(level1_path)
-        aia_304 = aia.AIA.from_path('aia_304', aia_path)
+        times = self.time
+        aia_304 = aia.AIA.from_time_range(times[0] - 20 * u.s, times[-1] + 20 * u.s, channels=[304 * u.AA],
+                                          user_email='jacobdparker@gmail.com')
+
         transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
+        aia_times = []
         for l3_seq, l1_seq in enumerate(self.lev1_sequences):
+            td = aia_304.time - times[l3_seq]  # should be the same for every camera
+            best_im = np.abs(td.sec).argmin()
+            aia_im = aia_304.intensity[best_im, 0]
+            aia_times.append(aia_304.time[best_im,0])
             for l3_cam, l1_cam in enumerate(self.lev1_cameras):
-                td = aia_304.exposure_start_time - esis.time[l1_seq, 0]  # should be the same for every camera
-                best_im = np.abs(td.sec).argmin()
-                aia_im = aia_304.intensity[best_im, ...]
                 crop = transforms.transform_cube[l3_seq][l3_cam].post_transform_crop
                 self.observation.data[l3_seq,l3_cam] = aia_im[crop]
-        self.observation.meta = {'Description':'Test object using AIA 304 images and the same masks as initial Level3 object'}
-
+        self.observation.meta['times'] = aia_times
         return self
+
 
     def masked_mean_normalization(self) -> np.ndarray:
         '''
