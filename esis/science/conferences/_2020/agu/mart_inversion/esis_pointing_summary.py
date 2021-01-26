@@ -19,7 +19,7 @@ import irispy.io
 if __name__ == '__main__':
     lw = 2
 
-    lev3 = level_3.Level3.from_pickle(level_3.ov_final_path)
+    lev3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
     print(lev3.observation.wcs)
 
     fig, ax = plt.subplots(subplot_kw=dict(projection=lev3.observation.wcs[15, 1]))

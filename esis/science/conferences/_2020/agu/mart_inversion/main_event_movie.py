@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     event = l3_events.main_event
 
-    lev3 = level_3.Level3.from_pickle(level_3.ov_final_path)
+    lev3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
     times = lev3.time
 
     l4 = level_4.Level_4.from_pickle(event.mart_inverted_pickle_path)

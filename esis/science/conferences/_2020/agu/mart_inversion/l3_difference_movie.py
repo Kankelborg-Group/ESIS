@@ -7,7 +7,7 @@ import numpy as np
 
 if __name__ == '__main__':
 
-    lev3 = level_3.Level3.from_pickle(level_3.ov_final_path)
+    lev3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
     lev3_dif = lev3.observation.data[:,1,...]-lev3.observation.data[:,2,...]
     times = lev3.time
 

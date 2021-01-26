@@ -6,7 +6,7 @@ import pathlib
 from esis.flight import l3_events
 
 if __name__ == '__main__':
-    l3 = level_3.Level3.from_pickle(level_3.ov_final_path)
+    l3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
 
     event = l3_events.mgxfree
 

@@ -20,6 +20,8 @@ import scipy.optimize
 import scipy.ndimage
 import scipy.signal
 
+import copy
+
 from matplotlib.patches import Polygon
 
 __all__ = ['ov_Level3_initial',
@@ -48,9 +50,9 @@ hei_final_path = pathlib.Path(__file__).parents[1] / 'flight/hei_Level3_final.pi
 
 
 @dataclass
-class Level3(Pickleable):
+class Level_3(Pickleable):
     '''
-    The ESIS Level3 data will be stored in an NDCube.
+    The ESIS Level_3 data will be stored in an NDCube.
     The NDCube will contain a 4 axis (time, camera_id, solarx, solary) WCS object.
     '''
 
@@ -66,10 +68,10 @@ class Level3(Pickleable):
             aia_path: typ.Optional[pathlib.Path] = None,
             level1_path: pathlib.Path = level_1.Level_1.default_pickle_path(),
             hei: bool = False
-    ) -> 'Level3':
+    ) -> 'Level_3':
 
         """
-        Create a Level3 Obj through a linear co-alignment of ESIS Level1 to AIA 304.
+        Create a Level_3 Obj through a linear co-alignment of ESIS Level1 to AIA 304.
 
         NOTE!!! This contains hard coded variables that only pertain to the 2019 ESIS Flight, will need to be made
         more general for future launches.  Including a rough FOV and pointing when choosing an AIA cutout should do the
@@ -77,7 +79,11 @@ class Level3(Pickleable):
         """
 
         lev_1 = level_1.Level_1.from_pickle(level1_path)
-        lev_1.intensity = lev_1.intensity_photons(630 * u.AA)
+        if hei:
+            lev_1.intensity = lev_1.intensity_photons(584 * u.AA)
+        else:
+            lev_1.intensity = lev_1.intensity_photons(630 * u.AA)
+
         #undo flip about short axis from optical system
         lev_1.intensity = np.flip(lev_1.intensity, axis=-2)
 
@@ -138,7 +144,7 @@ class Level3(Pickleable):
 
                 td = aia_304.time - lev_1.time[i, 0]  # should be the same for every camera
                 best_im = np.abs(td.sec).argmin()
-                aia_im = aia_304.intensity[best_im, ...]
+                aia_im = aia_304.intensity[best_im, 0, ...]
 
                 esis_im = cropped_imgs[i, j, ...]
 
@@ -192,7 +198,7 @@ class Level3(Pickleable):
                                                                      inital_cropping, initial_pad, aia_shp, trans, pos))
                 print('Fit Duration = ', time.time()-start)
             lev_3_transforms.append(transform_per_camera)
-        aia_wcs = aia_304.wcs[0].slice(pos)
+        aia_wcs = aia_304.wcs[0,0].slice(pos)
         date_obs = lev_1.time[sequence[0], 0]
         time_delta = lev_1.time[sequence[1], 0] - date_obs
 
@@ -208,7 +214,7 @@ class Level3(Pickleable):
                              ])
         lev_3_wcs = wcs.WCS(lev_3_header)
 
-        meta = dict([("Description", "Level3 was formed via a linear co-alignment of ESIS level1 and AIA 304"),
+        meta = dict([("Description", "Level_3 was formed via a linear co-alignment of ESIS level1 and AIA 304"),
                      ])
         lev_3_ndcube = ndcube.NDCube(lev_3_data,lev_3_wcs,meta = meta)
 
@@ -227,8 +233,14 @@ class Level3(Pickleable):
         return cls(observation=lev_3_ndcube,transformation_objects=transform_path,
                    lev1_sequences=sequence,lev1_cameras=camera)
 
-    def update_internal_alignment(self,ref_channel = 1, heI = False) -> 'Level3':
+    def update_internal_alignment(self,ref_channel = 1, heI = False) -> 'Level_3':
         lev1 = level_1.Level_1.from_pickle(level_1.Level_1.default_pickle_path())
+        if heI:
+            lev1.intensity = lev1.intensity_photons(584 * u.AA)
+        else:
+            lev1.intensity = lev1.intensity_photons(630 * u.AA)
+
+
         print(self.transformation_objects)
         lev1_transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
 
@@ -284,9 +296,9 @@ class Level3(Pickleable):
 
         return self
 
-    def add_mask(self, line = None) -> 'Level3':
+    def add_mask(self, line = None) -> 'Level_3':
         '''
-        Transform masks created for Level1 data into Level3 coordinates and add to Level3 NDCube
+        Transform masks created for Level1 data into Level_3 coordinates and add to Level_3 NDCube
         '''
         lev1 = level_1.Level_1.from_pickle()
         if line == 'mgx':
@@ -365,7 +377,7 @@ class Level3(Pickleable):
         return ov_final_path
 
     @classmethod
-    def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level3':
+    def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level_3':
         obs = super().from_pickle(path)
         obs.observation.wcs.array_shape = obs.observation.data.shape
         return obs
@@ -398,11 +410,11 @@ class Level3(Pickleable):
         with tarfile.open(path.parent / output_file, "w:gz") as tar:
             tar.add(path, arcname=path.name)
 
-    def to_aia_object(self, aia_channel = 304 * u.AA) -> 'Level3':
+    def to_aia_object(self, aia_channel = 304 * u.AA) -> 'Level_3':
         '''
         Replace all images in a Level 3 object with co-temporal AIA images.
         '''
-
+        aia_obj = copy.deepcopy(self)
         times = self.time
         aia_304 = aia.AIA.from_time_range(times[0] - 20 * u.s, times[-1] + 20 * u.s, channels=[304 * u.AA],
                                           user_email='jacobdparker@gmail.com')
@@ -416,9 +428,9 @@ class Level3(Pickleable):
             aia_times.append(aia_304.time[best_im,0])
             for l3_cam, l1_cam in enumerate(self.lev1_cameras):
                 crop = transforms.transform_cube[l3_seq][l3_cam].post_transform_crop
-                self.observation.data[l3_seq,l3_cam] = aia_im[crop]
-        self.observation.meta['times'] = aia_times
-        return self
+                aia_obj.observation.data[l3_seq,l3_cam] = aia_im[crop]
+        aia_obj.observation.meta['times'] = aia_times
+        return aia_obj
 
 
     def masked_mean_normalization(self) -> np.ndarray:
@@ -443,13 +455,13 @@ class Level3(Pickleable):
 
     @property
     def time(self):
-
         shp = self.observation.data.shape[0]
         time_pix = np.arange(shp)
         pix = np.zeros(shp)
         times = self.observation.wcs.pixel_to_world(pix, pix, pix, time_pix)[-1]
         times.format = 'isot'
         return times
+
 
     @property
     def min_images(self):
@@ -459,7 +471,7 @@ class Level3(Pickleable):
 
 
 
-def vignetting_correction_quality(x, lev3: 'Level3'):
+def vignetting_correction_quality(x, lev3: 'Level_3'):
 
     scale_factor = x[0:4]
     vignetting = lev3.correct_vignetting(scale_factor)
@@ -518,7 +530,7 @@ def vignetting_correction_quality(x, lev3: 'Level3'):
     print(least_squares)
     return least_squares
 
-def find_vignetting_correction(lev3: 'Level3'):
+def find_vignetting_correction(lev3: 'Level_3'):
     # bounds = [(.2,.6),(.2,.6),(.2,.6),(.2,.6),(-10,10),(-10,10),(-10,10),(-10,10)]
     # bounds = [(.3, .5), (.3, .5), (.3, .5), (.3, .5), (-0, 0), (-0, 0), (-0, 0), (-0, 0)]
     # guess = np.array([0.38815087, 0.33319833, 0.32219223, 0.4400179 , 0.        ,

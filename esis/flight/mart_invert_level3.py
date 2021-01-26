@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     # plt.rcParams['figure.figsize'] = [20, 20]
 
-    ov = level_3.Level3.from_pickle(level_3.ov_final_path)
+    ov = level_3.Level_3.from_pickle(level_3.ov_final_path)
     ov_data = ov.observation.data - ov.min_images
     test_seq = 15
 

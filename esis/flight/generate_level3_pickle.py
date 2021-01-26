@@ -10,17 +10,17 @@ def generate_level3(line='ov', overwrite=True):
         lev1.to_pickle()
 
     if line == 'ov':
-        print('Generating OV Level3 Object')
+        print('Generating OV Level_3 Object')
         if level_3.ov_Level3_initial.is_file() == False or overwrite == True:
-            lev3 = level_3.Level3.from_aia_level1()
+            lev3 = level_3.Level_3.from_aia_level1()
             lev3.to_pickle(level_3.ov_Level3_initial)
         else:
-            lev3 = level_3.Level3.from_pickle(level_3.ov_Level3_initial)
+            lev3 = level_3.Level_3.from_pickle(level_3.ov_Level3_initial)
         if level_3.ov_Level3_updated.is_file() == False or overwrite == True:
             lev3_updated = lev3.update_internal_alignment()
             lev3_updated.to_pickle(level_3.ov_Level3_updated)
         else:
-            lev3_updated = level_3.Level3.from_pickle(level_3.ov_Level3_updated)
+            lev3_updated = level_3.Level_3.from_pickle(level_3.ov_Level3_updated)
 
         lev3_masked = lev3_updated.add_mask(line='mgx')
         lev3_masked.to_pickle(level_3.ov_Level3_masked)

@@ -11,10 +11,10 @@ from esis.data import level_1, level_3
 @pytest.mark.skip('Jake\'s problem')
 def test_to_fits():
     '''
-    Likely needs serious rework since migration to NDCube for Level3
+    Likely needs serious rework since migration to NDCube for Level_3
     '''
     path = level_3.ov_Level3_initial
-    lev3 = level_3.Level3.from_pickle(path)
+    lev3 = level_3.Level_3.from_pickle(path)
 
     dir = pathlib.Path(__file__).parent / 'ESIS_Level3_Fits/'
 
@@ -30,7 +30,7 @@ def test_to_fits():
 @pytest.mark.skip('Jake\'s problem')
 def test_from_pickle():
     path = level_3.ov_Level3_initial
-    lev3 = level_3.Level3.from_pickle(path)
+    lev3 = level_3.Level_3.from_pickle(path)
 
     print(lev3.start_time)
 
@@ -39,28 +39,28 @@ def test_from_pickle():
 def test_to_pickle(capsys):
     with capsys.disabled():
         path = level_3.ov_Level3_initial
-        lev3 = level_3.Level3.from_pickle(path)
+        lev3 = level_3.Level_3.from_pickle(path)
         lev3.to_pickle(level_3.ov_Level3_initial)
 
 
 @pytest.mark.skip('Jake\'s problem')
 def test_from_aia_level1(capsys):
     with capsys.disabled():
-        lev3 = level_3.Level3.from_aia_level1()
+        lev3 = level_3.Level_3.from_aia_level1()
         lev3.to_pickle(level_3.ov_Level3_initial)
 
 
 @pytest.mark.skip('Jake\'s problem')
 def test_update_internal_alignment(capsys):
     with capsys.disabled():
-        lev3 = level_3.Level3.from_pickle(level_3.ov_Level3_initial)
+        lev3 = level_3.Level_3.from_pickle(level_3.ov_Level3_initial)
         lev3_update = lev3.update_internal_alignment()
         lev3_update.to_pickle(level_3.ov_Level3_updated)
 
 
 @pytest.mark.skip('Jake\'s problem')
 def test_add_mask():
-    lev3 = level_3.Level3.from_pickle(level_3.ov_Level3_updated)
+    lev3 = level_3.Level_3.from_pickle(level_3.ov_Level3_updated)
     lev3.add_mask(line= 'mgx')
 
     cube_slice = lev3.observation[12,3,:,:]
@@ -75,7 +75,7 @@ def test_add_mask():
 @pytest.mark.skip('Jake\'s problem')
 def test_vignetting_correction(capsys):
     with capsys.disabled():
-        lev3 = level_3.Level3.from_pickle(level_3.ov_Level3_masked)
+        lev3 = level_3.Level_3.from_pickle(level_3.ov_Level3_masked)
 
         fit = level_3.find_vignetting_correction(lev3)
         print(fit)
@@ -96,7 +96,7 @@ def test_vignetting_correction(capsys):
 def test_transform_image():
 
     lev1 = level_1.Level_1.from_pickle()
-    lev3 = level_3.Level3.from_pickle(level_3.ov_Level3_masked)
+    lev3 = level_3.Level_3.from_pickle(level_3.ov_Level3_masked)
     transform_path = lev3.transformation_objects
 
     transformations = image_coalignment.TransformCube.from_pickle(transform_path)

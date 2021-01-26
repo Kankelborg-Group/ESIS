@@ -32,18 +32,18 @@
 <path fill="none" stroke="black" stroke-width="0.5" d="M65,-109.75C65,-101.41 65,-88.74 65,-79.09"/>
 <polygon fill="black" stroke="black" stroke-width="0.5" points="66.75,-79.09 65,-74.09 63.25,-79.09 66.75,-79.09"/>
 </g>
-<!-- esis.data.level_3.Level3 -->
+<!-- esis.data.level_3.Level_3 -->
 <g id="node2" class="node">
-<title>esis.data.level_3.Level3</title>
-<g id="a_node2"><a xlink:href="../_autosummary/esis.data.level_3.Level3.html#esis.data.level_3.Level3" xlink:title="The ESIS Level3 data will be stored in an NDCube." target="_top">
+<title>esis.data.level_3.Level_3</title>
+<g id="a_node2"><a xlink:href="../_autosummary/esis.data.level_3.Level_3.html#esis.data.level_3.Level_3" xlink:title="The ESIS Level_3 data will be stored in an NDCube." target="_top">
 <polygon fill="white" stroke="black" stroke-width="0.5" points="130,-19 0,-19 0,0 130,0 130,-19"/>
-<text text-anchor="middle" x="65" y="-7" font-family="Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans" font-size="10.00">esis.data.level_3.Level3</text>
+<text text-anchor="middle" x="65" y="-7" font-family="Vera Sans, DejaVu Sans, Liberation Sans, Arial, Helvetica, sans" font-size="10.00">esis.data.level_3.Level_3</text>
 </a>
 </g>
 </g>
-<!-- kgpy.mixin.Pickleable&#45;&gt;esis.data.level_3.Level3 -->
+<!-- kgpy.mixin.Pickleable&#45;&gt;esis.data.level_3.Level_3 -->
 <g id="edge1" class="edge">
-<title>kgpy.mixin.Pickleable&#45;&gt;esis.data.level_3.Level3</title>
+<title>kgpy.mixin.Pickleable&#45;&gt;esis.data.level_3.Level_3</title>
 <path fill="none" stroke="black" stroke-width="0.5" d="M65,-54.75C65,-46.41 65,-33.74 65,-24.09"/>
 <polygon fill="black" stroke="black" stroke-width="0.5" points="66.75,-24.09 65,-19.09 63.25,-24.09 66.75,-24.09"/>
 </g>
