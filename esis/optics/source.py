@@ -17,9 +17,9 @@ class Source(optics.component.PistonComponent):
 
     @property
     def surface(self) -> SurfaceT:
-        surface = super().surface   # type: SurfaceT
+        surface = super().surface  # type: SurfaceT
         surface.aperture = optics.surface.aperture.Rectangular(
-            decenter=transform.rigid.Translate([0, 0, 0] * u.deg),
+            decenter=transform.rigid.Translate(x=0 * u.deg, y=0 * u.deg, z=0 * u.deg),
             half_width_x=self.half_width_x,
             half_width_y=self.half_width_y,
         )
