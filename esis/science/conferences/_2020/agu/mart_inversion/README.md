@@ -2,7 +2,7 @@ Time to gather thoughts for AGU Poster ...
 
 To do:
 
-- [ ] Level3 Prep details
+- [ ] Level_3 Prep details
 - [ ] Updated Pointing Summary
 - [ ] Good Enough Inversion
 - [ ] 2D Histogram from test

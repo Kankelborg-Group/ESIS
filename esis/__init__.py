@@ -5,9 +5,11 @@ __all__ = [
     'optics', 'Optics',
     'data',
     'flight',
+    'science'
 ]
 
 from . import optics
 from .optics import Optics
 from . import data
 from . import flight
+from . import science
