@@ -38,7 +38,7 @@ class Level_1(observatories.Obs, mixin.Pickleable):
             intensity=intensity,
             time=lev0.time_signal,
             exposure_length=lev0.requested_exposure_time_signal,
-            channel=lev0.channel_signal,
+            channel=lev0.channel,
             time_index=lev0.time_index_signal,
             detector=lev0.detector
         )
@@ -106,3 +106,6 @@ class Level_1(observatories.Obs, mixin.Pickleable):
             tar.add(path, arcname=path.name)
 
         return
+
+    def optics_fit(self, guess: esis.optics.Optics):
+        pass

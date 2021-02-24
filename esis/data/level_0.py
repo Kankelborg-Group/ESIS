@@ -207,10 +207,6 @@ class Level_0(kgpy.observatories.Obs):
         return self.requested_exposure_time[self.signal_slice]
 
     @property
-    def channel_signal(self) -> u.Quantity:
-        return self.channel[self.signal_slice]
-
-    @property
     def time_index_signal(self) -> u.Quantity:
         return self.time_index[self.signal_slice]
 

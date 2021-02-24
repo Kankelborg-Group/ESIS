@@ -48,7 +48,7 @@ def histogram_tetraptych(
     x_ranges = [(np.nanpercentile(xj, ht_lower_x), np.nanpercentile(xj, ht_upper_x)) for xj in [x0, x1, x2, x3]]
     y_ranges = [(np.nanpercentile(yj, ht_lower_y), np.nanpercentile(yj, ht_upper_y)) for yj in [y0, y1, y2, y3]]
 
-    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(14, 10), dpi=140, constrained_layout=True)
+    fig, ax = plt.subplots(nrows=2, ncols=2, constrained_layout=True)
     # colornorm = matplotlib.colors.SymLogNorm(1e-3)
     colornorm = None
 

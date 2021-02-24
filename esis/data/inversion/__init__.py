@@ -1,3 +1,10 @@
-from .inversion import Inversion
+import dataclasses
 
-__all__ = ['Inversion']
+__all__ = ['Inversion', 'cnn']
+
+
+@dataclasses.dataclass
+class Inversion:
+    pass
+
+from . import cnn
