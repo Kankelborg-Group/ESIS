@@ -9,6 +9,9 @@ import astropy.wcs
 import astropy.io.fits
 import astropy.visualization
 import scipy.stats
+import scipy.interpolate
+import kgpy.obs
+import kgpy.nsroc
 import kgpy.observatories
 import esis
 
@@ -16,7 +19,10 @@ __all__ = ['Level_0']
 
 
 @dataclasses.dataclass
-class Level_0(kgpy.observatories.Obs):
+class Level_0(
+    # kgpy.observatories.Obs,
+    kgpy.obs.Image,
+):
     cam_sn: typ.Optional[np.ndarray] = None
     global_index: typ.Optional[np.ndarray] = None
     requested_exposure_time: typ.Optional[u.Quantity] = None
@@ -31,24 +37,29 @@ class Level_0(kgpy.observatories.Obs):
     adc_temp_3: typ.Optional[u.Quantity] = None
     adc_temp_4: typ.Optional[u.Quantity] = None
     detector: typ.Optional[esis.optics.Detector] = None
+    trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None
+    timeline: typ.Optional[kgpy.nsroc.Timeline] = None
     caching: bool = False
     num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
 
     def __post_init__(self):
+        super().__post_init__()
         self.update()
 
     def update(self) -> typ.NoReturn:
         self._intensity_derivative = None
         self._intensity_nobias = None
         self._intensity_nobias_nodark = None
-        self._dark_nobias = None
+        self._darks_nobias = None
 
     @classmethod
     def from_directory(
             cls,
             directory: pathlib.Path,
             detector: esis.optics.Detector,
+            trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None,
+            timeline: typ.Optional[kgpy.nsroc.Timeline] = None,
             caching: bool = False,
             num_dark_safety_frames: int = 1,
     ) -> 'Level_0':
@@ -63,12 +74,15 @@ class Level_0(kgpy.observatories.Obs):
         fits_list = fits_list.reshape((num_channels, -1))
         fits_list = fits_list.transpose()
         bad_exposures = 2
+        # bad_exposures = 0
         num_exposures = len(fits_list) - bad_exposures
 
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
-        self.exposure_length = self.exposure_length * u.adu / u.s
+        # self.exposure_length = self.exposure_length * u.adu / u.s
         self.detector = detector
+        self.trajectory = trajectory
+        self.timeline = timeline
         self.caching = caching
         self.num_dark_safety_frames = num_dark_safety_frames
 
@@ -78,11 +92,11 @@ class Level_0(kgpy.observatories.Obs):
                 hdu = astropy.io.fits.open(fits_list[bad_exposures + i, c])[0]
                 self.intensity[i, c] = hdu.data * u.adu
                 self.time[i, c] = astropy.time.Time(hdu.header['IMG_TS'])
-                self.exposure_length[i, c] = float(hdu.header['MEAS_EXP']) * u.adu
+                self.exposure_length[i, c] = float(hdu.header['MEAS_EXP']) * 25 * u.ns
                 if i == 0:
                     self.channel[c] = int(hdu.header['CAM_ID'][~0]) * u.chan
                 if c == 0:
-                    self.time_index[i] = int(hdu.header['IMG_CNT'])
+                    self.time_index[i] = int(hdu.header['IMG_CNT']) - bad_exposures
                 self.cam_sn[i, c] = int(hdu.header['CAM_SN'])
                 self.global_index[i, c] = int(hdu.header['IMG_ISN'])
                 self.requested_exposure_time[i, c] = float(hdu.header['IMG_EXP']) * u.ms
@@ -96,6 +110,9 @@ class Level_0(kgpy.observatories.Obs):
                 self.adc_temp_2[i, c] = float(hdu.header['ADCTEMP2']) * u.adu
                 self.adc_temp_3[i, c] = float(hdu.header['ADCTEMP3']) * u.adu
                 self.adc_temp_4[i, c] = float(hdu.header['ADCTEMP4']) * u.adu
+
+        self.time = self.time - self.exposure_length / 2
+
         return self
 
     @classmethod
@@ -119,6 +136,22 @@ class Level_0(kgpy.observatories.Obs):
         return self
 
     @property
+    def time_start(self) -> astropy.time.Time:
+        # return self.time_exp_start[0].min()
+        return self.trajectory.time_start
+
+    @property
+    def altitude(self) -> u.Quantity:
+        interpolator = scipy.interpolate.interp1d(
+            x=self.trajectory.time.to_value('mjd'),
+            y=self.trajectory.altitude,
+            kind='quadratic',
+        )
+        t = self.time.to_value('mjd')
+        return interpolator(t) << self.trajectory.altitude.unit
+        # return interpolator((t[1:] + t[:~0]) / 2) << self.trajectory.altitude.unit
+
+    @property
     def intensity_derivative(self) -> u.Quantity:
         if self._intensity_derivative is None:
             m = np.percentile(self.intensity, 99, axis=self.axis.xy)
@@ -126,18 +159,26 @@ class Level_0(kgpy.observatories.Obs):
         return self._intensity_derivative
 
     @property
-    def signal_index_first(self) -> int:
-        indices = np.argmax(self.intensity_derivative, axis=self.axis.time) - self.num_dark_safety_frames
+    def _index_deriv_max(self):
+        indices = np.argmax(self.intensity_derivative, axis=self.axis.time)
         return scipy.stats.mode(indices)[0][0]
 
     @property
-    def signal_index_last(self) -> int:
-        indices = np.argmin(self.intensity_derivative, axis=0) + self.num_dark_safety_frames
+    def _index_deriv_min(self):
+        indices = np.argmin(self.intensity_derivative, axis=self.axis.time)
         return scipy.stats.mode(indices)[0][0]
+
+    @property
+    def index_signal_first(self) -> int:
+        return self._index_deriv_max - self.num_dark_safety_frames
+
+    @property
+    def index_signal_last(self) -> int:
+        return self._index_deriv_min + self.num_dark_safety_frames
 
     @property
     def signal_slice(self) -> slice:
-        return slice(self.signal_index_first, self.signal_index_last + 1)
+        return slice(self.index_signal_first, self.index_signal_last + 1)
 
     @property
     def bias(self) -> u.Quantity:
@@ -173,13 +214,16 @@ class Level_0(kgpy.observatories.Obs):
         return intensity_nobias
 
     @property
-    def dark_nobias(self) -> u.Quantity:
-        if self._dark_nobias is None:
+    def darks_nobias(self) -> u.Quantity:
+        if self._darks_nobias is None:
             intensity = self.intensity_nobias
-            first_ind, last_ind = self.signal_index_first, self.signal_index_last + 1
-            darks = np.concatenate([intensity[:first_ind], intensity[last_ind:]])
-            self._dark_nobias = np.median(darks, axis=0)
-        return self._dark_nobias
+            first_ind, last_ind = self.index_signal_first, self.index_signal_last + 1
+            self._darks_nobias = np.concatenate([intensity[:first_ind], intensity[last_ind:]])
+        return self._darks_nobias
+
+    @property
+    def dark_nobias(self) -> u.Quantity:
+        return np.median(self.darks_nobias, axis=self.axis.time)
 
     @property
     def intensity_nobias_nodark(self) -> u.Quantity:
@@ -216,16 +260,42 @@ class Level_0(kgpy.observatories.Obs):
             a_name: str = '',
             ax: typ.Optional[plt.Axes] = None,
             legend_ncol: int = 1,
-            drawstyle: str = 'steps',
+            drawstyle: str = 'steps-mid',
     ) -> plt.Axes:
         ax = super().plot_quantity_vs_index(a=a, a_name=a_name, ax=ax, legend_ncol=legend_ncol, drawstyle=drawstyle)
-        ax.axvline(self.time_index[self.signal_index_first], color='black')
-        ax.axvline(self.time_index[self.signal_index_last + 1], color='black')
+        # with astropy.visualization.time_support(format='isot'):
+        start_line = ax.axvline(
+            x=self.time_exp_start[self.index_signal_first, 0].to_datetime(),
+            color='black',
+            label='signal start',
+        )
+        end_line = ax.axvline(
+            x=self.time_exp_end[self.index_signal_last, 0].to_datetime(),
+            color='black',
+            label='signal end'
+        )
+        # ax.legend()
+        # ax.figure.legend(handles=[start_line, end_line])
         return ax
 
     def plot_intensity_nobias_mean(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
         return self.plot_quantity_vs_index(
-            a=self.intensity_nobias.mean(self.axis.xy), a_name='mean intensity, no bias', ax=ax)
+            a=self.intensity_nobias.mean(self.axis.xy), a_name='mean signal', ax=ax)
+
+    def plot_intensity_derivative(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
+        ax = self.plot_quantity_vs_index(a=self.intensity_derivative, a_name='signal derivative', ax=ax)
+        start_line = ax.axvline(
+            x=self.time[self._index_deriv_max, 0].to_value('mjd'),
+            color='black',
+            label='max derivative',
+            linestyle='--',
+        )
+        end_line = ax.axvline(
+            x=self.time[self._index_deriv_min, 0].to_value('mjd'),
+            color='black',
+            label='min derivative',
+            linestyle='--',
+        )
 
     def plot_fpga_temp(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
         return self.plot_quantity_vs_index(a=self.fpga_temp, a_name='FPGA temp.', ax=ax)
@@ -247,11 +317,12 @@ class Level_0(kgpy.observatories.Obs):
         return ax
 
     def plot_bias(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        bias = self.bias
-        num_quadrants = bias.shape[~0]
-        for q in range(num_quadrants):
-            name = 'bias, q' + str(q)
-            ax = self.plot_quantity_vs_index(a=bias[..., q], a_name=name, ax=ax, legend_ncol=num_quadrants // 2)
+        bias = self.bias.mean(axis=~0)
+        ax = self.plot_quantity_vs_index(a=bias, a_name='bias', ax=ax)
+        # num_quadrants = bias.shape[~0]
+        # for q in range(num_quadrants):
+        #     name = 'bias, q' + str(q)
+        #     ax = self.plot_quantity_vs_index(a=bias[..., q], a_name=name, ax=ax, legend_ncol=num_quadrants // 2)
         return ax
 
     def plot_dark(self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None) -> typ.MutableSequence[plt.Axes]:
@@ -262,11 +333,80 @@ class Level_0(kgpy.observatories.Obs):
             self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
     ) -> typ.MutableSequence[plt.Axes]:
         if axs is None:
-            fig, axs = plt.subplots(nrows=3)
+            fig, axs = plt.subplots(nrows=4)
+
+        for ax in axs[:~0]:
+            ax.set_xlabel('')
+
+        axs_2 = [ax.secondary_xaxis(
+            location='top',
+            functions=(self._time_to_index, self._index_to_time),
+        ) for ax in axs]
+        axs_2[0].set_xlabel('exposure index')
+        for ax in axs_2[1:]:
+            ax.set_xticklabels([])
+
+        # self.trajectory.plot_altitude_vs_time(axs[0])
         self.plot_intensity_nobias_mean(ax=axs[0])
-        self.plot_exposure_length(ax=axs[1])
-        self.plot_bias(ax=axs[2])
+        self.plot_intensity_derivative(ax=axs[1])
+        self.plot_exposure_length(ax=axs[2])
+        self.plot_bias(ax=axs[3])
         return axs
+
+    def plot_altitude_and_signal_vs_time(
+            self,
+            ax: typ.Optional[plt.Axes],
+    ) -> plt.Axes:
+
+        ax_twin = ax.twinx()
+        ax_twin._get_lines.prop_cycler = ax._get_lines.prop_cycler
+
+        # self.plot_intensity_nobias_mean(ax=ax)
+        signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
+        signal = signal / signal.max(self.axis.time)
+
+        self.plot_quantity_vs_index(
+            a=signal,
+            a_name='mean intensity',
+            # ax=ax,
+            ax=ax_twin,
+            # drawstyle='default',
+        )
+        self.trajectory.plot_altitude_vs_time(
+            ax=ax,
+            time_start=self.time_start,
+            # ax=ax_twin,
+        )
+        ax_twin.set_ylabel('normalized intensity')
+
+        # ax.legend()
+        # ax.legend(loc='center right', bbox_to_anchor=(-0.1, 0.5))
+        # self.timeline.plot(ax=ax, time_start=self.trajectory.time_start)
+
+        # lines, labels = ax.get_legend_handles_labels()
+        # lines_twin, labels_twin = ax_twin.get_legend_handles_labels()
+        #
+        # ax.legend(lines + lines_twin, labels + labels_twin)
+        # ax_twin.get_legend().remove()
+
+        return ax_twin
+
+    def plot_signal_vs_altitude(
+            self,
+            ax: typ.Optional[plt.Axes] = None,
+    ) -> plt.Axes:
+        if ax is None:
+            _, ax = plt.subplots()
+
+        with astropy.visualization.quantity_support():
+            ax.plot(
+                self.altitude,
+                self.intensity_nobias_nodark_active.mean(self.axis.xy),
+                # drawstyle='steps',
+            )
+            ax.legend(['mean signal, ch' + str(i + 1) for i in range(self.num_channels)])
+
+        return ax
 
     def plot_bias_subtraction_vs_index(
             self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,

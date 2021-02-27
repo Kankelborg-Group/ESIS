@@ -13,10 +13,11 @@ __all__ = [
 import pathlib
 import numpy as np
 import matplotlib.pyplot as plt
+import astropy.units as u
 from kgpy import plot
 from kgpy.observatories import iris
 from .. import data
-from . import optics
+from . import optics, nsroc
 
 raw_img_dir = pathlib.Path(__file__).parent / 'images'
 num_dark_safety_frames = 3
@@ -98,11 +99,15 @@ def level_0(caching: bool = True) -> data.Level_0:
 
 
     """
+    trajectory = nsroc.trajectory()
+    # trajectory.time_start += 10 * u.s
     return data.Level_0.from_directory(
         directory=raw_img_dir,
         detector=optics.as_measured().detector,
         caching=caching,
         num_dark_safety_frames=num_dark_safety_frames,
+        trajectory=trajectory,
+        timeline=nsroc.timeline(),
     )
 
 
