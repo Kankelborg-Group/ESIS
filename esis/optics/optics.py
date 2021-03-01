@@ -106,6 +106,10 @@ class Optics(mixin.Named, mixin.Pickleable):
     def pixel_subtent(self):
         return np.arctan2(self.detector.pixel_width, self.effective_focal_length) << u.rad
 
+    @property
+    def plate_scale(self):
+        return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
         other.wavelengths = self.wavelengths.copy()
