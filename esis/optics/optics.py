@@ -78,7 +78,7 @@ class Optics(mixin.Named, mixin.Pickleable):
     @property
     def rays_output(self) -> optics.rays.Rays:
         rays = self.system.rays_output.copy()
-        rays.position = rays.position / self.detector.pixel_width.to(u.mm) * u.pix
+        rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
         rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
         rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
         return rays

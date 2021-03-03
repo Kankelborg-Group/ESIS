@@ -10,6 +10,7 @@ import astropy.io.fits
 import astropy.visualization
 import scipy.stats
 import scipy.interpolate
+import scipy.optimize
 import kgpy.obs
 import kgpy.nsroc
 import kgpy.observatories
@@ -20,7 +21,6 @@ __all__ = ['Level_0']
 
 @dataclasses.dataclass
 class Level_0(
-    # kgpy.observatories.Obs,
     kgpy.obs.Image,
 ):
     cam_sn: typ.Optional[np.ndarray] = None
@@ -37,7 +37,7 @@ class Level_0(
     adc_temp_3: typ.Optional[u.Quantity] = None
     adc_temp_4: typ.Optional[u.Quantity] = None
     detector: typ.Optional[esis.optics.Detector] = None
-    trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None
+    trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None
     timeline: typ.Optional[kgpy.nsroc.Timeline] = None
     caching: bool = False
     num_dark_safety_frames: int = 1
@@ -52,13 +52,14 @@ class Level_0(
         self._intensity_nobias = None
         self._intensity_nobias_nodark = None
         self._darks_nobias = None
+        self._trajectory = None
 
     @classmethod
     def from_directory(
             cls,
             directory: pathlib.Path,
             detector: esis.optics.Detector,
-            trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None,
+            trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None,
             timeline: typ.Optional[kgpy.nsroc.Timeline] = None,
             caching: bool = False,
             num_dark_safety_frames: int = 1,
@@ -81,7 +82,7 @@ class Level_0(
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
         # self.exposure_length = self.exposure_length * u.adu / u.s
         self.detector = detector
-        self.trajectory = trajectory
+        self.trajectory_raw = trajectory_raw
         self.timeline = timeline
         self.caching = caching
         self.num_dark_safety_frames = num_dark_safety_frames
@@ -140,45 +141,109 @@ class Level_0(
         # return self.time_exp_start[0].min()
         return self.trajectory.time_start
 
-    @property
-    def altitude(self) -> u.Quantity:
-        interpolator = scipy.interpolate.interp1d(
-            x=self.trajectory.time.to_value('mjd'),
-            y=self.trajectory.altitude,
-            kind='quadratic',
-        )
-        t = self.time.to_value('mjd')
-        return interpolator(t) << self.trajectory.altitude.unit
-        # return interpolator((t[1:] + t[:~0]) / 2) << self.trajectory.altitude.unit
+    def _calc_closest_index(self, t: astropy.time.Time) -> int:
+        dt = self.time - t
+        return np.median(np.argmin(np.abs(dt.value), axis=0)).astype(int)
 
     @property
-    def intensity_derivative(self) -> u.Quantity:
-        if self._intensity_derivative is None:
-            m = np.percentile(self.intensity, 99, axis=self.axis.xy)
-            self._intensity_derivative = np.gradient(m, axis=self.axis.time)
-        return self._intensity_derivative
+    def trajectory(self) -> kgpy.nsroc.Trajectory:
+
+        if self._trajectory is None:
+
+            # signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
+            signal = self.intensity.mean(self.axis.xy)
+
+            def objective(t: float):
+                trajectory = self.trajectory_raw.copy()
+                trajectory.time_start = trajectory.time_start + t * u.s
+                altitude = trajectory.altitude_interp(self.time)
+                apogee_index = self._calc_closest_index(trajectory.time_apogee)
+                altitude_up, altitude_down = altitude[:apogee_index], altitude[apogee_index:]
+                signal_up, signal_down = signal[:apogee_index], signal[apogee_index:]
+                mask = altitude_up > 200 * u.km
+                result = 0
+                for i in range(self.num_channels):
+                    signal_down_interp = scipy.interpolate.interp1d(altitude_down[..., i], signal_down[..., i])
+                    mask_i = mask[..., i]
+                    diff = signal_up[mask_i].value - signal_down_interp(altitude_up[mask_i])
+                    result = result + np.mean(np.square(diff))
+                result = np.sqrt(result / self.num_channels)
+                return result
+
+            bound = self.exposure_length.mean()
+
+            time_offset, *_ = scipy.optimize.brute(
+                func=objective,
+                Ns=10,
+                ranges=[[-bound.value, bound.value]],
+            )
+
+            self._trajectory = self.trajectory_raw.copy()
+            self._trajectory.time_start = self._trajectory.time_start + time_offset * u.s
+        return self._trajectory
+
+    # @property
+    # def intensity_derivative(self) -> u.Quantity:
+    #     if self._intensity_derivative is None:
+    #         m = np.percentile(self.intensity, 99, axis=self.axis.xy)
+    #         self._intensity_derivative = np.gradient(m, axis=self.axis.time)
+    #     return self._intensity_derivative
+    #
+    # @property
+    # def _index_deriv_max(self):
+    #     indices = np.argmax(self.intensity_derivative, axis=self.axis.time)
+    #     return scipy.stats.mode(indices)[0][0]
+    #
+    # @property
+    # def _index_deriv_min(self):
+    #     indices = np.argmin(self.intensity_derivative, axis=self.axis.time)
+    #     return scipy.stats.mode(indices)[0][0]
 
     @property
-    def _index_deriv_max(self):
-        indices = np.argmax(self.intensity_derivative, axis=self.axis.time)
-        return scipy.stats.mode(indices)[0][0]
+    def index_dark_up_first(self) -> int:
+        return 0
 
     @property
-    def _index_deriv_min(self):
-        indices = np.argmin(self.intensity_derivative, axis=self.axis.time)
-        return scipy.stats.mode(indices)[0][0]
+    def index_dark_up_last(self) -> int:
+        return self._calc_closest_index(self.time_start + self.timeline.shutter_door_open.time_mission) - 1
+
+    @property
+    def index_dark_down_first(self) -> int:
+        return self._calc_closest_index(self.time_start + self.timeline.parachute_deploy.time_mission)
+
+    @property
+    def index_dark_down_last(self) -> int:
+        return self.num_times - 1
 
     @property
     def index_signal_first(self) -> int:
-        return self._index_deriv_max - self.num_dark_safety_frames
+        return self._calc_closest_index(self.time_start + self.timeline.sparcs_rlg_enable.time_mission) + 1
+        # return self._index_deriv_max - self.num_dark_safety_frames
 
     @property
     def index_signal_last(self) -> int:
-        return self._index_deriv_min + self.num_dark_safety_frames
+        return self._calc_closest_index(self.time_start + self.timeline.sparcs_rlg_disable.time_mission) - 1
+        # return self._index_deriv_min + self.num_dark_safety_frames
 
     @property
-    def signal_slice(self) -> slice:
+    def slice_signal(self) -> slice:
         return slice(self.index_signal_first, self.index_signal_last + 1)
+
+    @property
+    def index_apogee(self) -> int:
+        return self._calc_closest_index(self.trajectory.time_apogee)
+
+    @property
+    def time_apogee(self) -> astropy.time.Time:
+        return self.time[self.index_apogee]
+
+    @property
+    def slice_upleg(self) -> slice:
+        return slice(None, self.index_apogee)
+
+    @property
+    def slice_downleg(self) -> slice:
+        return slice(self.index_apogee, None)
 
     @property
     def bias(self) -> u.Quantity:
@@ -214,22 +279,38 @@ class Level_0(
         return intensity_nobias
 
     @property
-    def darks_nobias(self) -> u.Quantity:
-        if self._darks_nobias is None:
-            intensity = self.intensity_nobias
-            first_ind, last_ind = self.index_signal_first, self.index_signal_last + 1
-            self._darks_nobias = np.concatenate([intensity[:first_ind], intensity[last_ind:]])
-        return self._darks_nobias
+    def darks_up(self):
+        return self.intensity_nobias[self.index_dark_up_first:self.index_dark_up_last + 1]
 
     @property
-    def dark_nobias(self) -> u.Quantity:
-        return np.median(self.darks_nobias, axis=self.axis.time)
+    def darks_down(self):
+        return self.intensity_nobias[self.index_dark_down_first:self.index_dark_down_last + 1]
+
+    @property
+    def darks(self):
+        return np.concatenate([self.darks_up, self.darks_down])
+
+    # @property
+    # def darks_nobias(self) -> u.Quantity:
+    #     if self._darks_nobias is None:
+    #         intensity = self.intensity_nobias
+    #         first_ind, last_ind = self.index_signal_first, self.index_signal_last + 1
+    #         self._darks_nobias = np.concatenate([intensity[:first_ind], intensity[last_ind:]])
+    #     return self._darks_nobias
+    #
+    # @property
+    # def dark_nobias(self) -> u.Quantity:
+    #     return np.median(self.darks_nobias, axis=self.axis.time)
+
+    @property
+    def dark(self):
+        return np.median(self.darks, axis=self.axis.time)
 
     @property
     def intensity_nobias_nodark(self) -> u.Quantity:
         intensity_nobias_nodark = self._intensity_nobias_nodark
         if intensity_nobias_nodark is None:
-            intensity_nobias_nodark = self.intensity_nobias - self.dark_nobias
+            intensity_nobias_nodark = self.intensity_nobias - self.dark
             if self.caching:
                 self._intensity_nobias_nodark = intensity_nobias_nodark
         return intensity_nobias_nodark
@@ -240,117 +321,171 @@ class Level_0(
 
     @property
     def intensity_signal(self) -> u.Quantity:
-        return self.intensity_nobias_nodark_active[self.signal_slice]
+        return self.intensity_nobias_nodark_active[self.slice_signal]
 
     @property
     def time_signal(self) -> astropy.time.Time:
-        return self.time[self.signal_slice]
+        return self.time[self.slice_signal]
 
     @property
     def requested_exposure_time_signal(self) -> u.Quantity:
-        return self.requested_exposure_time[self.signal_slice]
+        return self.requested_exposure_time[self.slice_signal]
 
     @property
     def time_index_signal(self) -> u.Quantity:
-        return self.time_index[self.signal_slice]
+        return self.time_index[self.slice_signal]
 
-    def plot_quantity_vs_index(
-            self,
-            a: u.Quantity,
-            a_name: str = '',
-            ax: typ.Optional[plt.Axes] = None,
-            legend_ncol: int = 1,
-            drawstyle: str = 'steps-mid',
-    ) -> plt.Axes:
-        ax = super().plot_quantity_vs_index(a=a, a_name=a_name, ax=ax, legend_ncol=legend_ncol, drawstyle=drawstyle)
-        # with astropy.visualization.time_support(format='isot'):
-        start_line = ax.axvline(
-            x=self.time_exp_start[self.index_signal_first, 0].to_datetime(),
-            color='black',
-            label='signal start',
-        )
-        end_line = ax.axvline(
-            x=self.time_exp_end[self.index_signal_last, 0].to_datetime(),
-            color='black',
-            label='signal end'
-        )
-        # ax.legend()
-        # ax.figure.legend(handles=[start_line, end_line])
-        return ax
+    # def plot_quantity_vs_index(
+    #         self,
+    #         a: u.Quantity,
+    #         a_name: str = '',
+    #         ax: typ.Optional[plt.Axes] = None,
+    #         legend_ncol: int = 1,
+    #         drawstyle: str = 'steps-mid',
+    # ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+    #     ax2, lines = super().plot_quantity_vs_index(
+    #         ax=ax,
+    #         a=a,
+    #         a_name=a_name,
+    #         drawstyle=drawstyle
+    #     )
+    #     start_line = ax.axvline(
+    #         x=self.time_exp_start[self.index_signal_first, 0].to_datetime(),
+    #         color='black',
+    #         label='signal start',
+    #     )
+    #     end_line = ax.axvline(
+    #         x=self.time_exp_end[self.index_signal_last, 0].to_datetime(),
+    #         color='black',
+    #         label='signal end'
+    #     )
+    #     lines.append(start_line)
+    #     lines.append(end_line)
+    #     return ax2, lines
 
-    def plot_intensity_nobias_mean(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
+    def plot_intensity_nobias_mean(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
         return self.plot_quantity_vs_index(
-            a=self.intensity_nobias.mean(self.axis.xy), a_name='mean signal', ax=ax)
-
-    def plot_intensity_derivative(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        ax = self.plot_quantity_vs_index(a=self.intensity_derivative, a_name='signal derivative', ax=ax)
-        start_line = ax.axvline(
-            x=self.time[self._index_deriv_max, 0].to_value('mjd'),
-            color='black',
-            label='max derivative',
-            linestyle='--',
-        )
-        end_line = ax.axvline(
-            x=self.time[self._index_deriv_min, 0].to_value('mjd'),
-            color='black',
-            label='min derivative',
-            linestyle='--',
+            ax=ax,
+            a=self.intensity_nobias.mean(self.axis.xy),
+            a_name='mean signal',
         )
 
-    def plot_fpga_temp(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_index(a=self.fpga_temp, a_name='FPGA temp.', ax=ax)
+    def plot_intensity_nobias_nodark_active_mean(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+        return self.plot_quantity_vs_index(
+            ax=ax,
+            a=self.intensity_nobias_nodark_active.mean(self.axis.xy),
+            a_name='mean signal',
+        )
 
-    def plot_fpga_vccint(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_index(a=self.fpga_vccint_voltage, a_name='FPGA VCCint', ax=ax)
+    # def plot_intensity_derivative(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+    #     ax2, lines = self.plot_quantity_vs_index(
+    #         ax=ax,
+    #         a=self.intensity_derivative,
+    #         a_name='signal derivative',
+    #     )
+    #     start_line = ax.axvline(
+    #         x=self.time[self._index_deriv_max, 0].to_datetime(),
+    #         color='black',
+    #         label='max derivative',
+    #         linestyle='--',
+    #     )
+    #     end_line = ax.axvline(
+    #         x=self.time[self._index_deriv_min, 0].to_datetime(),
+    #         color='black',
+    #         label='min derivative',
+    #         linestyle='--',
+    #     )
+    #     lines.append(start_line)
+    #     lines.append(end_line)
+    #     return ax2, lines
 
-    def plot_fpga_vccaux(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_index(a=self.fpga_vccaux_voltage, a_name='FPGA VCCaux', ax=ax)
+    def plot_fpga_temp(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+        return self.plot_quantity_vs_index(a=self.fpga_temp, a_name='FPGA temp.', ax=ax, )
 
-    def plot_fpga_vccbram(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
-        return self.plot_quantity_vs_index(a=self.fpga_vccbram_voltage, a_name='FPGA BRAM', ax=ax)
+    def plot_fpga_vccint(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+        return self.plot_quantity_vs_index(ax=ax, a=self.fpga_vccint_voltage, a_name='FPGA VCCint', )
 
-    def plot_adc_temperature(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
+    def plot_fpga_vccaux(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+        return self.plot_quantity_vs_index(ax=ax, a=self.fpga_vccaux_voltage, a_name='FPGA VCCaux', )
+
+    def plot_fpga_vccbram(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+        return self.plot_quantity_vs_index(ax=ax, a=self.fpga_vccbram_voltage, a_name='FPGA BRAM', )
+
+    def plot_adc_temperature(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
         ax = self.plot_quantity_vs_index(a=self.adc_temp_1, a_name='ADC temp 1', ax=ax)
         ax = self.plot_quantity_vs_index(a=self.adc_temp_2, a_name='ADC temp 2', ax=ax)
         ax = self.plot_quantity_vs_index(a=self.adc_temp_3, a_name='ADC temp 3', ax=ax)
         ax = self.plot_quantity_vs_index(a=self.adc_temp_4, a_name='ADC temp 4', ax=ax, legend_ncol=2)
         return ax
 
-    def plot_bias(self, ax: typ.Optional[plt.Axes] = None, ) -> plt.Axes:
+    def plot_bias(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
         bias = self.bias.mean(axis=~0)
-        ax = self.plot_quantity_vs_index(a=bias, a_name='bias', ax=ax)
+        return self.plot_quantity_vs_index(ax=ax, a=bias, a_name='bias', )
         # num_quadrants = bias.shape[~0]
         # for q in range(num_quadrants):
         #     name = 'bias, q' + str(q)
         #     ax = self.plot_quantity_vs_index(a=bias[..., q], a_name=name, ax=ax, legend_ncol=num_quadrants // 2)
-        return ax
+        # return ax
+
+    def plot_dark_up_span(self, ax: plt.Axes) -> plt.Line2D:
+        return ax.axvspan(
+            xmin=self.time_exp_start[self.index_dark_up_first, 0].to_datetime(),
+            xmax=self.time_exp_end[self.index_dark_up_last, 0].to_datetime(),
+            alpha=0.3,
+            color='gray',
+            label='upleg darks',
+        )
+
+    def plot_dark_down_span(self, ax: plt.Axes) -> plt.Line2D:
+        return ax.axvspan(
+            xmin=self.time_exp_start[self.index_dark_down_first, 0].to_datetime(),
+            xmax=self.time_exp_end[self.index_dark_down_last, 0].to_datetime(),
+            alpha=0.3,
+            color='gray',
+            label='downleg darks',
+        )
+
+    def plot_signal_span(self, ax: plt.Axes) -> plt.Line2D:
+        return ax.axvspan(
+            xmin=self.time_exp_start[self.index_signal_first, 0].to_datetime(),
+            xmax=self.time_exp_end[self.index_signal_last, 0].to_datetime(),
+            alpha=0.3,
+            color='green',
+            label='signal',
+        )
+
+    def plot_dark_spans(self, ax: plt.Axes):
+        self.plot_dark_up_span(ax=ax)
+        self.plot_dark_down_span(ax=ax)
 
     def plot_dark(self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None) -> typ.MutableSequence[plt.Axes]:
         axs[0].figure.suptitle('Median dark images')
         return self.plot_time(images=self.dark_nobias, image_names=self.channel_labels, axs=axs, )
 
     def plot_exposure_stats_vs_index(
-            self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None,
-    ) -> typ.MutableSequence[plt.Axes]:
-        if axs is None:
-            fig, axs = plt.subplots(nrows=4)
+            self, axs: typ.Sequence[plt.Axes],
+    ) -> typ.Sequence[plt.Axes]:
+
+
+
+        # axs_2 = [ax.secondary_xaxis(
+        #     location='top',
+        #     functions=(self._time_to_index, self._index_to_time),
+        # ) for ax in axs]
+        # # axs_2[0].set_xlabel('exposure index')
+        # for ax in axs_2[1:]:
+        #     ax.set_xticklabels([])
+
+        axs2 = [None] * len(axs)
+
+        self.plot_intensity_nobias_nodark_active_mean(ax=axs[0])
+        # self.plot_intensity_derivative(ax=axs[1])
+        self.plot_exposure_length(ax=axs[1])
+        self.plot_bias(ax=axs[2])
 
         for ax in axs[:~0]:
             ax.set_xlabel('')
 
-        axs_2 = [ax.secondary_xaxis(
-            location='top',
-            functions=(self._time_to_index, self._index_to_time),
-        ) for ax in axs]
-        axs_2[0].set_xlabel('exposure index')
-        for ax in axs_2[1:]:
-            ax.set_xticklabels([])
-
-        # self.trajectory.plot_altitude_vs_time(axs[0])
-        self.plot_intensity_nobias_mean(ax=axs[0])
-        self.plot_intensity_derivative(ax=axs[1])
-        self.plot_exposure_length(ax=axs[2])
-        self.plot_bias(ax=axs[3])
         return axs
 
     def plot_altitude_and_signal_vs_time(
@@ -368,43 +503,33 @@ class Level_0(
         self.plot_quantity_vs_index(
             a=signal,
             a_name='mean intensity',
-            # ax=ax,
             ax=ax_twin,
-            # drawstyle='default',
         )
         self.trajectory.plot_altitude_vs_time(
             ax=ax,
             time_start=self.time_start,
-            # ax=ax_twin,
         )
         ax_twin.set_ylabel('normalized intensity')
 
-        # ax.legend()
-        # ax.legend(loc='center right', bbox_to_anchor=(-0.1, 0.5))
-        # self.timeline.plot(ax=ax, time_start=self.trajectory.time_start)
-
-        # lines, labels = ax.get_legend_handles_labels()
-        # lines_twin, labels_twin = ax_twin.get_legend_handles_labels()
-        #
-        # ax.legend(lines + lines_twin, labels + labels_twin)
-        # ax_twin.get_legend().remove()
-
         return ax_twin
 
-    def plot_signal_vs_altitude(
-            self,
-            ax: typ.Optional[plt.Axes] = None,
-    ) -> plt.Axes:
-        if ax is None:
-            _, ax = plt.subplots()
-
+    def plot_signal_vs_altitude(self, ax: plt.Axes, ) -> plt.Axes:
         with astropy.visualization.quantity_support():
-            ax.plot(
-                self.altitude,
-                self.intensity_nobias_nodark_active.mean(self.axis.xy),
-                # drawstyle='steps',
-            )
-            ax.legend(['mean signal, ch' + str(i + 1) for i in range(self.num_channels)])
+            altitude = self.trajectory.altitude_interp(self.time)
+            signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
+            for i in range(self.num_channels):
+                lines_up, = ax.plot(
+                    altitude[self.slice_upleg, i],
+                    signal[self.slice_upleg, i],
+                    label=self.channel_labels[i] + ' mean signal, upleg',
+                )
+                lines_down, = ax.plot(
+                    altitude[self.slice_downleg, i],
+                    signal[self.slice_downleg, i],
+                    label=self.channel_labels[i] + ' mean signal, downleg',
+                    color=lines_up.get_color(),
+                    linestyle='--',
+                )
 
         return ax
 
