@@ -1,17 +1,14 @@
 import typing as typ
 import dataclasses
-import warnings
 import pathlib
-import numpy as np
-from astropy.io import fits
 import tarfile
+import numpy as np
+import astropy.io.fits
 import astropy.units as u
-import astropy.time
-# from kgpy import mixin, img, observatories
 import kgpy.mixin
 import kgpy.obs
 import kgpy.img
-from kgpy.img import mask as img_mask
+import kgpy.img.mask
 import kgpy.nsroc
 import esis.optics
 from . import Level_0
@@ -82,9 +79,9 @@ class Level_1(
             fig, ax = plt.subplots()
             ax.imshow(img, cmap='gray_r', norm=colors.SymLogNorm(1))
 
-            poly = Polygon(img_mask.default_vertices(ax), animated=True, facecolor='none')
+            poly = Polygon(kgpy.img.mask.default_vertices(ax), animated=True, facecolor='none')
             ax.add_patch(poly)
-            p = img_mask.PolygonInteractor(ax, poly)
+            p = kgpy.img.mask.PolygonInteractor(ax, poly)
 
             ax.set_title('Click and drag a vertex to move it. Press "i" and near line to insert. \n '
                          'Click and hold vertex then press "d" to delete. \n'
@@ -113,14 +110,14 @@ class Level_1(
                 name = 'ESIS_Level1_' + str(self.time[sequence, camera]) + '_' + str(camera + 1) + '.fits'
                 filename = path / name
 
-                hdr = fits.Header()
+                hdr = astropy.io.fits.Header()
                 hdr['CAM_ID'] = self.channel[sequence, camera]
                 hdr['DATE_OBS'] = str(self.time[sequence, camera])
                 hdr['IMG_EXP'] = self.exposure_length[sequence, camera]
 
-                hdul = fits.HDUList()
+                hdul = astropy.io.fits.HDUList()
 
-                hdul.append(fits.PrimaryHDU(np.array(self.intensity[sequence, camera, ...]), hdr))
+                hdul.append(astropy.io.fits.PrimaryHDU(np.array(self.intensity[sequence, camera, ...]), hdr))
 
                 hdul.writeto(filename, overwrite=True)
 
