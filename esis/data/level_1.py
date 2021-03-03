@@ -7,8 +7,12 @@ from astropy.io import fits
 import tarfile
 import astropy.units as u
 import astropy.time
-from kgpy import mixin, img, observatories
+# from kgpy import mixin, img, observatories
+import kgpy.mixin
+import kgpy.obs
+import kgpy.img
 from kgpy.img import mask as img_mask
+import kgpy.nsroc
 import esis.optics
 from . import Level_0
 
@@ -16,35 +20,55 @@ __all__ = ['Level_1']
 
 
 @dataclasses.dataclass
-class Level_1(observatories.Obs, mixin.Pickleable):
+class Level_1(
+    kgpy.obs.Image,
+    kgpy.mixin.Pickleable,
+):
     detector: typ.Optional[esis.optics.Detector] = None
-    sequence_metadata: np.ndarray = None
-    analog_metadata: np.ndarray = None
+    trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.update()
+
+    def update(self) -> typ.NoReturn:
+        self._despike_result = None
 
     @classmethod
-    def from_level_0(cls, lev0: Level_0, despike: bool = False) -> 'Level_1':
-        intensity = lev0.intensity_signal
-        if despike:
-            intensity_unit = intensity.unit
-            warnings.warn('Despiking data, this will take a while ...')
-            intensity, mask, stats = img.spikes.identify_and_fix(
-                data=intensity.value,
+    def from_level_0(cls, lev0: Level_0) -> 'Level_1':
+        return cls(
+            intensity=lev0.intensity_signal,
+            time=lev0.time_signal,
+            exposure_length=lev0.exposure_length_signal,
+            channel=lev0.channel,
+            time_index=lev0.time_index_signal,
+            detector=lev0.detector,
+            trajectory=lev0.trajectory,
+        )
+
+    def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
+        return self.detector.convert_electrons_to_photons(self.intensity, wavelength)
+
+    @property
+    def despike_result(self):
+        if self._despike_result is None:
+            intensity, mask, stats = kgpy.img.spikes.identify_and_fix(
+                data=self.intensity.value,
                 axis=(0, 2, 3),
                 percentile_threshold=(0, 99.9),
                 poly_deg=1,
             )
-            intensity = intensity << intensity_unit
-        return cls(
-            intensity=intensity,
-            time=lev0.time_signal,
-            exposure_length=lev0.requested_exposure_time_signal,
-            channel=lev0.channel,
-            time_index=lev0.time_index_signal,
-            detector=lev0.detector
-        )
+            intensity = intensity << self.intensity.unit
+            self._despike_result = intensity, mask, stats
+        return self._despike_result
 
-    def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
-        return self.detector.convert_adu_to_photons(self.intensity, wavelength)
+    @property
+    def intensity_despiked(self):
+        return self.despike_result[0]
+
+    @property
+    def spikes(self):
+        return self.intensity - self.intensity_despiked
 
     def create_mask(self, sequence):
         import matplotlib.pyplot as plt
