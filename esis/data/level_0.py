@@ -52,7 +52,6 @@ class Level_0(
     def update(self) -> typ.NoReturn:
         self._intensity_derivative = None
         self._intensity_nobias = None
-        self._intensity_nobias_nodark = None
         self._darks_nobias = None
         self._trajectory = None
 
@@ -302,12 +301,7 @@ class Level_0(
 
     @property
     def intensity_nobias_nodark(self) -> u.Quantity:
-        intensity_nobias_nodark = self._intensity_nobias_nodark
-        if intensity_nobias_nodark is None:
-            intensity_nobias_nodark = self.intensity_nobias - self.dark
-            if self.caching:
-                self._intensity_nobias_nodark = intensity_nobias_nodark
-        return intensity_nobias_nodark
+        return self.intensity_nobias - self.dark
 
     @property
     def intensity_nobias_nodark_active(self):
