@@ -198,7 +198,6 @@ def final(
     detector.readout_noise_tap3 = 4 * u.ct
     detector.readout_noise_tap4 = 4 * u.ct
 
-
     field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = Source()
     source.piston = front_aperture.piston + 400 * u.mm
