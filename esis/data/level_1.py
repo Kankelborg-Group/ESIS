@@ -10,19 +10,16 @@ import kgpy.obs
 import kgpy.img
 import kgpy.img.mask
 import kgpy.nsroc
-import esis.optics
 from . import Level_0
+import esis
 
 __all__ = ['Level_1']
 
 
 @dataclasses.dataclass
-class Level_1(
-    kgpy.obs.Image,
-    kgpy.mixin.Pickleable,
-):
-    detector: typ.Optional[esis.optics.Detector] = None
-    trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None
+class Level_1(kgpy.obs.Image):
+    optics: esis.optics.Optics = None
+    # detector: typ.Optional[esis.optics.Detector] = None
 
     def __post_init__(self):
         super().__post_init__()
@@ -32,19 +29,19 @@ class Level_1(
         self._despike_result = None
 
     @classmethod
-    def from_level_0(cls, lev0: Level_0) -> 'Level_1':
+    def from_level_0(cls, level_0: Level_0) -> 'Level_1':
         return cls(
-            intensity=lev0.intensity_signal,
-            time=lev0.time_signal,
-            exposure_length=lev0.exposure_length_signal,
-            channel=lev0.channel,
-            time_index=lev0.time_index_signal,
-            detector=lev0.detector,
-            trajectory=lev0.trajectory,
+            intensity=level_0.intensity_signal,
+            time=level_0.time_signal,
+            exposure_length=level_0.exposure_length_signal,
+            channel=level_0.channel,
+            time_index=level_0.time_index_signal,
+            optics=level_0.optics
+            # detector=lev0.detector,
         )
 
     def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
-        return self.detector.convert_electrons_to_photons(self.intensity, wavelength)
+        return self.optics.detector.convert_electrons_to_photons(self.intensity, wavelength)
 
     @property
     def despike_result(self):
