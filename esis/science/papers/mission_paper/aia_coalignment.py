@@ -52,7 +52,7 @@ if __name__ == '__main__':
     ax[1].imshow(img2, origin='lower',cmap = 'sdoaia304', vmax = np.percentile(img2,99.5))
     ax[1].set_xlabel('Solar X (arcsec)')
     ax[1].coords[1].set_ticklabel_visible(False)
-    ax[1].coords[1].set_ticks_visible(False)
+    # ax[1].coords[1].set_ticks_visible(False)
     ax[1].set_title('SDO AIA He II 304 $\AA$')
 
     t2 = ax[1].annotate(aia_times[seq].to_value('isot'), (5, 5), color='w')

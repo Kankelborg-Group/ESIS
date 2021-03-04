@@ -8,8 +8,7 @@ def generate_level1():
     optics = esis.flight.optics.as_measured()
     detector = optics.detector
     lev0 = Level_0.from_directory(esis.flight.raw_img_dir, detector)
-
-    lev1 = Level_1.from_level_0(lev0, despike = True)
+    lev1 = Level_1.from_level_0(lev0)
     return lev1
 
 

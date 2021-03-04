@@ -61,7 +61,7 @@ def test_update_internal_alignment(capsys):
 @pytest.mark.skip('Jake\'s problem')
 def test_add_mask():
     lev3 = level_3.Level_3.from_pickle(level_3.ov_Level3_updated)
-    lev3.add_mask(line= 'mgx')
+    lev3.add_mask(line= 'disperse')
 
     cube_slice = lev3.observation[12,3,:,:]
     masked_img = cube_slice.data * cube_slice.mask
