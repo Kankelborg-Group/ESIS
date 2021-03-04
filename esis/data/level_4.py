@@ -19,10 +19,6 @@ class Level_4(Pickleable):
     cube_list: typ.List[Result]
     wcs_list: typ.List[wcs.WCS]
 
-    @staticmethod
-    def default_pickle_path() -> pathlib.Path:
-        return default_path
-
     @classmethod
     def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level_4':
         obs = super().from_pickle(path)

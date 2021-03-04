@@ -365,10 +365,6 @@ class Level_3(Pickleable):
 
         return vignette_correction
 
-    @staticmethod
-    def default_pickle_path() -> pathlib.Path:
-        return ov_final_path
-
     @classmethod
     def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level_3':
         obs = super().from_pickle(path)
