@@ -1,19 +1,21 @@
 import typing as typ
 import dataclasses
+import pathlib
 import timeit
 import numpy as np
 import scipy.optimize
+import scipy.signal
 import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.time
-from kgpy import Name, mixin, vector, optics, transform, observatories
+from kgpy import Name, mixin, vector, optics, transform, observatories, polynomial
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
 
 
 @dataclasses.dataclass
-class Optics(mixin.Named):
+class Optics(mixin.Named, mixin.Pickleable):
     """
     Add test docstring to see if this is the problem.
     """
@@ -29,6 +31,18 @@ class Optics(mixin.Named):
     grating: Grating = dataclasses.field(default_factory=Grating)
     filter: Filter = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
+    stray_light: u.Quantity = 0 * u.adu
+    vignetting_correction: polynomial.Polynomial3D = dataclasses.field(
+        default_factory=lambda: polynomial.Polynomial3D(
+            degree=1,
+            coefficients=[1 * u.dimensionless_unscaled, 0 / u.AA, 0 / u.arcsec, 0 / u.arcsec]
+        )
+    )
+
+    @staticmethod
+    def default_pickle_path() -> pathlib.Path:
+        return pathlib.Path('optics.pickle')
+
 
     def __post_init__(self):
         self.update()
@@ -47,7 +61,7 @@ class Optics(mixin.Named):
                 object_surface=self.source.surface,
                 surfaces=optics.surface.SurfaceList([
                     self.front_aperture.surface,
-                    self.central_obscuration.surface,
+                    # self.central_obscuration.surface,
                     self.central_obscuration.surface,
                     self.primary.surface,
                     self.field_stop.surface,
@@ -64,9 +78,9 @@ class Optics(mixin.Named):
     @property
     def rays_output(self) -> optics.rays.Rays:
         rays = self.system.rays_output.copy()
-        rays.position = rays.position / self.detector.pixel_width.to(u.mm) * u.pix
-        rays.position[vector.x] = rays.position[vector.x] + self.detector.num_pixels[vector.ix] * u.pix / 2
-        rays.position[vector.y] = rays.position[vector.y] + self.detector.num_pixels[vector.iy] * u.pix / 2
+        rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
+        rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
+        rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
         return rays
 
     @property
@@ -92,6 +106,10 @@ class Optics(mixin.Named):
     def pixel_subtent(self):
         return np.arctan2(self.detector.pixel_width, self.effective_focal_length) << u.rad
 
+    @property
+    def plate_scale(self):
+        return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
         other.wavelengths = self.wavelengths.copy()
@@ -105,20 +123,108 @@ class Optics(mixin.Named):
         other.grating = self.grating.copy()
         other.filter = self.filter.copy()
         other.detector = self.detector.copy()
+        other.stray_light = self.stray_light.copy()
+        other.vignetting_correction = self.vignetting_correction.copy()
         return other
 
-    def _rough_fit_factory(self, x: np.ndarray, channel_index: int, ) -> 'Optics':
+    def __call__(
+            self,
+            data: u.Quantity,
+            wavelength: u.Quantity,
+            spatial_domain_input: u.Quantity,
+            spatial_domain_output: u.Quantity,
+            spatial_samples_output: typ.Union[int, typ.Tuple[int, int]],
+            inverse: bool = False,
+    ):
+        distortion = self.rays_output.distortion(polynomial_degree=2)
+        vignetting = self.rays_output.vignetting(polynomial_degree=1)
+        if not inverse:
+            data = vignetting(
+                cube=data,
+                wavelength=wavelength,
+                spatial_domain=spatial_domain_input,
+                inverse=inverse,
+            )
+            data = distortion.distort_cube(
+                cube=data,
+                wavelength=wavelength,
+                spatial_domain_input=spatial_domain_input,
+                spatial_domain_output=spatial_domain_output,
+                spatial_samples_output=spatial_samples_output,
+                inverse=inverse,
+                fill_value=np.nan,
+            )
+        else:
+            data = distortion.distort_cube(
+                cube=data,
+                wavelength=wavelength,
+                spatial_domain_input=spatial_domain_input,
+                spatial_domain_output=spatial_domain_output,
+                spatial_samples_output=spatial_samples_output,
+                inverse=inverse,
+                fill_value=np.nan,
+            )
+            data = vignetting(
+                cube=data,
+                wavelength=wavelength,
+                spatial_domain=spatial_domain_output,
+                inverse=inverse,
+            )
+        return data
+
+    def _rough_fit_factory_simple(self, x: np.ndarray, channel_index: int) -> 'Optics':
         other = self.copy()
-        other.grating.roll[channel_index] = x[0] << u.deg
-        other.grating.inclination[channel_index] = x[1] << u.deg
-        other.grating.twist[channel_index] = x[2] << u.deg
-        # other.detector.cylindrical_radius[channel_index] = x[0] << u.mm
-        # other.detector.cylindrical_azimuth[channel_index] = x[1] << u.deg
-        other.detector.piston[channel_index] = x[3] << u.mm
-        other.detector.inclination[channel_index] = x[4] << u.deg
-        other.detector.roll[channel_index] = x[5] << u.deg
-        other.detector.twist[channel_index] = x[6] << u.deg
-        other.grating.ruling_density[channel_index] = x[7] / u.mm
+        (
+            g_twist,
+            g_inclination,
+            g_roll,
+            # d_roll,
+            g_T,
+            # d_inclination,
+            # d_twist,
+            # d_piston,
+        ) = x
+        other.grating.inclination[channel_index] = g_inclination << u.deg
+        other.grating.twist[channel_index] = g_twist << u.deg
+        other.grating.roll[channel_index] = g_roll << u.deg
+        # other.detector.roll[channel_index] = d_roll << u.deg
+        other.grating.ruling_density[channel_index] = g_T / u.mm
+        # other.detector.inclination[channel_index] = d_inclination << u.deg
+        # other.detector.twist[channel_index] = d_twist << u.deg
+        # other.detector.piston[channel_index] = d_piston << u.mm
+        return other
+
+    def _rough_fit_factory(self, x: np.ndarray, channel_index: int) -> 'Optics':
+        other = self.copy()
+        (
+            g_twist,
+            g_inclination,
+            g_roll,
+            d_roll,
+            g_T,
+            d_inclination,
+            d_twist,
+            d_piston,
+            # g_piston,
+            v_0,
+            v_x,
+            v_y,
+            stray_light,
+        ) = x
+        other.grating.inclination[channel_index] = g_inclination << u.deg
+        other.grating.twist[channel_index] = g_twist << u.deg
+        other.grating.roll[channel_index] = g_roll << u.deg
+        other.detector.roll[channel_index] = d_roll << u.deg
+        other.grating.ruling_density[channel_index] = g_T / u.mm
+        other.detector.inclination[channel_index] = d_inclination << u.deg
+        other.detector.twist[channel_index] = d_twist << u.deg
+        other.detector.piston[channel_index] = d_piston << u.mm
+        # other.grating.piston[channel_index] = g_piston << u.mm
+        other.vignetting_correction.coefficients[0][channel_index] = v_0 * u.dimensionless_unscaled
+        other.vignetting_correction.coefficients[2][channel_index] = v_x / u.arcsec
+        other.vignetting_correction.coefficients[3][channel_index] = v_y / u.arcsec
+        other.stray_light[channel_index] = stray_light * u.adu
+
         return other
 
     def _rough_fit_func(
@@ -126,44 +232,100 @@ class Optics(mixin.Named):
             x: np.ndarray,
             images: u.Quantity,
             channel_index: int,
+            ref_image: u.Quantity = None,
             spatial_samples: int = 100,
-            # aia_obs: observatories.aia.AIA,
+            oversize_ratio: float = 1.1,
+            is_simple: bool = False,
+            plot_steps: bool = False,
     ) -> float:
 
-        other = self._rough_fit_factory(x, channel_index=channel_index)
+        if is_simple:
+            other = self._rough_fit_factory_simple(x, channel_index=channel_index)
+        else:
+            other = self._rough_fit_factory(x, channel_index=channel_index)
+
+        other.grating.roll = other.grating.roll[channel_index]
+        other.grating.inclination = other.grating.inclination[channel_index]
+        other.grating.twist = other.grating.twist[channel_index]
+        other.detector.cylindrical_radius = other.detector.cylindrical_radius[channel_index]
+        other.detector.cylindrical_azimuth = other.detector.cylindrical_azimuth[channel_index]
+        other.detector.piston = other.detector.piston[channel_index]
+        other.detector.roll = other.detector.roll[channel_index]
+        other.detector.inclination = other.detector.inclination[channel_index]
+        other.detector.twist = other.detector.twist[channel_index]
+        other.grating.ruling_density = other.grating.ruling_density[channel_index]
+        other.grating.cylindrical_azimuth = other.grating.cylindrical_azimuth[channel_index]
+        other.grating.piston = other.grating.piston[channel_index]
+        other.filter.cylindrical_azimuth = other.filter.cylindrical_azimuth[channel_index]
+        other.stray_light = other.stray_light[channel_index]
+        other.vignetting_correction.coefficients[0] = other.vignetting_correction.coefficients[0][channel_index]
+        other.vignetting_correction.coefficients[1] = other.vignetting_correction.coefficients[1][channel_index]
+        other.vignetting_correction.coefficients[2] = other.vignetting_correction.coefficients[2][channel_index]
+        other.vignetting_correction.coefficients[3] = other.vignetting_correction.coefficients[3][channel_index]
+
+        ish = 2 * (spatial_samples, )
+        ix, iy = np.indices(ish)
+        sx, sy = ish[vector.ix] // 2, ish[vector.iy] // 2
+        ix, iy = ix - sx, iy - sy
+        sx, sy = sx / oversize_ratio, sy / oversize_ratio
+        sr = np.sqrt(sx * sx + sy * sy)
+        ir = np.ones_like(ix, dtype=np.float)
+        ir[iy > ix + sr] = 0
+        ir[iy < ix - sr] = 0
+        ir[iy > -ix + sr] = 0
+        ir[iy < -ix - sr] = 0
+        ir[ix > sx] = 0
+        ir[ix < -sx] = 0
+        ir[iy > sy] = 0
+        ir[iy < -sy] = 0
+
+        # mask_584 = ir * u.adu
+        # mask_584[ir > 0] = np.nan
+        # mask_584 = np.broadcast_to(mask_584, (2,) + mask_584.shape, subok=True)
+
         rays = other.rays_output
         distortion = rays.distortion(polynomial_degree=2)
-        wavelength = distortion.wavelength[:, ::2, 0, 0]
-        # spatial_samples = aia_obs.shape[~1:]
-        # print(spatial_samples)
-        # spatial_domain = aia_obs.wcs[0, 0].calc_footprint(axes=spatial_samples)
-        # spatial_min = aia_obs.wcs[0, 0].all_pix2world(0, 0, 0) * u.deg
-        # spatial_min[0] -= 360 * u.deg
-        # spatial_max = aia_obs.wcs[0, 0].all_pix2world(*spatial_samples, 0) * u.deg
-        # spatial_domain = u.Quantity([spatial_min, spatial_max]).to(u.arcsec)
-        # print(spatial_domain)
-        # spatial_domain = spatial_domain[::2]
-        oversize_ratio = 1.1
-        spatial_domain = oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max])
+        wavelength = distortion.wavelength[..., ::2, 0, 0]
+        spatial_domain = oversize_ratio * u.Quantity([other.system.field_min[:2], other.system.field_max[:2]])
+        pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
+        # w584 = distortion.wavelength[..., 1, 0, 0]
+        # w584 = np.broadcast_to(w584[..., None], w584.shape + (2, ), subok=True)
+        new_images = images[channel_index] - other.stray_light
+        # new_images += distortion.distort_cube(
+        #     cube=mask_584,
+        #     wavelength=w584,
+        #     spatial_domain_input=spatial_domain,
+        #     spatial_domain_output=pixel_domain,
+        #     spatial_samples_output=images.shape[~1:],
+        # )
+
         new_images = distortion.distort_cube(
-            cube=images,
+            cube=new_images,
             wavelength=wavelength,
+            spatial_domain_input=pixel_domain,
             spatial_domain_output=spatial_domain,
             spatial_samples_output=spatial_samples,
             inverse=True,
+            fill_value=np.nan,
         )
-        # vignetting = rays.vignetting(polynomial_degree=1)
-        # new_images = vignetting(
-        #     cube=new_images,
-        #     wavelength=wavelength,
-        #     spatial_domain=spatial_domain,
-        #     inverse=True,
-        # )
+        vignetting = rays.vignetting(polynomial_degree=1)
+        new_images = vignetting(
+            cube=new_images,
+            wavelength=wavelength,
+            spatial_domain=spatial_domain,
+            inverse=True,
+        )
+        new_images = optics.aberration.Vignetting.apply_model(
+            model=other.vignetting_correction,
+            cube=new_images,
+            wavelength=wavelength,
+            spatial_domain=spatial_domain
+        )
 
 
         # aia_images = aia_obs.intensity[0, 0]
         # aia_images = aia_images / aia_images.mean()
-        new_images = new_images / np.nanmean(new_images, axis=(~1, ~0))[..., None, None]
+        # new_images = new_images / np.nanmean(new_images, axis=(~1, ~0))[..., None, None]
         # new_images = new_images - np.nanmean(new_images, axis=(~1, ~0))[..., None, None]
 
         # ish = new_images.shape[~1:]
@@ -178,60 +340,64 @@ class Optics(mixin.Named):
         # mask[ir > sx] = 0
         # norm = -np.nansum(new_images[channel_index])
 
-        ish = new_images.shape[~1:]
-        ix, iy = np.indices(ish)
-        sx, sy = ish[vector.ix] // 2, ish[vector.iy] // 2
-        ix, iy = ix - sx, iy - sy
-        sx, sy = sx / oversize_ratio, sy / oversize_ratio
-        sr = np.sqrt(sx * sx + sy * sy)
-        # ix, iy = ix / sx, iy / sy
-        # ir = np.exp(-np.power(ix * ix + iy * iy, 10))
-        ir = np.ones_like(ix)
-        ir[iy > ix + sr] = 0
-        ir[iy < ix - sr] = 0
-        ir[iy > -ix + sr] = 0
-        ir[iy < -ix - sr] = 0
-        ir[ix > sx] = 0
-        ir[ix < -sx] = 0
-        ir[iy > sy] = 0
-        ir[iy < -sy] = 0
+
+        ir = np.broadcast_to(ir, new_images.shape)
         ir = ir / np.nanmean(ir)
+        if ref_image is None:
+            ref_image = ir * np.nanmean(new_images, axis=(~1, ~0))[..., None, None]
+        # else:
+        #     new_images[ir == 0] = np.nan
+        #     ref_image[ir == 0] = np.nan
+        #
+        # new_images = new_images / np.nanmean(new_images, axis=(~1, ~0))[..., None, None]
+        # ref_image = ref_image / np.nanmean(ref_image, axis=(~1, ~0))[..., None, None]
+
+
 
         # norm = np.sqrt(np.nanmean(np.square(new_images - ir)))
         # norm = np.sqrt(np.nanmean(np.square(new_images[channel_index] - ir)))
-        norm_base = new_images[channel_index] - ir
-        # _, axs = plt.subplots(ncols=2, figsize=(12, 6))
-        # axs[0].imshow(norm_base[0])
-        # axs[1].imshow(norm_base[1])
-        # plt.show()
+        norm_base = new_images - ref_image
+        # norm_base = scipy.signal.correlate(new_images, ir, mode='same')
+
+
+        if plot_steps:
+            test_img = norm_base.value
+            _, axs = plt.subplots(ncols=2, figsize=(12, 6))
+            axs[0].imshow(test_img[0], vmin=np.nanpercentile(test_img[0], 2), vmax=np.nanpercentile(test_img[0], 98))
+            axs[1].imshow(test_img[1], vmin=np.nanpercentile(test_img[1], 2), vmax=np.nanpercentile(test_img[1], 98))
+            plt.show()
+
         norm = np.sqrt(np.nanmean(np.square(norm_base)))
+        # norm = -np.sqrt(np.nanmean(np.square(norm_base.max((~1, ~0)))))
         # norm = -np.nansum(ir * new_images[channel_index])
         # norm /= new_images[channel_index].size
         # norm = -np.nansum(new_images[channel_index] * ir) / new_images[channel_index].size
         # print('channel index', channel_index)
-        # print('grating.roll', other.grating.roll[channel_index])
-        # print('grating.inclination', other.grating.inclination[channel_index])
-        # print('grating.twist', other.grating.twist[channel_index])
-        # # print('detector.cylindrical_radius', other.detector.cylindrical_radius[channel_index])
-        # # print('detector.cylindrical azimuth', other.detector.cylindrical_azimuth[channel_index])
-        # print('detector.piston', other.detector.piston[channel_index])
-        # print('detector.inclination', other.detector.inclination[channel_index])
-        # print('detector.roll', other.detector.roll[channel_index])
-        # print('detector.twist', other.detector.twist[channel_index])
-        # print('grating.ruling_density', other.grating.ruling_density[channel_index])
-        # print(norm)
+        # print('detector.cylindrical_radius', other.detector.cylindrical_radius)
+        # print('detector.cylindrical azimuth', other.detector.cylindrical_azimuth)
+        print('grating.inclination', other.grating.inclination)
+        print('grating.twist', other.grating.twist)
+        print('grating.roll', other.grating.roll)
+        # print('detector.roll', other.detector.roll)
+        print('grating.ruling_density', other.grating.ruling_density)
+        # print('detector.inclination', other.detector.inclination)
+        # print('detector.twist', other.detector.twist)
+        # print('detector.piston', other.detector.piston)
+        # # print('grating.piston', other.grating.piston)
+        # print('stray_light', other.stray_light)
+        # print('vignetting', other.vignetting_correction.coefficients)
+        print(norm)
         # print()
 
-        # import matplotlib.pyplot as plt
-        # plt.figure()
-        # plt.imshow((new_images - ir)[channel_index, ~0])
-
-        return norm
+        return norm.value
 
     def rough_fit_to_images(
             self,
             images: u.Quantity,
-            spatial_samples: 100,
+            spatial_samples: int = 100,
+            ref_index_start: int = 0,
+            ref_index_end: int = 2,
+            plot_steps: bool = False,
             # aia_obs: observatories.aia.AIA,
     ) -> 'Optics':
 
@@ -245,144 +411,305 @@ class Optics(mixin.Named):
         other.grating.inclination = np.broadcast_to(other.grating.inclination, sh, subok=True)
         other.grating.twist = np.broadcast_to(other.grating.twist, sh, subok=True)
 
-        # other.detector.cylindrical_radius = np.broadcast_to(other.detector.cylindrical_radius, sh, subok=True)
-        # other.detector.cylindrical_azimuth = np.broadcast_to(other.detector.cylindrical_azimuth, sh, subok=True)
+        other.detector.cylindrical_radius = np.broadcast_to(other.detector.cylindrical_radius, sh, subok=True)
+        other.detector.cylindrical_azimuth = np.broadcast_to(other.detector.cylindrical_azimuth, sh, subok=True)
         other.detector.piston = np.broadcast_to(other.detector.piston, sh, subok=True)
         other.detector.inclination = np.broadcast_to(other.detector.inclination, sh, subok=True)
         other.detector.roll = np.broadcast_to(other.detector.roll, sh, subok=True)
         other.detector.twist = np.broadcast_to(other.detector.twist, sh, subok=True)
         other.grating.ruling_density = np.broadcast_to(other.grating.ruling_density, sh, subok=True)
+        other.grating.piston = np.broadcast_to(other.grating.piston, sh, subok=True)
+        other.stray_light = np.broadcast_to(other.stray_light, sh, subok=True)
 
-        for channel_index in range(sh[0]):
-        # for channel_index in range(1):
-            print('channel', channel_index)
+        v_c = other.vignetting_correction.coefficients
+        v_c[0] = np.broadcast_to(v_c[0], sh, subok=True)
+        v_c[1] = np.broadcast_to(v_c[1], sh, subok=True)
+        v_c[2] = np.broadcast_to(v_c[2], sh, subok=True)
+        v_c[3] = np.broadcast_to(v_c[3], sh, subok=True)
 
-            # if channel_index == 1:
-            #     continue
+        oversize_ratio = 1.1
 
-            g_roll = other.grating.roll[channel_index]
-            g_inclination = other.grating.inclination[channel_index]
-            g_twist = other.grating.twist[channel_index]
-            # d_r = other.detector.cylindrical_radius[channel_index]
-            # d_phi = other.detector.cylindrical_azimuth[channel_index]
-            d_z = other.detector.piston[channel_index]
-            d_inclination = other.detector.inclination[channel_index]
-            d_roll = other.detector.roll[channel_index]
-            d_twist = other.detector.twist[channel_index]
-            g_T = other.grating.ruling_density[channel_index]
+        ish = 2 * (1024, )
+        ix, iy = np.indices(ish)
+        sx, sy = ish[vector.ix] // 2, ish[vector.iy] // 2
+        ix, iy = ix - sx, iy - sy
+        sx, sy = sx / oversize_ratio, sy / oversize_ratio
+        sr = np.sqrt(sx * sx + sy * sy)
+        ir = np.ones_like(ix, dtype=np.float)
+        ir[iy > ix + sr] = 0
+        ir[iy < ix - sr] = 0
+        ir[iy > -ix + sr] = 0
+        ir[iy < -ix - sr] = 0
+        ir[ix > sx] = 0
+        ir[ix < -sx] = 0
+        ir[iy > sy] = 0
+        ir[iy < -sy] = 0
 
-            bounds = np.array([
-                (g_roll[..., None] + [-1, 1] * u.deg).value,
-                (g_inclination[..., None] + [-0.04, 0.04] * u.deg).value,
-                (g_twist[..., None] + [-0.04, 0.04] * u.deg).value,
-                # (d_r[..., None] + [-2, 2] * u.mm).value,
-                # (d_phi[..., None] + [-1, 1] * u.deg).value,
-                (d_z[..., None] + [-5, 5] * u.mm).value,
-                (d_inclination[..., None] + [-0.3, 0.3] * u.deg).value,
-                (d_roll[..., None] + [-2, 2] * u.deg).value,
-                (d_twist[..., None] + [-0.3, 0.3] * u.deg).value,
-                (g_T[..., None] + [-1, 1] / u.mm).value,
-            ])
+        mask_584 = ir * u.adu
+        mask_584[ir > 0] = np.nan
+        mask_584 = np.broadcast_to(mask_584, (4, 2,) + mask_584.shape, subok=True)
 
-            rel_step = 20e-3
-            step_size = rel_step * (bounds[..., 1] - bounds[..., 0])
+        for ref_index in range(ref_index_start, ref_index_end):
+            for channel_index in range(sh[0]):
+                print('reference', ref_index)
+                print('channel', channel_index)
 
-            step_size = np.array([
-                (0.01 * u.deg).value,
-                (0.001 * u.deg).value,
-                (0.001 * u.deg).value,
-                (0.01 * u.mm).value,
-                (0.01 * u.deg).value,
-                (0.0001 * u.deg).value,
-                (0.0001 * u.deg).value,
-                (0.01 / u.mm).value,
-            ])
+                g_roll = other.grating.roll[channel_index]
+                g_inclination = other.grating.inclination[channel_index]
+                g_twist = other.grating.twist[channel_index]
+                d_r = other.detector.cylindrical_radius[channel_index]
+                d_phi = other.detector.cylindrical_azimuth[channel_index]
+                d_z = other.detector.piston[channel_index]
+                d_inclination = other.detector.inclination[channel_index]
+                d_roll = other.detector.roll[channel_index]
+                d_twist = other.detector.twist[channel_index]
+                g_T = other.grating.ruling_density[channel_index]
+                g_piston = other.grating.piston[channel_index]
+                stray_light = other.stray_light[channel_index]
+                v_0 = other.vignetting_correction.coefficients[0][channel_index]
+                v_x = other.vignetting_correction.coefficients[2][channel_index]
+                v_y = other.vignetting_correction.coefficients[3][channel_index]
 
-            # result = scipy.optimize.shgo(
-            result = scipy.optimize.differential_evolution(
-            # result = scipy.optimize.minimize(
-            #     fun=other._rough_fit_func,
-                func=other._rough_fit_func,
-                # x0=np.array([
-                #     g_roll.value,
-                #     g_inclination.value,
-                #     g_twist.value,
-                #     # d_r.value,
-                #     # d_phi.value,
-                #     d_z.value,
-                #     d_inclination.value,
-                #     d_roll.value,
-                #     d_twist.value,
-                #     g_T.value,
-                # ]),
-                bounds=bounds,
-                # method='L-BFGS-B',
-                # method='Nelder-Mead',
-                # options={
-                #     # 'adaptive': True,
-                #     # 'gtol': 1e-3,
-                #     'eps': step_size,
-                # #     # 'maxiter': 1,
-                # },
-                args=(
-                    images.value,
-                    channel_index,
-                    spatial_samples,
-                    # aia_obs,
-                ),
-                disp=True,
-                polish=False,
-                popsize=20,
-                mutation=(0.5, 1.5),
-            )
 
-            # print('DE Best result')
-            # print(other._rough_fit_func(result.x, images.value, channel_index, spatial_samples))
-            #
-            # result = scipy.optimize.minimize(
-            #     fun=other._rough_fit_func,
-            #     x0=result.x,
-            #     bounds=bounds,
-            #     args=(
-            #        images.value,
-            #        channel_index,
-            #        spatial_samples,
-            #     ),
-            #     options={
-            #         'eps': 0.001,
-            #         'maxcor': 1000,
-            #     },
-            # )
 
-            other = other._rough_fit_factory(result.x, channel_index=channel_index)
+                if ref_index == 0:
+                    is_simple = True
+                    x0 = np.array([
+                        g_twist.value,
+                        g_inclination.value,
+                        g_roll.value,
+                        # d_roll.value,
+                        g_T.value,
+                        # d_inclination.value,
+                        # d_twist.value,
+                        # d_z.value,
+                    ])
+                    bounds = np.array([
+                        (g_twist[..., None] + [-0.05, 0.05] * u.deg).value,
+                        (g_inclination[..., None] + [-0.04, 0.04] * u.deg).value,
+                        (g_roll[..., None] + [-1, 1] * u.deg).value,
+                        # (d_roll[..., None] + [-2, 2] * u.deg).value,
+                        (g_T[..., None] + [-5, 5] / u.mm).value,
+                        # (d_inclination[..., None] + [-2, 2] * u.deg).value,
+                        # (d_twist[..., None] + [-2, 2] * u.deg).value,
+                        # (d_z[..., None] + [-10, 10] * u.mm).value,
+                    ])
+                    # simplex = 2 * np.random.random((7, 6)) - 1
+                    # simplex = np.random.normal(0, 1, (9, 8))
+                    # simplex /= np.sqrt(np.sum(np.square(simplex), ~0, keepdims=True))
+                    # simplex *= 2
+                    # simplex[..., :2] /= 40
+                    # simplex[4] *= 3
+                    # simplex[~0] *= 3
 
-            print('Best result')
-            print(other._rough_fit_func(result.x, images.value, channel_index, spatial_samples))
+                    # simplex = np.array([
+                    #     [-0.03, -0.03, -1, -2, -5, 2, 2, 10],
+                    #     [0.03, -0.03, -1, -2, -5, -2, 2, 10],
+                    #     [0.03, 0.03, -1, -2, -5, -2, -2, 10],
+                    #     [0.03, 0.03, 1, -2, -5, -2, -2, -10],
+                    #     [0.03, 0.03, 1, 2, -5, -2, -2, -10],
+                    #     [-0.03, 0.03, 1, 2, 5, -2, -2, -10],
+                    #     [-0.03, -0.03, 1, 2, 5, 2, -2, -10],
+                    #     [-0.03, -0.03, -1, 2, 5, 2, 2, -10],
+                    #     [-0.03, -0.03, -1, -2, 5, 2, 2, 10],
+                    # ])
+                    # simplex += x0
+                    ref_image = None
+                    images_masked = images
+                else:
+                    is_simple = True,
+                    x0 = np.array([
+                        g_twist.value,
+                        g_inclination.value,
+                        g_roll.value,
+                        d_roll.value,
+                        g_T.value,
+                        d_inclination.value,
+                        d_twist.value,
+                        d_z.value,
+                        # g_piston.value,
+                        # v_0.value,
+                        # v_x.value,
+                        # v_y.value,
+                        # stray_light.value,
+                    ])
+                    bounds = np.array([
+                        (g_twist[..., None] + [-0.05, 0.05] * u.deg).value,
+                        (g_inclination[..., None] + [-0.04, 0.04] * u.deg).value,
+                        (g_roll[..., None] + [-1, 1] * u.deg).value,
+                        (d_roll[..., None] + [-2, 2] * u.deg).value,
+                        (g_T[..., None] + [-5, 5] / u.mm).value,
+                        (d_inclination[..., None] + [-2, 2] * u.deg).value,
+                        (d_twist[..., None] + [-2, 2] * u.deg).value,
+                        (d_z[..., None] + [-10, 10] * u.mm).value,
+                        # (g_piston[..., None] + [-1, 1] * u.mm).value,
+                        # (v_0[..., None] + [-0.5, 0.5] * u.dimensionless_unscaled).value,
+                        # (v_x[..., None] + [-0.001, 0.001] / u.arcsec).value,
+                        # (v_y[..., None] + [-0.001, 0.001] / u.arcsec).value,
+                        # ([0, 20] * u.adu).value,
+
+                    ])
+                    # simplex = 2 * np.random.random((7, 6)) - 1
+                    # simplex /= 10
+                    # simplex[..., :2] /= 10
+                    # simplex += x0
+                    rays = other.rays_output
+                    distortion = rays.distortion(polynomial_degree=2)
+                    wavelength = distortion.wavelength[..., ::2, 0, 0]
+                    spatial_domain = oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max])[..., :2]
+                    pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
+                    w584 = distortion.wavelength[..., 1, 0, 0]
+                    w584 = np.broadcast_to(w584[..., None], w584.shape + (2,), subok=True)
+                    new_mask_584 = distortion.distort_cube(
+                        cube=mask_584,
+                        wavelength=w584,
+                        spatial_domain_input=spatial_domain,
+                        spatial_domain_output=pixel_domain,
+                        spatial_samples_output=images.shape[~1:],
+                    )
+                    images_masked = images + new_mask_584
+                    new_images = images_masked - other.stray_light[..., None, None, None]
+                    new_images = distortion.distort_cube(
+                        cube=new_images,
+                        wavelength=wavelength,
+                        spatial_domain_input=pixel_domain,
+                        spatial_domain_output=spatial_domain,
+                        spatial_samples_output=spatial_samples,
+                        inverse=True,
+                        fill_value=np.nan,
+                    )
+                    vignetting = rays.vignetting(polynomial_degree=1)
+                    new_images = vignetting(
+                        cube=new_images,
+                        wavelength=wavelength,
+                        spatial_domain=spatial_domain,
+                        inverse=True,
+                    )
+                    new_images = optics.aberration.Vignetting.apply_model(
+                        model=other.vignetting_correction,
+                        cube=new_images,
+                        wavelength=wavelength,
+                        spatial_domain=spatial_domain,
+                    )
+                    # new_images = new_images / np.nanmean(new_images, axis=(~1, ~0))[..., None, None]
+                    # new_images_lower = np.nanpercentile(new_images, 5, axis=(~1, ~0), keepdims=True)
+                    # new_images_upper = np.nanpercentile(new_images, 95, axis=(~1, ~0), keepdims=True)
+                    # new_images = (new_images - new_images_lower) / (new_images_upper - new_images_lower)
+                    new_images[channel_index] = np.nan
+                    ref_image = np.nanmean(new_images, axis=0)
+                    # plt.figure()
+                    # plt.imshow(ref_image[~0].value, vmin=0, vmax=200)
+                    # ref_image = new_images[ref_index]
+                    # ref_image = None
+                    other.update()
+
+
+                def cb(xk, convergence):
+                    print(convergence)
+                    other._rough_fit_func(xk, images, channel_index, ref_image, spatial_samples, oversize_ratio, is_simple, True)
+
+                # result = scipy.optimize.shgo(
+                # result = scipy.optimize.differential_evolution(
+                result = scipy.optimize.minimize(
+                # result = scipy.optimize.dual_annealing(
+                    fun=other._rough_fit_func,
+                    # func=other._rough_fit_func,
+                    x0=x0,
+                    bounds=bounds,
+                    # method='L-BFGS-B',
+                    options={
+                        'disp': True,
+                        # 'xtol': 1e-6,
+                        'ftol': 1e-3,
+                        # 'xatol': 1,
+                        # 'fatol': 1e-3,
+                        # 'initial_simplex': simplex,
+                        # 'adaptive': True,
+                    },
+                    method='Powell',
+                    # method='TNC',
+                    # local_search_options={
+                    #     'method': 'TNC',
+                    #     'options': {
+                    #         'gtol': 0.1,
+                    #         'eps': 0.01,
+                    #     }
+                    #
+                    # #     # 'adaptive': True,
+                    # #     # 'gtol': 1e-3,
+                    # #     'eps': 0.1,
+                    # # #     # 'maxiter': 1,
+                    # },
+                    args=(
+                        images_masked,
+                        channel_index,
+                        ref_image,
+                        spatial_samples,
+                        oversize_ratio,
+                        is_simple,
+                        plot_steps,
+                        # aia_obs,
+                    ),
+                    # no_local_search=True,
+                    # initial_temp=10,
+                    # maxiter=15,
+                    # visit=2,
+                    # disp=True,
+                    # polish=False,
+                    # popsize=800,
+                    # # strategy='currenttobest1exp',
+                    # mutation=0.2,
+                    # tol=0.001,
+                    # workers=-1,
+                    # callback=cb,
+                )
+
+                # print('DE Best result')
+                # print(other._rough_fit_func(result.x, images.value, channel_index, spatial_samples))
+                #
+                if is_simple:
+                    other = other._rough_fit_factory_simple(result.x, channel_index=channel_index)
+                else:
+                    other = other._rough_fit_factory(result.x, channel_index=channel_index)
 
         return other
 
     def _fit_factory(self, x: np.ndarray, ) -> 'Optics':
         other = self.copy()
-        other.grating.roll = x[0:4] << u.deg
-        other.grating.inclination = x[4:8] << u.deg
-        other.grating.twist = x[8:12] << u.deg
-        # other.grating.piston = x[12:16] << u.mm
+        x = x.reshape((-1, 4))
+        (
+            d_roll,
+            d_inclination,
+            d_twist,
+            # g_z,
+            d_z,
+            # g_T,
+            # g_roll,
+            # g_inclination,
+            # d_r,
+            # g_twist,
+            # d_phi,
+        ) = x
+        # other.grating.roll = g_roll << u.deg
+        # other.grating.inclination = g_inclination << u.deg
+        # other.grating.twist = g_twist << u.deg
+        # other.grating.piston = g_z << u.mm
         # other.grating.cylindrical_radius = x[16:20] << u.mm
         # other.grating.cylindrical_azimuth = x[20:24] << u.deg
         # other.detector.piston = x[24:28] << u.mm
-        # other.detector.cylindrical_radius = x[4:8] << u.mm
-        # other.detector.cylindrical_azimuth = x[8:12] << u.deg
-        other.detector.piston = x[12:16] << u.mm
-        other.detector.inclination = x[16:20] << u.deg
-        other.detector.roll = x[20:24] << u.deg
-        other.detector.twist = x[24:28] << u.deg
+        # other.detector.cylindrical_radius = d_r << u.mm
+        # other.detector.cylindrical_azimuth = d_phi << u.deg
+        other.detector.piston = d_z << u.mm
+        other.detector.inclination = d_inclination << u.deg
+        other.detector.roll = d_roll << u.deg
+        other.detector.twist = d_twist << u.deg
         # other.grating.piston = x[28:32] * u.mm
         # other.wavelengths[~0] = x[32] * u.AA
-        other.grating.ruling_density = x[28:32] / u.mm
+        # other.grating.ruling_density = g_T / u.mm
         # other.grating.tangential_radius = x[32:36] << u.mm
         # other.grating.sagittal_radius = other.grating.tangential_radius
-        # other.central_obscuration.position_error[vector.x] = x[32] << u.mm
-        # other.central_obscuration.position_error[vector.y] = x[33] << u.mm
+        # other.central_obscuration.position_error[vector.x] = x[0] << u.mm
+        # other.central_obscuration.position_error[vector.y] = x[1] << u.mm
         # other.update()
 
         # dr = np.broadcast_to(self.detector.roll, (4,))
@@ -394,54 +721,82 @@ class Optics(mixin.Named):
 
         return other
 
-    def _fit_func(self, x: np.ndarray, images: u.Quantity, spatial_samples: int = 100) -> float:
+    def _fit_func(
+            self,
+            x: np.ndarray,
+            images: u.Quantity,
+            spatial_samples: int = 100,
+            plot_steps: bool = False,
+            oversize_ratio: int = 1.1,
+    ) -> float:
 
         other = self._fit_factory(x)
 
-        distortion = other.rays_output.distortion(polynomial_degree=2)
-        wavelength = distortion.wavelength[:, ::2, 0, 0]
-        spatial_domain = u.Quantity([other.system.field_min, other.system.field_max])
-        new_images = distortion.distort_cube(
-            cube=images,
-            wavelength=wavelength,
-            spatial_domain_output=spatial_domain,
+        images = images / np.median(images)
+
+        new_images = other(
+            data=images,
+            wavelength=other.wavelengths[::2],
+            spatial_domain_input=[[0, 0], images.shape[~1:]] * u.pix,
+            spatial_domain_output=oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max]),
             spatial_samples_output=spatial_samples,
             inverse=True,
         )
 
-        vig_model = other.rays_output.vignetting(polynomial_degree=1).model(inverse=True)
-        # vig_model.coefficients[2][...] = x[32:36][..., None, None, None, None] << (1 / u.percent / u.deg)
-        # vig_model.coefficients[3][...] = x[36:40][..., None, None, None, None] << (1 / u.percent / u.deg)
-        new_images = optics.aberration.Vignetting.apply_model(
-            model=vig_model,
-            cube=new_images,
-            wavelength=wavelength,
-            spatial_domain=spatial_domain,
-        )
+        # distortion = other.rays_output.distortion(polynomial_degree=2)
+        # wavelength = distortion.wavelength[:, ::2, 0, 0]
+        # spatial_domain = oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max])
+        # pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
+        # new_images = distortion.distort_cube(
+        #     cube=images,
+        #     wavelength=wavelength,
+        #     spatial_domain_input=pixel_domain,
+        #     spatial_domain_output=spatial_domain,
+        #     spatial_samples_output=spatial_samples,
+        #     inverse=True,
+        #     fill_value=np.nan,
+        # )
+        # vignetting = other.rays_output.vignetting(polynomial_degree=1)
         # new_images = vignetting(
         #     cube=new_images,
         #     wavelength=wavelength,
         #     spatial_domain=spatial_domain,
         #     inverse=True,
         # )
+        new_images_nonan = np.nan_to_num(new_images)
 
-        ish = new_images.shape[~1:]
+
+        ish = 2 * (spatial_samples, )
         ix, iy = np.indices(ish)
         sx, sy = ish[vector.ix] // 2, ish[vector.iy] // 2
-        sr = np.sqrt(sx * sx + sy * sy)
         ix, iy = ix - sx, iy - sy
-        # ix, iy = ix / sx, iy / sy
-        # ir = np.exp(-np.power(ix * ix + iy * iy, 10))
-        ir = np.ones_like(ix)
+        sx, sy = sx / oversize_ratio, sy / oversize_ratio
+        sr = np.sqrt(sx * sx + sy * sy)
+        ir = np.ones_like(ix, dtype=np.float)
         ir[iy > ix + sr] = 0
         ir[iy < ix - sr] = 0
         ir[iy > -ix + sr] = 0
         ir[iy < -ix - sr] = 0
+        ir[ix > sx] = 0
+        ir[ix < -sx] = 0
+        ir[iy > sy] = 0
+        ir[iy < -sy] = 0
+        # ir = np.broadcast_to(ir, new_images.shape)
+        # ir = ir * np.nanmedian(new_images, axis=(~1, ~0))[..., None, None]
+        # ir = 2 - ir
+        ir -= 1/2
+
+        # new_images -= ir
+        # new_images = np.abs(new_images)
+
+        # new_images -= np.nanmedian(new_images, axis=(~1, ~0))[..., None, None]
+        # ir -= ir.mean()
 
         # norm = -np.power(np.nanmean(new_images.prod((0, 1))), 1 / (new_images.shape[0] * new_images.shape[1]))
         # new_images = ir * new_images
         # norm = -np.nanmean(new_images)
-        new_images = new_images / np.nanmean(new_images, axis=(~1, ~0))[..., None, None]
+        # new_images[ir == 0] = np.nan
+        # new_images = new_images / np.nanmedian(new_images, axis=(~1, ~0))[..., None, None]
         # norm = -np.prod(new_images, axis=(0, 1)).mean()
 
         # base_norm = (new_images[::2] - new_images[1::2]).sum(0)
@@ -453,42 +808,129 @@ class Optics(mixin.Named):
         # plt.imshow(base_norm[~0])
         # plt.show()
 
-        n1 = np.roll(new_images, 1, axis=0)
-        n2 = np.roll(new_images, 2, axis=0)
-        n3 = np.roll(new_images, 3, axis=0)
-        norm = np.sqrt(np.nanmean(np.square(n1 - new_images)))
-        norm += np.sqrt(np.nanmean(np.square(n2 - new_images)))
-        norm += np.sqrt(np.nanmean(np.square(n3 - new_images)))
-        # nw = np.roll(new_images, 1, axis=1)
-        # norm += np.sqrt(np.nanmean(np.square(n1 - nw)))
-        # norm += np.sqrt(np.nanmean(np.square(n2 - nw)))
-        # norm += np.sqrt(np.nanmean(np.square(n3 - nw)))
-        # norm += np.sqrt(np.nanmean(np.square(new_images - ir)))
-        # norm /= 7
-        norm /= 3
+        # norm = np.sqrt(np.nanmean(np.square(new_images - ir)))
+        # norm = np.sqrt(np.nanmean(np.square(new_images - np.roll(new_images, 1, axis=0))))
+        # norm += np.sqrt(np.nanmean(np.square(new_images[0] - new_images[1])))
+        # norm += np.sqrt(np.nanmean(np.square(new_images[2] - new_images[1])))
+        # norm += np.sqrt(np.nanmean(np.square(new_images[3] - new_images[1])))
+        # norm /= 4
 
-        # # print('grating.piston', other.grating.piston)
-        # print('grating.roll', other.grating.roll)
-        # print('grating.inclination', other.grating.inclination)
-        # print('grating.twist', other.grating.twist)
-        # # print('grating.piston', other.grating.piston)
-        # # print('grating.cylindrical_radius', other.grating.cylindrical_radius)
-        # # print('grating.cylindrical_azimuth', other.grating.cylindrical_azimuth)
-        # # print('detector.cylindrical_radius', other.detector.cylindrical_radius)
-        # # print('detector.cylindrical azimuth', other.detector.cylindrical_azimuth)
-        # print('detector.piston', other.detector.piston)
-        # print('detector.inclination', other.detector.inclination)
-        # print('detector.roll', other.detector.roll)
-        # print('detector.twist', other.detector.twist)
-        # # print('OV wavelength', other.wavelengths[~0])
-        # # print('grating.ruling_density', other.grating.ruling_density)
-        # # print('grating.radius', other.grating.tangential_radius)
+        # n1 = np.roll(new_images, 1, axis=0)
+        # n2 = np.roll(new_images, 2, axis=0)
+        # n3 = np.roll(new_images, 3, axis=0)
+        # norm = 3 * np.nanmean(np.square(new_images - ir))
+        # norm += np.nanmean(np.square(n1 - new_images))
+        # norm += np.nanmean(np.square(n2 - new_images))
+        # norm += np.nanmean(np.square(n3 - new_images))
+
+
+
+        ref_image = new_images_nonan[1]
+
+        p11 = scipy.signal.correlate(new_images_nonan[0, 0], ref_image[0], mode='full') / ref_image.size
+        p21 = scipy.signal.correlate(new_images_nonan[2, 0], ref_image[0], mode='full') / ref_image.size
+        p31 = scipy.signal.correlate(new_images_nonan[3, 0], ref_image[0], mode='full') / ref_image.size
+        p12 = scipy.signal.correlate(new_images_nonan[0, 1], ref_image[1], mode='full') / ref_image.size
+        p22 = scipy.signal.correlate(new_images_nonan[2, 1], ref_image[1], mode='full') / ref_image.size
+        p32 = scipy.signal.correlate(new_images_nonan[3, 1], ref_image[1], mode='full') / ref_image.size
+
+        # p1 = p1.prod(0)
+        # p2 = p2.prod(0)
+        # p3 = p3.prod(0)
+
+        # p3 = scipy.signal.correlate(p2, p1, mode='same')
+
+        # pnorm = scipy.signal.correlate(1 + 0 * new_images[0], 1 + 0 * new_images[0], mode='same').mean(0) / new_images[0].size
+        # p1 /= pnorm
+        # p2 /= pnorm
+        # p3 /= pnorm
+
+        # p1 = scipy.signal.correlate(new_images, new_images, mode='full') / new_images.size
+        # norm = p1.max((~1, ~0)).sum()
+
+        p4 = p11 + p21 + p31 + p12 + p22 + p32
+        # p2 = p1.max((0, 1))
+        # p2 = scipy.signal.correlate(new_images, new_images, mode='same')
+        # p3 = scipy.signal.correlate(new_images, new_images, mode='same')
+        # p4 = p1 * p2 * p3
+        # p5 = p4.prod(0)
+
+        # prenorm = ir * (new_images[3] - new_images[2] + new_images[1] - new_images[0])
+        norm = -(p11.max() + p21.max() + p31.max() + p12.max() + p22.max() + p32.max()) / 6
+
+        lag11 = np.array(np.unravel_index(np.argmax(p11), p11.shape)) - np.array(p11.shape) // 2
+        lag21 = np.array(np.unravel_index(np.argmax(p21), p21.shape)) - np.array(p21.shape) // 2
+        lag31 = np.array(np.unravel_index(np.argmax(p31), p31.shape)) - np.array(p31.shape) // 2
+        lag12 = np.array(np.unravel_index(np.argmax(p12), p12.shape)) - np.array(p12.shape) // 2
+        lag22 = np.array(np.unravel_index(np.argmax(p22), p22.shape)) - np.array(p22.shape) // 2
+        lag32 = np.array(np.unravel_index(np.argmax(p32), p32.shape)) - np.array(p32.shape) // 2
+
+        new_images[0, 0] = np.roll(new_images[0, 0], -lag11, axis=(~1, ~0))
+        new_images[2, 0] = np.roll(new_images[2, 0], -lag21, axis=(~1, ~0))
+        new_images[3, 0] = np.roll(new_images[3, 0], -lag31, axis=(~1, ~0))
+        new_images[0, 1] = np.roll(new_images[0, 1], -lag12, axis=(~1, ~0))
+        new_images[2, 1] = np.roll(new_images[2, 1], -lag22, axis=(~1, ~0))
+        new_images[3, 1] = np.roll(new_images[3, 1], -lag32, axis=(~1, ~0))
+
+        d1 = np.nanmean(np.square(new_images[0] - new_images[1]))
+        d2 = np.nanmean(np.square(new_images[2] - new_images[1]))
+        d3 = np.nanmean(np.square(new_images[3] - new_images[1]))
+        norm = np.sqrt((d1 + d2 + d3) / 3)
+
+        if plot_steps:
+
+            norm_base = new_images[3] - new_images[2] + new_images[1] - new_images[0]
+            norm_base = norm_base.value
+            _, axs = plt.subplots(ncols=2, figsize=(12, 6))
+            axs[0].imshow(norm_base[0], vmin=np.nanpercentile(norm_base[0], 2), vmax=np.nanpercentile(norm_base[0], 98))
+            axs[1].imshow(norm_base[1], vmin=np.nanpercentile(norm_base[1], 2), vmax=np.nanpercentile(norm_base[1], 98))
+            plt.show()
+
+
+            print('detector.roll', other.detector.roll)
+            print('detector.inclination', other.detector.inclination)
+            print('detector.twist', other.detector.twist)
+            # print('grating.piston', other.grating.piston)
+            print('detector.piston', other.detector.piston)
+            # print('grating.ruling_density', other.grating.ruling_density)
+            # print('grating.roll', other.grating.roll)
+            # print('grating.inclination', other.grating.inclination)
+            # print('detector.cylindrical_radius', other.detector.cylindrical_radius)
+            # print('grating.twist', other.grating.twist)
+            # print('detector.cylindrical_azimuth', other.detector.cylindrical_azimuth)
+            print('lags1', lag11, lag21, lag31, )
+            print('lags2', lag12, lag22, lag32, )
+            print(norm)
+            print()
+
+
+
+        # nw = np.roll(new_images, 1, axis=1)
+        # norm += np.nanmean(np.square(n1 - nw))
+        # norm += np.nanmean(np.square(n2 - nw))
+        # norm += np.nanmean(np.square(n3 - nw))
+        # norm += np.sqrt(np.nanmean(np.square(new_images - ir)))
+        # norm /= 6
+        # norm = np.sqrt(norm)
+        # norm /= 3
+
+
+
+        # print('grating.piston', other.grating.piston)
+        # print('grating.cylindrical_radius', other.grating.cylindrical_radius)
+        # print('grating.cylindrical_azimuth', other.grating.cylindrical_azimuth)
+        # print('detector.cylindrical_radius', other.detector.cylindrical_radius)
+        # print('detector.cylindrical azimuth', other.detector.cylindrical_azimuth)
+        # print('OV wavelength', other.wavelengths[~0])
+        # print('grating.radius', other.grating.tangential_radius)
         # print('grating.ruling_density', other.grating.ruling_density)
-        # # print('vignetting.x', vig_model.coefficients[2].flatten())
-        # # print('vignetting.y', vig_model.coefficients[3].flatten())
-        # # print('central_obscuration.position_error', other.central_obscuration.position_error)
-        print(norm)
-        # print()
+        # print('vignetting.x', vig_model.coefficients[2].flatten())
+        # print('vignetting.y', vig_model.coefficients[3].flatten())
+        # print('central_obscuration.position_error', other.central_obscuration.position_error)
+
+
+        # plt.show()
+
         return norm
 
     def fit_to_images(
@@ -498,9 +940,9 @@ class Optics(mixin.Named):
             local_search: bool = True,
             global_samples: int = 128,
             local_samples: int = 256,
+            plot_steps: bool = False,
+            oversize_ratio: int = 1.1,
     ) -> 'Optics':
-
-
 
         images = np.broadcast_to(images[:, None], images.shape[:1] + (2,) + images.shape[1:], subok=True)
 
@@ -516,76 +958,98 @@ class Optics(mixin.Named):
         # g_phi = np.broadcast_to(other.grating.cylindrical_azimuth, sh, subok=True)
 
 
-        # d_r = np.broadcast_to(other.detector.cylindrical_radius, sh, subok=True)
-        # d_phi = np.broadcast_to(other.detector.cylindrical_azimuth, sh, subok=True)
+        d_r = np.broadcast_to(other.detector.cylindrical_radius, sh, subok=True)
+        d_phi = np.broadcast_to(other.detector.cylindrical_azimuth, sh, subok=True)
         d_z = np.broadcast_to(other.detector.piston, sh, subok=True)
         d_inclination = np.broadcast_to(other.detector.inclination, sh, subok=True)
         d_roll = np.broadcast_to(other.detector.roll, sh, subok=True)
         d_twist = np.broadcast_to(other.detector.twist, sh, subok=True)
-        # g_z = np.broadcast_to(other.grating.piston, sh, subok=True)
+        g_z = np.broadcast_to(other.grating.piston, sh, subok=True)
         g_T = np.broadcast_to(other.grating.ruling_density, sh, subok=True)
         # g_r = np.broadcast_to(other.grating.tangential_radius, sh, subok=True)
         # wavl = other.wavelengths[~0:]
-        # t_position = other.central_obscuration.position_error
+        t_position = other.central_obscuration.position_error
         # vig_model = other.rays_output.vignetting(polynomial_degree=1).model(inverse=True)
         # v_x = vignetting.model(inverse=True)
         # v_x = np.broadcast_to(0 / u.percent / u.deg, sh, subok=True)
         # v_y = np.broadcast_to(0 / u.percent / u.deg, sh, subok=True)
 
         x0 = np.concatenate([
-            g_roll.value,
-            g_inclination.value,
-            g_twist.value,
-            # d_r.value,
-            # d_phi.value,
-            d_z.value,
-            d_inclination.value,
+
             d_roll.value,
+            d_inclination.value,
             d_twist.value,
             # g_z.value,
-            g_T.value,
+            d_z.value,
+            # g_T.value,
+            # g_roll.value,
+            # g_inclination.value,
+            # d_r.value,
+            # g_twist.value,
+            # d_phi.value,
+
+
+
+
+
+
+
+
+
             # g_r.value,
             # wavl.value,
             # v_x.value,
             # v_y.value,
         ])
-        # x0 = np.append(x0, [
-        #     t_position[vector.x].value,
-        #     t_position[vector.y].value,
-        # ])
         bounds = np.concatenate([
-            (g_roll[..., None] + [-1, 1] * u.deg).value,
-            (g_inclination[..., None] + [-0.03, 0.03] * u.deg).value,
-            (g_twist[..., None] + [-0.02, 0.02] * u.deg).value,
+
+            (d_roll[..., None] + [-1, 1] * u.deg).value,
+            (d_inclination[..., None] + [-2, 2] * u.deg).value,
+            (d_twist[..., None] + [-2, 2] * u.deg).value,
             # (g_z[..., None] + [-5, 5] * u.mm).value,
+            (d_z[..., None] + [-10, 10] * u.mm).value,
+            # (g_T[..., None] + [-5, 5] / u.mm).value,
+            # (g_roll[..., None] + [-2, 2] * u.deg).value,
+            # (g_inclination[..., None] + [-0.02, 0.02] * u.deg).value,
+            # (d_r[..., None] + [-1, 1] * u.mm).value,
+            # (g_twist[..., None] + [-0.02, 0.02] * u.deg).value,
+            # (d_phi[..., None] + [-2, 2] * u.deg).value,
+
+
+
+
             # (g_r[..., None] + [-5, 5] * u.mm).value,
             # (g_phi[..., None] + [-2, 2] * u.deg).value,
-            # (d_r[..., None] + [-1, 1] * u.mm).value,
-            # (d_phi[..., None] + [-2, 2] * u.deg).value,
-            (d_z[..., None] + [-5, 5] * u.mm).value,
-            (d_inclination[..., None] + [-0.5, 0.5] * u.deg).value,
-            (d_roll[..., None] + [-1.5, 1.5] * u.deg).value,
-            (d_twist[..., None] + [-0.1, 0.1] * u.deg).value,
+
+
+
             # (g_z[..., None] + [-0.1, 0.1] * u.mm).value,
-            (g_T[..., None] + [-1, 1] / u.mm).value,
+
+
             # (g_r[..., None] + [-5, 5] * u.mm).value,
             # (wavl[..., None] + [-1, 1] * u.AA).value,
             # (v_x[..., None] + [-1e-5, 1e-5] / u.percent / u.arcsec).to(0 / u.percent / u.deg).value,
             # (v_y[..., None] + [-1e-5, 1e-5] / u.percent / u.arcsec).to(0 / u.percent / u.deg).value,
         ])
-        # bounds = np.append(bounds, [
-        #     (t_position[vector.x][..., None] + [-2, 2] * u.mm).value,
-        #     (t_position[vector.y][..., None] + [-2, 2] * u.mm).value,
-        # ], axis=0)
         if global_search:
+            def cb(xk, convergence):
+                print(convergence)
+                other._fit_func(xk, images, global_samples, True)
             result = scipy.optimize.differential_evolution(
+            # result = scipy.optimize.shgo(
                 func=other._fit_func,
                 bounds=bounds,
-                args=(images.value, global_samples),
+                args=(images, global_samples, plot_steps, oversize_ratio),
+                # options={
+                #     'disp': True
+                # }
                 disp=True,
-                # mutation=(0.1, 1),
-                polish=False,
-                # popsize=15,
+                # mutation=0.1,
+                # polish=False,
+                popsize=60,
+                workers=-1,
+                callback=cb,
+                tol=1e-3,
             )
             x0 = result.x
         if local_search:
@@ -595,21 +1059,348 @@ class Optics(mixin.Named):
                 fun=other._fit_func,
                 x0=x0,
                 bounds=bounds,
+                # method='Powell',
                 method='L-BFGS-B',
                 options={
-                    # 'gtol': 1e-2,
-                    'eps': 0.001,
+                    'disp': True,
+                    # 'xtol': 1e-4,
+                    'ftol': 1e-4,
                     'maxcor': 1000,
+                    # 'maxiter': 0,
+                    # 'gtol': 1e-2,
+                    'eps': 1e-2,
                     # 'finite-diff_rel_step': 0.1
                 },
-                args=(images.value, local_samples),
+                callback=lambda xk: other._fit_func(xk, images, local_samples, True, oversize_ratio),
+                args=(images, local_samples, plot_steps, oversize_ratio),
             )
 
         return other._fit_factory(result.x)
 
+    def _fit_grating_roll_ruling_factory(self, x: np.ndarray, ) -> 'Optics':
+        other = self.copy()
+        x = x.reshape((-1, 4))
+        (
+            g_roll,
+            g_T,
+            # d_roll,
+        ) = x
+        other.grating.roll = g_roll << u.deg
+        other.grating.ruling_density = g_T / u.mm
+        # other.detector.roll = d_roll << u.deg
+        return other
+
+    def _fit_grating_roll_ruling_func(
+            self,
+            x: np.ndarray,
+            images: u.Quantity,
+            spatial_samples: int = 100,
+            plot_steps: bool = False,
+            oversize_ratio: int = 1.1,
+    ) -> float:
+
+        other = self._fit_grating_roll_ruling_factory(x)
+
+        images = images / np.median(images)
+
+        new_images = other(
+            data=images,
+            wavelength=other.wavelengths[::2],
+            spatial_domain_input=[[0, 0], images.shape[~1:]] * u.pix,
+            spatial_domain_output=oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max]),
+            spatial_samples_output=spatial_samples,
+            inverse=True,
+        )
+
+        # distortion = other.rays_output.distortion(polynomial_degree=2)
+        # wavelength = distortion.wavelength[:, ::2, 0, 0]
+        # spatial_domain = oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max])
+        # pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
+        # new_images = distortion.distort_cube(
+        #     cube=images,
+        #     wavelength=wavelength,
+        #     spatial_domain_input=pixel_domain,
+        #     spatial_domain_output=spatial_domain,
+        #     spatial_samples_output=spatial_samples,
+        #     inverse=True,
+        #     fill_value=np.nan,
+        # )
+        # vignetting = other.rays_output.vignetting(polynomial_degree=1)
+        # new_images = vignetting(
+        #     cube=new_images,
+        #     wavelength=wavelength,
+        #     spatial_domain=spatial_domain,
+        #     inverse=True,
+        # )
+        new_images_nonan = np.nan_to_num(new_images)
+        ref_image = new_images_nonan[1]
+
+        # p11 = scipy.signal.correlate(new_images[0, 0], ref_image[0], mode='full') / ref_image.size
+        # p21 = scipy.signal.correlate(new_images[2, 0], ref_image[0], mode='full') / ref_image.size
+        # p31 = scipy.signal.correlate(new_images[3, 0], ref_image[0], mode='full') / ref_image.size
+        # p12 = scipy.signal.correlate(new_images[0, 1], ref_image[1], mode='full') / ref_image.size
+        # p22 = scipy.signal.correlate(new_images[2, 1], ref_image[1], mode='full') / ref_image.size
+        # p32 = scipy.signal.correlate(new_images[3, 1], ref_image[1], mode='full') / ref_image.size
+        #
+        # p1 = (p11 + p12) / 2
+        # p2 = (p21 + p22) / 2
+        # p3 = (p31 + p32) / 2
+
+        p1 = scipy.signal.correlate(new_images_nonan[0], ref_image, mode='same') / ref_image.size
+        p2 = scipy.signal.correlate(new_images_nonan[2], ref_image, mode='same') / ref_image.size
+        p3 = scipy.signal.correlate(new_images_nonan[3], ref_image, mode='same') / ref_image.size
+
+        p1 = p1.prod(0)
+        p2 = p2.prod(0)
+        p3 = p3.prod(0)
+
+        lag1 = np.array(np.unravel_index(np.argmax(p1), p1.shape)) - np.array(p1.shape) // 2
+        lag2 = np.array(np.unravel_index(np.argmax(p2), p2.shape)) - np.array(p2.shape) // 2
+        lag3 = np.array(np.unravel_index(np.argmax(p3), p3.shape)) - np.array(p3.shape) // 2
+
+        new_images[0] = np.roll(new_images[0], -lag1, axis=(~1, ~0))
+        new_images[2] = np.roll(new_images[2], -lag2, axis=(~1, ~0))
+        new_images[3] = np.roll(new_images[3], -lag3, axis=(~1, ~0))
+
+        d1 = np.nanmean(np.square(new_images[0] - new_images[1]))
+        d2 = np.nanmean(np.square(new_images[2] - new_images[1]))
+        d3 = np.nanmean(np.square(new_images[3] - new_images[1]))
+        norm = np.sqrt((d1 + d2 + d3) / 3)
+
+        if plot_steps:
+
+            norm_base = new_images[3] - new_images[2] + new_images[1] - new_images[0]
+            norm_base = norm_base.value
+            _, axs = plt.subplots(ncols=2, figsize=(12, 6))
+            axs[0].imshow(norm_base[0], vmin=np.nanpercentile(norm_base[0], 2), vmax=np.nanpercentile(norm_base[0], 98))
+            axs[1].imshow(norm_base[1], vmin=np.nanpercentile(norm_base[1], 2), vmax=np.nanpercentile(norm_base[1], 98))
+            plt.show()
+
+        # norm = -(p1.max() + p2.max() + p3.max())
+
+            print('grating.roll', other.grating.roll)
+            print('grating.ruling_density', other.grating.ruling_density)
+            print('lags', lag1, lag2, lag3)
+            print(norm)
+            print()
+
+        return norm
+
+    def fit_grating_roll_ruling_to_images(
+            self,
+            images: u.Quantity,
+            spatial_samples: int = 512,
+            plot_steps: bool = False,
+            oversize_ratio: int = 1.1,
+    ) -> 'Optics':
+
+        images = np.broadcast_to(images[:, None], images.shape[:1] + (2,) + images.shape[1:], subok=True)
+
+        sh = images.shape[:1]
+
+        other = self.copy()
+
+        g_roll = np.broadcast_to(other.grating.roll, sh, subok=True)
+        g_T = np.broadcast_to(other.grating.ruling_density, sh, subok=True)
+        d_roll = np.broadcast_to(other.detector.roll, sh, subok=True)
+
+        x0 = np.concatenate([
+            g_roll.value,
+            g_T.value,
+            # d_roll.value,
+        ])
+        bounds = np.concatenate([
+            (g_roll[..., None] + [-2, 2] * u.deg).value,
+            (g_T[..., None] + [-10, 10] / u.mm).value,
+            # (g_roll[..., None] + [-2, 2] * u.deg).value,
+        ])
+
+        result = scipy.optimize.minimize(
+            fun=other._fit_grating_roll_ruling_func,
+            x0=x0,
+            bounds=bounds,
+            method='L-BFGS-B',
+            options={
+                'disp': True,
+                # 'xtol': 1e-4,
+                'ftol': 1e-4,
+                'eps': 1e-2,
+            },
+            callback=lambda xk: other._fit_grating_roll_ruling_func(xk, images, spatial_samples, True, oversize_ratio),
+            args=(images, spatial_samples, plot_steps, oversize_ratio),
+        )
+
+        return other._fit_grating_roll_ruling_factory(result.x)
+
+    def _fit_grating_inclination_twist_factory(self, x: np.ndarray, ) -> 'Optics':
+        other = self.copy()
+        x = x.reshape((-1, 4))
+        (
+            g_inclination,
+            g_twist,
+
+        ) = x
+        other.grating.inclination = g_inclination << u.deg
+        other.grating.twist = g_twist << u.deg
+        return other
+
+    def _fit_grating_inclination_twist_func(
+            self,
+            x: np.ndarray,
+            images: u.Quantity,
+            spatial_samples: int = 100,
+            plot_steps: bool = False,
+            oversize_ratio: int = 1.1,
+    ) -> float:
+
+        other = self._fit_grating_inclination_twist_factory(x)
+
+        images = images / np.median(images)
+
+        new_images = other(
+            data=images,
+            wavelength=other.wavelengths[::2],
+            spatial_domain_input=[[0, 0], images.shape[~1:]] * u.pix,
+            spatial_domain_output=oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max]),
+            spatial_samples_output=spatial_samples,
+            inverse=True,
+        )
+
+        # distortion = other.rays_output.distortion(polynomial_degree=2)
+        # wavelength = distortion.wavelength[:, ::2, 0, 0]
+        # spatial_domain = oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max])
+        # pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
+        # new_images = distortion.distort_cube(
+        #     cube=images,
+        #     wavelength=wavelength,
+        #     spatial_domain_input=pixel_domain,
+        #     spatial_domain_output=spatial_domain,
+        #     spatial_samples_output=spatial_samples,
+        #     inverse=True,
+        #     fill_value=np.nan,
+        # )
+        # vignetting = other.rays_output.vignetting(polynomial_degree=1)
+        # new_images = vignetting(
+        #     cube=new_images,
+        #     wavelength=wavelength,
+        #     spatial_domain=spatial_domain,
+        #     inverse=True,
+        # )
+        # new_images_nonan = np.nan_to_num(new_images)
+        # ref_image = new_images_nonan[1]
+        #
+        # p1 = scipy.signal.correlate(new_images_nonan[0], ref_image, mode='same') / ref_image.size
+        # p2 = scipy.signal.correlate(new_images_nonan[2], ref_image, mode='same') / ref_image.size
+        # p3 = scipy.signal.correlate(new_images_nonan[3], ref_image, mode='same') / ref_image.size
+        #
+        # p1 = p1.prod(0)
+        # p2 = p2.prod(0)
+        # p3 = p3.prod(0)
+        #
+        # lag1 = np.array(np.unravel_index(np.argmax(p1), p1.shape)) - np.array(p1.shape) // 2
+        # lag2 = np.array(np.unravel_index(np.argmax(p2), p2.shape)) - np.array(p2.shape) // 2
+        # lag3 = np.array(np.unravel_index(np.argmax(p3), p3.shape)) - np.array(p3.shape) // 2
+
+        # p4 = scipy.signal.correlate(new_images, new_images, mode='same') / new_images.size
+        # p4 = p4.prod((0, 1))
+        # norm = -(p4.max())
+
+        d1 = np.nanmean(np.square(new_images[0] - new_images[1]))
+        d2 = np.nanmean(np.square(new_images[2] - new_images[1]))
+        d3 = np.nanmean(np.square(new_images[3] - new_images[1]))
+        norm = np.sqrt((d1 + d2 + d3) / 3)
+
+        # d1 = np.sum(np.square(lag1), axis=0)
+        # d2 = np.sum(np.square(lag2), axis=0)
+        # d3 = np.sum(np.square(lag3), axis=0)
+        # norm = np.sqrt((d1 + d2 + d3) / 3)
 
 
+        # lag1 = np.array(np.unravel_index(np.argmax(p1), p1.shape)) - np.array(p1.shape) // 2
+        # lag2 = np.array(np.unravel_index(np.argmax(p2), p2.shape)) - np.array(p2.shape) // 2
+        # lag3 = np.array(np.unravel_index(np.argmax(p3), p3.shape)) - np.array(p3.shape) // 2
 
+        if plot_steps:
+            norm_base = new_images[3] - new_images[2] + new_images[1] - new_images[0]
+            norm_base = norm_base.value
+            _, axs = plt.subplots(ncols=2, figsize=(12, 6))
+            axs[0].imshow(norm_base[0], vmin=np.nanpercentile(norm_base[0], 2), vmax=np.nanpercentile(norm_base[0], 98))
+            axs[1].imshow(norm_base[1], vmin=np.nanpercentile(norm_base[1], 2), vmax=np.nanpercentile(norm_base[1], 98))
+            plt.show()
+
+
+            print('grating.inclination', other.grating.inclination - self.grating.inclination)
+            print('grating.twist', other.grating.twist - self.grating.twist)
+            print(norm)
+            print()
+
+        return norm
+
+    def fit_grating_inclination_twist_to_images(
+            self,
+            images: u.Quantity,
+            spatial_samples: int = 512,
+            plot_steps: bool = False,
+            oversize_ratio: int = 1.1,
+    ) -> 'Optics':
+
+        images = np.broadcast_to(images[:, None], images.shape[:1] + (2,) + images.shape[1:], subok=True)
+
+        sh = images.shape[:1]
+
+        other = self.copy()
+
+        g_inclination = np.broadcast_to(other.grating.inclination, sh, subok=True)
+        g_twist = np.broadcast_to(other.grating.twist, sh, subok=True)
+
+        x0 = np.concatenate([
+            g_inclination.value,
+            g_twist.value,
+        ])
+        bounds = np.concatenate([
+            (g_inclination[..., None] + [-0.06, 0.06] * u.deg).value,
+            (g_twist[..., None] + [-0.15, 0.15] * u.deg).value,
+        ])
+
+        result = scipy.optimize.minimize(
+            fun=other._fit_grating_inclination_twist_func,
+            x0=x0,
+            bounds=bounds,
+            method='L-BFGS-B',
+            options={
+                'disp': True,
+                # 'xtol': 1e-4,
+                'ftol': 1e-4,
+                'eps': 1e-4,
+            },
+            callback=lambda xk: other._fit_grating_inclination_twist_func(
+                xk, images, spatial_samples, True, oversize_ratio),
+            args=(images, spatial_samples, plot_steps, oversize_ratio),
+        )
+
+        return other._fit_grating_inclination_twist_factory(result.x)
+
+    def fit_to_images_final(
+            self,
+            images: u.Quantity,
+            spatial_samples: int = 512,
+            num_iterations: int = 2,
+            plot_steps: bool = False,
+    ) -> 'Optics':
+        other = self.copy()
+
+        oversize_ratio = 1.3
+
+        for i in range(num_iterations):
+            other = other.fit_to_images(
+                images=images, global_search=False, local_samples=spatial_samples, plot_steps=plot_steps,
+                oversize_ratio=oversize_ratio)
+            other = other.fit_grating_roll_ruling_to_images(
+                images=images, spatial_samples=spatial_samples, plot_steps=plot_steps, oversize_ratio=oversize_ratio)
+            other = other.fit_grating_inclination_twist_to_images(
+                images=images, spatial_samples=spatial_samples, plot_steps=plot_steps, oversize_ratio=1.4)
+
+        return other
 
     def apply_poletto_layout(
             self,

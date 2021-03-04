@@ -1,11 +1,14 @@
-"""
+r"""
 
 .. jupyter-execute::
 
     import matplotlib.pyplot as plt
     import matplotlib.colors
+    import IPython.display
     from kgpy import vector, optics
     import esis
+
+    IPython.display.set_matplotlib_formats('svg')
 
 Layout
 ------
@@ -80,10 +83,15 @@ Vignetting
     ).rays_output
 
     vignetting_linear = rays.vignetting(polynomial_degree=1)
-    vignetting_linear.model().dataframe
+    vignetting_linear.model().dataframe.to_html()
 
 Distortion
 ----------
+
+.. math::
+
+   (a + b)^2  &=  (a + b)(a + b) \\
+              &=  a^2 + 2ab + b^2
 
 """
 import numpy as np
@@ -189,7 +197,6 @@ def final(
     detector.readout_noise_tap2 = 4 * u.ct
     detector.readout_noise_tap3 = 4 * u.ct
     detector.readout_noise_tap4 = 4 * u.ct
-
 
     field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = Source()

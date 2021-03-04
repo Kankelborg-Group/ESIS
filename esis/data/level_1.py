@@ -1,41 +1,69 @@
 import typing as typ
 import dataclasses
-import warnings
 import pathlib
-import numpy as np
-from astropy.io import fits
 import tarfile
+import numpy as np
+import astropy.io.fits
 import astropy.units as u
-import astropy.time
-from kgpy import mixin, img, observatories
-from kgpy.img import mask as img_mask
-import esis.optics
+import kgpy.mixin
+import kgpy.obs
+import kgpy.img
+import kgpy.img.mask
+import kgpy.nsroc
 from . import Level_0
+import esis
 
 __all__ = ['Level_1']
 
 
 @dataclasses.dataclass
-class Level_1(observatories.Obs, mixin.Pickleable):
-    detector: typ.Optional[esis.optics.Detector] = None
-    sequence_metadata: np.ndarray = None
-    analog_metadata: np.ndarray = None
+class Level_1(kgpy.obs.Image):
+    optics: esis.optics.Optics = None
+    # detector: typ.Optional[esis.optics.Detector] = None
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.update()
+
+    def update(self) -> typ.NoReturn:
+        self._despike_result = None
 
     @classmethod
-    def from_level_0(cls, lev0: Level_0, despike: bool = False) -> 'Level_1':
-        intensity = lev0.intensity_signal
-
+    def from_level_0(cls, level_0: Level_0) -> 'Level_1':
         return cls(
-            intensity=intensity,
-            time=lev0.time_signal,
-            exposure_length=lev0.requested_exposure_time_signal,
-            channel=lev0.channel_signal,
-            time_index=lev0.time_index_signal,
-            detector=lev0.detector
+            intensity=level_0.intensity_signal,
+            time=level_0.time_signal,
+            exposure_length=level_0.exposure_length_signal,
+            channel=level_0.channel,
+            time_index=level_0.time_index_signal,
+            optics=level_0.optics
+            # detector=lev0.detector,
         )
 
     def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:
-        return self.detector.convert_adu_to_photons(self.intensity, wavelength)
+        return self.optics.detector.convert_electrons_to_photons(self.intensity, wavelength)
+
+    @property
+    def despike_result(self):
+        if self._despike_result is None:
+            intensity, mask, stats = kgpy.img.spikes.identify_and_fix(
+                data=self.intensity.value,
+                axis=(0, 2, 3),
+                percentile_threshold=(0, 99.9),
+                poly_deg=1,
+            )
+            intensity = intensity << self.intensity.unit
+            self._despike_result = intensity, mask, stats
+        return self._despike_result
+
+
+    @property
+    def intensity_despiked(self):
+        return self.despike_result[0]
+
+    @property
+    def spikes(self):
+        return self.intensity - self.intensity_despiked
 
     def create_mask(self, sequence):
         import matplotlib.pyplot as plt
@@ -49,9 +77,9 @@ class Level_1(observatories.Obs, mixin.Pickleable):
             fig, ax = plt.subplots()
             ax.imshow(img, cmap='gray_r', norm=colors.SymLogNorm(1))
 
-            poly = Polygon(img_mask.default_vertices(ax), animated=True, facecolor='none')
+            poly = Polygon(kgpy.img.mask.default_vertices(ax), animated=True, facecolor='none')
             ax.add_patch(poly)
-            p = img_mask.PolygonInteractor(ax, poly)
+            p = kgpy.img.mask.PolygonInteractor(ax, poly)
 
             ax.set_title('Click and drag a vertex to move it. Press "i" and near line to insert. \n '
                          'Click and hold vertex then press "d" to delete. \n'
@@ -80,14 +108,14 @@ class Level_1(observatories.Obs, mixin.Pickleable):
                 name = 'ESIS_Level1_' + str(self.time[sequence, camera]) + '_' + str(camera + 1) + '.fits'
                 filename = path / name
 
-                hdr = fits.Header()
+                hdr = astropy.io.fits.Header()
                 hdr['CAM_ID'] = self.channel[sequence, camera]
                 hdr['DATE_OBS'] = str(self.time[sequence, camera])
                 hdr['IMG_EXP'] = self.exposure_length[sequence, camera]
 
-                hdul = fits.HDUList()
+                hdul = astropy.io.fits.HDUList()
 
-                hdul.append(fits.PrimaryHDU(np.array(self.intensity[sequence, camera, ...]), hdr))
+                hdul.append(astropy.io.fits.PrimaryHDU(np.array(self.intensity[sequence, camera, ...]), hdr))
 
                 hdul.writeto(filename, overwrite=True)
 
@@ -97,3 +125,6 @@ class Level_1(observatories.Obs, mixin.Pickleable):
             tar.add(path, arcname=path.name)
 
         return
+
+    def optics_fit(self, guess: esis.optics.Optics):
+        pass

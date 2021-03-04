@@ -14,6 +14,7 @@ setup(
         'astropy-sphinx-theme',
         'kgpy @ git+https://github.com/Kankelborg-Group/kgpy.git#egg=kgpy',
         'ndcube',
+        'keras',
     ],
     url='https://github.com/Kankelborg-Group/ESIS',
     license='',

@@ -14,7 +14,7 @@ SurfaceT = optics.surface.Surface[None, None, optics.surface.aperture.RegularPol
 class CentralObscuration(optics.component.PistonComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('obscuration'))
     obscured_half_width: u.Quantity = 0 * u.mm
-    position_error: u.Quantity = dataclasses.field(default_factory=lambda: vector.from_components() * u.mm)
+    position_error: vector.Vector3D = dataclasses.field(default_factory=vector.Vector3D.spatial)
 
     @property
     def obscured_radius(self) -> u.Quantity:
@@ -28,8 +28,8 @@ class CentralObscuration(optics.component.PistonComponent[SurfaceT]):
         surface.aperture = optics.surface.aperture.IrregularPolygon(
         # surface.aperture = optics.aperture.RegularPolygon(
             is_obscuration=True,
-            decenter=transform.rigid.Translate(self.position_error),
-            vertices=vector.from_components_cylindrical(self.obscured_radius, angles),
+            decenter=transform.rigid.Translate.from_vector(self.position_error),
+            vertices=vector.Vector3D.from_cylindrical(radius=self.obscured_radius, azimuth=angles, z=0*u.mm),
             # radius=self.obscured_radius,
             # num_sides=self.num_sides,
             # offset_angle=360 * u.deg / self.num_sides / 2,
