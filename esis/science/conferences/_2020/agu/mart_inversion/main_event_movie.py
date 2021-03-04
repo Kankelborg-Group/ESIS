@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from matplotlib import colors
 import kgpy.img.coalignment.image_coalignment as img_align
-from kgpy.observatories import aia
+from kgpy.observatories.sdo import aia
 from esis.data import level_3, level_4
 import astropy.units as u
 import scipy.ndimage
@@ -32,7 +31,7 @@ if __name__ == '__main__':
     ### NOTE likely a bug in Level 3 wcs that requires a swap axes here
     l3_img_wcs = lev3.observation[:, 0, event_location[0], event_location[1]].wcs.dropaxis(-1).dropaxis(-1).swapaxes(1, 0)
 
-    aia_304 = aia.AIA.from_time_range(times[0], times[-1]+100 * u.s, channels=[304 * u.AA], user_email='jacobdparker@gmail.com')
+    aia_304 = aia.AIA.from_time_range(times[0], times[-1] + 100 * u.s, channels=[304 * u.AA], user_email='jacobdparker@gmail.com')
 
     aia_304_imgs = []
     l3_imgs = []
