@@ -11,6 +11,7 @@ import astropy.visualization
 import scipy.stats
 import scipy.interpolate
 import scipy.optimize
+import kgpy.model
 import kgpy.obs
 import kgpy.nsroc
 import kgpy.observatories
@@ -36,7 +37,8 @@ class Level_0(
     adc_temp_2: typ.Optional[u.Quantity] = None
     adc_temp_3: typ.Optional[u.Quantity] = None
     adc_temp_4: typ.Optional[u.Quantity] = None
-    detector: typ.Optional[esis.optics.Detector] = None
+    # detector: typ.Optional[esis.optics.Detector] = None
+    optics: typ.Optional[esis.optics.Optics] = None
     trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None
     timeline: typ.Optional[kgpy.nsroc.Timeline] = None
     caching: bool = False
@@ -75,12 +77,10 @@ class Level_0(
         fits_list = fits_list.reshape((num_channels, -1))
         fits_list = fits_list.transpose()
         bad_exposures = 2
-        # bad_exposures = 0
         num_exposures = len(fits_list) - bad_exposures
 
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
-        # self.exposure_length = self.exposure_length * u.adu / u.s
         self.detector = detector
         self.trajectory_raw = trajectory_raw
         self.timeline = timeline
@@ -150,8 +150,10 @@ class Level_0(
 
         if self._trajectory is None:
 
-            # signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
-            signal = self.intensity.mean(self.axis.xy)
+            signal = np.mean(self.intensity_nobias, axis=self.axis.xy)
+            # signal = np.mean(self.intensity_nobias[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
+            # signal = np.median(self.intensity_nobias[..., 1024:], axis=self.axis.xy)
+            # signal = np.percentile(self.intensity_nobias, 75, axis=self.axis.xy)
 
             def objective(t: float):
                 trajectory = self.trajectory_raw.copy()
@@ -160,7 +162,7 @@ class Level_0(
                 apogee_index = self._calc_closest_index(trajectory.time_apogee)
                 altitude_up, altitude_down = altitude[:apogee_index], altitude[apogee_index:]
                 signal_up, signal_down = signal[:apogee_index], signal[apogee_index:]
-                mask = altitude_up > 200 * u.km
+                mask = altitude_up > 160 * u.km
                 result = 0
                 for i in range(self.num_channels):
                     signal_down_interp = scipy.interpolate.interp1d(altitude_down[..., i], signal_down[..., i])
@@ -170,17 +172,21 @@ class Level_0(
                 result = np.sqrt(result / self.num_channels)
                 return result
 
-            bound = self.exposure_length.mean()
+            bound = 4 * self.exposure_length.mean()
 
             time_offset, *_ = scipy.optimize.brute(
                 func=objective,
-                Ns=10,
+                Ns=100,
                 ranges=[[-bound.value, bound.value]],
             )
 
             self._trajectory = self.trajectory_raw.copy()
             self._trajectory.time_start = self._trajectory.time_start + time_offset * u.s
         return self._trajectory
+
+    @property
+    def altitude(self) -> u.Quantity:
+        return self.trajectory.altitude_interp(self.time)
 
     # @property
     # def intensity_derivative(self) -> u.Quantity:
@@ -248,10 +254,10 @@ class Level_0(
     @property
     def bias(self) -> u.Quantity:
         s1, s2 = [slice(None)] * self.axis.ndim, [slice(None)] * self.axis.ndim
-        s1[self.axis.x] = slice(self.num_ignored_bias_columns + 1, self.detector.npix_blank)
-        s2[self.axis.x] = slice(~(self.detector.npix_blank - 1), ~(self.num_ignored_bias_columns - 1))
+        s1[self.axis.x] = slice(self.num_ignored_bias_columns + 1, self.optics.detector.npix_blank)
+        s2[self.axis.x] = slice(~(self.optics.detector.npix_blank - 1), ~(self.num_ignored_bias_columns - 1))
         blank_pix = 2 * [s1] + 2 * [s2]
-        quadrants = self.detector.quadrants
+        quadrants = self.optics.detector.quadrants
         bias = np.empty(
             (self.shape[self.axis.time], self.shape[self.axis.channel], len(quadrants))) << self.intensity.unit
         for q in range(len(quadrants)):
@@ -270,7 +276,7 @@ class Level_0(
         intensity_nobias = self._intensity_nobias
         if intensity_nobias is None:
             intensity_nobias = self.intensity.copy()
-            quadrants = self.detector.quadrants
+            quadrants = self.optics.detector.quadrants
             bias = self.bias
             for q in range(len(quadrants)):
                 intensity_nobias[(...,) + quadrants[q]] -= bias[..., q, None, None]
@@ -290,18 +296,6 @@ class Level_0(
     def darks(self):
         return np.concatenate([self.darks_up, self.darks_down])
 
-    # @property
-    # def darks_nobias(self) -> u.Quantity:
-    #     if self._darks_nobias is None:
-    #         intensity = self.intensity_nobias
-    #         first_ind, last_ind = self.index_signal_first, self.index_signal_last + 1
-    #         self._darks_nobias = np.concatenate([intensity[:first_ind], intensity[last_ind:]])
-    #     return self._darks_nobias
-    #
-    # @property
-    # def dark_nobias(self) -> u.Quantity:
-    #     return np.median(self.darks_nobias, axis=self.axis.time)
-
     @property
     def dark(self):
         return np.median(self.darks, axis=self.axis.time)
@@ -317,23 +311,39 @@ class Level_0(
 
     @property
     def intensity_nobias_nodark_active(self):
-        return self.detector.remove_inactive_pixels(self.intensity_nobias_nodark)
+        return self.optics.detector.remove_inactive_pixels(self.intensity_nobias_nodark)
+
+    @property
+    def intensity_electrons(self) -> u.Quantity:
+        return self.optics.detector.convert_adu_to_electrons(self.intensity_nobias_nodark_active)
 
     @property
     def intensity_signal(self) -> u.Quantity:
-        return self.intensity_nobias_nodark_active[self.slice_signal]
+        return self.intensity_electrons[self.slice_signal]
 
     @property
     def time_signal(self) -> astropy.time.Time:
         return self.time[self.slice_signal]
 
     @property
-    def requested_exposure_time_signal(self) -> u.Quantity:
-        return self.requested_exposure_time[self.slice_signal]
+    def exposure_length_signal(self) -> u.Quantity:
+        return self.exposure_length[self.slice_signal]
 
     @property
     def time_index_signal(self) -> u.Quantity:
         return self.time_index[self.slice_signal]
+
+    @property
+    def absorption_atmosphere(self) -> kgpy.model.Logistic:
+        altitude_max = self.altitude.max()
+        signal = self.intensity_signal.mean(self.axis.xy)
+        return kgpy.model.Logistic.from_data_fit(
+            x=self.altitude[self.slice_signal],
+            y=signal,
+            amplitude_guess=signal.max(),
+            offset_x_guess=altitude_max / 2,
+            slope_guess=1 / altitude_max,
+        )
 
     # def plot_quantity_vs_index(
     #         self,
@@ -374,6 +384,13 @@ class Level_0(
         return self.plot_quantity_vs_index(
             ax=ax,
             a=self.intensity_nobias_nodark_active.mean(self.axis.xy),
+            a_name='mean signal',
+        )
+
+    def plot_intensity_electrons_mean(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
+        return self.plot_quantity_vs_index(
+            ax=ax,
+            a=self.intensity_electrons.mean(self.axis.xy),
             a_name='mean signal',
         )
 
@@ -460,26 +477,12 @@ class Level_0(
 
     def plot_dark(self, axs: typ.Optional[typ.MutableSequence[plt.Axes]] = None) -> typ.MutableSequence[plt.Axes]:
         axs[0].figure.suptitle('Median dark images')
-        return self.plot_time(images=self.dark_nobias, image_names=self.channel_labels, axs=axs, )
+        return self.plot_time(images=self.dark, image_names=self.channel_labels, axs=axs, )
 
     def plot_exposure_stats_vs_index(
             self, axs: typ.Sequence[plt.Axes],
     ) -> typ.Sequence[plt.Axes]:
-
-
-
-        # axs_2 = [ax.secondary_xaxis(
-        #     location='top',
-        #     functions=(self._time_to_index, self._index_to_time),
-        # ) for ax in axs]
-        # # axs_2[0].set_xlabel('exposure index')
-        # for ax in axs_2[1:]:
-        #     ax.set_xticklabels([])
-
-        axs2 = [None] * len(axs)
-
-        self.plot_intensity_nobias_nodark_active_mean(ax=axs[0])
-        # self.plot_intensity_derivative(ax=axs[1])
+        self.plot_intensity_electrons_mean(ax=axs[0])
         self.plot_exposure_length(ax=axs[1])
         self.plot_bias(ax=axs[2])
 
@@ -515,13 +518,18 @@ class Level_0(
 
     def plot_signal_vs_altitude(self, ax: plt.Axes, ) -> plt.Axes:
         with astropy.visualization.quantity_support():
-            altitude = self.trajectory.altitude_interp(self.time)
-            signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
+            altitude = self.altitude
+            signal = self.intensity_electrons.mean(self.axis.xy)
+            # signal = np.median(self.intensity_electrons[..., 1024:], axis=self.axis.xy)
+            # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
+            # signal = np.percentile(self.intensity_electrons, 75, axis=self.axis.xy)
+            absorption_model = self.absorption_atmosphere(altitude)
             for i in range(self.num_channels):
                 lines_up, = ax.plot(
                     altitude[self.slice_upleg, i],
                     signal[self.slice_upleg, i],
                     label=self.channel_labels[i] + ' mean signal, upleg',
+                    linestyle='-.',
                 )
                 lines_down, = ax.plot(
                     altitude[self.slice_downleg, i],
@@ -529,6 +537,12 @@ class Level_0(
                     label=self.channel_labels[i] + ' mean signal, downleg',
                     color=lines_up.get_color(),
                     linestyle='--',
+                )
+                lines_model = ax.plot(
+                    altitude[..., i],
+                    absorption_model[..., i],
+                    label=self.channel_labels[i] + ' modeled response',
+                    color=lines_up.get_color(),
                 )
 
         return ax
