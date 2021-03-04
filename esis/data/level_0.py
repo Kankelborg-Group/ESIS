@@ -21,9 +21,7 @@ __all__ = ['Level_0']
 
 
 @dataclasses.dataclass
-class Level_0(
-    kgpy.obs.Image,
-):
+class Level_0(kgpy.obs.Image):
     cam_sn: typ.Optional[np.ndarray] = None
     global_index: typ.Optional[np.ndarray] = None
     requested_exposure_time: typ.Optional[u.Quantity] = None
