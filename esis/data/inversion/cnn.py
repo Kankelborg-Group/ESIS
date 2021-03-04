@@ -134,10 +134,6 @@ class CNN(Inversion, mixin.Pickleable):
     def __call__(self, projections: obs.Image):
         pass
 
-    @staticmethod
-    def default_pickle_path() -> pathlib.Path:
-        return pathlib.Path(__file__).parent / 'cnn.pickle'
-
     def to_pickle(self, path: typ.Optional[pathlib.Path] = None):
         self.model_inverse.save(path.parent / (str(path.stem) + '.h5'))
         self.model_inverse = None

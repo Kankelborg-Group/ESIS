@@ -1,10 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-import matplotlib.colors as colors
 import astropy.units as u
-from kgpy.observatories import aia
-from kgpy.plot import CubeSlicer
+from kgpy.observatories.sdo import aia
 from esis.data import level_3
 from esis.science.papers.mission_paper import fig_path  # can't figure out relative import here
 import matplotlib.patheffects as PathEffects

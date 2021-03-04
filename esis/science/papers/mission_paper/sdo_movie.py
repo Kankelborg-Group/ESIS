@@ -1,14 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from matplotlib import colors
-import kgpy.img.coalignment.image_coalignment as img_align
-from kgpy.observatories import aia, hmi
-from esis.data import level_3, level_4
+from kgpy.observatories.sdo import hmi
+from esis.data import level_3
 import astropy.units as u
-import scipy.ndimage
-import pathlib
-from esis.flight import l3_events
 from kgpy.plot import CubeSlicer
 import pathlib
 

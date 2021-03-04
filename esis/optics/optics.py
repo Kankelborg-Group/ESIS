@@ -39,11 +39,6 @@ class Optics(mixin.Named, mixin.Pickleable):
         )
     )
 
-    @staticmethod
-    def default_pickle_path() -> pathlib.Path:
-        return pathlib.Path('optics.pickle')
-
-
     def __post_init__(self):
         self.update()
 

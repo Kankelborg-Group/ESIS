@@ -90,10 +90,6 @@ class Level_1(kgpy.obs.Image):
 
         return poly_list
 
-    @staticmethod
-    def default_pickle_path() -> pathlib.Path:
-        return pathlib.Path(__file__).parents[1] / 'flight/esis_Level1.pickle'
-
     @classmethod
     def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level_1':
         lev1 = super().from_pickle(path)

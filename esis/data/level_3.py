@@ -13,7 +13,7 @@ import kgpy.img.coalignment.image_coalignment as img_align
 import kgpy.img.mask as img_mask
 from esis.data import level_1
 import esis
-from kgpy.observatories import aia, hmi
+from kgpy.observatories.sdo import aia, hmi
 from kgpy.mixin import Pickleable
 
 import scipy.optimize
@@ -365,10 +365,6 @@ class Level_3(Pickleable):
 
         return vignette_correction
 
-    @staticmethod
-    def default_pickle_path() -> pathlib.Path:
-        return ov_final_path
-
     @classmethod
     def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level_3':
         obs = super().from_pickle(path)
@@ -433,7 +429,7 @@ class Level_3(Pickleable):
         hmi_obj = copy.deepcopy(self)
         times = self.time
         hmi_data = hmi.HMI.from_time_range(times[0] - 20 * u.s, times[-1] + 20 * u.s,
-                                          user_email='jacobdparker@gmail.com')
+                                           user_email='jacobdparker@gmail.com')
 
 
         transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
