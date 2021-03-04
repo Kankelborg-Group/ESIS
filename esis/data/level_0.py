@@ -61,7 +61,6 @@ class Level_0(
             detector: esis.optics.Detector,
             trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None,
             timeline: typ.Optional[kgpy.nsroc.Timeline] = None,
-            caching: bool = False,
             # num_dark_safety_frames: int = 1,
     ) -> 'Level_0':
         fits_list = np.array(list(directory.glob('*.fit*')))
