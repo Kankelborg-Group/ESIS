@@ -41,7 +41,6 @@ class Level_0(
     optics: typ.Optional[esis.optics.Optics] = None
     trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None
     timeline: typ.Optional[kgpy.nsroc.Timeline] = None
-    caching: bool = False
     # num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
 
@@ -83,7 +82,6 @@ class Level_0(
         self.detector = detector
         self.trajectory_raw = trajectory_raw
         self.timeline = timeline
-        self.caching = caching
         # self.num_dark_safety_frames = num_dark_safety_frames
 
         for i in range(num_exposures):
@@ -257,8 +255,8 @@ class Level_0(
         s2[self.axis.x] = slice(~(self.optics.detector.npix_blank - 1), ~(self.num_ignored_bias_columns - 1))
         blank_pix = 2 * [s1] + 2 * [s2]
         quadrants = self.optics.detector.quadrants
-        bias = np.empty(
-            (self.shape[self.axis.time], self.shape[self.axis.channel], len(quadrants))) << self.intensity.unit
+        bias_shape = (self.shape[self.axis.time], self.shape[self.axis.channel], len(quadrants))
+        bias = np.empty(bias_shape) << self.intensity.unit
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
@@ -272,16 +270,14 @@ class Level_0(
         -------
         Bias subtracted data
         """
-        intensity_nobias = self._intensity_nobias
-        if intensity_nobias is None:
+        if self._intensity_nobias is None:
             intensity_nobias = self.intensity.copy()
             quadrants = self.optics.detector.quadrants
             bias = self.bias
             for q in range(len(quadrants)):
-                intensity_nobias[(...,) + quadrants[q]] -= bias[..., q, None, None]
-            if self.caching:
-                self._intensity_nobias = intensity_nobias
-        return intensity_nobias
+                intensity_nobias[(...,) + quadrants[q]] -= bias[..., q, np.newaxis, np.newaxis]
+            self._intensity_nobias = intensity_nobias
+        return self._intensity_nobias
 
     @property
     def darks_up(self):
