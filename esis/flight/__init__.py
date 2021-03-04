@@ -117,7 +117,7 @@ def level_1() -> data.Level_1:
         return data.Level_1.from_pickle(level_1_cache)
 
     else:
-        l1 = data.Level_1.from_level_0(level_0(), despike=True)
+        l1 = data.Level_1.from_level_0(level_0())
         l1.to_pickle(level_1_cache)
         return l1
 
