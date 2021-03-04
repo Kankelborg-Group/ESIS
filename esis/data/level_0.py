@@ -58,7 +58,8 @@ class Level_0(
     def from_directory(
             cls,
             directory: pathlib.Path,
-            detector: esis.optics.Detector,
+            # detector: esis.optics.Detector,
+            optics: typ.Optional[esis.optics.Optics] = None,
             trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None,
             timeline: typ.Optional[kgpy.nsroc.Timeline] = None,
             # num_dark_safety_frames: int = 1,
@@ -78,13 +79,14 @@ class Level_0(
 
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
-        self.detector = detector
+        # self.detector = detector
+        self.optics = optics
         self.trajectory_raw = trajectory_raw
         self.timeline = timeline
         # self.num_dark_safety_frames = num_dark_safety_frames
 
         for i in range(num_exposures):
-            self.intensity_uncertainty[i] = detector.readout_noise_image(num_channels)
+            self.intensity_uncertainty[i] = optics.detector.readout_noise_image(num_channels)
             for c in range(num_channels):
                 hdu = astropy.io.fits.open(fits_list[bad_exposures + i, c])[0]
                 self.intensity[i, c] = hdu.data * u.adu
@@ -129,7 +131,7 @@ class Level_0(
         self.adc_temp_2 = np.zeros(sh) * u.adu
         self.adc_temp_3 = np.zeros(sh) * u.adu
         self.adc_temp_4 = np.zeros(sh) * u.adu
-        self.detector = esis.optics.Detector()
+        self.optics = esis.optics.Optics()
         return self
 
     @property
