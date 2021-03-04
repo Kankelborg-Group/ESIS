@@ -42,7 +42,7 @@ class Level_0(
     trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None
     timeline: typ.Optional[kgpy.nsroc.Timeline] = None
     caching: bool = False
-    num_dark_safety_frames: int = 1
+    # num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
 
     def __post_init__(self):
@@ -64,7 +64,7 @@ class Level_0(
             trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None,
             timeline: typ.Optional[kgpy.nsroc.Timeline] = None,
             caching: bool = False,
-            num_dark_safety_frames: int = 1,
+            # num_dark_safety_frames: int = 1,
     ) -> 'Level_0':
         fits_list = np.array(list(directory.glob('*.fit*')))
         fits_list.sort()
@@ -85,7 +85,7 @@ class Level_0(
         self.trajectory_raw = trajectory_raw
         self.timeline = timeline
         self.caching = caching
-        self.num_dark_safety_frames = num_dark_safety_frames
+        # self.num_dark_safety_frames = num_dark_safety_frames
 
         for i in range(num_exposures):
             self.intensity_uncertainty[i] = detector.readout_noise_image(num_channels)
