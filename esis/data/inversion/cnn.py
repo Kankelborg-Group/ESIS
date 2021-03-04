@@ -18,13 +18,13 @@ __all__ = ['CNN']
 
 @dataclasses.dataclass
 class CNN(Inversion, mixin.Pickleable):
-    model_forward: esis.Optics
+    model_forward: esis.optics.Optics
     model_inverse: keras.Sequential
 
     @classmethod
     def train(
             cls,
-            model_forward: esis.Optics,
+            model_forward: esis.optics.Optics,
             cube_training: obs.spectral.Cube,
             cube_validation: obs.spectral.Cube,
     ) -> 'CNN':
