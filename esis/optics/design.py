@@ -206,9 +206,6 @@ def final(
 
     return Optics(
         name=Name('ESIS'),
-        wavelengths=[584.3, 609.8, 629.7, ] * u.AA,
-        pupil_samples=pupil_samples,
-        field_samples=field_samples,
         source=source,
         front_aperture=front_aperture,
         central_obscuration=central_obscuration,
@@ -217,6 +214,9 @@ def final(
         grating=grating,
         filter=filter,
         detector=detector,
+        wavelength=[584.3, 609.8, 629.7, ] * u.AA,
+        pupil_samples=pupil_samples,
+        field_samples=field_samples,
     )
 
 
@@ -248,8 +248,8 @@ def final_from_poletto(
     detector_radius = detector.cylindrical_radius - detector.surface.aperture.half_width_x
     detector.dynamic_clearance = detector_radius - primary_clear_radius
     return esis.apply_poletto_layout(
-        wavelength_1=esis.wavelengths[..., 0],
-        wavelength_2=esis.wavelengths[..., ~0],
+        wavelength_1=esis.wavelength[..., 0],
+        wavelength_2=esis.wavelength[..., ~0],
         magnification=4 * u.dimensionless_unscaled,
         obscuration_margin=obs_margin,
         obscuration_thickness=obs_thickness,
