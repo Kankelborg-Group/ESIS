@@ -104,7 +104,9 @@ __all__ = ['final', 'final_from_poletto']
 
 def final(
         pupil_samples: int = 10,
+        pupil_is_stratified_random: bool = False,
         field_samples: int = 10,
+        field_is_stratified_random: bool = False,
         all_channels: bool = True,
 ) -> Optics:
     """
@@ -216,7 +218,9 @@ def final(
         detector=detector,
         wavelength=[584.3, 609.8, 629.7, ] * u.AA,
         pupil_samples=pupil_samples,
+        pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
+        field_is_stratified_random=field_is_stratified_random,
     )
 
 
