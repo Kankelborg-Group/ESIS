@@ -202,7 +202,7 @@ def final(
 
     field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = Source()
-    source.piston = front_aperture.piston + 400 * u.mm
+    source.piston = front_aperture.piston + 100 * u.mm
     source.half_width_x = field_limit
     source.half_width_y = field_limit
 
