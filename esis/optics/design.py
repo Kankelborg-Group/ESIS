@@ -116,14 +116,14 @@ def final(
     :return: An instance of the as-designed ESIS optics model.
     """
     num_sides = 8
-    num_channels = 4
+    num_channels = 6
     deg_per_channel = 360 * u.deg / num_sides
-    channel_offset_angle = deg_per_channel
+    channel_offset_angle = -deg_per_channel / 2
     channel_angle = np.linspace(0 * u.deg, num_channels * deg_per_channel, num_channels, endpoint=False)
     channel_angle += channel_offset_angle
     channel_angle = channel_angle[::-1]
     if not all_channels:
-        channel_angle = channel_angle[0]
+        channel_angle = 0 * u.deg
 
     primary = Primary()
     primary.radius = 2000 * u.mm

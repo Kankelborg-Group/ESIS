@@ -23,7 +23,8 @@ class CentralObscuration(optics.component.PistonComponent[SurfaceT]):
     @property
     def surface(self) -> SurfaceT:
         surface = super().surface  # type: SurfaceT
-        offset_angle = 360 * u.deg / 8 / 2
+        # offset_angle = 360 * u.deg / 8 / 2
+        offset_angle = 360 * u.deg / 8
         angles = np.linspace(0, 360 * u.deg, 8, endpoint=False)[:~0] - offset_angle
         surface.aperture = optics.surface.aperture.IrregularPolygon(
         # surface.aperture = optics.aperture.RegularPolygon(

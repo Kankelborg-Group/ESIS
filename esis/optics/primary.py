@@ -49,12 +49,12 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
         surface.aperture = optics.surface.aperture.RegularPolygon(
             radius=self.clear_radius,
             num_sides=self.num_sides,
-            offset_angle=180 * u.deg / self.num_sides,
+            # offset_angle=180 * u.deg / self.num_sides,
         )
         surface.aperture_mechanical = optics.surface.aperture.RegularPolygon(
             radius=self.mech_radius,
             num_sides=self.num_sides,
-            offset_angle=180 * u.deg / self.num_sides,
+            # offset_angle=180 * u.deg / self.num_sides,
         )
         return surface
 
