@@ -59,9 +59,18 @@ class Optics(mixin.Named, mixin.Pickleable):
         return self.system.shape[0]
 
     @property
+    def transform(self) -> transform.rigid.TransformList:
+        return transform.rigid.TransformList([
+            transform.rigid.TiltX(self.pointing.y),
+            transform.rigid.TiltY(self.pointing.x),
+            transform.rigid.TiltZ(self.roll),
+        ])
+
+    @property
     def system(self) -> optics.System:
         if self._system is None:
             self._system = optics.System(
+                transform=self.transform,
                 object_surface=self.source.surface,
                 surfaces=optics.surface.SurfaceList([
                     self.front_aperture.surface,
