@@ -5,8 +5,10 @@ import timeit
 import numpy as np
 import scipy.optimize
 import scipy.signal
+import matplotlib.axes
 import matplotlib.pyplot as plt
 import astropy.units as u
+import astropy.visualization
 import astropy.time
 from kgpy import Name, mixin, vector, optics, transform, observatories, polynomial, grid
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
@@ -1502,3 +1504,102 @@ class Optics(mixin.Named, mixin.Pickleable):
         other.update()
 
         return other
+
+    def plot_distance_annotations_zx(
+            self,
+            ax: matplotlib.axes.Axes,
+            transform_extra: typ.Optional[kgpy.transform.rigid.TransformList] = None,
+    ):
+        with astropy.visualization.quantity_support():
+            if transform_extra is None:
+                transform_extra = kgpy.transform.rigid.TransformList()
+            transform_base = transform_extra + self.transform
+
+            position_primary = (transform_base + self.primary.transform)(vector.Vector3D.spatial())
+            position_fs = (transform_base + self.field_stop.transform)(vector.Vector3D.spatial())
+            position_grating = (transform_base + self.grating.transform)(vector.Vector3D.spatial())
+            position_filter = (transform_base + self.filter.transform)(vector.Vector3D.spatial())
+            position_detector = (transform_base + self.detector.transform)(vector.Vector3D.spatial())
+
+            # line_symmetry = ax.axhline(y=0, linestyle='--', color='gray')
+            # text_symmetry = ax.text(
+            #     x=position_fs.z / 3,
+            #     y=0 * u.mm,
+            #     s='axis of symmetry',
+            #     horizontalalignment='center',
+            #     verticalalignment='center',
+            #     bbox=dict(
+            #         facecolor='white',
+            #         edgecolor='None',
+            #     )
+            # )
+
+            font_size = matplotlib.rcParams['font.size']
+
+            annotation_primary_to_fs_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_fs.zx,
+                component='x',
+                position_orthogonal=-0.2,
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_fs_to_grating_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_fs.zx,
+                point_2=position_grating.zx,
+                component='x',
+                position_orthogonal=-0.2,
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_primary_to_grating_y = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_grating.zx,
+                component='y',
+                position_orthogonal=-1550,
+                position_parallel=0,
+                text_offset=(0, -font_size / 2),
+                vertical_alignment='top',
+            )
+            annotation_primary_to_filter_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_filter.zx,
+                component='x',
+                position_orthogonal=-0.3,
+                position_parallel=1,
+                text_offset=(-font_size / 2, 0),
+                horizontal_alignment='right',
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_primary_to_filter_y = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_filter.zx,
+                component='y',
+                position_orthogonal=-650,
+                position_parallel=0.4,
+            )
+
+            annotation_primary_to_detector_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_detector.zx,
+                component='x',
+                position_orthogonal=-0.2,
+                position_parallel=1,
+                text_offset=(font_size / 2, 0),
+                horizontal_alignment='left',
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_primary_to_detector_y = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_detector.zx,
+                component='y',
+                position_orthogonal=-400,
+                position_parallel=0.4,
+            )
+
+
