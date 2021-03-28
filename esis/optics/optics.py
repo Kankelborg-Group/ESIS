@@ -1559,7 +1559,6 @@ class Optics(mixin.Named, mixin.Pickleable):
                 component='y',
                 position_orthogonal=-1550,
                 position_parallel=0,
-                text_offset=(0, -font_size / 2),
                 vertical_alignment='top',
             )
             annotation_primary_to_filter_x = plot.annotate_component(
@@ -1569,7 +1568,6 @@ class Optics(mixin.Named, mixin.Pickleable):
                 component='x',
                 position_orthogonal=-0.3,
                 position_parallel=1,
-                text_offset=(-font_size / 2, 0),
                 horizontal_alignment='right',
                 transform=ax.get_xaxis_transform(),
             )
@@ -1589,7 +1587,6 @@ class Optics(mixin.Named, mixin.Pickleable):
                 component='x',
                 position_orthogonal=-0.2,
                 position_parallel=1,
-                text_offset=(font_size / 2, 0),
                 horizontal_alignment='left',
                 transform=ax.get_xaxis_transform(),
             )
