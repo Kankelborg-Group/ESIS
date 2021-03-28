@@ -121,9 +121,9 @@ def final(
     channel_offset_angle = -deg_per_channel / 2
     channel_angle = np.linspace(0 * u.deg, num_channels * deg_per_channel, num_channels, endpoint=False)
     channel_angle += channel_offset_angle
-    channel_angle = channel_angle[::-1]
+    # channel_angle = channel_angle[::-1]
     if not all_channels:
-        channel_angle = 0 * u.deg
+        channel_angle = channel_angle[1]
 
     primary = Primary()
     primary.radius = 2000 * u.mm
