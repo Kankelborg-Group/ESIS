@@ -11,6 +11,7 @@ import astropy.visualization
 import scipy.stats
 import scipy.interpolate
 import scipy.optimize
+import kgpy.vector
 import kgpy.model
 import kgpy.obs
 import kgpy.nsroc
@@ -158,7 +159,7 @@ class Level_0(kgpy.obs.Image):
                 apogee_index = self._calc_closest_index(trajectory.time_apogee)
                 altitude_up, altitude_down = altitude[:apogee_index], altitude[apogee_index:]
                 signal_up, signal_down = signal[:apogee_index], signal[apogee_index:]
-                mask = altitude_up > 160 * u.km
+                mask = altitude_up > 200 * u.km
                 result = 0
                 for i in range(self.num_channels):
                     signal_down_interp = scipy.interpolate.interp1d(altitude_down[..., i], signal_down[..., i])
@@ -505,7 +506,7 @@ class Level_0(kgpy.obs.Image):
 
         return ax_twin
 
-    def plot_signal_vs_altitude(self, ax: plt.Axes, ) -> plt.Axes:
+    def plot_signal_vs_altitude(self, ax: plt.Axes, plot_model: bool = True) -> plt.Axes:
         with astropy.visualization.quantity_support():
             altitude = self.altitude
             signal = self.intensity_electrons.mean(self.axis.xy)
@@ -513,12 +514,16 @@ class Level_0(kgpy.obs.Image):
             # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
             # signal = np.percentile(self.intensity_electrons, 75, axis=self.axis.xy)
             absorption_model = self.absorption_atmosphere(altitude)
+            if plot_model:
+                ls = '-.'
+            else:
+                ls = 'default'
             for i in range(self.num_channels):
                 lines_up, = ax.plot(
                     altitude[self.slice_upleg, i],
                     signal[self.slice_upleg, i],
                     label=self.channel_labels[i] + ' mean signal, upleg',
-                    linestyle='-.',
+                    linestyle=ls,
                 )
                 lines_down, = ax.plot(
                     altitude[self.slice_downleg, i],
@@ -527,12 +532,13 @@ class Level_0(kgpy.obs.Image):
                     color=lines_up.get_color(),
                     linestyle='--',
                 )
-                lines_model = ax.plot(
-                    altitude[..., i],
-                    absorption_model[..., i],
-                    label=self.channel_labels[i] + ' modeled response',
-                    color=lines_up.get_color(),
-                )
+                if plot_model:
+                    lines_model = ax.plot(
+                        altitude[..., i],
+                        absorption_model[..., i],
+                        label=self.channel_labels[i] + ' modeled response',
+                        color=lines_up.get_color(),
+                    )
 
         return ax
 
