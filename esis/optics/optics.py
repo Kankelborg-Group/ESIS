@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.visualization
 import astropy.time
-from kgpy import Name, mixin, vector, optics, transform, observatories, polynomial, grid
+import kgpy.transform
+from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
