@@ -1,4 +1,4 @@
-from esis.data import level_3, level_4, level_1
+from esis.data import level_3, level_4
 import numpy as np
 import matplotlib.pyplot as plt
 from esis.flight import l3_events
@@ -6,13 +6,14 @@ import skimage.transform
 import astropy.units as u
 import kgpy.img.coalignment.image_coalignment as img_align
 from esis.flight.generate_level1_pickle import generate_level1
+import esis.flight
 
 
 if __name__ == '__main__':
     event = l3_events.perfectx
     l4 = level_4.Level_4.from_pickle(event.mart_inverted_pickle_path)
     l3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
-    l1 = generate_level1()
+    l1 = esis.flight.level1()
 
     l4_int = l4.integrated_intensity
     brightest_pix = np.unravel_index(l4_int.argmax(), l4_int.shape)
