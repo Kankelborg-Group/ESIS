@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from kgpy.observatories.sdo import hmi
+from kgpy.observatories.sdo import hmi, aia
 from esis.data import level_3
 import astropy.units as u
 from kgpy.plot import CubeSlicer
@@ -11,24 +11,24 @@ if __name__ == '__main__':
     lev3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
     times = lev3.time
 
-    # aia_obj = aia.AIA.from_time_range(times[0]-700*u.s, times[-1]+700 * u.s, user_email='jacobdparker@gmail.com',
-    #                               channels=[304*u.AA])
-    # slice = CubeSlicer(aia_obj.intensity[:, 0, ...].value, projection=aia_obj.wcs[0,0], origin='lower',
-    #                    vmax=np.percentile(aia_obj.intensity[:, 0, ...].value, 99.9))
-    # plt.show()
-
-
-    hmi_download_path = pathlib.Path(__file__).parent / 'hmi_data'
-    # if hmi_download_path.is_dir():
-    #     l1_path = hmi_download_path / 'level_1'
-    #     hmi_path_array = np.array(sorted(list(l1_path.glob('*'))))
-    #     hmi_obj = hmi.HMI.from_path_array(hmi_path_array)
-    # else:
-    hmi_obj = hmi.HMI.from_time_range(times[0] - 700 * u.s, times[-1] + 700 * u.s, user_email='jacobdparker@gmail.com',
-                                          download_path=hmi_download_path)
-    scale = 30
-    slice = CubeSlicer(hmi_obj.intensity[:, 0, ...], vmin=-scale, vmax=scale, projection=hmi_obj.wcs[0,0], origin='lower')
+    aia_obj = aia.AIA.from_time_range(times[0]-700*u.s, times[-1]+700 * u.s, user_email='jacobdparker@gmail.com',
+                                  channels=[94*u.AA])
+    slice = CubeSlicer(aia_obj.intensity[:, 0, ...].value, projection=aia_obj.wcs[0,0], origin='lower',
+                       vmax=np.percentile(aia_obj.intensity[:, 0, ...].value, 99.9))
     plt.show()
+
+
+    # hmi_download_path = pathlib.Path(__file__).parent / 'hmi_data'
+    # # if hmi_download_path.is_dir():
+    # #     l1_path = hmi_download_path / 'level_1'
+    # #     hmi_path_array = np.array(sorted(list(l1_path.glob('*'))))
+    # #     hmi_obj = hmi.HMI.from_path_array(hmi_path_array)
+    # # else:
+    # hmi_obj = hmi.HMI.from_time_range(times[0] - 700 * u.s, times[-1] + 700 * u.s, user_email='jacobdparker@gmail.com',
+    #                                       download_path=hmi_download_path)
+    # scale = 30
+    # slice = CubeSlicer(hmi_obj.intensity[:, 0, ...], vmin=-scale, vmax=scale, projection=hmi_obj.wcs[0,0], origin='lower')
+    # plt.show()
 
     #
     # fig = plt.figure()

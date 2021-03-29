@@ -40,8 +40,8 @@ big_blue = Event('big_blue', (slice(840+4-4+x,900-4-4-x), slice(144+x+2, 196-x+2
 little_red = Event('little_red', (slice(450-15+4+x,480+15-4-x), slice(1150+2+4+x,2+1210-4-x)))
 
 loopflow = Event('loopflow', (slice(310, 380), slice(835, 890)))
-
-otherx = Event('otherx', (slice(420, 520), slice(840, 920)))
+x=25
+otherx = Event('otherx', (slice(420+x+8, 520-x-8), slice(840+x-2, 920-x-3)))
 
 mgxfree = Event('mgxfree', (slice(710 - 10, 975 + 10), slice(585 - 10, 755 + 10)))
 

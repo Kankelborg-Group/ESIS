@@ -9,12 +9,18 @@ import numpy as np
 
 if __name__ == '__main__':
     l3 = level_3.Level_3.from_pickle(level_3.ov_final_path_spikes)
+
     times = l3.time
     main_event = l3_events.main_event
 
 
     event = l3.observation.data[..., main_event.location[0], main_event.location[1]]
-    dif = event[:, 1, ...] - event[:, 2, ...]
+    # event = l3.observation.data
+    dif = event[:,1,...] -event[:,2,...]
+
+
+    # slicer = CubeSlicer(dif, origin='lower',vmax = np.percentile(dif,99.5))
+    # plt.show()
 
 
     fig, axs = plt.subplots(3, 3,

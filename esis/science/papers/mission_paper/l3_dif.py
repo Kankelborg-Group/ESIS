@@ -4,6 +4,7 @@ from esis.science.papers.mission_paper import fig_path #can't figure out relativ
 import matplotlib.patheffects as PathEffects
 import matplotlib.patches as patches
 from esis.flight import l3_events
+from kgpy.plot import CubeSlicer
 
 
 plt.rcParams.update({'font.size': 9})
@@ -18,10 +19,6 @@ if __name__ == '__main__':
     img1 = l3.observation.data[seq, 1]
     img2 = l3.observation.data[seq, 2]
     dif = img1-img2
-
-
-
-
 
     fig, ax = plt.subplots(figsize=(7.5,7.5),
         subplot_kw=dict(projection=l3.observation[seq,1].wcs.dropaxis(-1).dropaxis(-1)),

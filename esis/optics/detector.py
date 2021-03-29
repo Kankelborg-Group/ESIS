@@ -249,7 +249,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     @u.quantity_input
     def remove_inactive_pixels(self, data: u.adu) -> u.adu:
         """
-        Given a raw image from the ESIS cameras, trim off the blank and overscan pixels, leaving only the light-
+        Given a raw image from the ESIS cameras, guass_fit_trim off the blank and overscan pixels, leaving only the light-
         sensitive pixels
 
         Parameters
