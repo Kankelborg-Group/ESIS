@@ -5,10 +5,12 @@ import timeit
 import numpy as np
 import scipy.optimize
 import scipy.signal
+import matplotlib.axes
 import matplotlib.pyplot as plt
 import astropy.units as u
+import astropy.visualization
 import astropy.time
-from kgpy import Name, mixin, vector, optics, transform, observatories, polynomial
+from kgpy import Name, mixin, vector, optics, transform, observatories, polynomial, grid
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
@@ -20,9 +22,6 @@ class Optics(mixin.Named, mixin.Pickleable):
     Add test docstring to see if this is the problem.
     """
     name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
-    wavelengths: u.Quantity = 0 * u.nm
-    pupil_samples: int = 10
-    field_samples: int = 10
     source: Source = dataclasses.field(default_factory=Source)
     front_aperture: FrontAperture = dataclasses.field(default_factory=FrontAperture)
     central_obscuration: CentralObscuration = dataclasses.field(default_factory=CentralObscuration)
@@ -31,6 +30,18 @@ class Optics(mixin.Named, mixin.Pickleable):
     grating: Grating = dataclasses.field(default_factory=Grating)
     filter: Filter = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
+    wavelength: u.Quantity = 0 * u.nm
+    field_samples: typ.Union[int, vector.Vector2D] = 10
+    field_is_stratified_random: bool = False
+    pupil_samples: typ.Union[int, vector.Vector2D] = 10
+    pupil_is_stratified_random: bool = False
+    grid_velocity_los: grid.Grid1D = dataclasses.field(default_factory=lambda: grid.RegularGrid1D(
+        min=0 * u.km / u.s,
+        max=0 * u.km / u.s,
+        num_samples=1,
+    ))
+    pointing: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.angular)
+    roll: u.Quantity = 0 * u.deg
     stray_light: u.Quantity = 0 * u.adu
     vignetting_correction: polynomial.Polynomial3D = dataclasses.field(
         default_factory=lambda: polynomial.Polynomial3D(
@@ -50,13 +61,21 @@ class Optics(mixin.Named, mixin.Pickleable):
         return self.system.shape[0]
 
     @property
+    def transform(self) -> transform.rigid.TransformList:
+        return transform.rigid.TransformList([
+            transform.rigid.TiltX(self.pointing.y),
+            transform.rigid.TiltY(self.pointing.x),
+            transform.rigid.TiltZ(self.roll),
+        ])
+
+    @property
     def system(self) -> optics.System:
         if self._system is None:
             self._system = optics.System(
+                transform=self.transform,
                 object_surface=self.source.surface,
                 surfaces=optics.surface.SurfaceList([
                     self.front_aperture.surface,
-                    # self.central_obscuration.surface,
                     self.central_obscuration.surface,
                     self.primary.surface,
                     self.field_stop.surface,
@@ -64,9 +83,14 @@ class Optics(mixin.Named, mixin.Pickleable):
                     self.filter.surface,
                     self.detector.surface,
                 ]),
-                wavelengths=self.wavelengths,
-                pupil_samples=self.pupil_samples,
+                wavelength=self.wavelength,
                 field_samples=self.field_samples,
+                field_is_stratified_random=self.field_is_stratified_random,
+                pupil_samples=self.pupil_samples,
+                pupil_is_stratified_random=self.pupil_is_stratified_random,
+                grid_velocity_los=self.grid_velocity_los,
+                pointing=self.pointing,
+                roll=self.roll,
             )
         return self._system
 
@@ -107,7 +131,7 @@ class Optics(mixin.Named, mixin.Pickleable):
 
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
-        other.wavelengths = self.wavelengths.copy()
+        other.wavelength = self.wavelength.copy()
         other.pupil_samples = self.pupil_samples
         other.field_samples = self.field_samples
         other.source = self.source.copy()
@@ -731,7 +755,7 @@ class Optics(mixin.Named, mixin.Pickleable):
 
         new_images = other(
             data=images,
-            wavelength=other.wavelengths[::2],
+            wavelength=other.wavelength[::2],
             spatial_domain_input=[[0, 0], images.shape[~1:]] * u.pix,
             spatial_domain_output=oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max]),
             spatial_samples_output=spatial_samples,
@@ -1100,7 +1124,7 @@ class Optics(mixin.Named, mixin.Pickleable):
 
         new_images = other(
             data=images,
-            wavelength=other.wavelengths[::2],
+            wavelength=other.wavelength[::2],
             spatial_domain_input=[[0, 0], images.shape[~1:]] * u.pix,
             spatial_domain_output=oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max]),
             spatial_samples_output=spatial_samples,
@@ -1254,7 +1278,7 @@ class Optics(mixin.Named, mixin.Pickleable):
 
         new_images = other(
             data=images,
-            wavelength=other.wavelengths[::2],
+            wavelength=other.wavelength[::2],
             spatial_domain_input=[[0, 0], images.shape[~1:]] * u.pix,
             spatial_domain_output=oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max]),
             spatial_samples_output=spatial_samples,
@@ -1474,9 +1498,108 @@ class Optics(mixin.Named, mixin.Pickleable):
         self.front_aperture.piston = self.central_obscuration.piston + 100 * u.mm
         # self.front_aperture.clear_radius = self.detector.channel_radius + self.detector.main_surface.aperture.width_x_pos
 
-        other.wavelengths = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
+        other.wavelength = u.Quantity([wavelength_1, (wavelength_1 + wavelength_2) / 2, wavelength_2])
         # other.wavelengths = u.Quantity([wavelength_1, wavelength_2])
 
         other.update()
 
         return other
+
+    def plot_distance_annotations_zx(
+            self,
+            ax: matplotlib.axes.Axes,
+            transform_extra: typ.Optional[kgpy.transform.rigid.TransformList] = None,
+    ):
+        with astropy.visualization.quantity_support():
+            if transform_extra is None:
+                transform_extra = kgpy.transform.rigid.TransformList()
+            transform_base = transform_extra + self.transform
+
+            position_primary = (transform_base + self.primary.transform)(vector.Vector3D.spatial())
+            position_fs = (transform_base + self.field_stop.transform)(vector.Vector3D.spatial())
+            position_grating = (transform_base + self.grating.transform)(vector.Vector3D.spatial())
+            position_filter = (transform_base + self.filter.transform)(vector.Vector3D.spatial())
+            position_detector = (transform_base + self.detector.transform)(vector.Vector3D.spatial())
+
+            # line_symmetry = ax.axhline(y=0, linestyle='--', color='gray')
+            # text_symmetry = ax.text(
+            #     x=position_fs.z / 3,
+            #     y=0 * u.mm,
+            #     s='axis of symmetry',
+            #     horizontalalignment='center',
+            #     verticalalignment='center',
+            #     bbox=dict(
+            #         facecolor='white',
+            #         edgecolor='None',
+            #     )
+            # )
+
+            font_size = matplotlib.rcParams['font.size']
+
+            annotation_primary_to_fs_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_fs.zx,
+                component='x',
+                position_orthogonal=-0.2,
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_fs_to_grating_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_fs.zx,
+                point_2=position_grating.zx,
+                component='x',
+                position_orthogonal=-0.2,
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_primary_to_grating_y = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_grating.zx,
+                component='y',
+                position_orthogonal=-1550,
+                position_parallel=0,
+                text_offset=(0, -font_size / 2),
+                vertical_alignment='top',
+            )
+            annotation_primary_to_filter_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_filter.zx,
+                component='x',
+                position_orthogonal=-0.3,
+                position_parallel=1,
+                text_offset=(-font_size / 2, 0),
+                horizontal_alignment='right',
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_primary_to_filter_y = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_filter.zx,
+                component='y',
+                position_orthogonal=-650,
+                position_parallel=0.4,
+            )
+
+            annotation_primary_to_detector_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_detector.zx,
+                component='x',
+                position_orthogonal=-0.2,
+                position_parallel=1,
+                text_offset=(font_size / 2, 0),
+                horizontal_alignment='left',
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_primary_to_detector_y = plot.annotate_component(
+                ax=ax,
+                point_1=position_primary.zx,
+                point_2=position_detector.zx,
+                component='y',
+                position_orthogonal=-400,
+                position_parallel=0.4,
+            )
+
+

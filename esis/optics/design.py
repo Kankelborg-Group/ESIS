@@ -104,7 +104,9 @@ __all__ = ['final', 'final_from_poletto']
 
 def final(
         pupil_samples: int = 10,
+        pupil_is_stratified_random: bool = False,
         field_samples: int = 10,
+        field_is_stratified_random: bool = False,
         all_channels: bool = True,
 ) -> Optics:
     """
@@ -114,14 +116,14 @@ def final(
     :return: An instance of the as-designed ESIS optics model.
     """
     num_sides = 8
-    num_channels = 4
+    num_channels = 6
     deg_per_channel = 360 * u.deg / num_sides
-    channel_offset_angle = deg_per_channel
+    channel_offset_angle = -deg_per_channel / 2
     channel_angle = np.linspace(0 * u.deg, num_channels * deg_per_channel, num_channels, endpoint=False)
     channel_angle += channel_offset_angle
-    channel_angle = channel_angle[::-1]
+    # channel_angle = channel_angle[::-1]
     if not all_channels:
-        channel_angle = channel_angle[0]
+        channel_angle = channel_angle[1]
 
     primary = Primary()
     primary.radius = 2000 * u.mm
@@ -200,15 +202,12 @@ def final(
 
     field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = Source()
-    source.piston = front_aperture.piston + 400 * u.mm
+    source.piston = front_aperture.piston + 100 * u.mm
     source.half_width_x = field_limit
     source.half_width_y = field_limit
 
     return Optics(
         name=Name('ESIS'),
-        wavelengths=[584.3, 609.8, 629.7, ] * u.AA,
-        pupil_samples=pupil_samples,
-        field_samples=field_samples,
         source=source,
         front_aperture=front_aperture,
         central_obscuration=central_obscuration,
@@ -217,6 +216,11 @@ def final(
         grating=grating,
         filter=filter,
         detector=detector,
+        wavelength=[584.3, 609.8, 629.7, ] * u.AA,
+        pupil_samples=pupil_samples,
+        pupil_is_stratified_random=pupil_is_stratified_random,
+        field_samples=field_samples,
+        field_is_stratified_random=field_is_stratified_random,
     )
 
 
@@ -248,8 +252,8 @@ def final_from_poletto(
     detector_radius = detector.cylindrical_radius - detector.surface.aperture.half_width_x
     detector.dynamic_clearance = detector_radius - primary_clear_radius
     return esis.apply_poletto_layout(
-        wavelength_1=esis.wavelengths[..., 0],
-        wavelength_2=esis.wavelengths[..., ~0],
+        wavelength_1=esis.wavelength[..., 0],
+        wavelength_2=esis.wavelength[..., ~0],
         magnification=4 * u.dimensionless_unscaled,
         obscuration_margin=obs_margin,
         obscuration_thickness=obs_thickness,

@@ -91,9 +91,8 @@ class Level_1(kgpy.obs.Image):
         return poly_list
 
     @classmethod
-    def from_pickle(cls, path: typ.Optional[pathlib.Path] = None) -> 'Level_1':
-        lev1 = super().from_pickle(path)
-        return lev1
+    def from_pickle(cls, path: typ.Optional[pathlib.Path]) -> 'Level_1':
+        return super().from_pickle(path)
 
     def to_fits(self, path: pathlib.Path):
 
@@ -122,5 +121,12 @@ class Level_1(kgpy.obs.Image):
 
         return
 
-    def optics_fit(self, guess: esis.optics.Optics):
+    # @property
+    # def aia_obs(self) -> kgpy.observatories.sdo.aia.AIA:
+    #     return kgpy.observatories.sdo.aia.AIA.from_time_range(
+    #         time_start=self.time_exp_start[0],
+    #         time_end=self.time_exp_end[~0],
+    #     )
+
+    def optics_fit(self, aia_obs: kgpy.observatories.sdo.aia.AIA):
         pass
