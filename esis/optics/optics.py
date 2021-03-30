@@ -134,6 +134,8 @@ class Optics(mixin.Named, mixin.Pickleable):
         other.grating = self.grating.copy()
         other.filter = self.filter.copy()
         other.detector = self.detector.copy()
+        other.pointing = self.pointing.copy()
+        other.roll = self.roll.copy()
         other.stray_light = self.stray_light.copy()
         other.vignetting_correction = self.vignetting_correction.copy()
         return other
