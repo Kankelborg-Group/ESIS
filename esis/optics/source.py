@@ -2,7 +2,7 @@ import typing
 import dataclasses
 import astropy.units as u
 import pandas
-from kgpy import Name, format, transform, optics
+from kgpy import Name, vector, format, transform, optics
 
 __all__ = ['Source']
 
@@ -12,6 +12,7 @@ SurfaceT = optics.surface.Surface[None, None, optics.surface.aperture.Rectangula
 @dataclasses.dataclass
 class Source(optics.component.PistonComponent):
     name: Name = dataclasses.field(default_factory=lambda: Name('sun'))
+    decenter: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.angular)
     half_width_x: u.Quantity = 0 * u.deg
     half_width_y: u.Quantity = 0 * u.deg
 
@@ -19,7 +20,7 @@ class Source(optics.component.PistonComponent):
     def surface(self) -> SurfaceT:
         surface = super().surface  # type: SurfaceT
         surface.aperture = optics.surface.aperture.Rectangular(
-            decenter=transform.rigid.Translate(x=0 * u.deg, y=0 * u.deg, z=0 * u.deg),
+            decenter=transform.rigid.Translate(x=self.decenter.x, y=self.decenter.y, z=0 * u.deg),
             half_width_x=self.half_width_x,
             half_width_y=self.half_width_y,
         )
@@ -27,6 +28,7 @@ class Source(optics.component.PistonComponent):
 
     def copy(self) -> 'Source':
         other = super().copy()  # type: Source
+        other.decenter = self.decenter.copy()
         other.half_width_x = self.half_width_x.copy()
         other.half_width_y = self.half_width_y.copy()
         return other
