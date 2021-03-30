@@ -18,7 +18,10 @@ __all__ = ['Optics']
 
 
 @dataclasses.dataclass
-class Optics(mixin.Named, mixin.Pickleable):
+class Optics(
+    mixin.Pickleable,
+    mixin.Named,
+):
     """
     Add test docstring to see if this is the problem.
     """
