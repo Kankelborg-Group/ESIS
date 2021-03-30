@@ -25,11 +25,11 @@ class Optics(mixin.Named, mixin.Pickleable):
     name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
     source: Source = dataclasses.field(default_factory=Source)
     front_aperture: FrontAperture = dataclasses.field(default_factory=FrontAperture)
-    central_obscuration: CentralObscuration = dataclasses.field(default_factory=CentralObscuration)
+    central_obscuration: typ.Optional[CentralObscuration] = dataclasses.field(default_factory=CentralObscuration)
     primary: Primary = dataclasses.field(default_factory=Primary)
     field_stop: FieldStop = dataclasses.field(default_factory=FieldStop)
     grating: Grating = dataclasses.field(default_factory=Grating)
-    filter: Filter = dataclasses.field(default_factory=Filter)
+    filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
     wavelength: u.Quantity = 0 * u.nm
     field_samples: typ.Union[int, vector.Vector2D] = 10
@@ -64,17 +64,19 @@ class Optics(mixin.Named, mixin.Pickleable):
     @property
     def system(self) -> optics.System:
         if self._system is None:
+            surfaces = optics.surface.SurfaceList()
+            surfaces.append(self.front_aperture.surface)
+            if self.central_obscuration is not None:
+                surfaces.append(self.central_obscuration.surface)
+            surfaces.append(self.primary.surface)
+            surfaces.append(self.field_stop.surface)
+            surfaces.append(self.grating.surface)
+            if self.filter is not None:
+                surfaces.append(self.filter.surface)
+            surfaces.append(self.detector.surface)
             self._system = optics.System(
                 object_surface=self.source.surface,
-                surfaces=optics.surface.SurfaceList([
-                    self.front_aperture.surface,
-                    self.central_obscuration.surface,
-                    self.primary.surface,
-                    self.field_stop.surface,
-                    self.grating.surface,
-                    self.filter.surface,
-                    self.detector.surface,
-                ]),
+                surfaces=surfaces,
                 wavelength=self.wavelength,
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
@@ -128,11 +130,17 @@ class Optics(mixin.Named, mixin.Pickleable):
         other.field_samples = self.field_samples
         other.source = self.source.copy()
         other.front_aperture = self.front_aperture.copy()
-        other.central_obscuration = self.central_obscuration.copy()
+        if self.central_obscuration is not None:
+            other.central_obscuration = self.central_obscuration.copy()
+        else:
+            other.central_obscuration = self.central_obscuration
         other.primary = self.primary.copy()
         other.field_stop = self.field_stop.copy()
         other.grating = self.grating.copy()
-        other.filter = self.filter.copy()
+        if self.filter is not None:
+            other.filter = self.filter.copy()
+        else:
+            other.filter = self.filter
         other.detector = self.detector.copy()
         other.pointing = self.pointing.copy()
         other.roll = self.roll.copy()
