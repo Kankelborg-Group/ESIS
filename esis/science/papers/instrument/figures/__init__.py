@@ -24,6 +24,8 @@ def layout() -> matplotlib.figure.Figure:
     esis_optics.pointing.y = 60 * u.deg
     esis_optics.central_obscuration = None
     esis_optics.filter = None
+    esis_optics.primary.substrate_thickness = None
+    esis_optics.grating.substrate_thickness = None
 
     esis_optics_rays = esis_optics.copy()
     chan_index = 4
