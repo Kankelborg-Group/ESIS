@@ -19,7 +19,7 @@ def layout() -> matplotlib.figure.Figure:
     # ax_layout.set_xlabel('')
     # ax_layout.set_ylabel('')
     ax_layout.set_aspect('equal')
-    esis_optics = esis.optics.design.final(pupil_samples=5, field_samples=5)
+    esis_optics = esis.optics.design.final(pupil_samples=kgpy.vector.Vector2D(3, 1), field_samples=1)
     esis_optics.pointing.y = 60 * u.deg
     esis_optics.source.decenter.y = esis_optics.pointing.y
     esis_optics.central_obscuration = None
