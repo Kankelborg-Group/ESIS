@@ -46,8 +46,8 @@ def layout() -> matplotlib.figure.Figure:
         # plot_rays=False,
         plot_annotations=False,
         # plot_vignetted=True,
+        plot_colorbar=False,
     )
-    colorbar.remove()
 
     return fig_layout
 
