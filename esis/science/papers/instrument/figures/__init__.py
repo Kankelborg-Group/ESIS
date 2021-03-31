@@ -2,6 +2,7 @@ import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
+import kgpy.vector
 import esis.optics
 
 __all__ = [
