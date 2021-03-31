@@ -7,6 +7,7 @@ import astropy.io.fits
 import astropy.units as u
 import kgpy.mixin
 import kgpy.obs
+import kgpy.observatories
 import kgpy.img
 import kgpy.img.mask
 import kgpy.nsroc
