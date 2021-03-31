@@ -30,7 +30,7 @@ def layout() -> matplotlib.figure.Figure:
     esis_optics_rays.grating.cylindrical_azimuth = esis_optics_rays.grating.cylindrical_azimuth[chan_index]
     # esis_optics_rays.filter.cylindrical_azimuth = esis_optics_rays.filter.cylindrical_azimuth[chan_index]
     esis_optics_rays.detector.cylindrical_azimuth = esis_optics_rays.detector.cylindrical_azimuth[chan_index]
-    # esis_optics_rays.wavelength = esis_optics_rays.wavelength[0]
+    esis_optics_rays.wavelength = esis_optics_rays.wavelength[~0:]
 
     esis_optics.system.plot(
         ax=ax_layout,
