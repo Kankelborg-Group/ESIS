@@ -134,7 +134,7 @@ class Level_0(kgpy.obs.Image):
         return self
 
     @property
-    def time_start(self) -> astropy.time.Time:
+    def time_mission_start(self) -> astropy.time.Time:
         # return self.time_exp_start[0].min()
         return self.trajectory.time_start
 
@@ -208,11 +208,11 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def index_dark_up_last(self) -> int:
-        return self._calc_closest_index(self.time_start + self.timeline.shutter_door_open.time_mission) - 1
+        return self._calc_closest_index(self.time_mission_start + self.timeline.shutter_door_open.time_mission) - 1
 
     @property
     def index_dark_down_first(self) -> int:
-        return self._calc_closest_index(self.time_start + self.timeline.parachute_deploy.time_mission)
+        return self._calc_closest_index(self.time_mission_start + self.timeline.parachute_deploy.time_mission)
 
     @property
     def index_dark_down_last(self) -> int:
@@ -220,12 +220,12 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def index_signal_first(self) -> int:
-        return self._calc_closest_index(self.time_start + self.timeline.sparcs_rlg_enable.time_mission) + 1
+        return self._calc_closest_index(self.time_mission_start + self.timeline.sparcs_rlg_enable.time_mission) + 1
         # return self._index_deriv_max - self.num_dark_safety_frames
 
     @property
     def index_signal_last(self) -> int:
-        return self._calc_closest_index(self.time_start + self.timeline.sparcs_rlg_disable.time_mission) - 1
+        return self._calc_closest_index(self.time_mission_start + self.timeline.sparcs_rlg_disable.time_mission) - 1
         # return self._index_deriv_min + self.num_dark_safety_frames
 
     @property
@@ -500,7 +500,7 @@ class Level_0(kgpy.obs.Image):
         )
         self.trajectory.plot_altitude_vs_time(
             ax=ax,
-            time_start=self.time_start,
+            time_start=self.time_mission_start,
         )
         ax_twin.set_ylabel('normalized intensity')
 
