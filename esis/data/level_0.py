@@ -138,6 +138,10 @@ class Level_0(kgpy.obs.Image):
         # return self.time_exp_start[0].min()
         return self.trajectory.time_start
 
+    @property
+    def time_shutter_open(self) -> astropy.time.Time:
+        return self.time_mission_start + self.timeline.shutter_door_open.time_mission
+
     def _calc_closest_index(self, t: astropy.time.Time) -> int:
         dt = self.time - t
         return np.median(np.argmin(np.abs(dt.value), axis=0)).astype(int)
@@ -208,7 +212,7 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def index_dark_up_last(self) -> int:
-        return self._calc_closest_index(self.time_mission_start + self.timeline.shutter_door_open.time_mission) - 1
+        return self._calc_closest_index(self.time_shutter_open) - 1
 
     @property
     def index_dark_down_first(self) -> int:
