@@ -34,18 +34,6 @@ def as_measured(
         [3.9, 3.9, 4.2, 4.1],
     ] * u.adu
 
-    # detector.gain_tap1 = [2.57, 2.55, 2.57, 2.60] * u.electron / u.ct
-    # detector.gain_tap2 = [2.50, 2.58, 2.53, 2.60] * u.electron / u.ct
-    # detector.gain_tap3 = [2.52, 2.57, 2.52, 2.54] * u.electron / u.ct
-    # detector.gain_tap4 = [2.53, 2.63, 2.59, 2.58] * u.electron / u.ct
-    #
-    # detector.readout_noise_tap1 = [3.9, 3.9, 4.1, 3.9] * u.ct
-    # detector.readout_noise_tap2 = [4.0, 4.0, 4.1, 3.9] * u.ct
-    # detector.readout_noise_tap3 = [4.1, 4.0, 4.1, 4.2] * u.ct
-    # detector.readout_noise_tap4 = [3.7, 4.0, 4.3, 4.1] * u.ct
-
-    # opt.update()
-
     return opt
 
 
