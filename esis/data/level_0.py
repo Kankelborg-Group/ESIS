@@ -142,6 +142,10 @@ class Level_0(kgpy.obs.Image):
     def time_shutter_open(self) -> astropy.time.Time:
         return self.time_mission_start + self.timeline.shutter_door_open.time_mission
 
+    @property
+    def time_shutter_close(self) -> astropy.time.Time:
+        return self.time_mission_start + self.timeline.shutter_door_close.time_mission
+
     def _calc_closest_index(self, t: astropy.time.Time) -> int:
         dt = self.time - t
         return np.median(np.argmin(np.abs(dt.value), axis=0)).astype(int)
