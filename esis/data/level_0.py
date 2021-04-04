@@ -154,6 +154,10 @@ class Level_0(kgpy.obs.Image):
     def time_shutter_close(self) -> astropy.time.Time:
         return self.time_mission_start + self.timeline.shutter_door_close.time_mission
 
+    @property
+    def time_parachute_deploy(self) -> astropy.time.Time:
+        return self.time_mission_start + self.timeline.parachute_deploy.time_mission
+
     def _calc_closest_index(self, t: astropy.time.Time) -> int:
         dt = self.time - t
         return np.median(np.argmin(np.abs(dt.value), axis=0)).astype(int)
@@ -228,7 +232,7 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def index_dark_down_first(self) -> int:
-        return self._calc_closest_index(self.time_mission_start + self.timeline.parachute_deploy.time_mission)
+        return self._calc_closest_index(self.time_parachute_deploy)
 
     @property
     def index_dark_down_last(self) -> int:
