@@ -11,9 +11,12 @@ __all__ = ['as_measured', 'as_flown']
 def as_measured(
         pupil_samples: int = 10,
         field_samples: int = 10,
-        all_channels: bool = True
 ) -> esis.optics.Optics:
-    opt = esis.optics.design.final(pupil_samples, field_samples, all_channels)
+    opt = esis.optics.design.final(
+        pupil_samples=pupil_samples,
+        field_samples=field_samples,
+        all_channels=True,
+    )
 
     # opt.grating.tangential_radius = (597.46 * u.mm + 597.08 * u.mm) / 2
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
