@@ -20,16 +20,14 @@ def as_measured(
     opt.grating.ruling_density = 2585.5 / u.mm
 
     # numbers sourced from ESIS instrument paper as of 09/10/20
-    detector = opt.detector
-
-    detector.gain = [
+    opt.detector.gain = [
         [2.57, 2.50, 2.52, 2.53],
         [2.55, 2.58, 2.57, 2.63],
         [2.57, 2.53, 2.52, 2.59],
         [2.60, 2.60, 2.54, 2.58],
     ] * u.electron / u.adu
 
-    detector.readout_noise = [
+    opt.detector.readout_noise = [
         [3.9, 4.0, 4.1, 3.7],
         [3.9, 4.0, 4.0, 4.0],
         [4.1, 4.1, 4.1, 4.3],
