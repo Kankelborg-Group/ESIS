@@ -335,34 +335,6 @@ class Level_0(kgpy.obs.Image):
             slope_guess=1 / altitude_max,
         )
 
-    # def plot_quantity_vs_index(
-    #         self,
-    #         a: u.Quantity,
-    #         a_name: str = '',
-    #         ax: typ.Optional[plt.Axes] = None,
-    #         legend_ncol: int = 1,
-    #         drawstyle: str = 'steps-mid',
-    # ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
-    #     ax2, lines = super().plot_quantity_vs_index(
-    #         ax=ax,
-    #         a=a,
-    #         a_name=a_name,
-    #         drawstyle=drawstyle
-    #     )
-    #     start_line = ax.axvline(
-    #         x=self.time_exp_start[self.index_signal_first, 0].to_datetime(),
-    #         color='black',
-    #         label='signal start',
-    #     )
-    #     end_line = ax.axvline(
-    #         x=self.time_exp_end[self.index_signal_last, 0].to_datetime(),
-    #         color='black',
-    #         label='signal end'
-    #     )
-    #     lines.append(start_line)
-    #     lines.append(end_line)
-    #     return ax2, lines
-
     def plot_intensity_nobias_mean(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
         return self.plot_quantity_vs_index(
             ax=ax,
