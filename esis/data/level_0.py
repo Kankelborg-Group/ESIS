@@ -143,6 +143,14 @@ class Level_0(kgpy.obs.Image):
         return self.time_mission_start + self.timeline.shutter_door_open.time_mission
 
     @property
+    def time_rlg_enable(self) -> astropy.time.Time:
+        return self.time_mission_start + self.timeline.sparcs_rlg_enable.time_mission
+
+    @property
+    def time_rlg_disable(self) -> astropy.time.Time:
+        return self.time_mission_start + self.timeline.sparcs_rlg_disable.time_mission
+
+    @property
     def time_shutter_close(self) -> astropy.time.Time:
         return self.time_mission_start + self.timeline.shutter_door_close.time_mission
 
@@ -228,12 +236,12 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def index_signal_first(self) -> int:
-        return self._calc_closest_index(self.time_mission_start + self.timeline.sparcs_rlg_enable.time_mission) + 1
+        return self._calc_closest_index(self.time_rlg_enable) + 1
         # return self._index_deriv_max - self.num_dark_safety_frames
 
     @property
     def index_signal_last(self) -> int:
-        return self._calc_closest_index(self.time_mission_start + self.timeline.sparcs_rlg_disable.time_mission) - 1
+        return self._calc_closest_index(self.time_rlg_disable) - 1
         # return self._index_deriv_min + self.num_dark_safety_frames
 
     @property
