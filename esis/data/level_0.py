@@ -432,16 +432,16 @@ class Level_0(kgpy.obs.Image):
             xmax=self.time_exp_end[self.index_dark_up_last, 0].to_datetime(),
             alpha=0.3,
             color='gray',
-            label='upleg darks',
+            label='upleg dark frames',
         )
 
     def plot_dark_down_span(self, ax: plt.Axes) -> plt.Line2D:
         return ax.axvspan(
             xmin=self.time_exp_start[self.index_dark_down_first, 0].to_datetime(),
             xmax=self.time_exp_end[self.index_dark_down_last, 0].to_datetime(),
-            alpha=0.3,
+            alpha=0.4,
             color='gray',
-            label='downleg darks',
+            label='downleg dark frames',
         )
 
     def plot_signal_span(self, ax: plt.Axes) -> plt.Line2D:
@@ -450,7 +450,7 @@ class Level_0(kgpy.obs.Image):
             xmax=self.time_exp_end[self.index_signal_last, 0].to_datetime(),
             alpha=0.3,
             color='green',
-            label='signal',
+            label='light frames',
         )
 
     def plot_dark_spans(self, ax: plt.Axes):
