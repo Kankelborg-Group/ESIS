@@ -143,16 +143,16 @@ class Level_0(kgpy.obs.Image):
         return self.time_mission_start + self.timeline.shutter_door_open.time_mission
 
     @property
+    def time_shutter_close(self) -> astropy.time.Time:
+        return self.time_mission_start + self.timeline.shutter_door_close.time_mission
+
+    @property
     def time_rlg_enable(self) -> astropy.time.Time:
         return self.time_mission_start + self.timeline.sparcs_rlg_enable.time_mission
 
     @property
     def time_rlg_disable(self) -> astropy.time.Time:
         return self.time_mission_start + self.timeline.sparcs_rlg_disable.time_mission
-
-    @property
-    def time_shutter_close(self) -> astropy.time.Time:
-        return self.time_mission_start + self.timeline.shutter_door_close.time_mission
 
     @property
     def time_parachute_deploy(self) -> astropy.time.Time:
