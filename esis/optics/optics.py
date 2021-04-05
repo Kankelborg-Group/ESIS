@@ -5,6 +5,7 @@ import timeit
 import numpy as np
 import scipy.optimize
 import scipy.signal
+import matplotlib.transforms
 import matplotlib.axes
 import matplotlib.pyplot as plt
 import astropy.units as u
@@ -1523,13 +1524,28 @@ class Optics(
         with astropy.visualization.quantity_support():
             if transform_extra is None:
                 transform_extra = kgpy.transform.rigid.TransformList()
-            transform_base = transform_extra + self.transform
+            # transform_base = transform_extra + self.transform
 
-            position_primary = (transform_base + self.primary.transform)(vector.Vector3D.spatial())
-            position_fs = (transform_base + self.field_stop.transform)(vector.Vector3D.spatial())
-            position_grating = (transform_base + self.grating.transform)(vector.Vector3D.spatial())
-            position_filter = (transform_base + self.filter.transform)(vector.Vector3D.spatial())
-            position_detector = (transform_base + self.detector.transform)(vector.Vector3D.spatial())
+            for surf in self.system.surfaces_all.flat_global:
+                if surf.name == self.central_obscuration.name:
+                    position_obscuration = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                elif surf.name == self.primary.name:
+                    position_primary = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                elif surf.name == self.field_stop.name:
+                    position_fs = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                elif surf.name == self.grating.name:
+                    position_grating = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                elif surf.name == self.filter.name:
+                    position_filter = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                elif surf.name == self.detector.name:
+                    position_detector = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+
+            # position_obscuration = (transform_base + self.central_obscuration.transform)(vector.Vector3D.spatial())
+            # position_primary = (transform_base + self.primary.transform)(vector.Vector3D.spatial())
+            # position_fs = (transform_base + self.field_stop.transform)(vector.Vector3D.spatial())
+            # position_grating = (transform_base + self.grating.transform)(vector.Vector3D.spatial())
+            # position_filter = (transform_base + self.filter.transform)(vector.Vector3D.spatial())
+            # position_detector = (transform_base + self.detector.transform)(vector.Vector3D.spatial())
 
             # line_symmetry = ax.axhline(y=0, linestyle='--', color='gray')
             # text_symmetry = ax.text(
@@ -1546,6 +1562,8 @@ class Optics(
 
             font_size = matplotlib.rcParams['font.size']
 
+            blended_transform_x = matplotlib.transforms.blended_transform_factory(ax.transData, ax.figure.dpi_scale_trans)
+
             annotation_primary_to_fs_x = plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx,
@@ -1560,6 +1578,16 @@ class Optics(
                 point_2=position_grating.zx,
                 component='x',
                 position_orthogonal=-0.2,
+                transform=ax.get_xaxis_transform(),
+            )
+            annotation_fs_to_obscuration_x = plot.annotate_component(
+                ax=ax,
+                point_1=position_fs.zx,
+                point_2=position_obscuration.zx,
+                component='x',
+                position_orthogonal=-0.3,
+                # position_parallel=1,
+                # horizontal_alignment='right',
                 transform=ax.get_xaxis_transform(),
             )
             annotation_primary_to_grating_y = plot.annotate_component(
@@ -1587,7 +1615,7 @@ class Optics(
                 point_2=position_filter.zx,
                 component='y',
                 position_orthogonal=-650,
-                position_parallel=0.4,
+                position_parallel=0.3,
             )
 
             annotation_primary_to_detector_x = plot.annotate_component(
@@ -1607,6 +1635,15 @@ class Optics(
                 component='y',
                 position_orthogonal=-400,
                 position_parallel=0.4,
+            )
+
+            annotation_grating_tip = plot.annotate_angle(
+                ax=ax,
+                point_center=position_grating.zx,
+                radius=10 * self.grating.surface.aperture_mechanical.max.y,
+                angle_1=90 * u.deg,
+                angle_2=90 * u.deg + self.grating.inclination,
+                angle_label=90 * u.deg + self.grating.inclination / 2,
             )
 
 
