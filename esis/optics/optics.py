@@ -126,6 +126,11 @@ class Optics(
     def plate_scale(self) -> vector.Vector2D:
         return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
 
+    @property
+    def dispersion(self) -> u.Quantity:
+        val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
+        return val.to(u.Angstrom / u.pix)
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
         other.wavelength = self.wavelength.copy()
