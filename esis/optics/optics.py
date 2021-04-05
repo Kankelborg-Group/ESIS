@@ -119,11 +119,11 @@ class Optics(
         return self.magnification * self.primary.focal_length
 
     @property
-    def pixel_subtent(self):
+    def pixel_subtent(self) -> u.Quantity:
         return np.arctan2(self.detector.pixel_width, self.effective_focal_length) << u.rad
 
     @property
-    def plate_scale(self):
+    def plate_scale(self) -> vector.Vector2D:
         return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
 
     def copy(self) -> 'Optics':
