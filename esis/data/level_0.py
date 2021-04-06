@@ -509,7 +509,7 @@ class Level_0(kgpy.obs.Image):
             if plot_model:
                 ls = '-.'
             else:
-                ls = 'default'
+                ls = None
             for i in range(self.num_channels):
                 lines_up, = ax.plot(
                     altitude[self.slice_upleg, i],
