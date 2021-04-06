@@ -22,6 +22,18 @@ def as_measured(
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
     opt.grating.ruling_density = 2585.5 / u.mm
 
+    i1 = 1
+    i4 = 4 + 1
+
+    opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[i1:i4]
+    opt.grating.plot_kwargs['linestyle'] = opt.grating.plot_kwargs['linestyle'][i1:i4]
+
+    opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[i1:i4]
+    opt.filter.plot_kwargs['linestyle'] = opt.filter.plot_kwargs['linestyle'][i1:i4]
+
+    opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[i1:i4]
+    opt.detector.plot_kwargs['linestyle'] = opt.detector.plot_kwargs['linestyle'][i1:i4]
+
     # numbers sourced from ESIS instrument paper as of 09/10/20
     opt.detector.gain = [
         [2.57, 2.50, 2.52, 2.53],
