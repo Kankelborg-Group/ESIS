@@ -1646,4 +1646,70 @@ class Optics(
                 angle_label=90 * u.deg + self.grating.inclination / 2,
             )
 
+    def plot_field_stop_projections(
+            self,
+            ax: matplotlib.axes.Axes,
+    ):
+
+        subsystem = optics.System(
+            object_surface=self.field_stop.surface,
+            surfaces=optics.surface.SurfaceList([
+                self.grating.surface,
+                self.detector.surface,
+            ]),
+            wavelength=self.wavelength,
+            field_samples=self.field_samples,
+            field_margin=1 * u.nm,
+            field_is_stratified_random=self.field_is_stratified_random,
+            pupil_samples=self.pupil_samples,
+            pupil_is_stratified_random=self.pupil_is_stratified_random,
+            grid_velocity_los=self.grid_velocity_los,
+            pointing=self.pointing,
+            roll=self.roll,
+        )
+
+        transform_detectors = kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.TiltZ(self.detector.cylindrical_azimuth),
+            kgpy.transform.rigid.Translate(x=2.5 * self.detector.clear_half_width),
+        ])
+
+        self.detector.surface.plot(
+            ax=ax,
+            transform_extra=transform_detectors,
+            plot_annotations=False,
+            # to_global=True,
+        )
+
+        with astropy.visualization.quantity_support():
+
+            colormap = plt.cm.viridis
+            colornorm = plt.Normalize(vmin=self.wavelength.min().value, vmax=self.wavelength.max().value)
+
+            wire = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
+            wire.z = self.wavelength
+            for w in range(wire.shape[~0]):
+                ax.plot(
+                    4 * wire.x_final[..., w],
+                    4 * wire.y_final[..., w],
+                    color=colormap(colornorm(self.wavelength[..., w].value)),
+                    label=self.wavelength[..., w],
+                )
+
+            subsystem_model = subsystem.rays_output.distortion(polynomial_degree=2).model()
+            wire = subsystem_model(wire)
+            wire = transform_detectors(wire.to_3d(), num_extra_dims=3)
+
+            for i in range(wire.shape[0]):
+                for w in range(wire.shape[~0]):
+                    # label_kwarg = dict()
+                    # if i == 0:
+                    #     label_kwarg['label'] = self.wavelength[..., w]
+                    ax.plot(
+                        wire.x[i, ..., w],
+                        wire.y[i, ..., w],
+                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                        # **label_kwarg,
+                    )
+
+
 
