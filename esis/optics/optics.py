@@ -1691,8 +1691,9 @@ class Optics(
                 ax.plot(
                     -4 * wire.x_final[..., w],
                     4 * wire.y_final[..., w],
-                    color=colormap(colornorm(self.wavelength[..., w].value)),
-                    label=self.wavelength[..., w],
+                    # color=colormap(colornorm(self.wavelength[..., w].value)),
+                    color='black',
+                    # label=self.wavelength[..., w],
                 )
 
             subsystem_model = subsystem.rays_output.distortion(polynomial_degree=2).model()
@@ -1701,32 +1702,35 @@ class Optics(
 
             for i in range(wire.shape[0]):
                 for w in range(wire.shape[~0]):
-                    # label_kwarg = dict()
-                    # if i == 0:
-                    #     label_kwarg['label'] = self.wavelength[..., w]
+                    if i == 0:
+                        label_kwarg = dict(label=self.wavelength[..., w])
+                    else:
+                        label_kwarg = dict()
                     ax.plot(
                         wire.x[i, ..., w],
                         wire.y[i, ..., w],
                         color=colormap(colornorm(self.wavelength[..., w].value)),
-                        # **label_kwarg,
+                        **label_kwarg,
                     )
 
+            length = self.field_stop.clear_radius / 3
             fiducial = vector.Vector3D.from_cylindrical(
-                radius=self.field_stop.clear_radius / 3,
-                azimuth=np.linspace(0, 360, 4, endpoint=True) * u.deg,
+                radius=length,
+                azimuth=np.linspace(0, 360, 4, endpoint=True) * u.deg + 30 * u.deg,
                 z=0 * u.mm
             )
 
             fiducial.x = fiducial.x[..., np.newaxis, np.newaxis]
             fiducial.y = fiducial.y[..., np.newaxis, np.newaxis]
-            fiducial.x = fiducial.x + self.field_stop.clear_radius / 2 * np.array([-1, 0, 1])
+            fiducial.y = fiducial.y - length
             fiducial.z = self.wavelength
 
             for w in range(fiducial.shape[~0]):
                 ax.fill(
                     -4 * fiducial.x_final[..., w],
-                    4 * fiducial.y_final[..., w],
-                    color=colormap(colornorm(self.wavelength[..., w].value)),
+                    -4 * fiducial.y_final[..., w],
+                    # color=colormap(colornorm(self.wavelength[..., w].value)),
+                    color='black'
                 )
 
             fiducial = subsystem_model(fiducial)
@@ -1737,5 +1741,31 @@ class Optics(
                     ax.fill(
                         fiducial.x[i, ..., w],
                         fiducial.y[i, ..., w],
+                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                    )
+
+            line = vector.Vector3D.spatial()
+            line.y = length * [-1, 1]
+
+            line.x = line.x[..., np.newaxis, np.newaxis]
+            line.y = line.y[..., np.newaxis, np.newaxis]
+            line.z = self.wavelength
+
+            for w in range(line.shape[~0]):
+                ax.plot(
+                    -4 * line.x_final[..., w],
+                    -4 * line.y_final[..., w],
+                    # color=colormap(colornorm(self.wavelength[..., w].value)),
+                    color='black'
+                )
+
+            line = subsystem_model(line)
+            line = transform_detectors(line.to_3d(), num_extra_dims=3)
+
+            for i in range(fiducial.shape[0]):
+                for w in range(fiducial.shape[~0]):
+                    ax.plot(
+                        line.x[i, ..., w],
+                        line.y[i, ..., w],
                         color=colormap(colornorm(self.wavelength[..., w].value)),
                     )
