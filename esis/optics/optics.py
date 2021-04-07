@@ -1723,7 +1723,7 @@ class Optics(
             fiducial.z = self.wavelength
 
             for w in range(fiducial.shape[~0]):
-                ax.plot(
+                ax.fill(
                     -4 * fiducial.x_final[..., w],
                     4 * fiducial.y_final[..., w],
                     color=colormap(colornorm(self.wavelength[..., w].value)),
@@ -1734,7 +1734,7 @@ class Optics(
 
             for i in range(fiducial.shape[0]):
                 for w in range(fiducial.shape[~0]):
-                    ax.plot(
+                    ax.fill(
                         fiducial.x[i, ..., w],
                         fiducial.y[i, ..., w],
                         color=colormap(colornorm(self.wavelength[..., w].value)),
