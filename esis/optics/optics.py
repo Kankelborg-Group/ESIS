@@ -1689,7 +1689,7 @@ class Optics(
             wire.z = self.wavelength
             for w in range(wire.shape[~0]):
                 ax.plot(
-                    4 * wire.x_final[..., w],
+                    -4 * wire.x_final[..., w],
                     4 * wire.y_final[..., w],
                     color=colormap(colornorm(self.wavelength[..., w].value)),
                     label=self.wavelength[..., w],
