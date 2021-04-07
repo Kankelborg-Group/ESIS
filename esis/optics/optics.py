@@ -1711,5 +1711,31 @@ class Optics(
                         # **label_kwarg,
                     )
 
+            fiducial = vector.Vector3D.from_cylindrical(
+                radius=self.field_stop.clear_radius / 3,
+                azimuth=np.linspace(0, 360, 4, endpoint=True) * u.deg,
+                z=0 * u.mm
+            )
 
+            fiducial.x = fiducial.x[..., np.newaxis, np.newaxis]
+            fiducial.y = fiducial.y[..., np.newaxis, np.newaxis]
+            fiducial.x = fiducial.x + self.field_stop.clear_radius / 2 * np.array([-1, 0, 1])
+            fiducial.z = self.wavelength
 
+            for w in range(fiducial.shape[~0]):
+                ax.plot(
+                    -4 * fiducial.x_final[..., w],
+                    4 * fiducial.y_final[..., w],
+                    color=colormap(colornorm(self.wavelength[..., w].value)),
+                )
+
+            fiducial = subsystem_model(fiducial)
+            fiducial = transform_detectors(fiducial.to_3d(), num_extra_dims=3)
+
+            for i in range(fiducial.shape[0]):
+                for w in range(fiducial.shape[~0]):
+                    ax.plot(
+                        fiducial.x[i, ..., w],
+                        fiducial.y[i, ..., w],
+                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                    )
