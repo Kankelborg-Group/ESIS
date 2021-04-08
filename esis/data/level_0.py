@@ -42,6 +42,8 @@ class Level_0(kgpy.obs.Image):
     timeline: typ.Optional[kgpy.nsroc.Timeline] = None
     # num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
+    num_invalid_exposures: int = 2
+    dacs_sample_period: u.Quantity = 2 * u.s
 
     def __post_init__(self):
         super().__post_init__()
@@ -73,8 +75,7 @@ class Level_0(kgpy.obs.Image):
 
         fits_list = fits_list.reshape((num_channels, -1))
         fits_list = fits_list.transpose()
-        bad_exposures = 2
-        num_exposures = len(fits_list) - bad_exposures
+        num_exposures = len(fits_list)
 
         hdu = astropy.io.fits.open(fits_list[0, 0])[0]
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
@@ -87,14 +88,15 @@ class Level_0(kgpy.obs.Image):
         for i in range(num_exposures):
             self.intensity_uncertainty[i] = optics.detector.readout_noise_image(num_channels)
             for c in range(num_channels):
-                hdu = astropy.io.fits.open(fits_list[bad_exposures + i, c])[0]
+                hdu = astropy.io.fits.open(fits_list[i, c])[0]
                 self.intensity[i, c] = hdu.data * u.adu
                 self.time[i, c] = astropy.time.Time(hdu.header['IMG_TS'])
                 self.exposure_length[i, c] = float(hdu.header['MEAS_EXP']) * 25 * u.ns
                 if i == 0:
                     self.channel[c] = int(hdu.header['CAM_ID'][~0]) * u.chan
                 if c == 0:
-                    self.time_index[i] = int(hdu.header['IMG_CNT']) - bad_exposures
+                    self.time_index[i] = int(hdu.header['IMG_CNT'])
+                    # self.time_index[i] = int(hdu.header['IMG_CNT']) - self.num_invalid_exposures
                 self.cam_sn[i, c] = int(hdu.header['CAM_SN'])
                 self.global_index[i, c] = int(hdu.header['IMG_ISN'])
                 self.requested_exposure_time[i, c] = float(hdu.header['IMG_EXP']) * u.ms
@@ -132,6 +134,22 @@ class Level_0(kgpy.obs.Image):
         self.adc_temp_4 = np.zeros(sh) * u.adu
         self.optics = esis.optics.Optics()
         return self
+
+    @property
+    def slice_valid(self) -> slice:
+        return slice(self.num_invalid_exposures, None)
+
+    @property
+    def intensity_valid(self) -> u.Quantity:
+        return self.intensity[self.slice_valid]
+
+    @property
+    def time_valid(self) -> astropy.time.Time:
+        return self.time[self.slice_valid]
+
+    @property
+    def time_index_valid(self):
+        return self.time_index[self.slice_valid]
 
     @property
     def time_mission_start(self) -> astropy.time.Time:
@@ -224,7 +242,7 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def index_dark_up_first(self) -> int:
-        return 0
+        return self.num_invalid_exposures
 
     @property
     def index_dark_up_last(self) -> int:
@@ -354,6 +372,14 @@ class Level_0(kgpy.obs.Image):
             offset_x_guess=altitude_max / 2,
             slope_guess=1 / altitude_max,
         )
+
+    @property
+    def _time_plot_grid(self):
+        return super()._time_plot_grid[1:]
+    
+    @property
+    def _index_plot_grid(self):
+        return super()._index_plot_grid[1:]
 
     def plot_intensity_nobias_mean(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
         return self.plot_quantity_vs_index(
