@@ -111,7 +111,7 @@ class Level_0(kgpy.obs.Image):
                 self.adc_temp_3[i, c] = float(hdu.header['ADCTEMP3']) * u.adu
                 self.adc_temp_4[i, c] = float(hdu.header['ADCTEMP4']) * u.adu
 
-        self.time = self.time - self.exposure_length / 2
+        self.time = self.time - self.exposure_half_length
 
         return self
 
