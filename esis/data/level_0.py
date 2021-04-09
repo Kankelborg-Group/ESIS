@@ -516,12 +516,13 @@ class Level_0(kgpy.obs.Image):
         ax_twin._get_lines.prop_cycler = ax._get_lines.prop_cycler
 
         # self.plot_intensity_nobias_mean(ax=ax)
-        signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
+        signal = np.median(self.intensity_nobias_nodark_active, axis=self.axis.xy)
+        # signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
         signal = signal / signal.max(self.axis.time)
 
         self.plot_quantity_vs_index(
             a=signal,
-            a_name='mean intensity',
+            a_name='median intensity',
             ax=ax_twin,
         )
         self.trajectory.plot_altitude_vs_time(
@@ -535,8 +536,8 @@ class Level_0(kgpy.obs.Image):
     def plot_signal_vs_altitude(self, ax: plt.Axes, plot_model: bool = True) -> plt.Axes:
         with astropy.visualization.quantity_support():
             altitude = self.altitude
-            signal = self.intensity_electrons.mean(self.axis.xy)
-            # signal = np.median(self.intensity_electrons[..., 1024:], axis=self.axis.xy)
+            # signal = self.intensity_electrons.mean(self.axis.xy)
+            signal = np.median(self.intensity_electrons, axis=self.axis.xy)
             # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
             # signal = np.percentile(self.intensity_electrons, 75, axis=self.axis.xy)
             absorption_model = self.absorption_atmosphere(altitude)
@@ -548,13 +549,13 @@ class Level_0(kgpy.obs.Image):
                 lines_up, = ax.plot(
                     altitude[self.slice_upleg, i],
                     signal[self.slice_upleg, i],
-                    label=self.channel_labels[i] + ' mean signal, upleg',
+                    label=self.channel_labels[i] + ' median signal, upleg',
                     linestyle=ls,
                 )
                 lines_down, = ax.plot(
                     altitude[self.slice_downleg, i],
                     signal[self.slice_downleg, i],
-                    label=self.channel_labels[i] + ' mean signal, downleg',
+                    label=self.channel_labels[i] + ' median signal, downleg',
                     color=lines_up.get_color(),
                     linestyle='--',
                 )
