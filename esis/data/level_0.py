@@ -514,10 +514,14 @@ class Level_0(kgpy.obs.Image):
     def plot_altitude_and_signal_vs_time(
             self,
             ax: typ.Optional[plt.Axes],
+            time: typ.Optional[astropy.time.Time] = None
     ) -> plt.Axes:
 
         ax_twin = ax.twinx()
         ax_twin._get_lines.prop_cycler = ax._get_lines.prop_cycler
+
+        if time is None:
+            time = self.time
 
         # self.plot_intensity_nobias_mean(ax=ax)
         signal = np.median(self.intensity_nobias_nodark_active, axis=self.axis.xy)
@@ -526,6 +530,7 @@ class Level_0(kgpy.obs.Image):
 
         self.plot_quantity_vs_index(
             a=signal,
+            t=time,
             a_name='median intensity',
             ax=ax_twin,
         )
