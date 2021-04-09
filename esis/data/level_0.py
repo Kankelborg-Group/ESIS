@@ -413,6 +413,10 @@ class Level_0(kgpy.obs.Image):
         return self.optics.detector.convert_adu_to_electrons(self.intensity_nobias_nodark_active)
 
     @property
+    def intensity_electrons_avg(self) -> u.Quantity:
+        return self._calc_intensity_avg(self.intensity_electrons)
+
+    @property
     def intensity_signal(self) -> u.Quantity:
         return self.intensity_electrons[self.slice_signal]
 
@@ -578,15 +582,16 @@ class Level_0(kgpy.obs.Image):
         if time is None:
             time = self.time
 
+        signal = self.intensity_electrons_avg
         # self.plot_intensity_nobias_mean(ax=ax)
-        signal = np.median(self.intensity_nobias_nodark_active, axis=self.axis.xy)
+        # signal = np.median(self.intensity_nobias_nodark_active, axis=self.axis.xy)
         # signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
         signal = signal / signal.max(self.axis.time)
 
         self.plot_quantity_vs_index(
             a=signal,
             t=time,
-            a_name='median intensity',
+            a_name='average intensity',
             ax=ax_twin,
         )
         self.trajectory.plot_altitude_vs_time(
@@ -610,7 +615,7 @@ class Level_0(kgpy.obs.Image):
             altitude = self.trajectory.altitude_interp(time)
             signal = self.intensity_electrons_avg
             # signal = self.intensity_electrons.mean(self.axis.xy)
-            signal = np.median(self.intensity_electrons, axis=self.axis.xy)
+            # signal = np.median(self.intensity_electrons, axis=self.axis.xy)
             # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
             # signal = np.percentile(self.intensity_electrons, 75, axis=self.axis.xy)
             absorption_model = self.absorption_atmosphere(altitude)
@@ -622,13 +627,13 @@ class Level_0(kgpy.obs.Image):
                 lines_up, = ax.plot(
                     altitude[self.slice_upleg, i],
                     signal[self.slice_upleg, i],
-                    label=self.channel_labels[i] + ' median signal, upleg',
+                    label=self.channel_labels[i] + ' average signal, upleg',
                     linestyle=ls,
                 )
                 lines_down, = ax.plot(
                     altitude[self.slice_downleg, i],
                     signal[self.slice_downleg, i],
-                    label=self.channel_labels[i] + ' median signal, downleg',
+                    label=self.channel_labels[i] + ' average signal, downleg',
                     color=lines_up.get_color(),
                     linestyle='--',
                 )
