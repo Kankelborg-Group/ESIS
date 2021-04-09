@@ -161,7 +161,7 @@ class Level_0(kgpy.obs.Image):
         return self.time_mission_start + self.timeline.esis_exp_launch.time_mission + self.dacs_sample_period / 2
 
     @property
-    def offset_data_start_expectation(self):
+    def offset_data_start_expectation(self) -> u.Quantity:
         return (self.time_data_start_expectation - self.time_exp_start[0].min()).to(u.s)
 
     @property
