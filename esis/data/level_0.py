@@ -165,6 +165,10 @@ class Level_0(kgpy.obs.Image):
         return (self.time_data_start_expectation - self.time_exp_start[0].min()).to(u.s)
 
     @property
+    def time_expectation(self) -> astropy.time.Time:
+        return self.time + self.offset_data_start_expectation
+
+    @property
     def time_shutter_open(self) -> astropy.time.Time:
         return self.time_mission_start + self.timeline.shutter_door_open.time_mission
 
