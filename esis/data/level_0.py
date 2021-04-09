@@ -54,6 +54,7 @@ class Level_0(kgpy.obs.Image):
         self._intensity_nobias = None
         self._darks_nobias = None
         self._trajectory = None
+        self._time_optimized = None
 
     @classmethod
     def from_directory(
@@ -243,41 +244,47 @@ class Level_0(kgpy.obs.Image):
     @property
     def trajectory(self) -> kgpy.nsroc.Trajectory:
 
-        if self._trajectory is None:
+        return self.trajectory_raw
 
-            signal = np.mean(self.intensity_nobias, axis=self.axis.xy)
-            # signal = np.mean(self.intensity_nobias[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
-            # signal = np.median(self.intensity_nobias[..., 1024:], axis=self.axis.xy)
-            # signal = np.percentile(self.intensity_nobias, 75, axis=self.axis.xy)
-
-            def objective(t: float):
-                trajectory = self.trajectory_raw.copy()
-                trajectory.time_start = trajectory.time_start + t * u.s
-                altitude = trajectory.altitude_interp(self.time)
-                apogee_index = self._calc_closest_index(trajectory.time_apogee)
-                altitude_up, altitude_down = altitude[:apogee_index], altitude[apogee_index:]
-                signal_up, signal_down = signal[:apogee_index], signal[apogee_index:]
-                mask = altitude_up > 200 * u.km
-                result = 0
-                for i in range(self.num_channels):
-                    signal_down_interp = scipy.interpolate.interp1d(altitude_down[..., i], signal_down[..., i])
-                    mask_i = mask[..., i]
-                    diff = signal_up[mask_i].value - signal_down_interp(altitude_up[mask_i])
-                    result = result + np.mean(np.square(diff))
-                result = np.sqrt(result / self.num_channels)
-                return result
-
-            bound = 4 * self.exposure_length.mean()
-
-            time_offset, *_ = scipy.optimize.brute(
-                func=objective,
-                Ns=100,
-                ranges=[[-bound.value, bound.value]],
-            )
-
-            self._trajectory = self.trajectory_raw.copy()
-            self._trajectory.time_start = self._trajectory.time_start + time_offset * u.s
-        return self._trajectory
+        # self._trajectory = None
+        #
+        # if self._trajectory is None:
+        #
+        #     # signal = np.mean(self.intensity_nobias, axis=self.axis.xy)
+        #     # signal = np.mean(self.intensity_nobias[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
+        #     signal = np.median(self.intensity_nobias, axis=self.axis.xy)
+        #     # signal = np.percentile(self.intensity_nobias, 75, axis=self.axis.xy)
+        #
+        #     def objective(t: float):
+        #         trajectory = self.trajectory_raw.copy()
+        #         trajectory.time_start = trajectory.time_start + t * u.s
+        #         altitude = trajectory.altitude_interp(self.time)
+        #         apogee_index = self._calc_closest_index(trajectory.time_apogee)
+        #         altitude_up, altitude_down = altitude[:apogee_index], altitude[apogee_index:]
+        #         signal_up, signal_down = signal[:apogee_index], signal[apogee_index:]
+        #         mask = altitude_up >= 150 * u.km
+        #         result = 0
+        #         for i in range(self.num_channels):
+        #             signal_down_interp = scipy.interpolate.interp1d(altitude_down[..., i], signal_down[..., i])
+        #             mask_i = mask[..., i]
+        #             diff = signal_up[mask_i, i].value - signal_down_interp(altitude_up[mask_i, i])
+        #             # print(signal_down_interp(altitude_up[mask_i, i]).shape)
+        #             result = result + np.mean(np.square(diff))
+        #         result = np.sqrt(result / self.num_channels)
+        #         # print(result)
+        #         return result
+        #
+        #     bound = self.exposure_length.mean()
+        #
+        #     time_offset, *_ = scipy.optimize.brute(
+        #         func=objective,
+        #         Ns=100,
+        #         ranges=[[-bound.value, bound.value]],
+        #     )
+        #
+        #     self._trajectory = self.trajectory_raw.copy()
+        #     self._trajectory.time_start = self._trajectory.time_start + time_offset * u.s
+        # return self._trajectory
 
     @property
     def altitude(self) -> u.Quantity:
