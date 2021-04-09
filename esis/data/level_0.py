@@ -562,7 +562,7 @@ class Level_0(kgpy.obs.Image):
     def plot_altitude_and_signal_vs_time(
             self,
             ax: typ.Optional[plt.Axes],
-            time: typ.Optional[astropy.time.Time] = None
+            time: typ.Optional[astropy.time.Time] = None,
     ) -> plt.Axes:
 
         ax_twin = ax.twinx()
@@ -590,9 +590,18 @@ class Level_0(kgpy.obs.Image):
 
         return ax_twin
 
-    def plot_signal_vs_altitude(self, ax: plt.Axes, plot_model: bool = True) -> plt.Axes:
+    def plot_signal_vs_altitude(
+            self,
+            ax: plt.Axes,
+            time: typ.Optional[astropy.time.Time] = None,
+            plot_model: bool = True,
+    ) -> plt.Axes:
         with astropy.visualization.quantity_support():
-            altitude = self.altitude
+            if time is None:
+                time = self.time
+
+            altitude = self.trajectory.altitude_interp(time)
+            signal = self.intensity_electrons_avg
             # signal = self.intensity_electrons.mean(self.axis.xy)
             signal = np.median(self.intensity_electrons, axis=self.axis.xy)
             # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
