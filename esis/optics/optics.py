@@ -1689,7 +1689,7 @@ class Optics(
             wire.z = self.wavelength
             for w in range(wire.shape[~0]):
                 ax.plot(
-                    -4 * wire.x_final[..., w],
+                    4 * wire.x_final[..., w],
                     4 * wire.y_final[..., w],
                     # color=colormap(colornorm(self.wavelength[..., w].value)),
                     color='black',
@@ -1727,8 +1727,8 @@ class Optics(
 
             for w in range(fiducial.shape[~0]):
                 ax.fill(
-                    -4 * fiducial.x_final[..., w],
-                    -4 * fiducial.y_final[..., w],
+                    4 * fiducial.x_final[..., w],
+                    4 * fiducial.y_final[..., w],
                     # color=colormap(colornorm(self.wavelength[..., w].value)),
                     color='black'
                 )
@@ -1753,8 +1753,8 @@ class Optics(
 
             for w in range(line.shape[~0]):
                 ax.plot(
-                    -4 * line.x_final[..., w],
-                    -4 * line.y_final[..., w],
+                    4 * line.x_final[..., w],
+                    4 * line.y_final[..., w],
                     # color=colormap(colornorm(self.wavelength[..., w].value)),
                     color='black'
                 )
