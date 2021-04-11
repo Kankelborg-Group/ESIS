@@ -615,32 +615,35 @@ class Level_0(kgpy.obs.Image):
 
             altitude = self.trajectory.altitude_interp(time)
             signal = self.intensity_electrons_avg
+            apogee_index = self._calc_closest_index(self.trajectory.time_apogee, times=time)
+            altitude_up, altitude_down = altitude[:apogee_index + 1], altitude[apogee_index:]
+            signal_up, signal_down = signal[:apogee_index + 1], signal[apogee_index:]
             # signal = self.intensity_electrons.mean(self.axis.xy)
             # signal = np.median(self.intensity_electrons, axis=self.axis.xy)
             # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
             # signal = np.percentile(self.intensity_electrons, 75, axis=self.axis.xy)
-            absorption_model = self.absorption_atmosphere(altitude)
+            absorption_model = self.absorption_atmosphere(altitude_up)
             if plot_model:
                 ls = '-.'
             else:
                 ls = None
             for i in range(self.num_channels):
                 lines_up, = ax.plot(
-                    altitude[self.slice_upleg, i],
-                    signal[self.slice_upleg, i],
+                    altitude_up[..., i],
+                    signal_up[..., i],
                     label=self.channel_labels[i] + ' average signal, upleg',
                     linestyle=ls,
                 )
                 lines_down, = ax.plot(
-                    altitude[self.slice_downleg, i],
-                    signal[self.slice_downleg, i],
+                    altitude_down[..., i],
+                    signal_down[..., i],
                     label=self.channel_labels[i] + ' average signal, downleg',
                     color=lines_up.get_color(),
                     linestyle='--',
                 )
                 if plot_model:
                     lines_model = ax.plot(
-                        altitude[..., i],
+                        altitude_up[..., i],
                         absorption_model[..., i],
                         label=self.channel_labels[i] + ' modeled response',
                         color=lines_up.get_color(),
