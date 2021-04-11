@@ -16,6 +16,7 @@ import kgpy.model
 import kgpy.obs
 import kgpy.nsroc
 import kgpy.observatories
+from . import nsroc
 import esis
 
 __all__ = ['Level_0']
@@ -39,7 +40,7 @@ class Level_0(kgpy.obs.Image):
     # detector: typ.Optional[esis.optics.Detector] = None
     optics: typ.Optional[esis.optics.Optics] = None
     trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None
-    timeline: typ.Optional[esis.flight.nsroc.Timeline] = None
+    timeline: typ.Optional[nsroc.Timeline] = None
     # num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
     num_invalid_exposures: int = 2
