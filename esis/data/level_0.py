@@ -39,7 +39,7 @@ class Level_0(kgpy.obs.Image):
     adc_temp_4: typ.Optional[u.Quantity] = None
     # detector: typ.Optional[esis.optics.Detector] = None
     optics: typ.Optional[esis.optics.Optics] = None
-    trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None
+    trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None
     timeline: typ.Optional[nsroc.Timeline] = None
     # num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
@@ -63,7 +63,7 @@ class Level_0(kgpy.obs.Image):
             directory: pathlib.Path,
             # detector: esis.optics.Detector,
             optics: typ.Optional[esis.optics.Optics] = None,
-            trajectory_raw: typ.Optional[kgpy.nsroc.Trajectory] = None,
+            trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None,
             timeline: typ.Optional[kgpy.nsroc.Timeline] = None,
             # num_dark_safety_frames: int = 1,
     ) -> 'Level_0':
@@ -83,7 +83,7 @@ class Level_0(kgpy.obs.Image):
         self = cls.zeros((num_exposures, num_channels) + hdu.data.shape)
         # self.detector = detector
         self.optics = optics
-        self.trajectory_raw = trajectory_raw
+        self.trajectory = trajectory
         self.timeline = timeline
         # self.num_dark_safety_frames = num_dark_safety_frames
 

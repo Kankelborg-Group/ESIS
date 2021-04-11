@@ -106,7 +106,7 @@ def level_0(caching: bool = True) -> data.Level_0:
         # detector=optics.as_measured().detector,
         optics=optics.as_measured(),
         # num_dark_safety_frames=num_dark_safety_frames,
-        trajectory_raw=trajectory,
+        trajectory=trajectory,
         timeline=nsroc.timeline(),
     )
 
