@@ -288,15 +288,19 @@ class Level_0(kgpy.obs.Image):
     def index_dark_down_last(self) -> int:
         return self.num_times - 1
 
+    def _index_signal_first(self, time: astropy.time.Time) -> int:
+        return self._calc_closest_index(t=self.time_rlg_enable, times=time) + 1
+
     @property
     def index_signal_first(self) -> int:
-        return self._calc_closest_index(self.time_rlg_enable) + 1
-        # return self._index_deriv_max - self.num_dark_safety_frames
+        return self._index_signal_first(time=self.time)
+
+    def _index_signal_last(self, time: astropy.time.Time) -> int:
+        return self._calc_closest_index(t=self.time_rlg_disable, times=time) - 1
 
     @property
     def index_signal_last(self) -> int:
-        return self._calc_closest_index(self.time_rlg_disable) - 1
-        # return self._index_deriv_min + self.num_dark_safety_frames
+        return self._index_signal_last(time=self.time)
 
     @property
     def slice_signal(self) -> slice:
