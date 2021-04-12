@@ -375,9 +375,13 @@ class Level_0(kgpy.obs.Image):
     def dark(self):
         return self._calc_dark(self.darks)
 
+    @classmethod
+    def _remove_dark(cls, intensity: u.Quantity, master_dark: u.Quantity) -> u.Quantity:
+        return intensity - master_dark
+
     @property
     def intensity_nobias_nodark(self) -> u.Quantity:
-        return self.intensity_nobias - self.dark
+        return self._remove_dark(self.intensity_nobias, self.dark)
 
     @property
     def intensity_nobias_nodark_active(self):
