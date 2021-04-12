@@ -302,9 +302,12 @@ class Level_0(kgpy.obs.Image):
     def index_signal_last(self) -> int:
         return self._index_signal_last(time=self.time)
 
+    def _slice_signal(self, time: astropy.time.Time) -> slice:
+        return slice(self._index_signal_first(time=time), self._index_signal_last(time=time) + 1)
+
     @property
     def slice_signal(self) -> slice:
-        return slice(self.index_signal_first, self.index_signal_last + 1)
+        return self._slice_signal(time=self.time)
 
     @property
     def index_apogee(self) -> int:
