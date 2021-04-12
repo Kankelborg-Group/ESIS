@@ -250,6 +250,10 @@ class Level_0(kgpy.obs.Image):
     def altitude(self) -> u.Quantity:
         return self.trajectory.altitude_interp(self.time)
 
+    @property
+    def sun_zenith_angle(self):
+        return self.trajectory.sun_zenith_angle_interp(self.time)
+
     # @property
     # def intensity_derivative(self) -> u.Quantity:
     #     if self._intensity_derivative is None:
