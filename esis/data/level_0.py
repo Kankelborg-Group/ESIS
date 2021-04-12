@@ -12,6 +12,7 @@ import scipy.stats
 import scipy.interpolate
 import scipy.optimize
 import kgpy.vector
+import kgpy.atmosphere
 import kgpy.model
 import kgpy.obs
 import kgpy.nsroc
@@ -407,6 +408,24 @@ class Level_0(kgpy.obs.Image):
             offset_x_guess=altitude_max / 2,
             slope_guess=1 / altitude_max,
         )
+
+    def atmosphere_transmission(self, time: astropy.time.Time) -> kgpy.atmosphere.Transmission:
+
+        signal = self._calc_intensity_avg(self.intensity_nobias)
+        # signal = signal / signal.max(axis=0)
+
+        signal_sum = signal.sum(axis=self.axis.channel)
+        mask = signal_sum > signal_sum.max() / 10
+
+        atmosphere_transmission = kgpy.atmosphere.Transmission.from_data_fit(
+            observer_height=self.trajectory.altitude_interp(t=time)[mask],
+            zenith_angle=self.trajectory.sun_zenith_angle_interp(t=time)[mask],
+            intensity_observed=signal[mask],
+            absorption_coefficient_guess=1 / u.m,
+            scale_height_guess=10 * u.km,
+        )
+
+        return atmosphere_transmission
 
     @property
     def _time_plot_grid(self):
