@@ -28,7 +28,7 @@ if __name__ == '__main__':
     scale = 40
 
     ax.imshow(dif, origin='lower', vmin=-scale, vmax=scale)
-    ax.set_title('Level-3 Difference (Camera 2 - Camera 3)')
+    ax.set_title('Level-3 Difference (Channel 2 - Channel 3)')
     ax.set_xlabel('Solar X (arcsec)')
     ax.set_ylabel('Solar Y (arcsec)')
     ax.coords[0].display_minor_ticks(True)
@@ -36,18 +36,12 @@ if __name__ == '__main__':
     t = ax.annotate(times[seq],(5,5), color='w')
     t.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
 
-    events = [l3_events.big_blue,  l3_events.little_red, l3_events.perfectx, l3_events.main_event]
-    labels = ['a', 'b', 'c', 'd']
+    events = [l3_events.big_blue,  l3_events.little_red, l3_events.perfectx,l3_events.otherx, l3_events.main_event]
+    labels = ['a', 'b', 'c', 'd', 'e']
     for i,event in enumerate(events):
         ax.add_patch(event.rectangle)
         num = ax.annotate(labels[i]+')', (event.location[1].start-30, event.location[0].start-30), color='w')
         num.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
 
-
-
-
-
-
-
     fig.savefig(fig_path/'l3_dif.pdf')
-    plt.show()
+    # plt.show()

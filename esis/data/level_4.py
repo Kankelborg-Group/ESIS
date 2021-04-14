@@ -8,6 +8,7 @@ from kgpy.plot import HypercubeSlicer
 import numpy as np
 import kgpy.moment
 from esis.data.inversion import mart
+import astropy.units as u
 
 all = ['default_path','main_event']
 
@@ -28,9 +29,19 @@ class Level_4(Pickleable):
         return obs
 
     def plot(self):
-        for wcs in self.wcs_list:
-            wcs.wcs.ctype[1] = 'Solar X'
-            wcs.wcs.ctype[2] = 'Solar Y'
+
+        # NOTE, this currently doesn't require looping because the list contains repeated wcs objects in memory.
+        # Might need to fix this later.
+        wcs = self.wcs_list[0]
+        wcs.wcs.ctype[1] = 'Solar X'
+        wcs.wcs.ctype[2] = 'Solar Y'
+        wcs.wcs.cunit[1] = u.arcsec
+        wcs.wcs.cunit[2] = u.arcsec
+        wcs.wcs.cdelt[1] *= 3600
+        wcs.wcs.cdelt[2] *= 3600
+        wcs.wcs.crval[1] *= 3600
+        wcs.wcs.crval[2] *= 3600
+
         return HypercubeSlicer(self.cube_list,self.wcs_list,(0,99.95),width_ratios=(5, 1),
                 height_ratios=(5, 1))
 

@@ -1,6 +1,6 @@
 import numpy as np
 from esis.data import level_1, level_3
-from esis.flight.generate_level1_pickle import generate_level1
+import esis.flight
 import pathlib
 from kgpy import img
 
@@ -8,7 +8,7 @@ from kgpy import img
 def generate_level3(line='ov', despike=True):
 
 
-    lev1 = generate_level1()
+    lev1 = esis.flight.level_1()
 
     if despike:
         intensity_unit = lev1.intensity.unit
@@ -25,7 +25,7 @@ def generate_level3(line='ov', despike=True):
         print('Generating OV Level_3 Object')
 
         lev3 = level_3.Level_3.from_aia_level1(lev_1 = lev1)
-        lev3_updated = lev3.update_internal_alignment()
+        lev3_updated = lev3.update_internal_alignment(lev1 = lev1)
         lev3_masked = lev3_updated.add_mask(line='disperse')
 
         scales = np.array([0.43610222, 0.33961842, 0.38185936, 0.49515337])  # hard coded for speed, can be found

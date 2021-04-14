@@ -34,9 +34,9 @@ if __name__ == '__main__':
 
     angles = (np.arange(4) * 45 - 22.5 + -45) * u.deg
 
-    l3_event = l3_events.big_blue
+    l3_event = l3_events.perfectx
 
-    save_path = 'lev4_' + l3_event.name + '_mart.pickle'
+    save_path = 'lev4_' + l3_event.name + '_mart_maxfilter.pickle'
     event = l3_event.location
     pad = 50
     event = (slice(event[0].start - pad, event[0].stop + pad, None), slice(event[1].start - pad, event[1].stop + pad))
@@ -72,9 +72,8 @@ if __name__ == '__main__':
         use_maximize=False,
         use_filter=True,
         use_lgof=False,
-        anti_aliasing=True,
         max_multiplicative_iteration=20,
-        max_filtering_iterations=25,
+        max_filtering_iterations=75,
         photon_read_noise=2,
         # track_cube_history='filter',
         contrast_exponent=.2,

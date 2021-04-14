@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 from kgpy.img.coalignment import image_coalignment
 from esis.data import level_1, level_3
+import esis.flight
 
 
 @pytest.mark.skip('Jake\'s problem')
@@ -46,8 +47,10 @@ def test_to_pickle(capsys):
 @pytest.mark.skip('Jake\'s problem')
 def test_from_aia_level1(capsys):
     with capsys.disabled():
-        lev3 = level_3.Level_3.from_aia_level1()
-        lev3.to_pickle(level_3.ov_Level3_initial)
+        lev1 = esis.flight.level_1()
+        lev3 = level_3.Level_3.from_aia_level1(lev1)
+
+
 
 
 @pytest.mark.skip('Jake\'s problem')
@@ -72,24 +75,15 @@ def test_add_mask():
     lev3.to_pickle(level_3.ov_Level3_masked)
 
 
-@pytest.mark.skip('Jake\'s problem')
+# @pytest.mark.skip('Jake\'s problem')
 def test_vignetting_correction(capsys):
     with capsys.disabled():
         lev3 = level_3.Level_3.from_pickle(level_3.ov_Level3_masked)
+        lev3.spectral_line_name = 'ov'
+        lev3 = lev3.correct_vignetting()
+        print(lev3.vignetting_correction_params)
 
-        fit = level_3.find_vignetting_correction(lev3)
-        print(fit)
 
-
-        # fit = np.array([0.40371635, 4.46974554, -0.6823358, 7.80875192, -4.22512385])
-        # fit = np.array([ 0.40843749,  0.35517264,  0.51301844,  0.4767043 , -8.81371075,
-        #        -1.15916574,  8.57623802,  8.99914776])
-        # vignetting = lev3.correct_vignetting(fit[0],fit[1:])
-
-    # fit = level_3.vignetting_correction_quality(np.array([.40167,5.9317,.0701,8.2418,-5.80780]),lev3)
-    # fit = level_3.vignetting_correction_quality(np.array([ 0.40371635,  4.46974554, -0.6823358 ,  7.80875192, -4.22512385]),lev3)
-
-    # fit = level_3.vignetting_correction_quality(np.array([.40167,0,0,0,0]),lev3)
 
 
 @pytest.mark.skip('Jake\'s problem')

@@ -14,6 +14,7 @@ import matplotlib.patches as patches
 from esis.science.papers.mission_paper import fig_path  # can't figure out relative import here
 import matplotlib.patheffects as PathEffects
 from kgpy.moment.percentile import width
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
 
 plt.rcParams.update({'font.size': 9})
 
@@ -78,8 +79,8 @@ def gauss_fit(domain, data):
 
 def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
     l4 = level_4.Level_4.from_pickle(event.mart_inverted_pickle_path)
-    # plot = l4.plot()
-    # plt.show()
+    plot = l4.plot()
+    plt.show()
     l4_int = l4.integrated_intensity
     brightest_pix = np.unravel_index(l4_int.argmax(), l4_int.shape)
 
@@ -101,8 +102,9 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
 
     wr = [1, 1, 1, 1, .05]
     hr = [1, 1]
-    fig1 = plt.figure(figsize=[7, 5])
-    spec1 = gridspec.GridSpec(nrows=2, ncols=len(seqs) + 1, width_ratios=wr, height_ratios=hr)
+    fig1 = plt.figure(figsize=[6.5, 3.1])
+    # fig1 = plt.figure(figsize=[6.5, 3.3])
+    spec1 = gridspec.GridSpec(nrows=2, ncols=len(seqs) + 1, width_ratios=wr, height_ratios=hr, top=.99)
     axs_top = []
     axs_bottom = []
 
@@ -123,14 +125,15 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
         t = axs_top[j].annotate(times[seq].strftime('%H:%M:%S'), (.25, .25), color='w')
         t.set_path_effects([PathEffects.withStroke(linewidth=1.1, foreground='black')])
         axs_top[j].coords[0].set_ticklabel(exclude_overlapping=True)
-        axs_top[j].coords[0].set_axislabel('Solar X (arcsec)')
+        axs_top[j].coords[0].set_axislabel(' ')
+        # axs_top[j].set_xlabel('')
         axs_top[j].coords[1].set_axislabel('Solar Y (arcsec)')
 
         if j > 0:
             axs_top[j].coords[1].set_ticklabel_visible(False)
         if j == len(seqs) - 1:
             cbaxes = fig1.add_subplot(spec1[0, j + 1])
-            cb = plt.colorbar(intensity, cax=cbaxes)
+            cb = plt.colorbar(intensity, cax=cbaxes, label='Photons')
 
         for i in range(event_pix.shape[1]):
             axs_top[j].plot(event_pix[1, i] - crop[1].start, event_pix[0, i] - crop[0].start, marker='.', color='r')
@@ -148,7 +151,7 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
             axs_bottom[j].coords[1].set_ticklabel_visible(False)
         if j == len(seqs) - 1:
             cbaxes = fig1.add_subplot(spec1[1, j + 1])
-            cb = plt.colorbar(dif_im, cax=cbaxes)
+            cb = plt.colorbar(dif_im, cax=cbaxes, label='Photons')
 
         shp = int_cutout.shape
         points = np.array([(0, 0), (0, shp[1]), (shp[0], shp[1]), (shp[0], 0)])
@@ -161,8 +164,10 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
                               )
         axs_bottom[j].add_patch(box)
 
+
     fits = []
-    fig2, axs = plt.subplots(n, n, constrained_layout=True, figsize=(7.5, 6))
+    fig2, axs = plt.subplots(n, n, constrained_layout=True, figsize=(6.5, 5))
+
     axs = axs[::-1]  # corrects subplots to match dot locations
     flat_axs = axs.flatten()
     colors = ['r', 'g', 'b', 'black']
@@ -185,16 +190,18 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
             # fit_params = gauss_fit(domain[guass_fit_trim: -guass_fit_trim], line_profile[guass_fit_trim: -guass_fit_trim])
             fits.append(fit_params)
 
-            flat_axs[i].plot(domain, line_profile, marker='.', linestyle='None', color=colors[j],ms=4)
+            flat_axs[i].plot(domain, line_profile, marker='.', linestyle='None', color=colors[j],ms=3)
             flat_axs[i].plot(domain, two_gauss(domain, *fit_params), color=colors[j], linewidth=1)
             flat_axs[i].set_ylim(top=lp_max)
+            flat_axs[i].xaxis.set_minor_locator(AutoMinorLocator())
             w1 = '%.0f' % fit_params[2]
             w2 = '%.0f' % fit_params[3]
             vel1 = '%.0f' % fit_params[4]
             vel2 = '%.0f' % fit_params[5]
-            flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (130, lp_max - 1.5 - 1.75 * j), color=colors[j],
+            flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (60, lp_max - 2.5 * (j+1)), color=colors[j],
                                  fontsize=7)
-            # flat_axs[i].annotate('w =' + w1 + ',' + w2, (150, top - 2 - 1 * j), color=colors[j], fontsize=7)
+            # flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (70, lp_max - 2 * (j+1)), color=colors[j],
+            #                      fontsize=7)
 
             if i == 1 or i == 2 or i == 4 or i == 5 or i == 7 or i == 8:
                 flat_axs[i].tick_params(labelleft=False)
@@ -208,6 +215,7 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
     axs[0, 0].set_ylabel('Intensity (photons)')
     axs[1, 0].set_ylabel('Intensity (photons)')
     axs[2, 0].set_ylabel('Intensity (photons)')
+    plt.subplots_adjust(top=.97,right=.97, left=.105)
 
     return fig1, fig2
 
@@ -390,14 +398,14 @@ if __name__ == '__main__':
 
 
     #
-    event = l3_events.perfectx
-    seqs = [6, 10, 15, 19] #for static figure
-    time_trim = slice(0, -4)
+    # event = l3_events.perfectx
+    # seqs = [6, 11, 15, 19] #for static figure
+    # time_trim = slice(0, -4)
 
 
-    # event = l3_events.otherx
-    # seqs = [4, 8, 13, 18]
-    # time_trim=None
+    event = l3_events.otherx
+    seqs = [4, 8, 13, 18]
+    time_trim=None
 
     ### Doesn't work when the thing you care about isn't the brightest in the frame
     # event = l3_events.big_blue

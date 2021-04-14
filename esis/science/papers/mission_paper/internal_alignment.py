@@ -10,7 +10,8 @@ plt.rcParams.update({'font.size': 9})
 if __name__ == '__main__':
 
     lev_3 = level_3.Level_3.from_pickle(level_3.ov_Level3_initial)
-    camera_combos = [(0, 1), (1, 2), (1, 3), (0, 2), (0, 3), (2, 3)]
+    channel_index = [(0, 1), (1, 2), (1, 3), (0, 2), (0, 3), (2, 3)]
+    cam_ids = [(1, 2), (2, 3), (2, 4), (1, 3), (1, 4), (3, 4)]
     colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
     marker = ['.', '.', '.', '*', '*', '*']
 
@@ -20,7 +21,7 @@ if __name__ == '__main__':
 
     list_cc = []
     for lev3_seq, lev1_seq in enumerate(lev_3.lev1_sequences):
-        for i, j in camera_combos:
+        for i, j in channel_index:
             cc = np.sum(normalized_imgs[lev3_seq, i] * normalized_imgs[lev3_seq, j]) / normalized_imgs[lev3_seq, i].size
             list_cc.append(cc)
 
@@ -34,7 +35,7 @@ if __name__ == '__main__':
 
     updated_list_cc = []
     for lev3_seq, lev1_seq in enumerate(updated_lev_3.lev1_sequences):
-        for i, j in camera_combos:
+        for i, j in channel_index:
             cc = np.sum(normalized_imgs[lev3_seq, i] * normalized_imgs[lev3_seq, j]) / normalized_imgs[lev3_seq, i].size
             updated_list_cc.append(cc)
 
@@ -50,8 +51,8 @@ if __name__ == '__main__':
     ax.set_ylabel('Cross-Correlation Ratio')
     ax.set_xlabel('Level-3 Image Sequence')
     for lev3_seq, lev1_seq in enumerate(updated_lev_3.lev1_sequences):
-        for i, combo in enumerate(camera_combos):
-            ax.plot(lev3_seq, cc_ratio[i, lev3_seq], marker=marker[i], ls='', color=colors[i], label=camera_combos[i])
+        for i, combo in enumerate(channel_index):
+            ax.plot(lev3_seq, cc_ratio[i, lev3_seq], marker=marker[i], ls='', color=colors[i], label=cam_ids[i])
             if lev3_seq == 0:
                 ax.legend()
     ax.axhline(y=1, color='r')
