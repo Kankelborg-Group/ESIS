@@ -24,7 +24,7 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
     num_sides: int = 0
     clear_half_width: u.Quantity = 0 * u.mm
     border_width: u.Quantity = 0 * u.mm
-    substrate_thickness: u.Quantity = 0 * u.mm
+    substrate_thickness: typ.Optional[u.Quantity] = None
 
     @property
     def focal_length(self) -> u.Quantity:
@@ -65,7 +65,10 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
         other.num_sides = self.num_sides
         other.clear_half_width = self.clear_half_width.copy()
         other.border_width = self.border_width.copy()
-        other.substrate_thickness = self.substrate_thickness.copy()
+        if self.substrate_thickness is not None:
+            other.substrate_thickness = self.substrate_thickness.copy()
+        else:
+            other.substrate_thickness = self.substrate_thickness
         return other
 
     @property

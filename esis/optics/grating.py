@@ -39,7 +39,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     border_width: u.Quantity = 0 * u.mm
     inner_border_width: u.Quantity = 0 * u.mm
     dynamic_clearance: u.Quantity = 0 * u.mm
-    substrate_thickness: u.Quantity = 0 * u.mm
+    substrate_thickness: typ.Optional[u.Quantity] = None
 
     @property
     def dataframe(self) -> pandas.DataFrame:
@@ -111,7 +111,11 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
             ruling_density_quadratic=self.ruling_density_coeff_quadratic,
             ruling_density_cubic=self.ruling_density_coeff_cubic,
         )
-        surface.material = optics.surface.material.Mirror(thickness=-self.substrate_thickness)
+        if self.substrate_thickness is not None:
+            thickness = -self.substrate_thickness
+        else:
+            thickness = None
+        surface.material = optics.surface.material.Mirror(thickness=thickness)
         side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
         surface.aperture = optics.surface.aperture.IsoscelesTrapezoid(
             apex_offset=-(self.cylindrical_radius - side_border_x),
@@ -147,7 +151,10 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.border_width = self.border_width.copy()
         other.inner_border_width = self.inner_border_width.copy()
         other.dynamic_clearance = self.dynamic_clearance.copy()
-        other.substrate_thickness = self.substrate_thickness.copy()
+        if self.substrate_thickness is not None:
+            other.substrate_thickness = self.substrate_thickness.copy()
+        else:
+            other.substrate_thickness = self.substrate_thickness
         return other
 
     def apply_gregorian_layout(

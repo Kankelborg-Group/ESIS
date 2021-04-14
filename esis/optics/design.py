@@ -125,6 +125,14 @@ def final(
     if not all_channels:
         channel_angle = channel_angle[1]
 
+    if not all_channels:
+        roll = -channel_angle
+    else:
+        roll = 0 * u.deg
+
+    dashstyle = (0, (1, 1))
+    dashstyle_channels = [dashstyle, None, None, None, None, dashstyle]
+
     primary = Primary()
     primary.radius = 2000 * u.mm
     primary.num_sides = num_sides
@@ -174,6 +182,8 @@ def final(
     grating.outer_half_width = 10.49 * u.mm - grating.border_width
     grating.dynamic_clearance = 1.25 * u.mm
     grating.substrate_thickness = 10 * u.mm
+    if all_channels:
+        grating.plot_kwargs['linestyle'] = dashstyle_channels
 
     filter = Filter()
     filter.piston = grating.piston - 1.301661998854058 * u.m
@@ -181,6 +191,8 @@ def final(
     filter.cylindrical_azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
     filter.clear_radius = 15.9 * u.mm
+    if all_channels:
+        filter.plot_kwargs['linestyle'] = dashstyle_channels
 
     detector = Detector()
     detector.piston = filter.piston - 200 * u.mm
@@ -199,6 +211,8 @@ def final(
     detector.readout_noise_tap2 = 4 * u.ct
     detector.readout_noise_tap3 = 4 * u.ct
     detector.readout_noise_tap4 = 4 * u.ct
+    if all_channels:
+        detector.plot_kwargs['linestyle'] = dashstyle_channels
 
     field_limit = (0.09561 * u.deg).to(u.arcsec)
     source = Source()
@@ -221,6 +235,7 @@ def final(
         pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
         field_is_stratified_random=field_is_stratified_random,
+        roll=roll,
     )
 
 

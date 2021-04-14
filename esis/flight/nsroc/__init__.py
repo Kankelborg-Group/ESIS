@@ -3,6 +3,7 @@ import pathlib
 import astropy.units as u
 import kgpy
 import kgpy.nsroc
+import esis.data
 
 __all__ = [
     'trajectory_file',
@@ -17,18 +18,8 @@ def trajectory() -> kgpy.nsroc.Trajectory:
     return kgpy.nsroc.Trajectory.from_nsroc_csv(csv_file=trajectory_file)
 
 
-@dataclasses.dataclass
-class Timeline(kgpy.nsroc.Timeline):
-    esis_exp_launch: kgpy.nsroc.Event = dataclasses.field(
-        default_factory=lambda: kgpy.nsroc.Event(name=kgpy.Name('ESIS EXP launch')))
-
-    def __iter__(self):
-        yield from super().__iter__()
-        yield self.esis_exp_launch
-
-
-def timeline() -> kgpy.nsroc.Timeline:
-    tl = Timeline()
+def timeline() -> esis.data.nsroc.Timeline:
+    tl = esis.data.nsroc.Timeline()
     tl.esis_exp_launch.time_mission = 0.1 * u.s
     tl.rail_release.time_mission = 0.6 * u.s
     tl.terrier_burnout.time_mission = 6.2 * u.s
