@@ -57,6 +57,7 @@ class Level_0(kgpy.obs.Image):
         self._darks_nobias = None
         self._trajectory = None
         self._time_optimized = None
+        self._intensity_electrons_prelim = None
 
     @classmethod
     def from_directory(
@@ -390,6 +391,23 @@ class Level_0(kgpy.obs.Image):
     @property
     def intensity_electrons(self) -> u.Quantity:
         return self.optics.detector.convert_adu_to_electrons(self.intensity_nobias_nodark_active)
+
+    @property
+    def intensity_electrons_prelim(self) -> u.Quantity:
+        if self._intensity_electrons_prelim is None:
+            index_dark_up_first = self.index_dark_up_first
+            index_dark_up_last = index_dark_up_first + 5
+            index_dark_down_last = self.index_dark_down_last
+            index_dark_down_first = index_dark_down_last - 5
+            darks_up = self.intensity_nobias[index_dark_up_first:index_dark_up_last + 1]
+            darks_down = self.intensity_nobias[index_dark_down_first:index_dark_down_last + 1]
+            darks = np.concatenate([darks_up, darks_down])
+            dark = self._calc_dark(darks=darks)
+            intensity_nobias_nodark = self._remove_dark(intensity=self.intensity_nobias, master_dark=dark)
+            intensity_nobias_nodark_active = self.optics.detector.remove_inactive_pixels(intensity_nobias_nodark)
+            intensity_electrons = self.optics.detector.convert_adu_to_electrons(intensity_nobias_nodark_active)
+            self._intensity_electrons_prelim = intensity_electrons
+        return self._intensity_electrons_prelim
 
     @property
     def intensity_electrons_avg(self) -> u.Quantity:
