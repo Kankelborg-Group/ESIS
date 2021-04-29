@@ -403,7 +403,7 @@ class Level_0(kgpy.obs.Image):
         )
 
     @classmethod
-    def atmosphere_transmission(
+    def _calc_atmosphere_transmission(
             cls,
             intensity_avg: u.Quantity,
             altitude: u.Quantity,
@@ -417,14 +417,30 @@ class Level_0(kgpy.obs.Image):
             absorption_coefficient_bounds=[0.0001, 0.01] * u.cm**2 / u.g,
             particle_mass=16 * u.cds.mp,
             radius_base=120 * u.km,
-            scale_height_bounds=[1, 100] * u.km,
+            scale_height_bounds=[5, 200] * u.km,
             temperature_base=355 * u.K,
-            temperature_infinity_bounds=[355, 1000] * u.K,
+            temperature_infinity_bounds=[355, 2000] * u.K,
         )
+
+    @property
+    def atmosphere_transmission(self) -> kgpy.atmosphere.TransmissionBates:
+        intensity_avg = self._calc_intensity_avg(self.intensity_electrons_nostray_prelim)
+        slice_optimize = self._slice_optimize(intensity_avg)
+        return self._calc_atmosphere_transmission(
+                intensity_avg=intensity_avg[slice_optimize],
+                altitude=self.altitude[slice_optimize],
+                sun_zenith_angle=self.sun_zenith_angle[slice_optimize],
+            )
+
+    def _slice_optimize(self, intensity_avg: u.Quantity) -> np.array:
+        intensity_avg_norm = intensity_avg / intensity_avg.max(self.axis.time)
+        return intensity_avg_norm.mean(self.axis.channel) >= 0.25
 
     def _calc_offset_optimized(self) -> u.Quantity:
 
         intensity_avg = self._calc_intensity_avg(self.intensity_electrons_nostray_prelim)
+
+        slice_optimize = self._slice_optimize(intensity_avg)
 
         def factory(
                 params: np.ndarray,
@@ -436,8 +452,8 @@ class Level_0(kgpy.obs.Image):
             time = self.time + time_offset
             altitude = self.trajectory.altitude_interp(t=time)
             sun_zenith_angle = self.trajectory.sun_zenith_angle_interp(t=time)
-            slice_optimize = self._slice_signal(time)
-            transmission_model = self.atmosphere_transmission(
+            # slice_optimize = self._slice_signal(time)
+            transmission_model = self._calc_atmosphere_transmission(
                 intensity_avg=intensity_avg[slice_optimize],
                 altitude=altitude[slice_optimize],
                 sun_zenith_angle=sun_zenith_angle[slice_optimize],
@@ -446,18 +462,18 @@ class Level_0(kgpy.obs.Image):
                 radius=altitude,
                 zenith_angle=sun_zenith_angle,
             )
-            # intensity_corrected = intensity_avg / transmission
+            intensity_corrected = intensity_avg / transmission
 
             # intensity_corrected = scipy.intensity_avg.detrend(
             #     data=intensity_corrected[slice_optimize],
             #     axis=0,
             # ) << intensity_corrected.unit
-            # intensity_corrected = intensity_corrected[slice_optimize]
+            intensity_corrected = intensity_corrected[slice_optimize]
 
-            # value = np.sqrt(np.mean(np.square(np.std(intensity_corrected, axis=0))))
-            intensity_normalized = intensity_avg / intensity_avg.max(self.axis.time)
-            intensity_normalized = intensity_normalized * transmission.max(self.axis.time)
-            value = np.sqrt(np.mean(np.square(intensity_normalized[slice_optimize] - transmission[slice_optimize])))
+            value = np.sqrt(np.mean(np.square(np.std(intensity_corrected, axis=0))))
+            # intensity_normalized = intensity_avg / intensity_avg.max(self.axis.time)
+            # intensity_normalized = intensity_normalized * transmission.max(self.axis.time)
+            # value = np.sqrt(np.mean(np.square(intensity_normalized[slice_optimize] - transmission[slice_optimize])))
             print(time_offset)
             print(transmission_model)
             print(value)
