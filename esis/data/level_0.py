@@ -186,14 +186,6 @@ class Level_0(kgpy.obs.Image):
         return np.median(np.argmin(np.abs(dt.value), axis=0)).astype(int)
 
     @property
-    def altitude(self) -> u.Quantity:
-        return self.trajectory.altitude_interp(self.time_optimized)
-
-    @property
-    def sun_zenith_angle(self) -> u.Quantity:
-        return self.trajectory.sun_zenith_angle_interp(self.time_optimized)
-
-    @property
     def index_dark_up_first(self) -> int:
         return self.num_invalid_exposures
 
@@ -488,6 +480,14 @@ class Level_0(kgpy.obs.Image):
     @property
     def time_optimized(self) -> astropy.time.Time:
         return self.time + self.offset_optimized
+
+    @property
+    def altitude(self) -> u.Quantity:
+        return self.trajectory.altitude_interp(self.time_optimized)
+
+    @property
+    def sun_zenith_angle(self) -> u.Quantity:
+        return self.trajectory.sun_zenith_angle_interp(self.time_optimized)
 
     @property
     def _time_plot_grid(self):
