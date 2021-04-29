@@ -438,7 +438,71 @@ class Level_0(kgpy.obs.Image):
             temperature_infinity_bounds=[355, 1000] * u.K,
         )
 
-        return atmosphere_transmission
+    def _calc_offset_optimized(self) -> u.Quantity:
+
+        intensity_avg = self._calc_intensity_avg(self.intensity_electrons_nostray_prelim)
+
+        def factory(
+                params: np.ndarray,
+        ) -> u.Quantity:
+            return params[0] * u.s
+
+        def objective(params: np.ndarray):
+            time_offset = factory(params)
+            time = self.time + time_offset
+            altitude = self.trajectory.altitude_interp(t=time)
+            sun_zenith_angle = self.trajectory.sun_zenith_angle_interp(t=time)
+            slice_optimize = self._slice_signal(time)
+            transmission_model = self.atmosphere_transmission(
+                intensity_avg=intensity_avg[slice_optimize],
+                altitude=altitude[slice_optimize],
+                sun_zenith_angle=sun_zenith_angle[slice_optimize],
+            )
+            transmission = transmission_model(
+                radius=altitude,
+                zenith_angle=sun_zenith_angle,
+            )
+            # intensity_corrected = intensity_avg / transmission
+
+            # intensity_corrected = scipy.intensity_avg.detrend(
+            #     data=intensity_corrected[slice_optimize],
+            #     axis=0,
+            # ) << intensity_corrected.unit
+            # intensity_corrected = intensity_corrected[slice_optimize]
+
+            # value = np.sqrt(np.mean(np.square(np.std(intensity_corrected, axis=0))))
+            intensity_normalized = intensity_avg / intensity_avg.max(self.axis.time)
+            intensity_normalized = intensity_normalized * transmission.max(self.axis.time)
+            value = np.sqrt(np.mean(np.square(intensity_normalized[slice_optimize] - transmission[slice_optimize])))
+            print(time_offset)
+            print(transmission_model)
+            print(value)
+            print()
+            return value.value
+
+        time_bound = self.exposure_length.mean() / 2
+        params_optimized = scipy.optimize.brute(
+            func=objective,
+            Ns=21,
+            ranges=[
+                [-time_bound.value, time_bound.value],
+            ],
+            # finish=None,
+        )
+
+        print(params_optimized)
+
+        return factory(params_optimized[np.newaxis])
+
+    @property
+    def offset_optimized(self) -> u.Quantity:
+        if self._offset_optimized is None:
+            self._offset_optimized = self._calc_offset_optimized()
+        return self._offset_optimized
+
+    @property
+    def time_optimized(self) -> astropy.time.Time:
+        return self.time + self.offset_optimized
 
     @property
     def _time_plot_grid(self):
