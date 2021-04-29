@@ -434,6 +434,36 @@ class Level_0(kgpy.obs.Image):
     def time_index_signal(self) -> u.Quantity:
         return self.time_index[self.slice_signal]
 
+    @classmethod
+    def _calc_stray_light_avg(cls, intensity: u.Quantity, num_pixels: int = 100):
+        slice_lower = [slice(None)] * cls.axis.ndim
+        slice_upper = [slice(None)] * cls.axis.ndim
+
+        slice_lower[cls.axis.y] = slice(None, num_pixels)
+        slice_upper[cls.axis.y] = slice(~(num_pixels - 1), None)
+
+        strip_lower = intensity[slice_lower]
+        strip_upper = intensity[slice_upper]
+
+        proportion = 0.3
+
+        strip_lower_avg = scipy.stats.trim_mean(
+            a=strip_lower.reshape(strip_lower.shape[:~1] + (-1,)),
+            proportiontocut=proportion,
+            axis=~0,
+        ) << strip_lower.unit
+        strip_upper_avg = scipy.stats.trim_mean(
+            a=strip_upper.reshape(strip_upper.shape[:~1] + (-1,)),
+            proportiontocut=proportion,
+            axis=~0,
+        ) << strip_upper.unit
+
+        return np.where(
+            strip_lower_avg.sum(cls.axis.time) < strip_upper_avg.sum(cls.axis.time),
+            strip_lower_avg,
+            strip_upper_avg,
+        )
+
     @property
     def absorption_atmosphere(self) -> kgpy.model.Logistic:
         altitude_max = self.altitude.max()
