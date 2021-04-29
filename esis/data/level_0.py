@@ -34,10 +34,7 @@ class Level_0(kgpy.obs.Image):
     fpga_vccint_voltage: typ.Optional[u.Quantity] = None
     fpga_vccaux_voltage: typ.Optional[u.Quantity] = None
     fpga_vccbram_voltage: typ.Optional[u.Quantity] = None
-    adc_temp_1: typ.Optional[u.Quantity] = None
-    adc_temp_2: typ.Optional[u.Quantity] = None
-    adc_temp_3: typ.Optional[u.Quantity] = None
-    adc_temp_4: typ.Optional[u.Quantity] = None
+    adc_temp: typ.Optional[u.Quantity] = None
     # detector: typ.Optional[esis.optics.Detector] = None
     optics: typ.Optional[esis.optics.Optics] = None
     trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None
@@ -110,10 +107,10 @@ class Level_0(kgpy.obs.Image):
                 self.fpga_vccint_voltage[i, c] = float(hdu.header['FPGAVINT']) * u.adu
                 self.fpga_vccaux_voltage[i, c] = float(hdu.header['FPGAVAUX']) * u.adu
                 self.fpga_vccbram_voltage[i, c] = float(hdu.header['FPGAVBRM']) * u.adu
-                self.adc_temp_1[i, c] = float(hdu.header['ADCTEMP1']) * u.adu
-                self.adc_temp_2[i, c] = float(hdu.header['ADCTEMP2']) * u.adu
-                self.adc_temp_3[i, c] = float(hdu.header['ADCTEMP3']) * u.adu
-                self.adc_temp_4[i, c] = float(hdu.header['ADCTEMP4']) * u.adu
+                self.adc_temp[i, c, 0] = float(hdu.header['ADCTEMP1']) * u.adu
+                self.adc_temp[i, c, 1] = float(hdu.header['ADCTEMP2']) * u.adu
+                self.adc_temp[i, c, 2] = float(hdu.header['ADCTEMP3']) * u.adu
+                self.adc_temp[i, c, 3] = float(hdu.header['ADCTEMP4']) * u.adu
 
         self.time = self.time - self.exposure_half_length
 
@@ -132,10 +129,7 @@ class Level_0(kgpy.obs.Image):
         self.fpga_vccint_voltage = np.zeros(sh) * u.adu
         self.fpga_vccaux_voltage = np.zeros(sh) * u.adu
         self.fpga_vccbram_voltage = np.zeros(sh) * u.adu
-        self.adc_temp_1 = np.zeros(sh) * u.adu
-        self.adc_temp_2 = np.zeros(sh) * u.adu
-        self.adc_temp_3 = np.zeros(sh) * u.adu
-        self.adc_temp_4 = np.zeros(sh) * u.adu
+        self.adc_temp = np.zeros(tuple(sh) + (4, )) * u.adu
         self.optics = esis.optics.Optics()
         return self
 
@@ -528,11 +522,11 @@ class Level_0(kgpy.obs.Image):
         return self.plot_quantity_vs_index(ax=ax, a=self.fpga_vccbram_voltage, a_name='FPGA BRAM', )
 
     def plot_adc_temperature(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_1, a_name='ADC temp 1', ax=ax)
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_2, a_name='ADC temp 2', ax=ax)
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_3, a_name='ADC temp 3', ax=ax)
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_4, a_name='ADC temp 4', ax=ax, legend_ncol=2)
-        return ax
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 0], a_name='ADC temp 1', ax=ax)
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 1], a_name='ADC temp 2', ax=ax)
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 2], a_name='ADC temp 3', ax=ax)
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 3], a_name='ADC temp 4', ax=ax)
+        return None
 
     def plot_bias(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
         bias = self.bias.mean(axis=~0)
