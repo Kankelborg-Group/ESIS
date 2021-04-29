@@ -666,14 +666,15 @@ class Level_0(kgpy.obs.Image):
             self,
             ax: plt.Axes,
             time: typ.Optional[astropy.time.Time] = None,
-            plot_model: bool = True,
     ) -> plt.Axes:
         with astropy.visualization.quantity_support():
             if time is None:
                 time = self.time_optimized
 
             altitude = self.trajectory.altitude_interp(time)
-            signal = self.intensity_electrons_avg
+            # signal = self.intensity_electrons_avg
+            signal = self._calc_intensity_avg(self.intensity_nobias)
+            signal = signal / signal.max(0)
             apogee_index = self._calc_closest_index(self.trajectory.time_apogee, times=time)
             altitude_up, altitude_down = altitude[:apogee_index + 1], altitude[apogee_index:]
             signal_up, signal_down = signal[:apogee_index + 1], signal[apogee_index:]
@@ -681,17 +682,11 @@ class Level_0(kgpy.obs.Image):
             # signal = np.median(self.intensity_electrons, axis=self.axis.xy)
             # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
             # signal = np.percentile(self.intensity_electrons, 75, axis=self.axis.xy)
-            absorption_model = self.absorption_atmosphere(altitude_up)
-            if plot_model:
-                ls = '-.'
-            else:
-                ls = None
             for i in range(self.num_channels):
                 lines_up, = ax.plot(
                     altitude_up[..., i],
                     signal_up[..., i],
                     label=self.channel_labels[i] + ' average signal, upleg',
-                    linestyle=ls,
                 )
                 lines_down, = ax.plot(
                     altitude_down[..., i],
@@ -700,13 +695,6 @@ class Level_0(kgpy.obs.Image):
                     color=lines_up.get_color(),
                     linestyle='--',
                 )
-                if plot_model:
-                    lines_model = ax.plot(
-                        altitude_up[..., i],
-                        absorption_model[..., i],
-                        label=self.channel_labels[i] + ' modeled response',
-                        color=lines_up.get_color(),
-                    )
 
         return ax
 
