@@ -372,26 +372,6 @@ class Level_0(kgpy.obs.Image):
     def intensity_electrons_avg(self) -> u.Quantity:
         return self._calc_intensity_avg(self.intensity_electrons)
 
-    @property
-    def intensity_signal(self) -> u.Quantity:
-        return self.intensity_electrons[self.slice_signal]
-
-    @property
-    def time_signal(self) -> astropy.time.Time:
-        return self.time[self.slice_signal]
-
-    @property
-    def time_optimized_signal(self) -> astropy.time.Time:
-        return self.time_optimized[self.slice_signal]
-
-    @property
-    def exposure_length_signal(self) -> u.Quantity:
-        return self.exposure_length[self.slice_signal]
-
-    @property
-    def time_index_signal(self) -> u.Quantity:
-        return self.time_index[self.slice_signal]
-
     @classmethod
     def _calc_stray_light_avg(cls, intensity: u.Quantity, num_pixels: int = 100):
         slice_lower = [slice(None)] * cls.axis.ndim
