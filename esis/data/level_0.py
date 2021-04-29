@@ -42,7 +42,6 @@ class Level_0(kgpy.obs.Image):
     # num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
     num_invalid_exposures: int = 2
-    dacs_sample_period: u.Quantity = 2 * u.s
 
     def __post_init__(self):
         super().__post_init__()
@@ -153,18 +152,6 @@ class Level_0(kgpy.obs.Image):
     def time_mission_start(self) -> astropy.time.Time:
         # return self.time_exp_start[0].min()
         return self.trajectory.time_start
-
-    @property
-    def time_data_start_expectation(self) -> astropy.time.Time:
-        return self.time_mission_start + self.timeline.esis_exp_launch.time_mission + self.dacs_sample_period / 2
-
-    @property
-    def offset_data_start_expectation(self) -> u.Quantity:
-        return (self.time_data_start_expectation - self.time_exp_start[0].min()).to(u.s)
-
-    @property
-    def time_expectation(self) -> astropy.time.Time:
-        return self.time + self.offset_data_start_expectation
 
     @classmethod
     def _calc_intensity_avg(cls, intensity: u.Quantity) -> u.Quantity:
