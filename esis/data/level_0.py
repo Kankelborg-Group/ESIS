@@ -52,7 +52,7 @@ class Level_0(kgpy.obs.Image):
         self._intensity_nobias = None
         self._darks_nobias = None
         self._trajectory = None
-        self._time_optimized = None
+        self._offset_optimized = None
         self._intensity_electrons_prelim = None
 
     @classmethod
@@ -187,17 +187,17 @@ class Level_0(kgpy.obs.Image):
             times: typ.Optional[astropy.time.Time] = None,
     ) -> int:
         if times is None:
-            times = self.time
+            times = self.time_optimized
         dt = times - t
         return np.median(np.argmin(np.abs(dt.value), axis=0)).astype(int)
 
     @property
     def altitude(self) -> u.Quantity:
-        return self.trajectory.altitude_interp(self.time)
+        return self.trajectory.altitude_interp(self.time_optimized)
 
     @property
-    def sun_zenith_angle(self):
-        return self.trajectory.sun_zenith_angle_interp(self.time)
+    def sun_zenith_angle(self) -> u.Quantity:
+        return self.trajectory.sun_zenith_angle_interp(self.time_optimized)
 
     # @property
     # def intensity_derivative(self) -> u.Quantity:
@@ -237,21 +237,21 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def index_signal_first(self) -> int:
-        return self._index_signal_first(time=self.time)
+        return self._index_signal_first(time=self.time_optimized)
 
     def _index_signal_last(self, time: astropy.time.Time) -> int:
         return self._calc_closest_index(t=self.time_rlg_disable, times=time) - 1
 
     @property
     def index_signal_last(self) -> int:
-        return self._index_signal_last(time=self.time)
+        return self._index_signal_last(time=self.time_optimized)
 
     def _slice_signal(self, time: astropy.time.Time) -> slice:
         return slice(self._index_signal_first(time=time), self._index_signal_last(time=time) + 1)
 
     @property
     def slice_signal(self) -> slice:
-        return self._slice_signal(time=self.time)
+        return self._slice_signal(time=self.time_optimized)
 
     @property
     def index_apogee(self) -> int:
@@ -259,7 +259,7 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def time_apogee(self) -> astropy.time.Time:
-        return self.time[self.index_apogee]
+        return self.time_optimized[self.index_apogee]
 
     @property
     def slice_upleg(self) -> slice:
@@ -379,6 +379,10 @@ class Level_0(kgpy.obs.Image):
     @property
     def time_signal(self) -> astropy.time.Time:
         return self.time[self.slice_signal]
+
+    @property
+    def time_optimized_signal(self) -> astropy.time.Time:
+        return self.time_optimized[self.slice_signal]
 
     @property
     def exposure_length_signal(self) -> u.Quantity:
@@ -640,7 +644,7 @@ class Level_0(kgpy.obs.Image):
         ax_twin._get_lines.prop_cycler = ax._get_lines.prop_cycler
 
         if time is None:
-            time = self.time
+            time = self.time_optimized
 
         signal = self.intensity_electrons_avg
         # self.plot_intensity_nobias_mean(ax=ax)
@@ -670,7 +674,7 @@ class Level_0(kgpy.obs.Image):
     ) -> plt.Axes:
         with astropy.visualization.quantity_support():
             if time is None:
-                time = self.time
+                time = self.time_optimized
 
             altitude = self.trajectory.altitude_interp(time)
             signal = self.intensity_electrons_avg
@@ -748,7 +752,7 @@ class Level_0(kgpy.obs.Image):
             self.intensity_nobias_nodark[time_index, channel_index],
         ])
 
-        time = self.time[time_index, channel_index]
+        time = self.time_optimized[time_index, channel_index]
         chan = self.channel[channel_index]
         seq_index = self.time_index[time_index]
 
