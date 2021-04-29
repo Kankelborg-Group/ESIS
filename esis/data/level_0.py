@@ -166,8 +166,13 @@ class Level_0(kgpy.obs.Image):
     def time_expectation(self) -> astropy.time.Time:
         return self.time + self.offset_data_start_expectation
 
-    def _calc_intensity_avg(self, intensity: u.Quantity) -> u.Quantity:
-        return intensity.mean(self.axis.xy)
+    @classmethod
+    def _calc_intensity_avg(cls, intensity: u.Quantity) -> u.Quantity:
+        return scipy.stats.trim_mean(
+            intensity.reshape(intensity.shape[:~1] + (-1, )),
+            proportiontocut=0.25,
+            axis=~0,
+        ) << intensity.unit
 
     @property
     def offset_optimized(self) -> u.Quantity:
