@@ -8,9 +8,11 @@ import astropy.time
 import astropy.wcs
 import astropy.io.fits
 import astropy.visualization
+# import astropy.modeling
 import scipy.stats
 import scipy.interpolate
 import scipy.optimize
+# import scipy.signal
 import kgpy.vector
 import kgpy.atmosphere
 import kgpy.model
@@ -152,14 +154,6 @@ class Level_0(kgpy.obs.Image):
     def time_mission_start(self) -> astropy.time.Time:
         # return self.time_exp_start[0].min()
         return self.trajectory.time_start
-
-    @classmethod
-    def _calc_intensity_avg(cls, intensity: u.Quantity) -> u.Quantity:
-        return scipy.stats.trim_mean(
-            intensity.reshape(intensity.shape[:~1] + (-1, )),
-            proportiontocut=0.25,
-            axis=~0,
-        ) << intensity.unit
 
     @property
     def time_shutter_open(self) -> astropy.time.Time:
@@ -397,6 +391,14 @@ class Level_0(kgpy.obs.Image):
             intensity_electrons = intensity_electrons - stray_light[..., np.newaxis, np.newaxis]
             self._intensity_electrons_prelim = intensity_electrons
         return self._intensity_electrons_prelim
+
+    @classmethod
+    def _calc_intensity_avg(cls, intensity: u.Quantity) -> u.Quantity:
+        return scipy.stats.trim_mean(
+            intensity.reshape(intensity.shape[:~1] + (-1, )),
+            proportiontocut=0.25,
+            axis=~0,
+        ) << intensity.unit
 
     @property
     def intensity_electrons_avg(self) -> u.Quantity:
