@@ -193,23 +193,6 @@ class Level_0(kgpy.obs.Image):
     def sun_zenith_angle(self) -> u.Quantity:
         return self.trajectory.sun_zenith_angle_interp(self.time_optimized)
 
-    # @property
-    # def intensity_derivative(self) -> u.Quantity:
-    #     if self._intensity_derivative is None:
-    #         m = np.percentile(self.intensity, 99, axis=self.axis.xy)
-    #         self._intensity_derivative = np.gradient(m, axis=self.axis.time)
-    #     return self._intensity_derivative
-    #
-    # @property
-    # def _index_deriv_max(self):
-    #     indices = np.argmax(self.intensity_derivative, axis=self.axis.time)
-    #     return scipy.stats.mode(indices)[0][0]
-    #
-    # @property
-    # def _index_deriv_min(self):
-    #     indices = np.argmin(self.intensity_derivative, axis=self.axis.time)
-    #     return scipy.stats.mode(indices)[0][0]
-
     @property
     def index_dark_up_first(self) -> int:
         return self.num_invalid_exposures
