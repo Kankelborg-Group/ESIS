@@ -420,20 +420,24 @@ class Level_0(kgpy.obs.Image):
             slope_guess=1 / altitude_max,
         )
 
-    def atmosphere_transmission(self, time: astropy.time.Time) -> kgpy.atmosphere.Transmission:
-
-        signal = self._calc_intensity_avg(self.intensity_nobias)
-        # signal = signal / signal.max(axis=0)
-
-        signal_sum = signal.sum(axis=self.axis.channel)
-        mask = signal_sum > signal_sum.max() / 10
-
-        atmosphere_transmission = kgpy.atmosphere.Transmission.from_data_fit(
-            observer_height=self.trajectory.altitude_interp(t=time)[mask],
-            zenith_angle=self.trajectory.sun_zenith_angle_interp(t=time)[mask],
-            intensity_observed=signal[mask],
-            absorption_coefficient_guess=1 / u.m,
-            scale_height_guess=10 * u.km,
+    @classmethod
+    def atmosphere_transmission(
+            cls,
+            intensity_avg: u.Quantity,
+            altitude: u.Quantity,
+            sun_zenith_angle: u.Quantity,
+    ) -> kgpy.atmosphere.TransmissionBates:
+        return kgpy.atmosphere.TransmissionBates.from_data_fit(
+            observer_height=altitude,
+            zenith_angle=sun_zenith_angle,
+            intensity_observed=intensity_avg,
+            density_base=0.001 * u.g / u.cm**3,
+            absorption_coefficient_bounds=[0.0001, 0.01] * u.cm**2 / u.g,
+            particle_mass=16 * u.cds.mp,
+            radius_base=120 * u.km,
+            scale_height_bounds=[1, 100] * u.km,
+            temperature_base=355 * u.K,
+            temperature_infinity_bounds=[355, 1000] * u.K,
         )
 
         return atmosphere_transmission
