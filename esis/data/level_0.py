@@ -162,49 +162,6 @@ class Level_0(kgpy.obs.Image):
         ) << intensity.unit
 
     @property
-    def offset_optimized(self) -> u.Quantity:
-
-        signal = self._calc_intensity_avg(self.intensity_nobias)
-        signal = signal / signal.max(0)
-
-        def objective(t: float):
-            time = self.time + t * u.s
-            altitude = self.trajectory.altitude_interp(time)
-            apogee_index = self._calc_closest_index(self.trajectory.time_apogee, times=time)
-            altitude_up, altitude_down = altitude[:apogee_index + 1], altitude[apogee_index:]
-            signal_up, signal_down = signal[:apogee_index + 1], signal[apogee_index:]
-            # mask = altitude_up >= 200 * u.km
-            result = 0
-            for i in range(self.num_channels):
-                # signal_down_interp = scipy.interpolate.interp1d(altitude_down[..., i], signal_down[..., i])
-                # mask_i = mask[..., i]
-                # diff = signal_up[mask_i, i].value - signal_down_interp(altitude_up[mask_i, i])
-                # result = result + np.mean(np.square(diff))
-                # print(signal_up[..., i])
-                altitude_up_interp = scipy.interpolate.interp1d(signal_up[..., i], altitude_up[..., i], fill_value='extrapolate')
-                altitude_down_interp = scipy.interpolate.interp1d(signal_down[..., i], altitude_down[..., i], fill_value='extrapolate')
-                diff = altitude_up_interp(1 / 2) - altitude_down_interp(1 / 2)
-                result = result + np.square(diff)
-            result = np.sqrt(result / self.num_channels)
-            return result
-
-        bound = self.exposure_length.mean()
-
-        time_offset, *_ = scipy.optimize.brute(
-            func=objective,
-            Ns=100,
-            ranges=[[-bound.value, bound.value]],
-        )
-
-        return time_offset * u.s
-
-    @property
-    def time_optimized(self):
-        if self._time_optimized is None:
-            self._time_optimized = self.time + self.offset_optimized
-        return self._time_optimized
-
-    @property
     def time_shutter_open(self) -> astropy.time.Time:
         return self.time_mission_start + self.timeline.shutter_door_open.time_mission
 
