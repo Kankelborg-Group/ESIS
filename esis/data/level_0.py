@@ -408,18 +408,6 @@ class Level_0(kgpy.obs.Image):
             strip_upper_avg,
         )
 
-    @property
-    def absorption_atmosphere(self) -> kgpy.model.Logistic:
-        altitude_max = self.altitude.max()
-        signal = self.intensity_signal.mean(self.axis.xy)
-        return kgpy.model.Logistic.from_data_fit(
-            x=self.altitude[self.slice_signal],
-            y=signal,
-            amplitude_guess=signal.max(),
-            offset_x_guess=altitude_max / 2,
-            slope_guess=1 / altitude_max,
-        )
-
     @classmethod
     def atmosphere_transmission(
             cls,
