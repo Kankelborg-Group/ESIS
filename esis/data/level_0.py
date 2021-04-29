@@ -190,53 +190,17 @@ class Level_0(kgpy.obs.Image):
         return self.num_invalid_exposures
 
     @property
-    def index_dark_up_last(self) -> int:
-        return self._calc_closest_index(self.time_shutter_open) - 1
-
-    @property
-    def index_dark_down_first(self) -> int:
-        return self._calc_closest_index(self.time_parachute_deploy)
-
-    @property
     def index_dark_down_last(self) -> int:
         return self.num_times - 1
 
     def _index_signal_first(self, time: astropy.time.Time) -> int:
         return self._calc_closest_index(t=self.time_rlg_enable, times=time) + 1
 
-    @property
-    def index_signal_first(self) -> int:
-        return self._index_signal_first(time=self.time_optimized)
-
     def _index_signal_last(self, time: astropy.time.Time) -> int:
         return self._calc_closest_index(t=self.time_rlg_disable, times=time) - 1
 
-    @property
-    def index_signal_last(self) -> int:
-        return self._index_signal_last(time=self.time_optimized)
-
     def _slice_signal(self, time: astropy.time.Time) -> slice:
         return slice(self._index_signal_first(time=time), self._index_signal_last(time=time) + 1)
-
-    @property
-    def slice_signal(self) -> slice:
-        return self._slice_signal(time=self.time_optimized)
-
-    @property
-    def index_apogee(self) -> int:
-        return self._calc_closest_index(self.trajectory.time_apogee)
-
-    @property
-    def time_apogee(self) -> astropy.time.Time:
-        return self.time_optimized[self.index_apogee]
-
-    @property
-    def slice_upleg(self) -> slice:
-        return slice(None, self.index_apogee)
-
-    @property
-    def slice_downleg(self) -> slice:
-        return slice(self.index_apogee, None)
 
     @property
     def bias(self) -> u.Quantity:
@@ -274,41 +238,13 @@ class Level_0(kgpy.obs.Image):
             self._intensity_nobias = intensity_nobias
         return self._intensity_nobias
 
-    @property
-    def darks_up(self):
-        return self.intensity_nobias[self.index_dark_up_first:self.index_dark_up_last + 1]
-
-    @property
-    def darks_down(self):
-        return self.intensity_nobias[self.index_dark_down_first:self.index_dark_down_last + 1]
-
-    @property
-    def darks(self):
-        return np.concatenate([self.darks_up, self.darks_down])
-
     def _calc_dark(self, darks: u.Quantity) -> u.Quantity:
         return scipy.stats.trim_mean(a=darks, proportiontocut=0.25, axis=self.axis.time) << darks.unit
         # return np.median(darks, axis=self.axis.time)
 
-    @property
-    def dark(self):
-        return self._calc_dark(self.darks)
-
     @classmethod
     def _remove_dark(cls, intensity: u.Quantity, master_dark: u.Quantity) -> u.Quantity:
         return intensity - master_dark
-
-    @property
-    def intensity_nobias_nodark(self) -> u.Quantity:
-        return self._remove_dark(self.intensity_nobias, self.dark)
-
-    @property
-    def intensity_nobias_nodark_active(self):
-        return self.optics.detector.remove_inactive_pixels(self.intensity_nobias_nodark)
-
-    @property
-    def intensity_electrons(self) -> u.Quantity:
-        return self.optics.detector.convert_adu_to_electrons(self.intensity_nobias_nodark_active)
 
     @classmethod
     def _calc_stray_light_avg(cls, intensity: u.Quantity, num_pixels: int = 100):
@@ -341,14 +277,6 @@ class Level_0(kgpy.obs.Image):
         )
 
     @property
-    def stray_light_avg(self) -> u.Quantity:
-        return self._calc_stray_light_avg(self.intensity_electrons)
-
-    @property
-    def intensity_electrons_nostray(self) -> u.Quantity:
-        return self.intensity_electrons - self.stray_light_avg[..., np.newaxis, np.newaxis]
-
-    @property
     def intensity_electrons_nostray_prelim(self) -> u.Quantity:
         if self._intensity_electrons_prelim is None:
             index_dark_up_first = self.index_dark_up_first
@@ -374,10 +302,6 @@ class Level_0(kgpy.obs.Image):
             proportiontocut=0.25,
             axis=~0,
         ) << intensity.unit
-
-    @property
-    def intensity_electrons_avg(self) -> u.Quantity:
-        return self._calc_intensity_avg(self.intensity_electrons)
 
     @classmethod
     def _calc_atmosphere_transmission(
@@ -488,6 +412,82 @@ class Level_0(kgpy.obs.Image):
     @property
     def sun_zenith_angle(self) -> u.Quantity:
         return self.trajectory.sun_zenith_angle_interp(self.time_optimized)
+
+    @property
+    def index_signal_first(self) -> int:
+        return self._index_signal_first(time=self.time_optimized)
+
+    @property
+    def index_signal_last(self) -> int:
+        return self._index_signal_last(time=self.time_optimized)
+
+    @property
+    def slice_signal(self) -> slice:
+        return self._slice_signal(time=self.time_optimized)
+
+    @property
+    def index_apogee(self) -> int:
+        return self._calc_closest_index(self.trajectory.time_apogee)
+
+    @property
+    def time_apogee(self) -> astropy.time.Time:
+        return self.time_optimized[self.index_apogee]
+
+    @property
+    def slice_upleg(self) -> slice:
+        return slice(None, self.index_apogee)
+
+    @property
+    def slice_downleg(self) -> slice:
+        return slice(self.index_apogee, None)
+
+    @property
+    def index_dark_up_last(self) -> int:
+        return self._calc_closest_index(self.time_shutter_open) - 1
+
+    @property
+    def index_dark_down_first(self) -> int:
+        return self._calc_closest_index(self.time_parachute_deploy)
+
+    @property
+    def darks_up(self):
+        return self.intensity_nobias[self.index_dark_up_first:self.index_dark_up_last + 1]
+
+    @property
+    def darks_down(self):
+        return self.intensity_nobias[self.index_dark_down_first:self.index_dark_down_last + 1]
+
+    @property
+    def darks(self):
+        return np.concatenate([self.darks_up, self.darks_down])
+
+    @property
+    def dark(self):
+        return self._calc_dark(self.darks)
+
+    @property
+    def intensity_nobias_nodark(self) -> u.Quantity:
+        return self._remove_dark(self.intensity_nobias, self.dark)
+
+    @property
+    def intensity_nobias_nodark_active(self):
+        return self.optics.detector.remove_inactive_pixels(self.intensity_nobias_nodark)
+
+    @property
+    def intensity_electrons(self) -> u.Quantity:
+        return self.optics.detector.convert_adu_to_electrons(self.intensity_nobias_nodark_active)
+
+    @property
+    def stray_light_avg(self) -> u.Quantity:
+        return self._calc_stray_light_avg(self.intensity_electrons)
+
+    @property
+    def intensity_electrons_nostray(self) -> u.Quantity:
+        return self.intensity_electrons - self.stray_light_avg[..., np.newaxis, np.newaxis]
+
+    @property
+    def intensity_electrons_avg(self) -> u.Quantity:
+        return self._calc_intensity_avg(self.intensity_electrons)
 
     @property
     def _time_plot_grid(self):
