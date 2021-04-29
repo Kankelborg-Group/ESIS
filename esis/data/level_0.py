@@ -374,7 +374,8 @@ class Level_0(kgpy.obs.Image):
         return np.concatenate([self.darks_up, self.darks_down])
 
     def _calc_dark(self, darks: u.Quantity) -> u.Quantity:
-        return np.median(darks, axis=self.axis.time)
+        return scipy.stats.trim_mean(a=darks, proportiontocut=0.25, axis=self.axis.time) << darks.unit
+        # return np.median(darks, axis=self.axis.time)
 
     @property
     def dark(self):
