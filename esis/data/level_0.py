@@ -342,6 +342,14 @@ class Level_0(kgpy.obs.Image):
         return self.optics.detector.convert_adu_to_electrons(self.intensity_nobias_nodark_active)
 
     @property
+    def stray_light_avg(self) -> u.Quantity:
+        return self._calc_stray_light_avg(self.intensity_electrons)
+
+    @property
+    def intensity_electrons_nostray(self) -> u.Quantity:
+        return self.intensity_electrons - self.stray_light_avg[..., np.newaxis, np.newaxis]
+
+    @property
     def intensity_electrons_prelim(self) -> u.Quantity:
         if self._intensity_electrons_prelim is None:
             index_dark_up_first = self.index_dark_up_first
