@@ -338,7 +338,12 @@ class Level_0(kgpy.obs.Image):
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
-            bias[..., q] = np.median(a=a, axis=self.axis.xy)
+            # bias[..., q] = np.median(a=a, axis=self.axis.xy)
+            bias[..., q] = scipy.stats.trim_mean(
+                a=a.reshape(a.shape[:~1] + (-1,)),
+                proportiontocut=0.25,
+                axis=~0
+            ) << a.unit
         return bias
 
     @property
