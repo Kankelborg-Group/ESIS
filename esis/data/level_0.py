@@ -350,7 +350,7 @@ class Level_0(kgpy.obs.Image):
         return self.intensity_electrons - self.stray_light_avg[..., np.newaxis, np.newaxis]
 
     @property
-    def intensity_electrons_prelim(self) -> u.Quantity:
+    def intensity_electrons_nostray_prelim(self) -> u.Quantity:
         if self._intensity_electrons_prelim is None:
             index_dark_up_first = self.index_dark_up_first
             index_dark_up_last = index_dark_up_first + 5
@@ -363,6 +363,8 @@ class Level_0(kgpy.obs.Image):
             intensity_nobias_nodark = self._remove_dark(intensity=self.intensity_nobias, master_dark=dark)
             intensity_nobias_nodark_active = self.optics.detector.remove_inactive_pixels(intensity_nobias_nodark)
             intensity_electrons = self.optics.detector.convert_adu_to_electrons(intensity_nobias_nodark_active)
+            stray_light = self._calc_stray_light_avg(intensity_electrons)
+            intensity_electrons = intensity_electrons - stray_light[..., np.newaxis, np.newaxis]
             self._intensity_electrons_prelim = intensity_electrons
         return self._intensity_electrons_prelim
 
