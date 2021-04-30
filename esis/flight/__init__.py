@@ -204,5 +204,4 @@ def level_3(despike=True) -> data.Level_3:
 
     else:
         l3 = data.level_3.full_level3_prep(despike=despike)
-        l3.to_pickle(level_3_cache)
         return l3

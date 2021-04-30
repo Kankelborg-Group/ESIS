@@ -13,10 +13,11 @@ if __name__ == '__main__':
     l3_crop = 500
 
     l3_vig = level_3.Level_3.from_pickle(level_3.ov_Level3_masked)
-    means = l3_vig.masked_mean_normalization()
-    brightest_channel = 0
-    for i in l3_vig.lev1_cameras:
-        l3_vig.observation.data[:, i, :, :] *= means[:, brightest_channel, :, :] / means[:, i, :, :]
+    # means = l3_vig.masked_mean_normalization()
+    # brightest_channel = 0
+    # for i in l3_vig.lev1_cameras:
+    #     l3_vig.observation.data[:, i, :, :] *= means[:, brightest_channel, :, :] / means[:, i, :, :]
+    l3_vig = l3_vig.normalize_intensites()
 
     l3_fin = level_3.Level_3.from_pickle(level_3.ov_final_path)
 
@@ -33,7 +34,6 @@ if __name__ == '__main__':
                    np.arange(column_mean_before.shape[0])[fit_window[1]])
     column_mean_before = column_mean_before[fit_window[0]:fit_window[1]]
     poly_fit = np.polynomial.Polynomial.fit(np.arange(column_mean_before.shape[0]), column_mean_before, deg=1)
-    print(poly_fit)
     slope1 = poly_fit.coef[1]
     bfit1 = slope1 * np.linspace(-1, 1, column_mean_before.shape[0]) + poly_fit.coef[0]
 
@@ -48,14 +48,13 @@ if __name__ == '__main__':
     column_mean_after = np.nanmean(dif2_cp, axis=0)
     column_mean_after = column_mean_after[fit_window[0]:fit_window[1]]
     poly_fit = np.polynomial.Polynomial.fit(np.arange(column_mean_after.shape[0]), column_mean_after, deg=1)
-    print(poly_fit)
     slope2 = poly_fit.coef[1]
     bfit2 = slope2 * np.linspace(-1, 1, column_mean_after.shape[0]) + poly_fit.coef[0]
 
     letter_pos = (10,700)
     lw=1.1
 
-    fig = plt.figure(figsize=[7.5, 5])
+    fig = plt.figure(figsize=[7.1, 5])
     ax1 = plt.subplot(2, 2, 1, projection=l3_fin.observation[sequence, 1, l3_crop:, :].wcs.dropaxis(-1).dropaxis(-1))
     ax1.imshow(dif1[..., l3_crop:, :], vmin=-scale, vmax=scale)
     ax1.axvline(start, color='r', label='Fit Region Edge')
@@ -63,7 +62,7 @@ if __name__ == '__main__':
     ax1.set_ylabel('Solar Y (arcsec)')
     ax1.coords[0].set_ticklabel_visible(False)
     ax1.coords[0].set_ticks_visible(False)
-    ax1.set_title('Masked Level-3 Difference Image (Uncorrected)')
+    ax1.set_title('Masked Difference Image (Uncorrected)')
     a = ax1.annotate('a)', letter_pos, color='w')
     a.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
     ax1.legend()
@@ -74,14 +73,14 @@ if __name__ == '__main__':
     ax2.axvline(stop, color='r')
     ax2.set_ylabel('Solar Y (arcsec)')
     ax2.set_xlabel('Solar X (arcsec)')
-    ax2.set_title('Masked Level-3 Difference Image (Corrected)')
+    ax2.set_title('Masked Difference Image (Corrected)')
     c = ax2.annotate('c)', letter_pos, color='w')
     c.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
 
     ax3 = plt.subplot(2, 2, 2)
     ax3.plot(column_mean_before)
     ax3.plot(bfit1, color='r', label='slope = ' + str(np.round(slope1, 2)))
-    ax3.legend()
+    # ax3.legend()
     ax3.set_xticklabels([])
     ax3.set_xticks([])
     ax3.set_ylabel('Column Mean (Photons)')
@@ -94,7 +93,7 @@ if __name__ == '__main__':
     ax4 = plt.subplot(2, 2, 4)
     ax4.plot(column_mean_after)
     ax4.plot(bfit2, color='r', label='slope = ' + str(np.round(slope2, 2)))
-    ax4.legend()
+    # ax4.legend()
     ax4.set_ylim(ax3.get_ylim())
     ax4.set_ylabel('Column Mean (Photons)')
     ax4.set_xlabel('Column (pix)')

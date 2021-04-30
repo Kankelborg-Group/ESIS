@@ -36,7 +36,7 @@ if __name__ == '__main__':
                # vmax=np.percentile(imgs[sequence, 0], p),
                norm = colors.LogNorm(5,vmax = np.percentile(imgs[sequence, 0],99)),
                )
-    ax1.set_title('Level-3 Camera 1')
+    ax1.set_title('Level-3 Channel 1')
     y.set_axislabel('Solar Y (arcsec)', minpad=y_label_pad)
     x.set_ticklabel_visible(False)
 
@@ -57,7 +57,7 @@ if __name__ == '__main__':
     ax2.imshow(imgs[sequence, 1], origin='lower',
                # vmax=np.percentile(imgs[sequence, 0], p),
                norm = colors.LogNorm(5,vmax = np.percentile(imgs[sequence, 1],99)))
-    ax2.set_title('Level-3 Camera 2')
+    ax2.set_title('Level-3 Channel 2')
     x.set_ticklabel_visible(False)
     y.set_ticklabel_visible(False)
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     ax3.imshow(imgs[sequence, 2], origin='lower',
                # vmax=np.percentile(imgs[sequence, 1], p),
                norm = colors.LogNorm(5,vmax = np.percentile(imgs[sequence, 2],99)))
-    ax3.set_title('Level-3 Camera 3')
+    ax3.set_title('Level-3 Channel 3')
     x.set_axislabel('Solar X (arcsec)', minpad=x_label_pad)
     y.set_axislabel('Solar Y (arcsec)', minpad=y_label_pad)
 
@@ -101,7 +101,7 @@ if __name__ == '__main__':
     ax4.imshow(imgs[sequence, 3], origin='lower',
                # vmax=np.percentile(imgs[sequence, 1], p),
                norm = colors.LogNorm(5,vmax = np.percentile(imgs[sequence, 3],99)))
-    ax4.set_title('Level-3 Camera 4')
+    ax4.set_title('Level-3 Channel 4')
     x.set_axislabel('Solar X (arcsec)',minpad=x_label_pad)
     y.set_axislabel_position('r')
     y.set_ticklabel_visible(False)

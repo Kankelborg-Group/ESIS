@@ -20,7 +20,7 @@ if __name__ == '__main__':
     img2 = l3.observation.data[seq, 2]
     dif = img1-img2
 
-    fig, ax = plt.subplots(figsize=(7.5,7.5),
+    fig, ax = plt.subplots(figsize=(7.1,7.1),
         subplot_kw=dict(projection=l3.observation[seq,1].wcs.dropaxis(-1).dropaxis(-1)),
                            )
 

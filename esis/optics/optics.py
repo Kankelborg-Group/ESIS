@@ -1649,6 +1649,7 @@ class Optics(
     def plot_field_stop_projections(
             self,
             ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None
     ):
 
         subsystem = optics.System(
@@ -1680,13 +1681,19 @@ class Optics(
             # to_global=True,
         )
 
-        with astropy.visualization.quantity_support():
 
-            colormap = plt.cm.viridis
-            colornorm = plt.Normalize(vmin=self.wavelength.min().value, vmax=self.wavelength.max().value)
+        with astropy.visualization.quantity_support():
 
             wire = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
             wire.z = self.wavelength
+
+            if wavelength_color is None:
+                colormap = plt.cm.viridis
+                colornorm = plt.Normalize(vmin=self.wavelength.min().value, vmax=self.wavelength.max().value)
+                wavelength_color = [colormap(colornorm(self.wavelength[..., w].value))
+                                    for w in range(self.wavelength.shape[~0])]
+
+
             for w in range(wire.shape[~0]):
                 ax.plot(
                     4 * wire.x_final[..., w],
@@ -1709,7 +1716,7 @@ class Optics(
                     ax.plot(
                         wire.x[i, ..., w],
                         wire.y[i, ..., w],
-                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                        color=wavelength_color[w],
                         **label_kwarg,
                     )
 
@@ -1741,7 +1748,7 @@ class Optics(
                     ax.fill(
                         fiducial.x[i, ..., w],
                         fiducial.y[i, ..., w],
-                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                        color=wavelength_color[w],
                     )
 
             line = vector.Vector3D.spatial()
@@ -1767,5 +1774,8 @@ class Optics(
                     ax.plot(
                         line.x[i, ..., w],
                         line.y[i, ..., w],
-                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                        color=wavelength_color[w],
                     )
+
+
+

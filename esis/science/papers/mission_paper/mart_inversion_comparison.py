@@ -14,6 +14,8 @@ import matplotlib.patches as patches
 from esis.science.papers.mission_paper import fig_path  # can't figure out relative import here
 import matplotlib.patheffects as PathEffects
 from kgpy.moment.percentile import width
+from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+
 
 plt.rcParams.update({'font.size': 9})
 
@@ -113,7 +115,7 @@ if __name__ == '__main__':
     event_pix = np.array(event_pix).T
 
     wr = [1, 1, 1, .05]
-    fig1 = plt.figure(figsize=[7, 3])
+    fig1 = plt.figure(figsize=[7.1, 3])
     spec1 = gridspec.GridSpec(nrows=1, ncols= 4, width_ratios=wr)
     axs_top = []
     axs_bottom = []
@@ -148,7 +150,7 @@ if __name__ == '__main__':
     axs_top[2].set_title('Integrated Intensity \n Filter Steps = 75')
 
 
-    fig2, axs = plt.subplots(n, n, constrained_layout=True, figsize=(7.5, 6))
+    fig2, axs = plt.subplots(n, n, constrained_layout=True, figsize=(7.1, 5))
     axs = axs[::-1]  # corrects subplots to match dot locations
     flat_axs = axs.flatten()
     colors = ['r', 'g', 'b']
@@ -174,11 +176,12 @@ if __name__ == '__main__':
             flat_axs[i].plot(domain, line_profile, marker='.', linestyle='None', color=colors[j], ms=4)
             flat_axs[i].plot(domain, two_gauss(domain, *fit_params), color=colors[j], linewidth=1)
             flat_axs[i].set_ylim(top=lp_max)
+            flat_axs[i].xaxis.set_minor_locator(AutoMinorLocator())
             w1 = '%.0f' % fit_params[2]
             w2 = '%.0f' % fit_params[3]
             vel1 = '%.0f' % fit_params[4]
             vel2 = '%.0f' % fit_params[5]
-            flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (130, lp_max - 2 - 1.75 * j), color=colors[j],
+            flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (130, lp_max - 2.5*(j+1)), color=colors[j],
                                  fontsize=7)
             # flat_axs[i].annotate('w =' + w1 + ',' + w2, (150, top - 2 - 1 * j), color=colors[j], fontsize=7)
 

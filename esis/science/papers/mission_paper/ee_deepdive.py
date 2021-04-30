@@ -102,8 +102,8 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
 
     wr = [1, 1, 1, 1, .05]
     hr = [1, 1]
-    fig1 = plt.figure(figsize=[6.5, 3.1])
-    # fig1 = plt.figure(figsize=[6.5, 3.3])
+    fig1 = plt.figure(figsize=[7.1, 3.1])
+    # fig1 = plt.figure(figsize=[7.1, 3.3])
     spec1 = gridspec.GridSpec(nrows=2, ncols=len(seqs) + 1, width_ratios=wr, height_ratios=hr, top=.99)
     axs_top = []
     axs_bottom = []
@@ -166,7 +166,7 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
 
 
     fits = []
-    fig2, axs = plt.subplots(n, n, constrained_layout=True, figsize=(6.5, 5))
+    fig2, axs = plt.subplots(n, n, constrained_layout=True, figsize=(7.1, 5))
 
     axs = axs[::-1]  # corrects subplots to match dot locations
     flat_axs = axs.flatten()

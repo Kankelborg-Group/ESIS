@@ -32,15 +32,15 @@ __all__ = ['ov_Level3_initial',
 # intermediate pickles for testing
 ov_Level3_initial = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_initial.pickle'
 ov_Level3_updated = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_updated.pickle'
-ov_Level3_transforms = pathlib.Path(__file__).parents[1] / 'flight/esis_Level3_transform.pickle'
-ov_Level3_transforms_updated = pathlib.Path(__file__).parents[1] / 'flight/esis_Level3_transform_updated.pickle'
+ov_Level3_transforms = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_transform.pickle'
+ov_Level3_transforms_updated = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_transform_updated.pickle'
 ov_Level3_masked = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_masked.pickle'
 
 mgx_masks = [pathlib.Path(__file__).parents[1] / 'flight/masks/esis_cam{}_mgx_mask.csv'.format(i + 1) for i in range(4)]
 hei_masks = [pathlib.Path(__file__).parents[1] / 'flight/masks/esis_cam{}_hei_mask.csv'.format(i + 1) for i in range(4)]
 
-hei_transforms = pathlib.Path(__file__).parents[1] / 'flight/heI_Level3_transform.pickle'
-hei_transforms_updated = pathlib.Path(__file__).parents[1] / 'flight/heI_Level3_transform_updated.pickle'
+hei_transforms = pathlib.Path(__file__).parents[1] / 'flight/hei_Level3_transform.pickle'
+hei_transforms_updated = pathlib.Path(__file__).parents[1] / 'flight/hei_Level3_transform_updated.pickle'
 
 # final pickles
 ov_final_path = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_final.pickle'
@@ -365,7 +365,7 @@ class Level_3(Pickleable):
 
     def find_vignetting_correction(self):
 
-        guess = np.array([.6, .6, .6, .6])
+        guess = np.array([.4, .4, .4, .4])
         bounds = [(.2, .8), (.2, .8), (.2, .8), (.2, .8)]
         start = time.time()
         print('Finding Vignetting Correction')
@@ -468,8 +468,7 @@ class Level_3(Pickleable):
             print('Best to correct vignetting first, proceeding anyway')
 
         means = self.masked_means
-
-        highest_mean = means.max(axis=(-2, -1), keepdims=True)
+        highest_mean = means.max(axis=(0, 1), keepdims=True)
 
         self.observation.data[...] *= highest_mean / means
 
@@ -599,17 +598,18 @@ def full_level3_prep(despike=True, line=None):
         lev1.intensity = intensity << intensity_unit
 
     lev3_initial = Level_3.from_aia_level1(lev1, line=line)
-    if line == 'ov' or None:
+    if line == 'ov' or line is None:
         lev3_initial.to_pickle(ov_Level3_initial)
     lev3_updated = lev3_initial.update_internal_alignment(lev1)
-    if line == 'ov' or None:
+
+    if line == 'ov' or line is None:
         lev3_updated.to_pickle(ov_Level3_updated)
     lev3_masked = lev3_updated.add_mask(lev1)
-    if line == 'ov' or None:
+    if line == 'ov' or line is None:
         lev3_updated.to_pickle(ov_Level3_masked)
     lev3_final = lev3_masked.correct_vignetting()
     lev3_final = lev3_final.normalize_intensites()
-    if line == 'ov' or None:
+    if line == 'ov' or line is None:
         if despike:
             lev3_final.to_pickle(ov_final_path)
         else:

@@ -11,7 +11,7 @@ if __name__ == '__main__':
 
     lev_3 = level_3.Level_3.from_pickle(level_3.ov_Level3_initial)
     channel_index = [(0, 1), (1, 2), (1, 3), (0, 2), (0, 3), (2, 3)]
-    cam_ids = [(1, 2), (2, 3), (2, 4), (1, 3), (1, 4), (3, 4)]
+    cam_ids = np.array(channel_index)+1
     colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
     marker = ['.', '.', '.', '*', '*', '*']
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     cc_ratio = cc_ratio.reshape(6, shp[0])
     print(cc_ratio.shape)
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=[7.1,3.7])
     ax.set_ylabel('Cross-Correlation Ratio')
     ax.set_xlabel('Level-3 Image Sequence')
     for lev3_seq, lev1_seq in enumerate(updated_lev_3.lev1_sequences):
@@ -58,6 +58,6 @@ if __name__ == '__main__':
     ax.axhline(y=1, color='r')
 
     # ax.legend()
-
-    fig.savefig(fig_path / 'internal_align.pdf')
     plt.show()
+    fig.savefig(fig_path / 'internal_align.pdf')
+
