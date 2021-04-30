@@ -56,6 +56,7 @@ class Level_0(kgpy.obs.Image):
         self._trajectory = None
         self._offset_optimized = None
         self._intensity_electrons_prelim = None
+        self._stray_light_avg = None
 
     @classmethod
     def from_directory(
@@ -340,6 +341,7 @@ class Level_0(kgpy.obs.Image):
     def _calc_offset_optimized(self) -> u.Quantity:
 
         intensity_avg = self._calc_intensity_avg(self.intensity_electrons_nostray_prelim)
+        intensity_avg = intensity_avg / intensity_avg.max(self.axis.time)
 
         slice_optimize = self._slice_optimize(intensity_avg)
 
@@ -375,10 +377,10 @@ class Level_0(kgpy.obs.Image):
             # intensity_normalized = intensity_avg / intensity_avg.max(self.axis.time)
             # intensity_normalized = intensity_normalized * transmission.max(self.axis.time)
             # value = np.sqrt(np.mean(np.square(intensity_normalized[slice_optimize] - transmission[slice_optimize])))
-            print(time_offset)
-            print(transmission_model)
-            print(value)
-            print()
+            # print(time_offset)
+            # print(transmission_model)
+            # print(value)
+            # print()
             return value.value
 
         time_bound = self.exposure_length.mean() / 2
@@ -391,7 +393,7 @@ class Level_0(kgpy.obs.Image):
             # finish=None,
         )
 
-        print(params_optimized)
+        # print(params_optimized)
 
         return factory(params_optimized[np.newaxis])
 
@@ -479,15 +481,32 @@ class Level_0(kgpy.obs.Image):
 
     @property
     def stray_light_avg(self) -> u.Quantity:
-        return self._calc_stray_light_avg(self.intensity_electrons)
+        if self._stray_light_avg is None:
+            self._stray_light_avg = self._calc_stray_light_avg(self.intensity_electrons)
+        return self._stray_light_avg
 
     @property
     def intensity_electrons_nostray(self) -> u.Quantity:
         return self.intensity_electrons - self.stray_light_avg[..., np.newaxis, np.newaxis]
 
     @property
-    def intensity_electrons_avg(self) -> u.Quantity:
-        return self._calc_intensity_avg(self.intensity_electrons)
+    def intensity_electrons_nostray_avg(self) -> u.Quantity:
+        return self._calc_intensity_avg(self.intensity_electrons_nostray)
+
+    @property
+    def transmission_atmosphere(self) -> u.Quantity:
+        return self.transmission_atmosphere_model(
+            radius=self.altitude,
+            zenith_angle=self.sun_zenith_angle,
+        )
+
+    @property
+    def intensity_electrons_nostray_noatm(self) -> u.Quantity:
+        return self.intensity_electrons_nostray / self.transmission_atmosphere[..., np.newaxis, np.newaxis]
+
+    @property
+    def intensity_electrons_nostray_noatm_avg(self) -> u.Quantity:
+        return self._calc_intensity_avg(self.intensity_electrons_nostray_noatm)
 
     @property
     def _time_plot_grid(self):
@@ -627,7 +646,7 @@ class Level_0(kgpy.obs.Image):
         if time is None:
             time = self.time_optimized
 
-        signal = self.intensity_electrons_avg
+        signal = self.intensity_electrons_nostray_avg
         # self.plot_intensity_nobias_mean(ax=ax)
         # signal = np.median(self.intensity_nobias_nodark_active, axis=self.axis.xy)
         # signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
