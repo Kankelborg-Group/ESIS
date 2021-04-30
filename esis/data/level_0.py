@@ -8,9 +8,11 @@ import astropy.time
 import astropy.wcs
 import astropy.io.fits
 import astropy.visualization
+# import astropy.modeling
 import scipy.stats
 import scipy.interpolate
 import scipy.optimize
+# import scipy.signal
 import kgpy.vector
 import kgpy.atmosphere
 import kgpy.model
@@ -34,10 +36,7 @@ class Level_0(kgpy.obs.Image):
     fpga_vccint_voltage: typ.Optional[u.Quantity] = None
     fpga_vccaux_voltage: typ.Optional[u.Quantity] = None
     fpga_vccbram_voltage: typ.Optional[u.Quantity] = None
-    adc_temp_1: typ.Optional[u.Quantity] = None
-    adc_temp_2: typ.Optional[u.Quantity] = None
-    adc_temp_3: typ.Optional[u.Quantity] = None
-    adc_temp_4: typ.Optional[u.Quantity] = None
+    adc_temp: typ.Optional[u.Quantity] = None
     # detector: typ.Optional[esis.optics.Detector] = None
     optics: typ.Optional[esis.optics.Optics] = None
     trajectory: typ.Optional[kgpy.nsroc.Trajectory] = None
@@ -45,7 +44,6 @@ class Level_0(kgpy.obs.Image):
     # num_dark_safety_frames: int = 1
     num_ignored_bias_columns: int = 20
     num_invalid_exposures: int = 2
-    dacs_sample_period: u.Quantity = 2 * u.s
 
     def __post_init__(self):
         super().__post_init__()
@@ -56,7 +54,9 @@ class Level_0(kgpy.obs.Image):
         self._intensity_nobias = None
         self._darks_nobias = None
         self._trajectory = None
-        self._time_optimized = None
+        self._offset_optimized = None
+        self._intensity_electrons_prelim = None
+        self._stray_light_avg = None
 
     @classmethod
     def from_directory(
@@ -109,10 +109,10 @@ class Level_0(kgpy.obs.Image):
                 self.fpga_vccint_voltage[i, c] = float(hdu.header['FPGAVINT']) * u.adu
                 self.fpga_vccaux_voltage[i, c] = float(hdu.header['FPGAVAUX']) * u.adu
                 self.fpga_vccbram_voltage[i, c] = float(hdu.header['FPGAVBRM']) * u.adu
-                self.adc_temp_1[i, c] = float(hdu.header['ADCTEMP1']) * u.adu
-                self.adc_temp_2[i, c] = float(hdu.header['ADCTEMP2']) * u.adu
-                self.adc_temp_3[i, c] = float(hdu.header['ADCTEMP3']) * u.adu
-                self.adc_temp_4[i, c] = float(hdu.header['ADCTEMP4']) * u.adu
+                self.adc_temp[i, c, 0] = float(hdu.header['ADCTEMP1']) * u.adu
+                self.adc_temp[i, c, 1] = float(hdu.header['ADCTEMP2']) * u.adu
+                self.adc_temp[i, c, 2] = float(hdu.header['ADCTEMP3']) * u.adu
+                self.adc_temp[i, c, 3] = float(hdu.header['ADCTEMP4']) * u.adu
 
         self.time = self.time - self.exposure_half_length
 
@@ -131,10 +131,7 @@ class Level_0(kgpy.obs.Image):
         self.fpga_vccint_voltage = np.zeros(sh) * u.adu
         self.fpga_vccaux_voltage = np.zeros(sh) * u.adu
         self.fpga_vccbram_voltage = np.zeros(sh) * u.adu
-        self.adc_temp_1 = np.zeros(sh) * u.adu
-        self.adc_temp_2 = np.zeros(sh) * u.adu
-        self.adc_temp_3 = np.zeros(sh) * u.adu
-        self.adc_temp_4 = np.zeros(sh) * u.adu
+        self.adc_temp = np.zeros(tuple(sh) + (4, )) * u.adu
         self.optics = esis.optics.Optics()
         return self
 
@@ -158,64 +155,6 @@ class Level_0(kgpy.obs.Image):
     def time_mission_start(self) -> astropy.time.Time:
         # return self.time_exp_start[0].min()
         return self.trajectory.time_start
-
-    @property
-    def time_data_start_expectation(self) -> astropy.time.Time:
-        return self.time_mission_start + self.timeline.esis_exp_launch.time_mission + self.dacs_sample_period / 2
-
-    @property
-    def offset_data_start_expectation(self) -> u.Quantity:
-        return (self.time_data_start_expectation - self.time_exp_start[0].min()).to(u.s)
-
-    @property
-    def time_expectation(self) -> astropy.time.Time:
-        return self.time + self.offset_data_start_expectation
-
-    def _calc_intensity_avg(self, intensity: u.Quantity) -> u.Quantity:
-        return intensity.mean(self.axis.xy)
-
-    @property
-    def offset_optimized(self) -> u.Quantity:
-
-        signal = self._calc_intensity_avg(self.intensity_nobias)
-        signal = signal / signal.max(0)
-
-        def objective(t: float):
-            time = self.time + t * u.s
-            altitude = self.trajectory.altitude_interp(time)
-            apogee_index = self._calc_closest_index(self.trajectory.time_apogee, times=time)
-            altitude_up, altitude_down = altitude[:apogee_index + 1], altitude[apogee_index:]
-            signal_up, signal_down = signal[:apogee_index + 1], signal[apogee_index:]
-            # mask = altitude_up >= 200 * u.km
-            result = 0
-            for i in range(self.num_channels):
-                # signal_down_interp = scipy.interpolate.interp1d(altitude_down[..., i], signal_down[..., i])
-                # mask_i = mask[..., i]
-                # diff = signal_up[mask_i, i].value - signal_down_interp(altitude_up[mask_i, i])
-                # result = result + np.mean(np.square(diff))
-                # print(signal_up[..., i])
-                altitude_up_interp = scipy.interpolate.interp1d(signal_up[..., i], altitude_up[..., i], fill_value='extrapolate')
-                altitude_down_interp = scipy.interpolate.interp1d(signal_down[..., i], altitude_down[..., i], fill_value='extrapolate')
-                diff = altitude_up_interp(1 / 2) - altitude_down_interp(1 / 2)
-                result = result + np.square(diff)
-            result = np.sqrt(result / self.num_channels)
-            return result
-
-        bound = self.exposure_length.mean()
-
-        time_offset, *_ = scipy.optimize.brute(
-            func=objective,
-            Ns=100,
-            ranges=[[-bound.value, bound.value]],
-        )
-
-        return time_offset * u.s
-
-    @property
-    def time_optimized(self):
-        if self._time_optimized is None:
-            self._time_optimized = self.time + self.offset_optimized
-        return self._time_optimized
 
     @property
     def time_shutter_open(self) -> astropy.time.Time:
@@ -243,46 +182,13 @@ class Level_0(kgpy.obs.Image):
             times: typ.Optional[astropy.time.Time] = None,
     ) -> int:
         if times is None:
-            times = self.time
+            times = self.time_optimized
         dt = times - t
         return np.median(np.argmin(np.abs(dt.value), axis=0)).astype(int)
 
     @property
-    def altitude(self) -> u.Quantity:
-        return self.trajectory.altitude_interp(self.time)
-
-    @property
-    def sun_zenith_angle(self):
-        return self.trajectory.sun_zenith_angle_interp(self.time)
-
-    # @property
-    # def intensity_derivative(self) -> u.Quantity:
-    #     if self._intensity_derivative is None:
-    #         m = np.percentile(self.intensity, 99, axis=self.axis.xy)
-    #         self._intensity_derivative = np.gradient(m, axis=self.axis.time)
-    #     return self._intensity_derivative
-    #
-    # @property
-    # def _index_deriv_max(self):
-    #     indices = np.argmax(self.intensity_derivative, axis=self.axis.time)
-    #     return scipy.stats.mode(indices)[0][0]
-    #
-    # @property
-    # def _index_deriv_min(self):
-    #     indices = np.argmin(self.intensity_derivative, axis=self.axis.time)
-    #     return scipy.stats.mode(indices)[0][0]
-
-    @property
     def index_dark_up_first(self) -> int:
         return self.num_invalid_exposures
-
-    @property
-    def index_dark_up_last(self) -> int:
-        return self._calc_closest_index(self.time_shutter_open) - 1
-
-    @property
-    def index_dark_down_first(self) -> int:
-        return self._calc_closest_index(self.time_parachute_deploy)
 
     @property
     def index_dark_down_last(self) -> int:
@@ -291,39 +197,11 @@ class Level_0(kgpy.obs.Image):
     def _index_signal_first(self, time: astropy.time.Time) -> int:
         return self._calc_closest_index(t=self.time_rlg_enable, times=time) + 1
 
-    @property
-    def index_signal_first(self) -> int:
-        return self._index_signal_first(time=self.time)
-
     def _index_signal_last(self, time: astropy.time.Time) -> int:
         return self._calc_closest_index(t=self.time_rlg_disable, times=time) - 1
 
-    @property
-    def index_signal_last(self) -> int:
-        return self._index_signal_last(time=self.time)
-
     def _slice_signal(self, time: astropy.time.Time) -> slice:
         return slice(self._index_signal_first(time=time), self._index_signal_last(time=time) + 1)
-
-    @property
-    def slice_signal(self) -> slice:
-        return self._slice_signal(time=self.time)
-
-    @property
-    def index_apogee(self) -> int:
-        return self._calc_closest_index(self.trajectory.time_apogee)
-
-    @property
-    def time_apogee(self) -> astropy.time.Time:
-        return self.time[self.index_apogee]
-
-    @property
-    def slice_upleg(self) -> slice:
-        return slice(None, self.index_apogee)
-
-    @property
-    def slice_downleg(self) -> slice:
-        return slice(self.index_apogee, None)
 
     @property
     def bias(self) -> u.Quantity:
@@ -337,7 +215,12 @@ class Level_0(kgpy.obs.Image):
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
             a = data_quadrant[blank_pix[q]]
-            bias[..., q] = np.median(a=a, axis=self.axis.xy)
+            # bias[..., q] = np.median(a=a, axis=self.axis.xy)
+            bias[..., q] = scipy.stats.trim_mean(
+                a=a.reshape(a.shape[:~1] + (-1,)),
+                proportiontocut=0.25,
+                axis=~0
+            ) << a.unit
         return bias
 
     @property
@@ -356,6 +239,218 @@ class Level_0(kgpy.obs.Image):
             self._intensity_nobias = intensity_nobias
         return self._intensity_nobias
 
+    def _calc_dark(self, darks: u.Quantity) -> u.Quantity:
+        return scipy.stats.trim_mean(a=darks, proportiontocut=0.25, axis=self.axis.time) << darks.unit
+        # return np.median(darks, axis=self.axis.time)
+
+    @classmethod
+    def _remove_dark(cls, intensity: u.Quantity, master_dark: u.Quantity) -> u.Quantity:
+        return intensity - master_dark
+
+    @classmethod
+    def _calc_stray_light_avg(cls, intensity: u.Quantity, num_pixels: int = 100):
+        slice_lower = [slice(None)] * cls.axis.ndim
+        slice_upper = [slice(None)] * cls.axis.ndim
+
+        slice_lower[cls.axis.y] = slice(None, num_pixels)
+        slice_upper[cls.axis.y] = slice(~(num_pixels - 1), None)
+
+        strip_lower = intensity[slice_lower]
+        strip_upper = intensity[slice_upper]
+
+        proportion = 0.3
+
+        strip_lower_avg = scipy.stats.trim_mean(
+            a=strip_lower.reshape(strip_lower.shape[:~1] + (-1,)),
+            proportiontocut=proportion,
+            axis=~0,
+        ) << strip_lower.unit
+        strip_upper_avg = scipy.stats.trim_mean(
+            a=strip_upper.reshape(strip_upper.shape[:~1] + (-1,)),
+            proportiontocut=proportion,
+            axis=~0,
+        ) << strip_upper.unit
+
+        return np.where(
+            strip_lower_avg.sum(cls.axis.time) < strip_upper_avg.sum(cls.axis.time),
+            strip_lower_avg,
+            strip_upper_avg,
+        )
+
+    @property
+    def intensity_electrons_nostray_prelim(self) -> u.Quantity:
+        if self._intensity_electrons_prelim is None:
+            index_dark_up_first = self.index_dark_up_first
+            index_dark_up_last = index_dark_up_first + 5
+            index_dark_down_last = self.index_dark_down_last
+            index_dark_down_first = index_dark_down_last - 5
+            darks_up = self.intensity_nobias[index_dark_up_first:index_dark_up_last + 1]
+            darks_down = self.intensity_nobias[index_dark_down_first:index_dark_down_last + 1]
+            darks = np.concatenate([darks_up, darks_down])
+            dark = self._calc_dark(darks=darks)
+            intensity_nobias_nodark = self._remove_dark(intensity=self.intensity_nobias, master_dark=dark)
+            intensity_nobias_nodark_active = self.optics.detector.remove_inactive_pixels(intensity_nobias_nodark)
+            intensity_electrons = self.optics.detector.convert_adu_to_electrons(intensity_nobias_nodark_active)
+            stray_light = self._calc_stray_light_avg(intensity_electrons)
+            intensity_electrons = intensity_electrons - stray_light[..., np.newaxis, np.newaxis]
+            self._intensity_electrons_prelim = intensity_electrons
+        return self._intensity_electrons_prelim
+
+    @classmethod
+    def _calc_intensity_avg(cls, intensity: u.Quantity) -> u.Quantity:
+        return scipy.stats.trim_mean(
+            intensity.reshape(intensity.shape[:~1] + (-1, )),
+            proportiontocut=0.25,
+            axis=~0,
+        ) << intensity.unit
+
+    @classmethod
+    def _calc_atmosphere_transmission(
+            cls,
+            intensity_avg: u.Quantity,
+            altitude: u.Quantity,
+            sun_zenith_angle: u.Quantity,
+    ) -> kgpy.atmosphere.TransmissionBates:
+        return kgpy.atmosphere.TransmissionBates.from_data_fit(
+            observer_height=altitude,
+            zenith_angle=sun_zenith_angle,
+            intensity_observed=intensity_avg,
+            density_base=0.001 * u.g / u.cm**3,
+            absorption_coefficient_bounds=[0.0001, 0.01] * u.cm**2 / u.g,
+            particle_mass=16 * u.cds.mp,
+            radius_base=120 * u.km,
+            scale_height_bounds=[5, 200] * u.km,
+            temperature_base=355 * u.K,
+            temperature_infinity_bounds=[355, 2000] * u.K,
+        )
+
+    @property
+    def transmission_atmosphere_model(self) -> kgpy.atmosphere.TransmissionBates:
+        intensity_avg = self._calc_intensity_avg(self.intensity_electrons_nostray_prelim)
+        slice_optimize = self._slice_optimize(intensity_avg)
+        return self._calc_atmosphere_transmission(
+                intensity_avg=intensity_avg[slice_optimize],
+                altitude=self.altitude[slice_optimize],
+                sun_zenith_angle=self.sun_zenith_angle[slice_optimize],
+            )
+
+    def _slice_optimize(self, intensity_avg: u.Quantity) -> np.array:
+        intensity_avg_norm = intensity_avg / intensity_avg.max(self.axis.time)
+        return intensity_avg_norm.mean(self.axis.channel) >= 0.25
+
+    def _calc_offset_optimized(self) -> u.Quantity:
+
+        intensity_avg = self._calc_intensity_avg(self.intensity_electrons_nostray_prelim)
+        intensity_avg = intensity_avg / intensity_avg.max(self.axis.time)
+
+        slice_optimize = self._slice_optimize(intensity_avg)
+
+        def factory(
+                params: np.ndarray,
+        ) -> u.Quantity:
+            return params[0] * u.s
+
+        def objective(params: np.ndarray):
+            time_offset = factory(params)
+            time = self.time + time_offset
+            altitude = self.trajectory.altitude_interp(t=time)
+            sun_zenith_angle = self.trajectory.sun_zenith_angle_interp(t=time)
+            # slice_optimize = self._slice_signal(time)
+            transmission_model = self._calc_atmosphere_transmission(
+                intensity_avg=intensity_avg[slice_optimize],
+                altitude=altitude[slice_optimize],
+                sun_zenith_angle=sun_zenith_angle[slice_optimize],
+            )
+            transmission = transmission_model(
+                radius=altitude,
+                zenith_angle=sun_zenith_angle,
+            )
+            intensity_corrected = intensity_avg / transmission
+
+            # intensity_corrected = scipy.intensity_avg.detrend(
+            #     data=intensity_corrected[slice_optimize],
+            #     axis=0,
+            # ) << intensity_corrected.unit
+            intensity_corrected = intensity_corrected[slice_optimize]
+
+            value = np.sqrt(np.mean(np.square(np.std(intensity_corrected, axis=0))))
+            # intensity_normalized = intensity_avg / intensity_avg.max(self.axis.time)
+            # intensity_normalized = intensity_normalized * transmission.max(self.axis.time)
+            # value = np.sqrt(np.mean(np.square(intensity_normalized[slice_optimize] - transmission[slice_optimize])))
+            # print(time_offset)
+            # print(transmission_model)
+            # print(value)
+            # print()
+            return value.value
+
+        time_bound = self.exposure_length.mean() / 2
+        params_optimized = scipy.optimize.brute(
+            func=objective,
+            Ns=21,
+            ranges=[
+                [-time_bound.value, time_bound.value],
+            ],
+            # finish=None,
+        )
+
+        # print(params_optimized)
+
+        return factory(params_optimized[np.newaxis])
+
+    @property
+    def offset_optimized(self) -> u.Quantity:
+        if self._offset_optimized is None:
+            self._offset_optimized = self._calc_offset_optimized()
+        return self._offset_optimized
+
+    @property
+    def time_optimized(self) -> astropy.time.Time:
+        return self.time + self.offset_optimized
+
+    @property
+    def altitude(self) -> u.Quantity:
+        return self.trajectory.altitude_interp(self.time_optimized)
+
+    @property
+    def sun_zenith_angle(self) -> u.Quantity:
+        return self.trajectory.sun_zenith_angle_interp(self.time_optimized)
+
+    @property
+    def index_signal_first(self) -> int:
+        return self._index_signal_first(time=self.time_optimized)
+
+    @property
+    def index_signal_last(self) -> int:
+        return self._index_signal_last(time=self.time_optimized)
+
+    @property
+    def slice_signal(self) -> slice:
+        return self._slice_signal(time=self.time_optimized)
+
+    @property
+    def index_apogee(self) -> int:
+        return self._calc_closest_index(self.trajectory.time_apogee)
+
+    @property
+    def time_apogee(self) -> astropy.time.Time:
+        return self.time_optimized[self.index_apogee]
+
+    @property
+    def slice_upleg(self) -> slice:
+        return slice(None, self.index_apogee)
+
+    @property
+    def slice_downleg(self) -> slice:
+        return slice(self.index_apogee, None)
+
+    @property
+    def index_dark_up_last(self) -> int:
+        return self._calc_closest_index(self.time_shutter_open) - 1
+
+    @property
+    def index_dark_down_first(self) -> int:
+        return self._calc_closest_index(self.time_parachute_deploy)
+
     @property
     def darks_up(self):
         return self.intensity_nobias[self.index_dark_up_first:self.index_dark_up_last + 1]
@@ -368,16 +463,9 @@ class Level_0(kgpy.obs.Image):
     def darks(self):
         return np.concatenate([self.darks_up, self.darks_down])
 
-    def _calc_dark(self, darks: u.Quantity) -> u.Quantity:
-        return np.median(darks, axis=self.axis.time)
-
     @property
     def dark(self):
         return self._calc_dark(self.darks)
-
-    @classmethod
-    def _remove_dark(cls, intensity: u.Quantity, master_dark: u.Quantity) -> u.Quantity:
-        return intensity - master_dark
 
     @property
     def intensity_nobias_nodark(self) -> u.Quantity:
@@ -392,54 +480,33 @@ class Level_0(kgpy.obs.Image):
         return self.optics.detector.convert_adu_to_electrons(self.intensity_nobias_nodark_active)
 
     @property
-    def intensity_electrons_avg(self) -> u.Quantity:
-        return self._calc_intensity_avg(self.intensity_electrons)
+    def stray_light_avg(self) -> u.Quantity:
+        if self._stray_light_avg is None:
+            self._stray_light_avg = self._calc_stray_light_avg(self.intensity_electrons)
+        return self._stray_light_avg
 
     @property
-    def intensity_signal(self) -> u.Quantity:
-        return self.intensity_electrons[self.slice_signal]
+    def intensity_electrons_nostray(self) -> u.Quantity:
+        return self.intensity_electrons - self.stray_light_avg[..., np.newaxis, np.newaxis]
 
     @property
-    def time_signal(self) -> astropy.time.Time:
-        return self.time[self.slice_signal]
+    def intensity_electrons_nostray_avg(self) -> u.Quantity:
+        return self._calc_intensity_avg(self.intensity_electrons_nostray)
 
     @property
-    def exposure_length_signal(self) -> u.Quantity:
-        return self.exposure_length[self.slice_signal]
-
-    @property
-    def time_index_signal(self) -> u.Quantity:
-        return self.time_index[self.slice_signal]
-
-    @property
-    def absorption_atmosphere(self) -> kgpy.model.Logistic:
-        altitude_max = self.altitude.max()
-        signal = self.intensity_signal.mean(self.axis.xy)
-        return kgpy.model.Logistic.from_data_fit(
-            x=self.altitude[self.slice_signal],
-            y=signal,
-            amplitude_guess=signal.max(),
-            offset_x_guess=altitude_max / 2,
-            slope_guess=1 / altitude_max,
+    def transmission_atmosphere(self) -> u.Quantity:
+        return self.transmission_atmosphere_model(
+            radius=self.altitude,
+            zenith_angle=self.sun_zenith_angle,
         )
 
-    def atmosphere_transmission(self, time: astropy.time.Time) -> kgpy.atmosphere.Transmission:
+    @property
+    def intensity_electrons_nostray_noatm(self) -> u.Quantity:
+        return self.intensity_electrons_nostray / self.transmission_atmosphere[..., np.newaxis, np.newaxis]
 
-        signal = self._calc_intensity_avg(self.intensity_nobias)
-        # signal = signal / signal.max(axis=0)
-
-        signal_sum = signal.sum(axis=self.axis.channel)
-        mask = signal_sum > signal_sum.max() / 10
-
-        atmosphere_transmission = kgpy.atmosphere.Transmission.from_data_fit(
-            observer_height=self.trajectory.altitude_interp(t=time)[mask],
-            zenith_angle=self.trajectory.sun_zenith_angle_interp(t=time)[mask],
-            intensity_observed=signal[mask],
-            absorption_coefficient_guess=1 / u.m,
-            scale_height_guess=10 * u.km,
-        )
-
-        return atmosphere_transmission
+    @property
+    def intensity_electrons_nostray_noatm_avg(self) -> u.Quantity:
+        return self._calc_intensity_avg(self.intensity_electrons_nostray_noatm)
 
     @property
     def _time_plot_grid(self):
@@ -505,11 +572,11 @@ class Level_0(kgpy.obs.Image):
         return self.plot_quantity_vs_index(ax=ax, a=self.fpga_vccbram_voltage, a_name='FPGA BRAM', )
 
     def plot_adc_temperature(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_1, a_name='ADC temp 1', ax=ax)
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_2, a_name='ADC temp 2', ax=ax)
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_3, a_name='ADC temp 3', ax=ax)
-        ax = self.plot_quantity_vs_index(a=self.adc_temp_4, a_name='ADC temp 4', ax=ax, legend_ncol=2)
-        return ax
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 0], a_name='ADC temp 1', ax=ax)
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 1], a_name='ADC temp 2', ax=ax)
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 2], a_name='ADC temp 3', ax=ax)
+        self.plot_quantity_vs_index(a=self.adc_temp[..., 3], a_name='ADC temp 4', ax=ax)
+        return None
 
     def plot_bias(self, ax: plt.Axes, ) -> typ.Tuple[plt.Axes, typ.List[plt.Line2D]]:
         bias = self.bias.mean(axis=~0)
@@ -577,9 +644,9 @@ class Level_0(kgpy.obs.Image):
         ax_twin._get_lines.prop_cycler = ax._get_lines.prop_cycler
 
         if time is None:
-            time = self.time
+            time = self.time_optimized
 
-        signal = self.intensity_electrons_avg
+        signal = self.intensity_electrons_nostray_avg
         # self.plot_intensity_nobias_mean(ax=ax)
         # signal = np.median(self.intensity_nobias_nodark_active, axis=self.axis.xy)
         # signal = self.intensity_nobias_nodark_active.mean(self.axis.xy)
@@ -603,14 +670,15 @@ class Level_0(kgpy.obs.Image):
             self,
             ax: plt.Axes,
             time: typ.Optional[astropy.time.Time] = None,
-            plot_model: bool = True,
     ) -> plt.Axes:
         with astropy.visualization.quantity_support():
             if time is None:
-                time = self.time
+                time = self.time_optimized
 
             altitude = self.trajectory.altitude_interp(time)
-            signal = self.intensity_electrons_avg
+            # signal = self.intensity_electrons_avg
+            signal = self._calc_intensity_avg(self.intensity_nobias)
+            signal = signal / signal.max(0)
             apogee_index = self._calc_closest_index(self.trajectory.time_apogee, times=time)
             altitude_up, altitude_down = altitude[:apogee_index + 1], altitude[apogee_index:]
             signal_up, signal_down = signal[:apogee_index + 1], signal[apogee_index:]
@@ -618,17 +686,11 @@ class Level_0(kgpy.obs.Image):
             # signal = np.median(self.intensity_electrons, axis=self.axis.xy)
             # signal = np.mean(self.intensity_electrons[..., 256:-256, 1024 + 256:-256], axis=self.axis.xy)
             # signal = np.percentile(self.intensity_electrons, 75, axis=self.axis.xy)
-            absorption_model = self.absorption_atmosphere(altitude_up)
-            if plot_model:
-                ls = '-.'
-            else:
-                ls = None
             for i in range(self.num_channels):
                 lines_up, = ax.plot(
                     altitude_up[..., i],
                     signal_up[..., i],
                     label=self.channel_labels[i] + ' average signal, upleg',
-                    linestyle=ls,
                 )
                 lines_down, = ax.plot(
                     altitude_down[..., i],
@@ -637,13 +699,6 @@ class Level_0(kgpy.obs.Image):
                     color=lines_up.get_color(),
                     linestyle='--',
                 )
-                if plot_model:
-                    lines_model = ax.plot(
-                        altitude_up[..., i],
-                        absorption_model[..., i],
-                        label=self.channel_labels[i] + ' modeled response',
-                        color=lines_up.get_color(),
-                    )
 
         return ax
 
@@ -685,7 +740,7 @@ class Level_0(kgpy.obs.Image):
             self.intensity_nobias_nodark[time_index, channel_index],
         ])
 
-        time = self.time[time_index, channel_index]
+        time = self.time_optimized[time_index, channel_index]
         chan = self.channel[channel_index]
         seq_index = self.time_index[time_index]
 

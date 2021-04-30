@@ -13,14 +13,13 @@ import kgpy.img.mask
 import kgpy.nsroc
 from . import Level_0
 import esis
-
 __all__ = ['Level_1']
 
 
 @dataclasses.dataclass
 class Level_1(kgpy.obs.Image):
+    transmission_atmosphere: typ.Optional[u.Quantity] = None
     optics: esis.optics.Optics = None
-    # detector: typ.Optional[esis.optics.Detector] = None
 
     def __post_init__(self):
         super().__post_init__()
@@ -31,14 +30,15 @@ class Level_1(kgpy.obs.Image):
 
     @classmethod
     def from_level_0(cls, level_0: Level_0) -> 'Level_1':
+        sl = level_0.slice_signal
         return cls(
-            intensity=level_0.intensity_signal,
-            time=level_0.time_signal,
-            exposure_length=level_0.exposure_length_signal,
+            intensity=level_0.intensity_electrons_nostray[sl],
+            time=level_0.time_optimized[sl],
+            exposure_length=level_0.exposure_length[sl],
             channel=level_0.channel,
-            time_index=level_0.time_index_signal,
-            optics=level_0.optics
-            # detector=lev0.detector,
+            time_index=level_0.time_index[sl],
+            transmission_atmosphere=level_0.transmission_atmosphere[sl],
+            optics=level_0.optics,
         )
 
     def intensity_photons(self, wavelength: u.Quantity) -> u.Quantity:

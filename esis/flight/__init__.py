@@ -27,7 +27,7 @@ level_2_cache = pathlib.Path(__file__).parent / 'level_2.pickle'
 level_3_cache = data.level_3.ov_final_path
 
 
-def level_0(caching: bool = True) -> data.Level_0:
+def level_0() -> data.Level_0:
     """
     Compute a :class:`esis.data.level_0.Level_0` instance for the 2019 flight.
 
@@ -100,12 +100,9 @@ def level_0(caching: bool = True) -> data.Level_0:
 
     """
     trajectory = nsroc.trajectory()
-    # trajectory.time_start += 10 * u.s
     return data.Level_0.from_directory(
         directory=raw_img_dir,
-        # detector=optics.as_measured().detector,
         optics=optics.as_measured(),
-        # num_dark_safety_frames=num_dark_safety_frames,
         trajectory=trajectory,
         timeline=nsroc.timeline(),
     )
