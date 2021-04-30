@@ -324,7 +324,7 @@ class Level_0(kgpy.obs.Image):
         )
 
     @property
-    def atmosphere_transmission(self) -> kgpy.atmosphere.TransmissionBates:
+    def transmission_atmosphere_model(self) -> kgpy.atmosphere.TransmissionBates:
         intensity_avg = self._calc_intensity_avg(self.intensity_electrons_nostray_prelim)
         slice_optimize = self._slice_optimize(intensity_avg)
         return self._calc_atmosphere_transmission(
