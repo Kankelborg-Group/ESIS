@@ -69,20 +69,35 @@ def document() -> pylatex.Document:
     doc.append(kgpy.latex.aas.Author('Larry Springer', affil_msu))
     doc.append(kgpy.latex.aas.Author('David L. Windt', affil_rxo))
 
-    doc.append(pylatex.Command('author', 'Micah Johnson'))
-    doc.append(affil_msu)
-
-    doc.append(pylatex.Command('author', 'Jacob D. Parker'))
-    doc.append(affil_msu)
-
-    doc.append(pylatex.Command('author', 'Laurel Rachmeler'))
-    doc.append(affil_msfc)
-
-    doc.append(pylatex.Command('author', 'Larry Springer'))
-    doc.append(affil_msu)
-
-    doc.append(pylatex.Command('author', 'David L. Windt'))
-    doc.append(affil_rxo)
+    with doc.create(kgpy.latex.Abstract()):
+        doc.append(pylatex.NoEscape(
+            r"""
+            The Extreme ultraviolet Snapshot Imaging Spectrograph (ESIS) is a next generation rocket borne 
+            instrument that will investigate magnetic reconnection and energy transport in the solar atmosphere 
+            \amy{by observing emission lines formed in the chromosphere (He\textsc{i} \SI{58.4}{\nano\meter}),
+            the transition region (O\,\textsc{v} \SI{62.9}{\nano\meter}), and corona (Mg\,\textsc{x}
+            \SI{62.5}{\nano\meter}).}
+            \jake{JDP: Would make more sense to talk about the brighter Mg line?  609.8}
+            The instrument is a pseudo Gregorian telescope; from prime focus, an array of spherical diffraction
+            gratings re-image with differing dispersion angles.
+            \amy{The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.
+            This field stop is re-imaged using an array of four spherical diffraction gratings with differing
+            dispersion angles relative to ...? [ I want to say relative to solar north or field stop north or
+            something], with each diffraction grating projecting the spectrum onto a unique detector.}
+            The slitless multi-projection design will obtain co-temporal spatial (\SI{0.76}{\arcsecond\per pixel})
+            and spectral (\SI{37}{\milli\angstrom\per pixel}) images at high cadence ($<$\SI{4}{\second}).
+            \amy{The instrument is designed to be capable of obtaining co-temporal spatial 
+            (\SI{0.76}{\arcsecond\per pixel}) and spectral (\SI{37}{\milli\angstrom\per pixel}) images at high cadence 
+            ($<$\SI{4}{\second}).}
+            \amy{Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile 
+            information at high spatial and spectral resolution over a large (\SI{11.3}{\arcminute}) field of view. 
+            The instrument was launched on September 30, 2019.  
+            The flight data is described in a subsequent paper.}
+            A single exposure will enable us to reconstruct line profile information at high spatial and spectral 
+            resolution over a large (\SI{11.3}{\arcminute}) field of view. The instrument is currently in the build up 
+            phase prior to spacecraft integration, testing, and launch.
+            """
+        ))
 
     with doc.create(pylatex.Section('Introduction')):
         pass
