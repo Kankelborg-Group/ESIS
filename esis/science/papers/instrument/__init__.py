@@ -32,20 +32,42 @@ def document() -> pylatex.Document:
 
     doc.append(kgpy.latex.Title('The EUV Snapshot Imaging Spectrograph'))
 
-    doc.append(pylatex.Command('author', 'Ben Carrol'))
-    doc.append(affil_msu)
+    affil_msu = kgpy.latex.aas.Affiliation(
+        'Montana State University, Department of Physics, '
+        'P.O. Box 173840, Bozeman, MT 59717, USA'
+    )
 
-    doc.append(pylatex.Command('author', 'Jonathan Cirtain'))
-    doc.append(affil_msfc)
+    affil_msfc = kgpy.latex.aas.Affiliation(
+        'NASA Marshall Space Flight Center, '
+        'Huntsville, AL 35812, USA'
+    )
 
-    doc.append(pylatex.Command('author', 'James A. Duffy'))
-    doc.append(affil_msfc)
+    affil_lbnl = kgpy.latex.aas.Affiliation(
+        'Lawrence Berkeley National Laboratory, '
+        '1 Cyclotron Road, Berkeley, CA 94720, USA'
+    )
 
-    doc.append(pylatex.Command('author', 'Carlos Gomez'))
-    doc.append(affil_msfc)
+    affil_rxo = kgpy.latex.aas.Affiliation(
+        'Reflective X-ray Optics LLC, '
+        '425 Riverside Dr., #16G, New York, NY 10025, USA'
+    )
 
-    doc.append(pylatex.Command('author', 'Eric Gullikson'))
-    doc.append(affil_lbnl)
+    doc.append(kgpy.latex.aas.Author('Hans T. Courrier', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Roy T. Smart', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Charles C. Kankelborg', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Amy R. Winebarger', affil_msfc))
+    doc.append(kgpy.latex.aas.Author('Ken Kobayashi', affil_msfc))
+    doc.append(kgpy.latex.aas.Author('Brent Beabout', affil_msfc))
+    doc.append(kgpy.latex.aas.Author('Dyana Beabout', affil_msfc))
+    doc.append(kgpy.latex.aas.Author('Ben Carrol', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Jonathan Cirtain', affil_msfc))
+    doc.append(kgpy.latex.aas.Author('James A. Duffy', affil_msfc))
+    doc.append(kgpy.latex.aas.Author('Eric Gullikson', affil_lbnl))
+    doc.append(kgpy.latex.aas.Author('Micah Johnson', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Jacob D. Parker', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Laurel Rachmeler', affil_msfc))
+    doc.append(kgpy.latex.aas.Author('Larry Springer', affil_msu))
+    doc.append(kgpy.latex.aas.Author('David L. Windt', affil_rxo))
 
     doc.append(pylatex.Command('author', 'Micah Johnson'))
     doc.append(affil_msu)
@@ -76,8 +98,8 @@ def document() -> pylatex.Document:
             with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
                 esis_figure_3d.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
 
-            with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
-                esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
+            # with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
+            #     esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
 
     doc.append('text')
 
@@ -93,6 +115,6 @@ if __name__ == '__main__':
     plt.rcParams['lines.linewidth'] = 1
 
     doc = document()
-    doc.generate_tex()
     doc.generate_pdf()
+    doc.generate_tex()
 
