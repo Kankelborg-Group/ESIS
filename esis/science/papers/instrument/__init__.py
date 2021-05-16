@@ -2,6 +2,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import astropy.units as u
 import pylatex
+import kgpy.latex
 import esis.optics
 import esis.science.papers.instrument.figures as figures
 
@@ -29,8 +30,7 @@ def document() -> pylatex.Document:
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\jake}[1]{{{\color{purple} #1}}}'))
 
-    doc.append(pylatex.Command('author', 'Dyana Beabout'))
-    doc.append(affil_msfc)
+    doc.append(kgpy.latex.Title('The EUV Snapshot Imaging Spectrograph'))
 
     doc.append(pylatex.Command('author', 'Ben Carrol'))
     doc.append(affil_msu)
