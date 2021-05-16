@@ -26,8 +26,8 @@ def document() -> pylatex.Document:
         """
     ))
 
-    doc.append(pylatex.Command('author', 'Brent Beabout'))
-    doc.append(affil_msfc)
+    doc.preamble.append(pylatex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
+    doc.preamble.append(pylatex.NoEscape(r'\newcommand{\jake}[1]{{{\color{purple} #1}}}'))
 
     doc.append(pylatex.Command('author', 'Dyana Beabout'))
     doc.append(affil_msfc)
