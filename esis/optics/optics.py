@@ -131,6 +131,10 @@ class Optics(
     def dispersion(self) -> u.Quantity:
         val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
         return val.to(u.Angstrom / u.pix)
+    
+    @property
+    def field_of_view(self) -> kgpy.vector.Vector2D:
+        return 2 * kgpy.vector.Vector2D(self.source.half_width_x, self.source.half_width_y)
 
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
