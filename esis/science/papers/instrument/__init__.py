@@ -20,11 +20,9 @@ def document() -> pylatex.Document:
 
     doc.packages.append(pylatex.Package('savesym'))
     doc.preamble.append(pylatex.NoEscape(
-        r"""
-        \savesymbol{tablenum}
-        \usepackage{siunitx}
-        \restoresymbol{SIX}{tablenum}
-        """
+        '\\savesymbol{tablenum}'
+        '\\usepackage{siunitx}'
+        '\\restoresymbol{SIX}{tablenum}'
     ))
 
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
