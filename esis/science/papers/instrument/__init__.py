@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 import pylatex
 import kgpy.latex
+import kgpy.units
 import esis.optics
 import esis.science.papers.instrument.figures as figures
 
@@ -67,47 +68,74 @@ def document() -> kgpy.latex.Document:
     doc.append(kgpy.latex.aas.Author('Larry Springer', affil_msu))
     doc.append(kgpy.latex.aas.Author('David L. Windt', affil_rxo))
 
+    optics_single = esis.optics.design.final(
+        pupil_samples=11,
+        pupil_is_stratified_random=True,
+        field_samples=11,
+        field_is_stratified_random=True,
+        all_channels=False,
+    )
+
+    doc.set_variable_quantity(
+        name='fov',
+        value=optics_single.field_of_view.quantity.mean().to(u.arcmin),
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='avgPlateScale',
+        value=optics_single.plate_scale.quantity.mean(),
+        digits_after_decimal=2,
+    )
+
+    doc.set_variable_quantity(
+        name='dispersion',
+        value=optics_single.dispersion.to(kgpy.units.mAA / u.pix),
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='minCadence',
+        value=optics_single.detector.exposure_length_min,
+        digits_after_decimal=1,
+    )
+
     with doc.create(kgpy.latex.Abstract()):
         doc.append(pylatex.NoEscape(
-            r"""
-            The Extreme ultraviolet Snapshot Imaging Spectrograph (ESIS) is a next generation rocket borne 
+            r"""The Extreme ultraviolet Snapshot Imaging Spectrograph (ESIS) is a next generation rocket borne 
             instrument that will investigate magnetic reconnection and energy transport in the solar atmosphere 
-            \amy{by observing emission lines formed in the chromosphere (He\textsc{i} \SI{58.4}{\nano\meter}),
-            the transition region (O\,\textsc{v} \SI{62.9}{\nano\meter}), and corona (Mg\,\textsc{x}
-            \SI{62.5}{\nano\meter}).}
+            \amy{by observing emission lines formed in the chromosphere (He\textsc{i} \SI{58.4}{\nano\meter}), the 
+            transition region (O\,\textsc{v} \SI{62.9}{\nano\meter}), and corona 
+            (Mg\,\textsc{x} \SI{62.5}{\nano\meter}).}
             \jake{JDP: Would make more sense to talk about the brighter Mg line?  609.8}
-            The instrument is a pseudo Gregorian telescope; from prime focus, an array of spherical diffraction
-            gratings re-image with differing dispersion angles.
-            \amy{The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.
-            This field stop is re-imaged using an array of four spherical diffraction gratings with differing
-            dispersion angles relative to ...? [ I want to say relative to solar north or field stop north or
+            The instrument is a pseudo Gregorian telescope; from prime focus, an array of spherical diffraction gratings 
+            re-image with differing dispersion angles. 
+            \amy{The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
+            This field stop is re-imaged  using an array of four spherical diffraction gratings with differing 
+            dispersion angles relative to ...? [ I want to say relative to solar north or field stop north or 
             something], with each diffraction grating projecting the spectrum onto a unique detector.}
-            The slitless multi-projection design will obtain co-temporal spatial (\SI{0.76}{\arcsecond\per pixel})
-            and spectral (\SI{37}{\milli\angstrom\per pixel}) images at high cadence ($<$\SI{4}{\second}).
+            The slitless multi-projection design will obtain co-temporal spatial (\avgPlateScale) and 
+            spectral (\dispersion) images at high cadence ($>=$\minCadence). 
             \amy{The instrument is designed to be capable of obtaining co-temporal spatial 
-            (\SI{0.76}{\arcsecond\per pixel}) and spectral (\SI{37}{\milli\angstrom\per pixel}) images at high cadence 
-            ($<$\SI{4}{\second}).}
+            (\avgPlateScale) and spectral (\dispersion) images at high cadence 
+            ($>=$\minCadence).}
             \amy{Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile 
-            information at high spatial and spectral resolution over a large (\SI{11.3}{\arcminute}) field of view. 
-            The instrument was launched on September 30, 2019.  
-            The flight data is described in a subsequent paper.}
+            information at high spatial and spectral resolution over a large (\fov) field of view. 
+            The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. }
             A single exposure will enable us to reconstruct line profile information at high spatial and spectral 
-            resolution over a large (\SI{11.3}{\arcminute}) field of view. The instrument is currently in the build up 
-            phase prior to spacecraft integration, testing, and launch.
-            """
+            resolution over a large (\fov) field of view. 
+            The instrument is currently in the build up phase prior to spacecraft integration, testing, and launch."""
         ))
 
-    with doc.create(pylatex.Section('Introduction')):
+    with doc.create(pylatex.Section('Introduction', label="section:intro")):
         pass
 
+
     with doc.create(pylatex.Section('The ESIS Concept')):
-
         with doc.create(pylatex.Subsection('Limitations of the MOSES Design')):
-
             pass
 
         with doc.create(pylatex.Subsection('ESIS Features')):
-
             with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
                 esis_figure_3d.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
 
@@ -130,4 +158,3 @@ if __name__ == '__main__':
     doc = document()
     doc.generate_pdf()
     doc.generate_tex()
-
