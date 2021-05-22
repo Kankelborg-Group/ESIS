@@ -11,9 +11,9 @@ path_pdf = path_base / 'instrument'
 path_figures = path_base / 'figures'
 
 
-def document() -> pylatex.Document:
+def document() -> kgpy.latex.Document:
 
-    doc = pylatex.Document(
+    doc = kgpy.latex.Document(
         default_filepath=str(path_pdf),
         documentclass='aastex63',
     )
