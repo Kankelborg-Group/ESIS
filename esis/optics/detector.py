@@ -36,6 +36,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     npix_blank: int = 0
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
+    exposure_length_min: u.Quantity = 0 * u.s
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
