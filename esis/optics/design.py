@@ -204,10 +204,7 @@ def final(
     detector.npix_overscan = 2
     detector.npix_blank = 50
     detector.gain = 1 * u.electron / u.adu
-    detector.readout_noise_tap1 = 4 * u.ct
-    detector.readout_noise_tap2 = 4 * u.ct
-    detector.readout_noise_tap3 = 4 * u.ct
-    detector.readout_noise_tap4 = 4 * u.ct
+    detector.readout_noise = 4 * u.adu
     if all_channels:
         detector.plot_kwargs['linestyle'] = dashstyle_channels
 
