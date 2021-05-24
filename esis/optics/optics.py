@@ -139,15 +139,19 @@ class Optics(
     @property
     def angle_alpha(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.field_stop.transform
+        t = t + kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate.from_vector(self.field_stop.surface.aperture.vertices)
+        ])
         t = t.translation_eff
-        t = t + self.field_stop.surface.aperture.vertices
         return np.arctan2(t.x, t.z)
 
     @property
     def angle_beta(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.detector.transform
+        t = t + kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate.from_vector(self.detector.surface.aperture.vertices)
+        ])
         t = t.translation_eff
-        t = t + self.detector.surface.aperture.vertices
         return np.arctan2(t.x, t.z)
 
     @property
