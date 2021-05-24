@@ -9,7 +9,7 @@ import matplotlib.patheffects as PathEffects
 
 
 if __name__ == '__main__':
-    seq = 15
+    seq = 12
 
     lev3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
 
@@ -21,6 +21,7 @@ if __name__ == '__main__':
     # plt.show()
 
     aia_304 = aia.AIA.from_time_range(lev3.time[0] - 20 * u.s, lev3.time[-1] + 20 * u.s, channels=[304 * u.AA])
+    print(lev3.time[seq])
     td = aia_304.time[:, 0, ...] - lev3.time[seq]  # should be the same for every camera
     aia_seq = np.abs(td.sec).argmin()
 

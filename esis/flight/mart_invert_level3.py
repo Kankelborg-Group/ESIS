@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
     l3_event = l3_events.perfectx
 
-    save_path = 'lev4_' + l3_event.name + '_mart_maxfilter.pickle'
+    save_path = 'lev4_' + l3_event.name + '_mart_nofilter.pickle'
     event = l3_event.location
     pad = 50
     event = (slice(event[0].start - pad, event[0].stop + pad, None), slice(event[1].start - pad, event[1].stop + pad))
@@ -70,10 +70,10 @@ if __name__ == '__main__':
     spectral_order = 1
     mart_obj = mart.MART(
         use_maximize=False,
-        use_filter=True,
+        use_filter=False,
         use_lgof=False,
         max_multiplicative_iteration=20,
-        max_filtering_iterations=75,
+        max_filtering_iterations=1,
         photon_read_noise=2,
         # track_cube_history='filter',
         contrast_exponent=.2,
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     inverted_results = np.array(
         [recovered_list[i].best_cube[pad:-pad, pad:-pad, ...] for i in range(len(recovered_list))])
 
-    velocity_correction = (.6 / .771)    #comes from rebining to AIA resolution of .6 arcsec per pix
+    velocity_correction = (.6 / .74)    #comes from rebining to AIA resolution of .6 arcsec per pix
     header = image_wcs.to_header()
     header['naxis'] = 3
     header['ctype3'] = 'km / s'

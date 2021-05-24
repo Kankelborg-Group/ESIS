@@ -36,6 +36,16 @@ if __name__ == '__main__':
     t = ax.annotate(times[seq],(5,5), color='w')
     t.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
 
+    disperse2 = ax.annotate('$\longleftarrow$', (950, 1200), color='w', rotation=22.5-90-45, ha='center', va='center')
+    disperse2.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+    disperse2_txt = ax.annotate('Ch2', (950, 1150), color='w', ha='center', va='center')
+    disperse2_txt.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+
+    disperse3 = ax.annotate('$\longleftarrow$', (320, 1200), color='w', rotation=22.5-90, ha='center', va='center')
+    disperse3.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+    disperse3_txt = ax.annotate('Ch3', (350, 1150), color='w', ha='center', va='center')
+    disperse3_txt.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
+
     events = [l3_events.big_blue,  l3_events.little_red, l3_events.perfectx,l3_events.otherx, l3_events.main_event]
     labels = ['a', 'b', 'c', 'd', 'e']
     for i,event in enumerate(events):
@@ -44,4 +54,4 @@ if __name__ == '__main__':
         num.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
 
     fig.savefig(fig_path/'l3_dif.pdf')
-    # plt.show()
+    plt.show()
