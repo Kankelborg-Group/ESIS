@@ -131,6 +131,43 @@ class Optics(
     def dispersion(self) -> u.Quantity:
         val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
         return val.to(u.Angstrom / u.pix)
+    
+    @property
+    def field_of_view(self) -> kgpy.vector.Vector2D:
+        return 2 * kgpy.vector.Vector2D(self.source.half_width_x, self.source.half_width_y)
+
+    @property
+    def angle_alpha(self) -> u.Quantity:
+        t = self.grating.transform.inverse + self.field_stop.transform
+        t = t + kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate.from_vector(self.field_stop.surface.aperture.vertices)
+        ])
+        t = t.translation_eff
+        return np.arctan2(t.x, t.z)
+
+    @property
+    def angle_beta(self) -> u.Quantity:
+        t = self.grating.transform.inverse + self.detector.transform
+        t = t + kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate.from_vector(self.detector.surface.aperture.vertices)
+        ])
+        t = t.translation_eff
+        return np.arctan2(t.x, t.z)
+
+    @property
+    def _wavelength_test_grid(self) -> u.Quantity:
+        return self.grating.surface.rulings.wavelength_from_angles(
+            input_angle=self.angle_alpha[..., :, np.newaxis],
+            output_angle=self.angle_beta[..., np.newaxis, :]
+        )
+
+    @property
+    def wavelength_min(self) -> u.Quantity:
+        return self._wavelength_test_grid.min((~1, ~0)).to(u.AA)
+
+    @property
+    def wavelength_max(self) -> u.Quantity:
+        return self._wavelength_test_grid.max((~1, ~0)).to(u.AA)
 
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
