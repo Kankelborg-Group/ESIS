@@ -136,6 +136,35 @@ class Optics(
     def field_of_view(self) -> kgpy.vector.Vector2D:
         return 2 * kgpy.vector.Vector2D(self.source.half_width_x, self.source.half_width_y)
 
+    @property
+    def angle_alpha(self) -> u.Quantity:
+        t = self.grating.transform.inverse + self.field_stop.transform
+        t = t.translation_eff
+        t = t + self.field_stop.surface.aperture.vertices
+        return np.arctan2(t.x, t.z)
+
+    @property
+    def angle_beta(self) -> u.Quantity:
+        t = self.grating.transform.inverse + self.detector.transform
+        t = t.translation_eff
+        t = t + self.detector.surface.aperture.vertices
+        return np.arctan2(t.x, t.z)
+
+    @property
+    def _wavelength_test_grid(self) -> u.Quantity:
+        return self.grating.surface.rulings.wavelength_from_angles(
+            input_angle=self.angle_alpha[..., :, np.newaxis],
+            output_angle=self.angle_beta[..., np.newaxis, :]
+        )
+
+    @property
+    def wavelength_min(self) -> u.Quantity:
+        return self._wavelength_test_grid.min((~1, ~0)).to(u.AA)
+
+    @property
+    def wavelength_max(self) -> u.Quantity:
+        return self._wavelength_test_grid.max((~1, ~0)).to(u.AA)
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
         other.wavelength = self.wavelength.copy()
