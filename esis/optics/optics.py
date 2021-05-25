@@ -13,6 +13,8 @@ import astropy.visualization
 import astropy.time
 import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
+import kgpy.sun
+import kgpy.atom
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
@@ -35,7 +37,7 @@ class Optics(
     grating: Grating = dataclasses.field(default_factory=Grating)
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
-    wavelength: u.Quantity = 0 * u.nm
+    num_emission_lines: int = 10
     field_samples: typ.Union[int, vector.Vector2D] = 10
     field_is_stratified_random: bool = False
     pupil_samples: typ.Union[int, vector.Vector2D] = 10
@@ -60,6 +62,7 @@ class Optics(
 
     def update(self) -> typ.NoReturn:
         self._system = None
+        self._transition = None
 
     @property
     def num_channels(self) -> int:
@@ -81,7 +84,7 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                wavelength=self.wavelength,
+                wavelength=self.transition.wavelength,
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
                 pupil_samples=self.pupil_samples,
@@ -169,9 +172,42 @@ class Optics(
     def wavelength_max(self) -> u.Quantity:
         return self._wavelength_test_grid.max((~1, ~0)).to(u.AA)
 
+    @property
+    def transition(self) -> kgpy.atom.Transition:
+        if self._transition is None:
+            temperature, emission = kgpy.sun.dem_qs()
+            spectrum = kgpy.sun.spectrum_qs_tr()
+
+            intensity = np.trapz(spectrum.Intensity['intensity'], temperature[..., np.newaxis], axis=0)
+            wavelength = spectrum.Intensity['wvl'] * u.AA
+            ion = spectrum.Intensity['ionS'].copy()
+            ion = np.array([spectrum.IonInstances[ion].Spectroscopic for ion in ion])
+
+            wavelength_mask_qs = (wavelength > self.wavelength_min) & (wavelength < self.wavelength_max)
+            intensity = intensity[wavelength_mask_qs]
+            wavelength = wavelength[wavelength_mask_qs]
+            ion = ion[wavelength_mask_qs]
+
+            sort_mask = np.argsort(intensity)
+            intensity = intensity[sort_mask][::-1]
+            wavelength = wavelength[sort_mask][::-1]
+            ion = ion[sort_mask][::-1]
+
+            intensity = intensity[:self.num_emission_lines]
+            wavelength = wavelength[:self.num_emission_lines]
+            ion = ion[:self.num_emission_lines]
+
+            self._transition = kgpy.atom.Transition(
+                ion=ion,
+                wavelength=wavelength,
+                intensity=intensity,
+            )
+
+        return self._transition
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
-        other.wavelength = self.wavelength.copy()
+        other.num_emission_lines = self.num_emission_lines
         other.pupil_samples = self.pupil_samples
         other.field_samples = self.field_samples
         other.source = self.source.copy()
