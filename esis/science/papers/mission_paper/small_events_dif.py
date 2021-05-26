@@ -16,8 +16,8 @@ if __name__ == '__main__':
     dif = img1 - img2
 
     fig = plt.figure(
-        figsize=(7.5,7.5),
-                     constrained_layout=True,
+        figsize=(7.1,7),
+                     # constrained_layout=True,
                      )
 
 
@@ -40,7 +40,7 @@ if __name__ == '__main__':
         axs[i].coords[1].display_minor_ticks(True)
         num = axs[i].annotate(label[i] + ')', (1,35), color='w')
         num.set_path_effects([PathEffects.withStroke(linewidth=1.1, foreground='black')])
-        t = axs[i].annotate(times[seq[i]], (.125, .125), color='w', size = 8)
+        t = axs[i].annotate(times[seq[i]].strftime('%H:%M:%S'), (.125, .125), color='w', size = 8)
         t.set_path_effects([PathEffects.withStroke(linewidth=1.1, foreground='black')])
 
     for i, event, in enumerate(events):
@@ -53,7 +53,8 @@ if __name__ == '__main__':
         axs[i+3].set_ylabel('Solar Y (arcsec)')
         axs[i+3].set_xlabel('Solar X (arcsec)')
         axs[i+3].coords[0].set_ticks(number=4)
-        axs[i+3].coords[1].set_ticks(number=4)
+        # axs[i+3].coords[1].set_ticks(number=4)
+        axs[i+3].coords[1].set_ticklabel_visible(False)
         axs[i+3].coords[0].display_minor_ticks(True)
         axs[i+3].coords[1].display_minor_ticks(True)
         # num = axs[i].annotate(label[i] + ')', (1,35), color='w')
@@ -71,7 +72,8 @@ if __name__ == '__main__':
         axs[i+6].set_ylabel('Solar Y (arcsec)')
         axs[i+6].set_xlabel('Solar X (arcsec)')
         axs[i+6].coords[0].set_ticks(number=4)
-        axs[i+6].coords[1].set_ticks(number=4)
+        # axs[i+6].coords[1].set_ticks(number=4)
+        axs[i + 6].coords[1].set_ticklabel_visible(False)
         axs[i+6].coords[0].display_minor_ticks(True)
         axs[i+6].coords[1].display_minor_ticks(True)
         # num = axs[i].annotate(label[i] + ')', (1,35), color='w')
@@ -79,25 +81,25 @@ if __name__ == '__main__':
         # t = axs[i].annotate(times[seq[i]], (.5, .5), color='w')
         # t.set_path_effects([PathEffects.withStroke(linewidth=1.1, foreground='black')])
 
-    axs[0].set_title('Camera 2-3')
-    axs[1].set_title('Camera 2-3')
-    axs[2].set_title('Camera 2-3')
+    axs[0].set_title('Channel 2-3')
+    # axs[1].set_title('Channel 2-3')
+    # axs[2].set_title('Channel 2-3')
 
-    axs[3].set_title('Camera 2')
-    axs[4].set_title('Camera 2')
-    axs[5].set_title('Camera 2')
+    axs[3].set_title('Channel 2')
+    # axs[4].set_title('Channel 2')
+    # axs[5].set_title('Channel 2')
 
-    axs[6].set_title('Camera 3')
-    axs[7].set_title('Camera 3')
-    axs[8].set_title('Camera 3')
+    axs[6].set_title('Channel 3')
+    # axs[7].set_title('Channel 3')
+    # axs[8].set_title('Channel 3')
 
     #
 
 
-
-    fig.canvas.draw()
-    fig.tight_layout()
+    #
+    # fig.canvas.draw()
+    # fig.tight_layout()
     # plt.subplot_tool()
-    plt.subplots_adjust(bottom=0.1, top=.95, left=.1, right=.95)
+    plt.subplots_adjust(hspace=.4,wspace=.1)
     plt.show()
     fig.savefig(fig_path/'dif_events.pdf')

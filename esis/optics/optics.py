@@ -13,6 +13,8 @@ import astropy.visualization
 import astropy.time
 import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
+import kgpy.sun
+import kgpy.atom
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
@@ -35,7 +37,7 @@ class Optics(
     grating: Grating = dataclasses.field(default_factory=Grating)
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
-    wavelength: u.Quantity = 0 * u.nm
+    num_emission_lines: int = 10
     field_samples: typ.Union[int, vector.Vector2D] = 10
     field_is_stratified_random: bool = False
     pupil_samples: typ.Union[int, vector.Vector2D] = 10
@@ -60,6 +62,7 @@ class Optics(
 
     def update(self) -> typ.NoReturn:
         self._system = None
+        self._transition = None
 
     @property
     def num_channels(self) -> int:
@@ -81,7 +84,7 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                wavelength=self.wavelength,
+                wavelength=self.transition.wavelength,
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
                 pupil_samples=self.pupil_samples,
@@ -131,10 +134,80 @@ class Optics(
     def dispersion(self) -> u.Quantity:
         val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
         return val.to(u.Angstrom / u.pix)
+    
+    @property
+    def field_of_view(self) -> kgpy.vector.Vector2D:
+        return 2 * kgpy.vector.Vector2D(self.source.half_width_x, self.source.half_width_y)
+
+    @property
+    def angle_alpha(self) -> u.Quantity:
+        t = self.grating.transform.inverse + self.field_stop.transform
+        t = t + kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate.from_vector(self.field_stop.surface.aperture.vertices)
+        ])
+        t = t.translation_eff
+        return np.arctan2(t.x, t.z)
+
+    @property
+    def angle_beta(self) -> u.Quantity:
+        t = self.grating.transform.inverse + self.detector.transform
+        t = t + kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate.from_vector(self.detector.surface.aperture.vertices)
+        ])
+        t = t.translation_eff
+        return np.arctan2(t.x, t.z)
+
+    @property
+    def _wavelength_test_grid(self) -> u.Quantity:
+        return self.grating.surface.rulings.wavelength_from_angles(
+            input_angle=self.angle_alpha[..., :, np.newaxis],
+            output_angle=self.angle_beta[..., np.newaxis, :]
+        )
+
+    @property
+    def wavelength_min(self) -> u.Quantity:
+        return self._wavelength_test_grid.min((~1, ~0)).to(u.AA)
+
+    @property
+    def wavelength_max(self) -> u.Quantity:
+        return self._wavelength_test_grid.max((~1, ~0)).to(u.AA)
+
+    @property
+    def transition(self) -> kgpy.atom.Transition:
+        if self._transition is None:
+            temperature, emission = kgpy.sun.dem_qs()
+            spectrum = kgpy.sun.spectrum_qs_tr()
+
+            intensity = np.trapz(spectrum.Intensity['intensity'], temperature[..., np.newaxis], axis=0)
+            wavelength = spectrum.Intensity['wvl'] * u.AA
+            ion = spectrum.Intensity['ionS'].copy()
+            ion = np.array([spectrum.IonInstances[ion].Spectroscopic for ion in ion])
+
+            wavelength_mask_qs = (wavelength > self.wavelength_min) & (wavelength < self.wavelength_max)
+            intensity = intensity[wavelength_mask_qs]
+            wavelength = wavelength[wavelength_mask_qs]
+            ion = ion[wavelength_mask_qs]
+
+            sort_mask = np.argsort(intensity)
+            intensity = intensity[sort_mask][::-1]
+            wavelength = wavelength[sort_mask][::-1]
+            ion = ion[sort_mask][::-1]
+
+            intensity = intensity[:self.num_emission_lines]
+            wavelength = wavelength[:self.num_emission_lines]
+            ion = ion[:self.num_emission_lines]
+
+            self._transition = kgpy.atom.Transition(
+                ion=ion,
+                wavelength=wavelength,
+                intensity=intensity,
+            )
+
+        return self._transition
 
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
-        other.wavelength = self.wavelength.copy()
+        other.num_emission_lines = self.num_emission_lines
         other.pupil_samples = self.pupil_samples
         other.field_samples = self.field_samples
         other.source = self.source.copy()
@@ -1649,6 +1722,7 @@ class Optics(
     def plot_field_stop_projections(
             self,
             ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None
     ):
 
         subsystem = optics.System(
@@ -1680,13 +1754,19 @@ class Optics(
             # to_global=True,
         )
 
-        with astropy.visualization.quantity_support():
 
-            colormap = plt.cm.viridis
-            colornorm = plt.Normalize(vmin=self.wavelength.min().value, vmax=self.wavelength.max().value)
+        with astropy.visualization.quantity_support():
 
             wire = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
             wire.z = self.wavelength
+
+            if wavelength_color is None:
+                colormap = plt.cm.viridis
+                colornorm = plt.Normalize(vmin=self.wavelength.min().value, vmax=self.wavelength.max().value)
+                wavelength_color = [colormap(colornorm(self.wavelength[..., w].value))
+                                    for w in range(self.wavelength.shape[~0])]
+
+
             for w in range(wire.shape[~0]):
                 ax.plot(
                     4 * wire.x_final[..., w],
@@ -1709,7 +1789,7 @@ class Optics(
                     ax.plot(
                         wire.x[i, ..., w],
                         wire.y[i, ..., w],
-                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                        color=wavelength_color[w],
                         **label_kwarg,
                     )
 
@@ -1741,7 +1821,7 @@ class Optics(
                     ax.fill(
                         fiducial.x[i, ..., w],
                         fiducial.y[i, ..., w],
-                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                        color=wavelength_color[w],
                     )
 
             line = vector.Vector3D.spatial()
@@ -1767,5 +1847,8 @@ class Optics(
                     ax.plot(
                         line.x[i, ..., w],
                         line.y[i, ..., w],
-                        color=colormap(colornorm(self.wavelength[..., w].value)),
+                        color=wavelength_color[w],
                     )
+
+
+

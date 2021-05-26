@@ -10743,7 +10743,7 @@ jQuery.each( ( "blur focus focusin focusout resize scroll click dblclick " +
 
 
 // Support: Android <=4.0 only
-// Make sure we trim BOM and NBSP
+// Make sure we guass_fit_trim BOM and NBSP
 var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
 
 // Bind a function to a context, optionally partially applying any

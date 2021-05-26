@@ -9,7 +9,7 @@ from esis.flight import l3_events
 
 if __name__ == '__main__':
 
-    event = l3_events.loopflow
+    event = l3_events.perfectx
     pickle_path = 'lev4_' + event.name +'_mart.pickle'
     html_path = event.name + '_doppler.html'
 

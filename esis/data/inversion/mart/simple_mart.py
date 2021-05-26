@@ -127,9 +127,13 @@ class SimpleMART:
 
                     goodness_of_fit = np.square(test_projection - projection) / (np.square(photon_read_noise) + test_projection)
                     chisq = SimpleMART.chisq(goodness_of_fit)
+
+                    ### Useful if MART is going not converging.  Allows direct inspection of residuals.
+                    # print(chisq)
                     # fig, ax = plt.subplots()
                     # im = ax.imshow(goodness_of_fit[0,0,:,:,0])
                     # fig.colorbar(im)
+                    # plt.show()
 
                     # print(chisq,np.max(goodness_of_fit),goodness_of_fit[goodness_of_fit>1].size)
 

@@ -8,7 +8,7 @@ from esis.flight import l3_events
 if __name__ == '__main__':
     l3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
 
-    event = l3_events.mgxfree
+    event = l3_events.perfectx
 
     l4 = level_4.Level_4.from_pickle(event.mart_inverted_pickle_path)
     l4_int = np.array(l4.integrated_intensity)
@@ -42,8 +42,8 @@ if __name__ == '__main__':
     profile = ax3.plot(l4.cube_list[0][bright_pix[1],bright_pix[2],:])
     ax3.set_ylim([0,peak_profile])
     dot = ax2.plot(bright_pix[2],bright_pix[1], marker = '.', color = 'r')
-    # vline = ax2.axvline(bright_pix[2])
-    # hline = ax2.axhline(bright_pix[1])
+    # vline = ax2.axvline(brightest_pix[2])
+    # hline = ax2.axhline(brightest_pix[1])
 
 
 

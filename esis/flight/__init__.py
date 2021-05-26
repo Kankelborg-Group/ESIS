@@ -5,7 +5,6 @@ __all__ = [
     'optics',
     'raw_img_dir',
     'level_0',
-    'num_dark_safety_frames',
     'level_1_cache',
     'level_1'
 ]
@@ -19,12 +18,13 @@ from kgpy.observatories import iris
 from .. import data
 from . import optics, nsroc
 
+
 raw_img_dir = pathlib.Path(__file__).parent / 'images'
-num_dark_safety_frames = 3
 
 level_1_cache = pathlib.Path(__file__).parent / 'level_1.pickle'
 cnn_inversion_cache = pathlib.Path(__file__).parent / 'cnn_inversion.pickle'
 level_2_cache = pathlib.Path(__file__).parent / 'level_2.pickle'
+level_3_cache = data.level_3.ov_final_path
 
 
 def level_0() -> data.Level_0:
@@ -193,3 +193,12 @@ def level_2() -> data.Level_2:
 
     else:
         pass
+
+def level_3(despike=True) -> data.Level_3:
+
+    if level_3_cache.exists():
+        return data.Level_3.from_pickle(level_3_cache)
+
+    else:
+        l3 = data.level_3.full_level3_prep(despike=despike)
+        return l3

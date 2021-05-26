@@ -78,6 +78,7 @@ class MART:
         """
         signal = cube.copy().flatten()
         # signal = signal[signal !=0] # attempting to account for zero paddings influence on entropy
+        signal*=100  # adding resolution to negentropy ... so noticeable difference in behavior
         signal = np.round(signal)
         unique_values, unique_counts = np.unique(signal, return_counts=True)
         probability = unique_counts / signal.size
@@ -127,11 +128,13 @@ class MART:
         :return: filtered version of input array.
         """
 
-        cube_exp = cube ** self.contrast_exponent
+        # cube_exp = cube ** self.contrast_exponent
+        cube_exp = (cube/1) ** self.contrast_exponent
+
         cube_filtered = cube * (1 + cube_exp)
 
         # cube_filtered = astropy.convolution.convolve(cube_filtered, kernel, boundary='extend')
-        cube_filtered = scipy.ndimage.convolve(cube_filtered, kernel, mode='nearest')
+        cube_filtered = scipy.ndimage.convolve(cube_filtered, kernel, mode='constant', cval=0)
         cube_filtered *= cube.sum() / cube_filtered.sum()
 
         return cube_filtered

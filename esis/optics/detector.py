@@ -36,6 +36,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     npix_blank: int = 0
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
+    exposure_length_min: u.Quantity = 0 * u.s
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
@@ -93,7 +94,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         return self.clear_height / 2
 
     @property
-    def transform(self) -> transform.rigid.Transform:
+    def transform(self) -> transform.rigid.TransformList:
         return super().transform + transform.rigid.TransformList([
             transform.rigid.TiltZ(self.roll),
             transform.rigid.TiltY(self.inclination),
@@ -249,7 +250,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     @u.quantity_input
     def remove_inactive_pixels(self, data: u.adu) -> u.adu:
         """
-        Given a raw image from the ESIS cameras, trim off the blank and overscan pixels, leaving only the light-
+        Given a raw image from the ESIS cameras, guass_fit_trim off the blank and overscan pixels, leaving only the light-
         sensitive pixels
 
         Parameters
