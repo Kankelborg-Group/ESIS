@@ -142,18 +142,22 @@ class Optics(
     def angle_alpha(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.field_stop.transform
         t = t + kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate.from_vector(self.field_stop.surface.aperture.vertices)
+            kgpy.transform.rigid.Translate.from_vector(
+                self.field_stop.surface.aperture.vertices[(...,) + (np.newaxis,) * t.translation_eff.ndim]
+            )
         ])
-        t = t.translation_eff
+        t = np.moveaxis(t.translation_eff, 0, ~0)
         return np.arctan2(t.x, t.z)
 
     @property
     def angle_beta(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.detector.transform
         t = t + kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate.from_vector(self.detector.surface.aperture.vertices)
+            kgpy.transform.rigid.Translate.from_vector(
+                self.detector.surface.aperture.vertices[(...,) + (np.newaxis,) * t.translation_eff.ndim]
+            )
         ])
-        t = t.translation_eff
+        t = np.moveaxis(t.translation_eff, 0, ~0)
         return np.arctan2(t.x, t.z)
 
     @property
@@ -175,8 +179,8 @@ class Optics(
     def bunch(self) -> kgpy.chianti.Bunch:
         if self._bunch is None:
             self._bunch = kgpy.chianti.bunch_tr_qs()
-            self._bunch.wavelength_min = self.wavelength_min
-            self._bunch.wavelength_max = self.wavelength_max
+            self._bunch.wavelength_min = self.wavelength_min.min()
+            self._bunch.wavelength_max = self.wavelength_max.max()
         return self._bunch
 
     def copy(self) -> 'Optics':
