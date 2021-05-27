@@ -31,6 +31,8 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\jake}[1]{{{\color{purple} #1}}}'))
 
+    doc.preamble.append(pylatex.Command('bibliographystyle', 'aasjournal'))
+
     doc.append(kgpy.latex.Title('The EUV Snapshot Imaging Spectrograph'))
 
     affil_msu = kgpy.latex.aas.Affiliation(
@@ -185,7 +187,7 @@ The instrument is currently in the build up phase prior to spacecraft integratio
             with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
                 esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
 
-    doc.append('text')
+    doc.append(pylatex.Command('bibliography', arguments='sources'))
 
     return doc
 
