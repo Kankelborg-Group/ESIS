@@ -36,7 +36,7 @@ class Optics(
     grating: Grating = dataclasses.field(default_factory=Grating)
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
-    num_emission_lines: int = 10
+    num_emission_lines: int = 3
     field_samples: typ.Union[int, vector.Vector2D] = 10
     field_is_stratified_random: bool = False
     pupil_samples: typ.Union[int, vector.Vector2D] = 10
