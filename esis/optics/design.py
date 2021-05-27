@@ -226,7 +226,6 @@ def final(
         filter=filter,
         detector=detector,
         num_emission_lines=10,
-        # wavelength=[584.3, 609.8, 629.7, ] * u.AA,
         pupil_samples=pupil_samples,
         pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
