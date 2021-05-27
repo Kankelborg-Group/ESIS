@@ -83,7 +83,7 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                wavelength=self.bunch.wavelength,
+                wavelength=self.bunch.wavelength[:self.num_emission_lines],
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
                 pupil_samples=self.pupil_samples,
