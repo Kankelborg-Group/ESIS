@@ -139,8 +139,8 @@ def document() -> kgpy.latex.Document:
             with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
                 esis_figure_3d.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
 
-            # with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
-            #     esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
+            with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
+                esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
 
     doc.append('text')
 
