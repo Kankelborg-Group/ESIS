@@ -1,9 +1,11 @@
 import pathlib
 import matplotlib.pyplot as plt
 import astropy.units as u
+import numpy as np
 import pylatex
 import kgpy.latex
 import kgpy.units
+import kgpy.chianti
 import esis.optics
 import esis.science.papers.instrument.figures as figures
 
@@ -105,6 +107,42 @@ def document() -> kgpy.latex.Document:
         name='minCadence',
         value=optics_single.detector.exposure_length_min,
         digits_after_decimal=1,
+    )
+
+    wavelength = optics.bunch.wavelength
+    ion = kgpy.chianti.to_spectroscopic(optics.bunch.ion)
+
+    index_o5 = np.nonzero(optics.bunch.ion == 'o_5')[0][0]
+    doc.set_variable_quantity(
+        name='wavelengthOV',
+        value=wavelength[index_o5],
+        digits_after_decimal=3,
+    )
+    doc.set_variable(
+        name='ionOV',
+        value=pylatex.NoEscape(ion[index_o5])
+    )
+
+    index_he1 = np.nonzero(optics.bunch.ion == 'he_1')[0][0]
+    doc.set_variable_quantity(
+        name='wavelengthHeI',
+        value=wavelength[index_he1],
+        digits_after_decimal=3,
+    )
+    doc.set_variable(
+        name='ionHeI',
+        value=pylatex.NoEscape(ion[index_he1])
+    )
+
+    index_mg10 = np.nonzero(optics.bunch.ion == 'mg_10')[0][0]
+    doc.set_variable_quantity(
+        name='wavelengthMgX',
+        value=wavelength[index_mg10],
+        digits_after_decimal=3,
+    )
+    doc.set_variable(
+        name='ionMgX',
+        value=pylatex.NoEscape(ion[index_mg10])
     )
 
     with doc.create(kgpy.latex.Abstract()):
