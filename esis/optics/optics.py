@@ -182,7 +182,7 @@ class Optics(
             intensity = np.trapz(bunch.Intensity['intensity'], temperature[..., np.newaxis], axis=0)
             wavelength = bunch.Intensity['wvl'] * u.AA
             ion = bunch.Intensity['ionS'].copy()
-            ion = np.array([bunch.IonInstances[ion].Spectroscopic for ion in ion])
+            # ion = np.array([bunch.IonInstances[ion].Spectroscopic for ion in ion])
 
             wavelength_mask_qs = (wavelength > self.wavelength_min) & (wavelength < self.wavelength_max)
             intensity = intensity[wavelength_mask_qs]
