@@ -39,7 +39,7 @@ def layout() -> matplotlib.figure.Figure:
     esis_optics_rays.detector.cylindrical_azimuth = esis_optics_rays.detector.cylindrical_azimuth[chan_index]
     esis_optics_rays.grating.plot_kwargs['linestyle'] = esis_optics_rays.grating.plot_kwargs['linestyle'][chan_index]
     esis_optics_rays.detector.plot_kwargs['linestyle'] = esis_optics_rays.detector.plot_kwargs['linestyle'][chan_index]
-    esis_optics_rays.wavelength = esis_optics_rays.wavelength[~0:]
+    esis_optics_rays.num_emission_lines = 1
 
     esis_optics.system.plot(
         ax=ax_layout,
