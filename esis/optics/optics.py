@@ -13,7 +13,7 @@ import astropy.visualization
 import astropy.time
 import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
-import kgpy.sun
+import kgpy.chianti
 import kgpy.atom
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
@@ -175,13 +175,14 @@ class Optics(
     @property
     def transition(self) -> kgpy.atom.Transition:
         if self._transition is None:
-            temperature, emission = kgpy.sun.dem_qs()
-            spectrum = kgpy.sun.spectrum_qs_tr()
+            temperature = kgpy.chianti.temperature()
+            emission = kgpy.chianti.dem_qs()
+            bunch = kgpy.chianti.bunch_tr(emission_measure=emission)
 
-            intensity = np.trapz(spectrum.Intensity['intensity'], temperature[..., np.newaxis], axis=0)
-            wavelength = spectrum.Intensity['wvl'] * u.AA
-            ion = spectrum.Intensity['ionS'].copy()
-            ion = np.array([spectrum.IonInstances[ion].Spectroscopic for ion in ion])
+            intensity = np.trapz(bunch.Intensity['intensity'], temperature[..., np.newaxis], axis=0)
+            wavelength = bunch.Intensity['wvl'] * u.AA
+            ion = bunch.Intensity['ionS'].copy()
+            ion = np.array([bunch.IonInstances[ion].Spectroscopic for ion in ion])
 
             wavelength_mask_qs = (wavelength > self.wavelength_min) & (wavelength < self.wavelength_max)
             intensity = intensity[wavelength_mask_qs]
