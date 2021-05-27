@@ -131,7 +131,7 @@ def final(
         roll = 0 * u.deg
 
     dashstyle = (0, (1, 1))
-    dashstyle_channels = [dashstyle, None, None, None, None, dashstyle]
+    dashstyle_channels = np.array([dashstyle, None, None, None, None, dashstyle], dtype=object)
 
     primary = Primary()
     primary.radius = 2000 * u.mm
