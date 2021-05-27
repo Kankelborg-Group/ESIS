@@ -47,6 +47,9 @@ def layout() -> matplotlib.figure.Figure:
         component_z='x',
         plot_rays=False,
         plot_annotations=False,
+        plot_kwargs=dict(
+            linewidth=0.5,
+        ),
     )
     _, colorbar = esis_optics_rays.system.plot(
         ax=ax_layout,
@@ -56,6 +59,9 @@ def layout() -> matplotlib.figure.Figure:
         plot_annotations=False,
         # plot_vignetted=True,
         plot_colorbar=False,
+        plot_kwargs=dict(
+            linewidth=0.5,
+        ),
     )
 
     ax_layout.view_init(elev=0, azim=-40)
