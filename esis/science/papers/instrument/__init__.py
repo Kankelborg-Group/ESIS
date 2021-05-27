@@ -182,7 +182,7 @@ large (\fov) field of view.
 The instrument is currently in the build up phase prior to spacecraft integration, testing, and launch."""
         ))
 
-    with doc.create(pylatex.Section('Introduction', label="section.intro")):
+    with doc.create(pylatex.Section('Introduction')):
         doc.append(pylatex.NoEscape(
             r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (FUV, EUV, and soft 
 X-ray), is a three-dimensional scene evolving in time: $I[x,y,\lambda,t]$.
@@ -251,11 +251,13 @@ Spectrograph (ESIS), that will improve on past efforts to produce a solar EUV sp
 ESIS will fly alongside MOSES and will observe the transition region (TR) and corona of the solar atmosphere in the 
 O\,\textsc{v} \SI{63.0}{\nano\meter} and Mg\,\textsc{x} \SI{62.5}{\nano\meter} and \SI{61.0}{\nano\meter} spectral 
 lines.
-In Section~\ref{S-OBESIS} we detail how our experience with the MOSES instrument has shaped the design of ESIS.
-Section~\ref{S-SCIMISS} describes the narrow scientific objectives and the requirements placed on the new instrument.
-Section~\ref{S-ESISD} describes the technical approach to meet our scientific objectives, followed by a brief 
-description of the expected mission profile in Section~\ref{S-ESIS_mp}.
-The current status and progress toward launch is summarized in Section~\ref{S-CONC}."""
+In Section~\ref{sec:TheESISConcept} we detail how our experience with the MOSES instrument has shaped the design of 
+ESIS.
+Section~\ref{sec:ScienceObjectives} describes the narrow scientific objectives and the requirements placed on the new 
+instrument.
+Section~\ref{sec:TheESISInstrument} describes the technical approach to meet our scientific objectives, followed by a 
+brief description of the expected mission profile in Section~\ref{sec:MissionProfile}.
+The current status and progress toward launch is summarized in Section~\ref{sec:ConclusionsandOutlook}."""
         ))
 
     with doc.create(pylatex.Section('The ESIS Concept')):
@@ -268,6 +270,18 @@ The current status and progress toward launch is summarized in Section~\ref{S-CO
 
             with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
                 esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
+
+    with doc.create(pylatex.Section('Science Objectives')):
+        pass
+
+    with doc.create(pylatex.Section('The ESIS Instrument')):
+        pass
+
+    with doc.create(pylatex.Section('Mission Profile')):
+        pass
+
+    with doc.create(pylatex.Section('Conclusions and Outlook')):
+        pass
 
     doc.append(pylatex.Command('bibliography', arguments='sources'))
 
