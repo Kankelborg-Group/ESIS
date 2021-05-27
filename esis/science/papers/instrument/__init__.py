@@ -76,6 +76,13 @@ def document() -> kgpy.latex.Document:
         all_channels=False,
     )
 
+    optics = esis.optics.design.final(
+        pupil_samples=11,
+        pupil_is_stratified_random=True,
+        field_samples=11,
+        field_is_stratified_random=True,
+    )
+
     doc.set_variable_quantity(
         name='fov',
         value=optics_single.field_of_view.quantity.mean().to(u.arcmin),
