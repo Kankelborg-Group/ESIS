@@ -19,6 +19,10 @@ def document() -> kgpy.latex.Document:
     doc = kgpy.latex.Document(
         default_filepath=str(path_pdf),
         documentclass='aastex63',
+        document_options=[
+            'twocolumn',
+            # 'linenumbers',
+        ]
     )
 
     doc.packages.append(pylatex.Package('savesym'))
