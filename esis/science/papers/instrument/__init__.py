@@ -296,7 +296,7 @@ upwards of 25 grating diffraction orders may be projected onto a single detector
 Through post processing of these images, \CTIS\ can recover a 3D data cube from a (spectrally) smooth and continuous 
 scene over a large bandpass (\eg\ \citet{Hagen08}).
 
-The \MOSES~\cite{Fox10,Fox11} is our first effort aimed at developing the unique capability of simultaneous 
+The \MOSES~\citep{Fox10,Fox11} is our first effort aimed at developing the unique capability of simultaneous 
 imaging and spectroscopy for solar \EUV\ scenes.
 \MOSES\ is a three-order slitless spectrograph that seeks to combine the simplicity of the SO82A concept with the 
 advantages of a \CTIS\ instrument.
