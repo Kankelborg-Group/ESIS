@@ -268,7 +268,7 @@ In principle, filter ratios that make use of spectrally adjacent multilayer \EUV
 shifts~\citep{Sakao99}.
 However, the passbands of the multilayer coatings are still wide enough that the presence of weaker contaminant lines 
 limits resolution of Doppler shifts to $\sim$\SI{1000}{\kilo\meter\per\second}~\citep{Kobayashi00}.
-Slit spectrographs (\eg\ \IRIS~\citep{IRIS14}) obtain fast, high-resolution spatial and spectral observations, but are 
+Slit spectrographs (\eg\ the \IRIS~\citep{IRIS14}) obtain fast, high-resolution spatial and spectral observations, but are 
 limited by the narrow \FOV\ of the spectrograph slit.
 The $I[x,y,\lambda]$ data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
 raster axis.
