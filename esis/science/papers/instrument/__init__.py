@@ -220,7 +220,7 @@ Here the solar sky plane spatial coordinates, $x$ and $y$, and the wavelength ax
 dimensions of the scene, while $t$ represents the temporal axis.
 An ideal instrument would capture a spatial/spectral data cube ($I[x,y,\lambda]$) at a rapid temporal cadence ($t$), 
 however, practical limitations lead us to accept various compromises of these four observables.
-Approaching this ideal is the fast tunable filtergraph (\ie\,fast tunable Fabry--P\'erot etalons, \eg\,The GREGOR 
+Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
 Fabry--P{\'e}rot Interferometer, \citet{Puschmann12}), but the materials do not exist to extend this technology to 
 extreme ultraviolet wavelengths (EUV) shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
 Imagers like the \textit{Transition Region and Coronal Explorer (TRACE)}~\citep{Handy99} and the \textit{Atmospheric 
@@ -230,7 +230,7 @@ In principle, filter ratios that make use of spectrally adjacent multilayer EUV 
 shifts~\citep{Sakao99}.
 However, the passbands of the multilayer coatings are still wide enough that the presence of weaker contaminant lines 
 limits resolution of Doppler shifts to $\sim$\SI{1000}{\kilo\meter\per\second}~\citep{Kobayashi00}.
-Slit spectrographs (\eg\,\textit{The Interface Region Imaging Spectrograph, IRIS}~\citep{IRIS14}) obtain fast, 
+Slit spectrographs (\eg\ \textit{The Interface Region Imaging Spectrograph, IRIS}~\citep{IRIS14}) obtain fast, 
 high-resolution spatial and spectral observations, but are limited by the narrow field of view (FOV) of the spectrograph
 slit.
 The $I[x,y,\lambda]$ data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
@@ -252,13 +252,13 @@ facilitated by increasing the number of independent spectral projections, or `lo
 $(x,y,\lambda)$ scene~\citep{DeForest04}.
 For example, \citet{DeForest04} demonstrated recovery of Doppler shifts in magnetograms from two dispersed orders of a 
 grating at the output of the \textit{Michelson Doppler Imager (MDI~\citep{Scherrer95})}.
-The quality of the inversion (\eg\,recovery of higher order spectral line moments) can also be improved by additional 
+The quality of the inversion (\eg\ recovery of higher order spectral line moments) can also be improved by additional 
 projections~\citep{Kak88,Descour97}, generally at the cost of computational complexity~\citep{Hagen08}.
 \textit{Computed Tomographic Imaging Spectrographs (CTIS)}~\citep{okamoto1991,Bulygin91,Descour95} leverage this concept
 by obtaining multiple, simultaneous dispersed images of an object or scene; 
 upwards of 25 grating diffraction orders may be projected onto a single detector plane~\citep{Descour97}.
 Through post processing of these images, CTIS can recover a 3D data cube from a (spectrally) smooth and continuous scene
-over a large bandpass (\eg\,\citet{Hagen08}).
+over a large bandpass (\eg\ \citet{Hagen08}).
 
 The Multi-Order Solar EUV Spectrograph (MOSES~\citet{Fox10,Fox11}) is our first effort aimed at developing the unique 
 capability of simultaneous imaging and spectroscopy for solar EUV scenes.
@@ -273,7 +273,7 @@ This constraint on the volume of the 3D data cube helps make inversion of MOSES 
 discontinuous nature of the solar EUV spectrum.
 This working concept enabled by MOSES has been proven over the course of two previous rocket flights.
 Through inversion of MOSES overlappograms, \citet{Fox10} obtained unprecedented measurements of Doppler shifts 
-(\ie\,line widths) of TR explosive events as a function of time and space while \citet{Rust17} recovered splitting and 
+(\ie\ line widths) of TR explosive events as a function of time and space while \citet{Rust17} recovered splitting and 
 distinct moments of compact TR bright point line profiles.
 
 Building on the working concept demonstrated by MOSES, here we describe a new instrument, the EUV Snapshot Imaging 
