@@ -259,7 +259,7 @@ dimensions of the scene, while $t$ represents the temporal axis.
 An ideal instrument would capture a spatial/spectral data cube ($I[x,y,\lambda]$) at a rapid temporal cadence ($t$), 
 however, practical limitations lead us to accept various compromises of these four observables.
 Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
-Fabry--P{\'e}rot Interferometer, \citet{Puschmann12}), but the materials do not exist to extend this technology to 
+Fabry--P{\'e}rot Interferometer, \citep{Puschmann12}), but the materials do not exist to extend this technology to 
 \EUV\ wavelengths shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
 Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect high cadence 2D \EUV\ spatial scenes, but 
 they collect spectrally integrated intensity over a fixed passband that is not narrow enough to isolate a single 
