@@ -294,10 +294,10 @@ The current status and progress toward launch is summarized in Section~\ref{sec:
             pass
 
         with doc.create(pylatex.Subsection('ESIS Features')):
-            with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
+            with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
                 esis_figure_3d.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
 
-            with doc.create(pylatex.Figure(position='ht')) as esis_figure_3d:
+            with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
                 esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
 
     with doc.create(pylatex.Section('Science Objectives')):
