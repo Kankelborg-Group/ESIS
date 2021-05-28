@@ -126,43 +126,69 @@ def document() -> kgpy.latex.Document:
 
     index_o5 = np.nonzero(optics.bunch.ion == 'o_5')[0][0]
     doc.set_variable_quantity(
-        name='wavelengthOV',
+        name='OVwavelength',
         value=wavelength[index_o5],
         digits_after_decimal=3,
     )
     doc.set_variable(
-        name='ionOV',
+        name='OVion',
         value=pylatex.NoEscape(ion[index_o5])
+    )
+    doc.set_variable(
+        name='OV',
+        value=pylatex.NoEscape(r'\OVion\ \OVwavelength')
     )
 
     index_he1 = np.nonzero(optics.bunch.ion == 'he_1')[0][0]
     doc.set_variable_quantity(
-        name='wavelengthHeI',
+        name='HeIwavelength',
         value=wavelength[index_he1],
         digits_after_decimal=3,
     )
     doc.set_variable(
-        name='ionHeI',
+        name='HeIion',
         value=pylatex.NoEscape(ion[index_he1])
+    )
+    doc.set_variable(
+        name='HeI',
+        value=pylatex.NoEscape(r'\HeIion\ \HeIwavelength')
     )
 
     index_mg10 = np.nonzero(optics.bunch.ion == 'mg_10')[0][0]
     doc.set_variable_quantity(
-        name='wavelengthMgX',
+        name='MgXwavelength',
         value=wavelength[index_mg10],
         digits_after_decimal=3,
     )
     doc.set_variable(
-        name='ionMgX',
+        name='MgXion',
         value=pylatex.NoEscape(ion[index_mg10])
+    )
+    doc.set_variable(
+        name='MgX',
+        value=pylatex.NoEscape(r'\MgXion\ \MgXwavelength')
+    )
+
+    index_mg10_2 = np.nonzero(optics.bunch.ion == 'mg_10')[0][1]
+    doc.set_variable_quantity(
+        name='MgXdimWavelength',
+        value=wavelength[index_mg10_2],
+        digits_after_decimal=3,
+    )
+    doc.set_variable(
+        name='MgXdimIon',
+        value=pylatex.NoEscape(ion[index_mg10_2])
+    )
+    doc.set_variable(
+        name='MgXdim',
+        value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
     )
 
     with doc.create(kgpy.latex.Abstract()):
         doc.append(pylatex.NoEscape(
             r"""The Extreme ultraviolet Snapshot Imaging Spectrograph (ESIS) is a next generation rocket borne 
 instrument that will investigate magnetic reconnection and energy transport in the solar atmosphere 
-\amy{by observing emission lines formed in the chromosphere (\ionHeI\ \wavelengthHeI), the transition region (\ionOV\ 
-\wavelengthOV), and corona (\ionMgX \wavelengthMgX).}
+\amy{by observing emission lines formed in the chromosphere (\HeI), the transition region (\OV), and corona (\MgX).}
 \jake{JDP: Would make more sense to talk about the brighter Mg line?  609.8}
 The instrument is a pseudo Gregorian telescope; 
 from prime focus, an array of spherical diffraction gratings re-image with differing dispersion angles. 
@@ -248,9 +274,8 @@ distinct moments of compact TR bright point line profiles.
 
 Building on the working concept demonstrated by MOSES, here we describe a new instrument, the EUV Snapshot Imaging 
 Spectrograph (ESIS), that will improve on past efforts to produce a solar EUV spectral map.
-ESIS will fly alongside MOSES and will observe the transition region (TR) and corona of the solar atmosphere in the 
-O\,\textsc{v} \SI{63.0}{\nano\meter} and Mg\,\textsc{x} \SI{62.5}{\nano\meter} and \SI{61.0}{\nano\meter} spectral 
-lines.
+ESIS will fly alongside MOSES and will observe the transition region (TR) and corona of the solar atmosphere in the
+\OV\ and \MgX\ / \MgXdimWavelength\ spectral lines.
 In Section~\ref{sec:TheESISConcept} we detail how our experience with the MOSES instrument has shaped the design of 
 ESIS.
 Section~\ref{sec:ScienceObjectives} describes the narrow scientific objectives and the requirements placed on the new 
