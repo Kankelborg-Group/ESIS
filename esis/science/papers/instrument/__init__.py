@@ -25,11 +25,32 @@ def document() -> kgpy.latex.Document:
         ]
     )
 
+    doc.packages.append(pylatex.Package('acronym'))
     doc.packages.append(pylatex.Package('savesym'))
     doc.preamble.append(pylatex.NoEscape(
         '\\savesymbol{tablenum}'
         '\\usepackage{siunitx}'
         '\\restoresymbol{SIX}{tablenum}'
+    ))
+
+    doc.preamble.append(pylatex.NoEscape(
+        r"""
+\makeatletter
+\newcommand{\acposs}[1]{%
+ \expandafter\ifx\csname AC@#1\endcsname\AC@used
+   \acs{#1}'s%
+ \else
+   \aclu{#1}'s (\acs{#1}'s)%
+ \fi
+}
+\newcommand{\Acposs}[1]{%
+ \expandafter\ifx\csname AC@#1\endcsname\AC@used
+   \acs{#1}'s%
+ \else
+   \Aclu{#1}'s (\acs{#1}'s)%
+ \fi
+}
+\makeatother"""
     ))
 
     doc.set_variable(
@@ -188,10 +209,26 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
     )
 
+    doc.preamble.append(kgpy.latex.Acronym('ESIS', r'\textit{EUV Snapshot Imaging Spectrograph}'))
+    doc.preamble.append(kgpy.latex.Acronym('MOSES', r'\textit{Multi-order Solar EUV Spectrograph}'))
+    doc.preamble.append(kgpy.latex.Acronym('TRACE', r'\textit{Transition Region and Coronal Explorer}'))
+    doc.preamble.append(kgpy.latex.Acronym('AIA', r'\textit{Atmospheric Imaging Assembly}'))
+    doc.preamble.append(kgpy.latex.Acronym('IRIS', r'\textit{Interface Region Imaging Spectrograph}'))
+    doc.preamble.append(kgpy.latex.Acronym('MDI', r'\textit{Michelson Doppler Imager}'))
+    doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
+    doc.preamble.append(kgpy.latex.Acronym('EUV', 'extreme ultraviolet'))
+    doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
+    doc.preamble.append(kgpy.latex.Acronym('CTIS', 'computed tomography imaging spectrograph', plural=True))
+    doc.preamble.append(kgpy.latex.Acronym('FOV', 'field of view'))
+    doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
+
+    # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
+    # doc.set_variable(name='MOSES', value=pylatex.Command('ac', 'MOSES'))
+
     with doc.create(kgpy.latex.Abstract()):
         doc.append(pylatex.NoEscape(
-            r"""The Extreme ultraviolet Snapshot Imaging Spectrograph (ESIS) is a next generation rocket borne 
-instrument that will investigate magnetic reconnection and energy transport in the solar atmosphere 
+            r"""The \ESIS\ is a next generation rocket borne instrument that will investigate magnetic reconnection 
+and energy transport in the solar atmosphere 
 \amy{by observing emission lines formed in the chromosphere (\HeI), the transition region (\OV), and corona (\MgX).}
 \jake{JDP: Would make more sense to talk about the brighter Mg line?  609.8}
 The instrument is a pseudo Gregorian telescope; 
@@ -205,16 +242,17 @@ at high cadence ($>=$\minCadence).
 \amy{The instrument is designed to be capable of obtaining co-temporal spatial (\avgPlateScale) and spectral 
 (\dispersion) images at high cadence ($>=$\minCadence).}
 \amy{Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
-at high spatial and spectral resolution over a large (\fov) field of view. 
+at high spatial and spectral resolution over a large (\fov) \FOV. 
 The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. }
 A single exposure will enable us to reconstruct line profile information at high spatial and spectral resolution over a 
-large (\fov) field of view. 
-The instrument is currently in the build up phase prior to spacecraft integration, testing, and launch."""
+large (\fov) \FOV. 
+The instrument is currently in the build up phase prior to spacecraft integration, testing, and launch.
+\acresetall"""
         ))
 
     with doc.create(pylatex.Section('Introduction')):
         doc.append(pylatex.NoEscape(
-            r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (FUV, EUV, and soft 
+            r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft 
 X-ray), is a three-dimensional scene evolving in time: $I[x,y,\lambda,t]$.
 Here the solar sky plane spatial coordinates, $x$ and $y$, and the wavelength axis, $\lambda$, comprise the three 
 dimensions of the scene, while $t$ represents the temporal axis.
@@ -222,27 +260,25 @@ An ideal instrument would capture a spatial/spectral data cube ($I[x,y,\lambda]$
 however, practical limitations lead us to accept various compromises of these four observables.
 Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
 Fabry--P{\'e}rot Interferometer, \citet{Puschmann12}), but the materials do not exist to extend this technology to 
-extreme ultraviolet wavelengths (EUV) shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
-Imagers like the \textit{Transition Region and Coronal Explorer (TRACE)}~\citep{Handy99} and the \textit{Atmospheric 
-Imaging Assembly (AIA)}~\citep{Lemen12} collect high cadence 2D EUV spatial scenes, but they collect spectrally 
-integrated intensity over a fixed passband that is not narrow enough to isolate a single emission line.  
-In principle, filter ratios that make use of spectrally adjacent multilayer EUV passbands could detect Doppler 
+\EUV\ wavelengths shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
+Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect high cadence 2D \EUV\ spatial scenes, but 
+they collect spectrally integrated intensity over a fixed passband that is not narrow enough to isolate a single 
+emission line.  
+In principle, filter ratios that make use of spectrally adjacent multilayer \EUV\ passbands could detect Doppler 
 shifts~\citep{Sakao99}.
 However, the passbands of the multilayer coatings are still wide enough that the presence of weaker contaminant lines 
 limits resolution of Doppler shifts to $\sim$\SI{1000}{\kilo\meter\per\second}~\citep{Kobayashi00}.
-Slit spectrographs (\eg\ \textit{The Interface Region Imaging Spectrograph, IRIS}~\citep{IRIS14}) obtain fast, 
-high-resolution spatial and spectral observations, but are limited by the narrow field of view (FOV) of the spectrograph
-slit.
+Slit spectrographs (\eg\ \IRIS~\citep{IRIS14}) obtain fast, high-resolution spatial and spectral observations, but are 
+limited by the narrow \FOV\ of the spectrograph slit.
 The $I[x,y,\lambda]$ data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
 raster axis.
 Moreover, extended and dynamic scenes can change significantly in the time required to raster over their extant.  
 
 A different approach is to forego the entrance slit employed by traditional spectrographs entirely.
-The Naval Research Laboratory's (NRL) SO82A~\citep{Tousey73,Tousey77} was one of the first instruments to pioneer this 
-method.
+The \Acposs{NRL} SO82A~\citep{Tousey73,Tousey77} was one of the first instruments to pioneer this method.
 The `overlappograms' obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
 recently been used to determine line ratios in solar flares~\citep{Keenan06}.
-Unfortunately, for closely spaced EUV lines, the dispersed images from the single diffraction order suffer from 
+Unfortunately, for closely spaced \EUV\ lines, the dispersed images from the single diffraction order suffer from 
 considerable overlap confusion.
 Image overlap is all but unavoidable with this configuration, however, overlappograms can be disentangled, or inverted, 
 under the right circumstances.  
@@ -251,37 +287,37 @@ In analogy to a tomographic imaging problem~\citep{Kak88}, inversion of an overl
 facilitated by increasing the number of independent spectral projections, or `look angles,' through the 3D 
 $(x,y,\lambda)$ scene~\citep{DeForest04}.
 For example, \citet{DeForest04} demonstrated recovery of Doppler shifts in magnetograms from two dispersed orders of a 
-grating at the output of the \textit{Michelson Doppler Imager (MDI~\citep{Scherrer95})}.
+grating at the output of the \MDI~\citep{Scherrer95}.
 The quality of the inversion (\eg\ recovery of higher order spectral line moments) can also be improved by additional 
 projections~\citep{Kak88,Descour97}, generally at the cost of computational complexity~\citep{Hagen08}.
-\textit{Computed Tomographic Imaging Spectrographs (CTIS)}~\citep{okamoto1991,Bulygin91,Descour95} leverage this concept
-by obtaining multiple, simultaneous dispersed images of an object or scene; 
+\Acp{CTIS}~\citep{okamoto1991,Bulygin91,Descour95} leverage this concept by obtaining multiple, simultaneous dispersed 
+images of an object or scene; 
 upwards of 25 grating diffraction orders may be projected onto a single detector plane~\citep{Descour97}.
-Through post processing of these images, CTIS can recover a 3D data cube from a (spectrally) smooth and continuous scene
-over a large bandpass (\eg\ \citet{Hagen08}).
+Through post processing of these images, \CTIS\ can recover a 3D data cube from a (spectrally) smooth and continuous 
+scene over a large bandpass (\eg\ \citet{Hagen08}).
 
-The Multi-Order Solar EUV Spectrograph (MOSES~\citet{Fox10,Fox11}) is our first effort aimed at developing the unique 
-capability of simultaneous imaging and spectroscopy for solar EUV scenes.
-MOSES is a three-order slitless spectrograph that seeks to combine the simplicity of the SO82A concept with the 
-advantages of a CTIS instrument.
+The \MOSES~\cite{Fox10,Fox11} is our first effort aimed at developing the unique capability of simultaneous 
+imaging and spectroscopy for solar \EUV\ scenes.
+\MOSES\ is a three-order slitless spectrograph that seeks to combine the simplicity of the SO82A concept with the 
+advantages of a \CTIS\ instrument.
 A single diffraction grating (in conjunction with a fold mirror) projects the $m=\pm1$ and the un-dispersed $m=0$ order 
 onto three different detectors.
 Through a combination of dispersion and multi-layer coatings, the passband of the $m=\pm1$ orders encompasses only a few
-solar EUV emission lines.
-Thus, MOSES overlappograms consist of only a handful of spectral images.
-This constraint on the volume of the 3D data cube helps make inversion of MOSES data better-posed despite the 
-discontinuous nature of the solar EUV spectrum.
-This working concept enabled by MOSES has been proven over the course of two previous rocket flights.
-Through inversion of MOSES overlappograms, \citet{Fox10} obtained unprecedented measurements of Doppler shifts 
-(\ie\ line widths) of TR explosive events as a function of time and space while \citet{Rust17} recovered splitting and 
-distinct moments of compact TR bright point line profiles.
+solar \EUV\ emission lines.
+Thus, \MOSES\ overlappograms consist of only a handful of spectral images.
+This constraint on the volume of the 3D data cube helps make inversion of \MOSES\ data better-posed despite the 
+discontinuous nature of the solar \EUV\ spectrum.
+This working concept enabled by \MOSES\ has been proven over the course of two previous rocket flights.
+Through inversion of \MOSES\ overlappograms, \citet{Fox10} obtained unprecedented measurements of Doppler shifts 
+(\ie\ line widths) of \TR\ explosive events as a function of time and space while \citet{Rust17} recovered splitting and 
+distinct moments of compact \TR\ bright point line profiles.
 
-Building on the working concept demonstrated by MOSES, here we describe a new instrument, the EUV Snapshot Imaging 
-Spectrograph (ESIS), that will improve on past efforts to produce a solar EUV spectral map.
-ESIS will fly alongside MOSES and will observe the transition region (TR) and corona of the solar atmosphere in the
-\OV\ and \MgX\ / \MgXdimWavelength\ spectral lines.
-In Section~\ref{sec:TheESISConcept} we detail how our experience with the MOSES instrument has shaped the design of 
-ESIS.
+Building on the working concept demonstrated by \MOSES, here we describe a new instrument, the \ESIS, that will improve 
+on past efforts to produce a solar \EUV\ spectral map.
+\ESIS\ will fly alongside \MOSES\ and will observe the \TR\ and corona of the solar atmosphere in the \OV\ and \MgX\ / 
+\MgXdimWavelength\ spectral lines.
+In Section~\ref{sec:TheESISConcept} we detail how our experience with the \MOSES\ instrument has shaped the design of 
+\ESIS.
 Section~\ref{sec:ScienceObjectives} describes the narrow scientific objectives and the requirements placed on the new 
 instrument.
 Section~\ref{sec:TheESISInstrument} describes the technical approach to meet our scientific objectives, followed by a 
