@@ -328,14 +328,14 @@ The current status and progress toward launch is summarized in Section~\ref{sec:
     with doc.create(pylatex.Section('The ESIS Concept')):
         doc.append(pylatex.NoEscape(
             r"""A primary goal of the \ESIS\ instrument is to improve the implementation of \EUV\ snapshot imaging 
-spectroscopy demonstrated by \MOSES\.  
+spectroscopy demonstrated by \MOSES.  
 Therefore, the design of the new instrument draws heavily from experiences and lessons learned through two flights of 
 the \MOSES\ instrument.
 \ESIS\ and \MOSES\ are both slitless, multi-projection spectrographs.
 As such, both produce dispersed images of a narrow portion of the solar spectrum, with the goal of enabling the 
 reconstruction of a spectral line profile at every point in the field of view.
-The similarities end there, however, as the optical layout of \ESIS\ differs significantly from that of \MOSES\.
-In this section, we detail some difficulties and limitations encountered with \MOSES\, then describe how the new design 
+The similarities end there, however, as the optical layout of \ESIS\ differs significantly from that of \MOSES.
+In this section, we detail some difficulties and limitations encountered with \MOSES, then describe how the new design 
 of \ESIS\ addresses these issues."""
         ))
         with doc.create(pylatex.Subsection('Limitations of the MOSES Design')):
