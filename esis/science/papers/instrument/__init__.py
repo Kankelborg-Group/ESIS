@@ -15,7 +15,6 @@ path_figures = path_base / 'figures'
 
 
 def document() -> kgpy.latex.Document:
-
     doc = kgpy.latex.Document(
         default_filepath=str(path_pdf),
         documentclass='aastex631',
@@ -339,7 +338,25 @@ In this section, we detail some difficulties and limitations encountered with \M
 of \ESIS\ addresses these issues."""
         ))
         with doc.create(pylatex.Subsection('Limitations of the MOSES Design')):
-            pass
+            doc.append(pylatex.NoEscape(
+                r"""The \MOSES\ design features a single concave diffraction grating forming images on three CCD 
+detectors~\citep{Fox10} (Fig.~\ref{fig:mosesSchematic}). 
+The optical path is folded in half by a single flat secondary mirror (omitted in Fig.~\ref{fig:mosesSchematic}).
+Provided that the three cameras are positioned correctly, this arragement allows the entire telescope to be brought 
+into focus using only the central (undispersed) order and a visible light source.
+Unfortunately this design uses volume inefficiently for two reasons.
+First, the lack of magnification by the secondary mirror limits the folded length of the entire telescope to be no less 
+than half the \SI{5}{\meter} focal length of the grating~\citep{Fox10,Fox11}.
+Second, the dispersion of the instrument is controlled by the placement of the cameras.
+To achieve the maximum dispersion of \SI{29}{\kilo\meter\per\second}~\citep{Fox10}, the outboard orders are imaged as 
+far apart as possible in the $\sim22''$ diameter cross section of the rocket payload.
+The resulting planar dispersion poorly fills the cylindrical volume of the payload, leaving much unused space along the 
+orthogonal planes."""
+            ))
+
+            with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
+                moses_schematic.add_image('figures/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
+                moses_schematic.append(pylatex.Command('label', 'fig:mosesSchematic'))
 
         with doc.create(pylatex.Subsection('ESIS Features')):
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
