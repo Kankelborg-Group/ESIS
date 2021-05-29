@@ -363,6 +363,78 @@ Incident light on the right forms an undispersed image on the central $m=0$ CCD.
 Dispersed images are formed on the outboard $m=\pm1$ CCDs."""
                 )
 
+            r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
+allow efficient placement of the dispersed image order cameras.  
+For all practical purposes, the diameter of the payload (\SI{0.56}{\meter}) can only accommodate three diffraction 
+orders ($m=-1, 0, +1$).
+Therefore, \textit{\MOSES\ can only collect, at most, three pieces of information at each point in the field of view.}
+From this, it is not reasonable to expect the reconstruction of more than three degrees of freedom in this spectrum, 
+except in the case very compact, isolated features such as those described by \citet{Fox10} and \citet{Rust17}.
+Consequently, it is a reasonable approximation to say that \MOSES\ is sensitive primarily to spectral line intensities, 
+shifts, and widths \citep{KankThom01}.
+With any tomographic apparatus, the degree of detail that can be resolved in the object depends critically on the 
+number of viewing angles~\citep{Kak88,Descour97,Hagen08}.
+So it is with the spectrum we observe with \MOSES: more dispersed images are required to confer sensitivity to finer 
+spectral details such additional lines in the passband or higher moments of the spectral line shape.
+
+A related issue stems from the use of a single grating, with a single plane of dispersion.
+Since the solar corona and transition region are structured by magnetic fields, the scene tends to be dominated by 
+field aligned structures such as loops~\citep{Rosner78,Bonnet80}.
+When the \MOSES\ dispersion direction happens to be aligned nearly perpendicular to the magnetic field, filamentary 
+structures on the transition region serve almost as spectrograph slits unto themselves.
+The estimation of Doppler shifts then becomes a simple act of triangulation, and broadenings are also readily 
+diagnosed~\citep{Fox10,Courrier18}.
+A double-peaked profile can also be observed with sufficiently isolated features~\citep{Rust17}.
+Unfortunately, solar magnetic fields in the transition region are quite complex and do not have a global preferred 
+direction.
+In cases where the field is nearly parallel to the instrument dispersion, spectral shifts and broadenings are not 
+readily apparent.
+
+The single diffraction grating also leads to a compromise in the optical performance of the instrument. 
+Since the \MOSES\ grating forms images in three orders simultaneously, aberration cannot be simultaneously optimized for 
+all three of those spectral orders.
+A result of this design is that the orientations (\ie\,the central axis) of the PSFs vary order to order~\citep{Rust17}.
+During the first mission, MOSES was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
+inter-order PSF variation and caused the individual PSFs to span several pixels~\citep{Rust17,Atwood18}.
+The combination of these two effects results in spurious spectral features that require additional 
+consideration~\citep{Atwood18} and further increase the complexity of the inversion process~\citep{Rust17,Courrier18}.
+ 
+Another complication is that the spatial and spectral content differs slightly between the three \MOSES\ image orders.
+This is because the \MOSES\ \FOV\ is defined by a combination of the aperture of the grating (\ie\,the entrance 
+aperture of the telescope) and the spatial extent of the CCDs.
+The \FOV\ in the $m=\pm1$ orders is shifted along the dispersion axis as a function of wavelength, dependant upon where 
+the dispersed spectral images intercept the $m=\pm1$ CCDs.
+Spatially, this effect is limited to only a handful of pixel columns at the edges of each image order.
+Of higher concern is the `spectral contamination' allowed by this layout; 
+\citet{Parker16} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
+\FOV\ could be diffracted onto the outboard order CCDs.
+This off-band contamination is detected as systematic intensity variation that lacks an anti-symmetric pairing in the 
+opposite dispersed image order.
+Analysis of the spectral contamination is ongoing. 
+
+Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the 
+CCDs~\citep{Fox11}.
+The observing interval for a solar sounding rocket flight is very short, typically about five minutes.
+Consequently, every second of observing time is precious, both to achieve adequate exposure time and to catch the full 
+development of dynamical phenomena.
+The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of the CCDs.
+Thus, valuable observing time is lost.
+The readout data gap impelled us to develop a \MOSES\ exposure sequence with exposures ranging from 
+$0.25$-\SI{24}{\second}, a careful trade-off between deep and fast exposures. 
+
+In summary, our experience leads us to conclude that the \MOSES\ design has the following primary limitations:
+\begin{enumerate}
+    \item inefficient use of volume \label{item-length} %(x and y direction)
+    \item dispersion constrained by payload dimensions \label{item-disp_con}
+    \item too few dispersed images (orders) \label{item-orders}
+    \item single plane dispersion \label{item-dispersion}
+    \item lack of aberration control \label{item-PSF}
+    \item insufficiently defined FOV \label{item-FOV}
+    \item sub-optimal exposure cadence \label{item-CAD}
+\end{enumerate}
+In designing \ESIS, we have sought to improve upon each of these points.
+"""
+
         with doc.create(pylatex.Subsection('ESIS Features')):
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
                 esis_figure_3d.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
