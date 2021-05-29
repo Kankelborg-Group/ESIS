@@ -356,7 +356,7 @@ orthogonal planes."""
 
             with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
                 moses_schematic.add_image('figures/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
-                moses_schematic.append(pylatex.Command('label', 'fig:mosesSchematic'))
+                moses_schematic.append(kgpy.latex.Label('fig:mosesSchematic'))
                 moses_schematic.add_caption(
                     r"""Schematic diagram of the MOSES instrument.
 Incident light on the right forms an undispersed image on the central $m=0$ CCD.
