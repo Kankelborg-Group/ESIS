@@ -357,6 +357,11 @@ orthogonal planes."""
             with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
                 moses_schematic.add_image('figures/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
                 moses_schematic.append(pylatex.Command('label', 'fig:mosesSchematic'))
+                moses_schematic.add_caption(
+                    r"""Schematic diagram of the MOSES instrument.
+Incident light on the right forms an undispersed image on the central $m=0$ CCD.
+Dispersed images are formed on the outboard $m=\pm1$ CCDs."""
+                )
 
         with doc.create(pylatex.Subsection('ESIS Features')):
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
