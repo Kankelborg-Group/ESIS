@@ -223,6 +223,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('FOV', 'field of view'))
     doc.preamble.append(kgpy.latex.Acronym('PSF', 'point-spread function'))
     doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
+    doc.preamble.append(kgpy.latex.Acronym('MHD', 'magnetohydrodynamic'))
 
     # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
     # doc.set_variable(name='MOSES', value=pylatex.Command('ac', 'MOSES'))
