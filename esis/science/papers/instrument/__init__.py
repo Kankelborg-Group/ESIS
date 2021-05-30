@@ -452,9 +452,8 @@ Eight grating positions appear in this schematic; only six fit within the volume
 Four channels are populated for the first flight."""
                 )
 
-    with doc.create(pylatex.Section('Science Objectives')):
-        doc.append(pylatex.NoEscape(
-            r"""The layout of \ESIS (Fig.~\ref{fig: layout}) is a modified form of Gregorian telescope.
+            doc.append(pylatex.NoEscape(
+                r"""The layout of \ESIS (Fig.~\ref{fig: layout}) is a modified form of Gregorian telescope.
 Incoming light is brought to focus at an octagonal field stop by a parabolic primary mirror.
 In the \ESIS\ layout, the secondary mirror of a typical Gregorian telescope is replaced by a segmented, octagonal array 
 of diffraction gratings.
@@ -528,7 +527,10 @@ The volume of the \ESIS\ optical layout is smaller than \MOSES\ by almost a fact
 improved spectral resolution, and faster exposure cadence.
 \ESIS\ offers several features to improve the recovery of spectral information, including more channels, crossed 
 dispersion planes, and a field stop."""
-        ))
+            ))
+
+    with doc.create(pylatex.Section('Science Objectives')):
+        pass
 
     with doc.create(pylatex.Section('The ESIS Instrument')):
         pass
