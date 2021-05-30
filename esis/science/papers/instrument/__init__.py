@@ -213,6 +213,8 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'))
     doc.preamble.append(kgpy.latex.Acronym('AIA', r'Atmospheric Imaging Assembly'))
     doc.preamble.append(kgpy.latex.Acronym('IRIS', r'Interface Region Imaging Spectrograph'))
+    doc.preamble.append(kgpy.latex.Acronym('EIS', 'EUV Imaging Spectrograph'))
+    doc.preamble.append(kgpy.latex.Acronym('EUNIS', 'EUV Normal-incidence Spectrometer'))
     doc.preamble.append(kgpy.latex.Acronym('MDI', r'Michelson Doppler Imager'))
     doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('EUV', 'extreme ultraviolet'))
