@@ -219,6 +219,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
     doc.preamble.append(kgpy.latex.Acronym('CTIS', 'computed tomography imaging spectrograph', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('FOV', 'field of view'))
+    doc.preamble.append(kgpy.latex.Acronym('PSF', 'point-spread function'))
     doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
 
     # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
@@ -393,9 +394,9 @@ readily apparent.
 The single diffraction grating also leads to a compromise in the optical performance of the instrument. 
 Since the \MOSES\ grating forms images in three orders simultaneously, aberration cannot be simultaneously optimized for 
 all three of those spectral orders.
-A result of this design is that the orientations (\ie\,the central axis) of the PSFs vary order to order~\citep{Rust17}.
+A result of this design is that the orientations (\ie\,the central axis) of the \PSFs\ vary order to order~\citep{Rust17}.
 During the first mission, MOSES was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
-inter-order PSF variation and caused the individual PSFs to span several pixels~\citep{Rust17,Atwood18}.
+inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
 The combination of these two effects results in spurious spectral features that require additional 
 consideration~\citep{Atwood18} and further increase the complexity of the inversion process~\citep{Rust17,Courrier18}.
  
