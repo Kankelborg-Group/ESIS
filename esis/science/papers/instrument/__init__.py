@@ -671,6 +671,7 @@ sources are localized in the \TR, but cover the surface densely enough to appear
 The resulting non-thermal widths for localized sources will be significantly higher than the 
 $\sim$\SI{20}{\kilo\meter\per\second} mean derived above.
 The concentration of non-thermal energy observed by \ESIS\ will serve as an indicator of source density.
+\roy{Should we remove this section considering that \MOSES\ didn't work?}
 Comparison of Doppler maps from \ESIS\ and \MOSES\ will indicate whether a uniform source density originates in the 
 chromosphere or below (scenario~\ref{wave-1}) or is associated with spatially distributed \TR\ phenomena 
 (scenario~\ref{wave-3}) such as explosive events, or macrospicules.
