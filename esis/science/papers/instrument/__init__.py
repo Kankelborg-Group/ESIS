@@ -457,7 +457,7 @@ Four channels are populated for the first flight."""
                 )
 
             doc.append(pylatex.NoEscape(
-                r"""The layout of \ESIS (Fig.~\ref{fig: layout}) is a modified form of Gregorian telescope.
+                r"""The layout of \ESIS\ (Fig.~\ref{fig: layout}) is a modified form of Gregorian telescope.
 Incoming light is brought to focus at an octagonal field stop by a parabolic primary mirror.
 In the \ESIS\ layout, the secondary mirror of a typical Gregorian telescope is replaced by a segmented, octagonal array 
 of diffraction gratings.
