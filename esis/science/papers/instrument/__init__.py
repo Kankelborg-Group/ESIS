@@ -562,8 +562,9 @@ isolated emission line formed in the lower \TR."""
         ))
 
         with doc.create(pylatex.Subsection('Magnetic Reconnection Events')):
-            r"""Magnetic reconnection describes the re-arrangement of the magnetic topology wherein magnetic energy is 
-converted to kinetic energy resulting in the acceleration of plasma particles.
+            doc.append(pylatex.NoEscape(
+                r"""Magnetic reconnection describes the re-arrangement of the magnetic topology wherein magnetic energy 
+is converted to kinetic energy resulting in the acceleration of plasma particles.
 Reconnection is implicated in many dynamic, high energy solar events.
 Solar flares are a well studied example (\eg\,\citet{Priest02} and the references therein), however we have little hope 
 of pointing in the right place at the right time to observe a significant flare event in a rocket flight lasting only 
@@ -605,6 +606,7 @@ a significant portion of their temporal evolution can be captured in $>$\SI{150}
 flight (\eg,~\citet{Dere89,Dere91}).
 In similarity with \MOSES, we seek a \TR\ line for \ESIS\ that is bright and well enough isolated from neighboring 
 emission lines so as to be easily distinguished."""
+            ))
 
     with doc.create(pylatex.Section('The ESIS Instrument')):
         pass
