@@ -64,6 +64,7 @@ def document() -> kgpy.latex.Document:
 
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\jake}[1]{{{\color{purple} #1}}}'))
+    doc.preamble.append(pylatex.NoEscape(r'\newcommand{\roy}[1]{{{\color{blue} #1}}}'))
 
     doc.preamble.append(pylatex.Command('bibliographystyle', 'aasjournal'))
 
