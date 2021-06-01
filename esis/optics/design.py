@@ -131,7 +131,7 @@ def final(
         roll = 0 * u.deg
 
     dashstyle = (0, (1, 1))
-    dashstyle_channels = [dashstyle, None, None, None, None, dashstyle]
+    dashstyle_channels = np.array([dashstyle, None, None, None, None, dashstyle], dtype=object)
 
     primary = Primary()
     primary.radius = 2000 * u.mm
@@ -225,7 +225,7 @@ def final(
         grating=grating,
         filter=filter,
         detector=detector,
-        wavelength=[584.3, 609.8, 629.7, ] * u.AA,
+        num_emission_lines=10,
         pupil_samples=pupil_samples,
         pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,

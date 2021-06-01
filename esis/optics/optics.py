@@ -13,6 +13,7 @@ import astropy.visualization
 import astropy.time
 import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
+import kgpy.chianti
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
@@ -35,7 +36,7 @@ class Optics(
     grating: Grating = dataclasses.field(default_factory=Grating)
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
-    wavelength: u.Quantity = 0 * u.nm
+    num_emission_lines: int = 3
     field_samples: typ.Union[int, vector.Vector2D] = 10
     field_is_stratified_random: bool = False
     pupil_samples: typ.Union[int, vector.Vector2D] = 10
@@ -60,6 +61,7 @@ class Optics(
 
     def update(self) -> typ.NoReturn:
         self._system = None
+        self._bunch = None
 
     @property
     def num_channels(self) -> int:
@@ -81,7 +83,7 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                wavelength=self.wavelength,
+                wavelength=self.bunch.wavelength[:self.num_emission_lines],
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
                 pupil_samples=self.pupil_samples,
@@ -140,18 +142,22 @@ class Optics(
     def angle_alpha(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.field_stop.transform
         t = t + kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate.from_vector(self.field_stop.surface.aperture.vertices)
+            kgpy.transform.rigid.Translate.from_vector(
+                self.field_stop.surface.aperture.vertices[(...,) + (np.newaxis,) * t.translation_eff.ndim]
+            )
         ])
-        t = t.translation_eff
+        t = np.moveaxis(t.translation_eff, 0, ~0)
         return np.arctan2(t.x, t.z)
 
     @property
     def angle_beta(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.detector.transform
         t = t + kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate.from_vector(self.detector.surface.aperture.vertices)
+            kgpy.transform.rigid.Translate.from_vector(
+                self.detector.surface.aperture.vertices[(...,) + (np.newaxis,) * t.translation_eff.ndim]
+            )
         ])
-        t = t.translation_eff
+        t = np.moveaxis(t.translation_eff, 0, ~0)
         return np.arctan2(t.x, t.z)
 
     @property
@@ -169,9 +175,17 @@ class Optics(
     def wavelength_max(self) -> u.Quantity:
         return self._wavelength_test_grid.max((~1, ~0)).to(u.AA)
 
+    @property
+    def bunch(self) -> kgpy.chianti.Bunch:
+        if self._bunch is None:
+            self._bunch = kgpy.chianti.bunch_tr_qs()
+            self._bunch.wavelength_min = self.wavelength_min.min()
+            self._bunch.wavelength_max = self.wavelength_max.max()
+        return self._bunch
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
-        other.wavelength = self.wavelength.copy()
+        other.num_emission_lines = self.num_emission_lines
         other.pupil_samples = self.pupil_samples
         other.field_samples = self.field_samples
         other.source = self.source.copy()
