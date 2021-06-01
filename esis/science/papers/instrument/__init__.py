@@ -24,6 +24,7 @@ def document() -> kgpy.latex.Document:
         ]
     )
 
+    doc.packages.append(pylatex.Package('paralist'))
     doc.packages.append(pylatex.Package('acronym'))
     doc.packages.append(pylatex.Package('savesym'))
     doc.preamble.append(pylatex.NoEscape(
@@ -67,6 +68,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(pylatex.NoEscape(r'\newcommand{\roy}[1]{{{\color{blue} #1}}}'))
 
     doc.preamble.append(pylatex.Command('bibliographystyle', 'aasjournal'))
+    doc.set_variable('spiejatis', pylatex.NoEscape(r'J~.Atmos.~Tel. \& Img.~Sys.'))
 
     doc.append(kgpy.latex.Title('The EUV Snapshot Imaging Spectrograph'))
 
@@ -222,10 +224,10 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
     doc.preamble.append(kgpy.latex.Acronym('CTIS', 'computed tomography imaging spectrograph', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('FOV', 'field of view'))
-    doc.preamble.append(kgpy.latex.Acronym('PSF', 'point-spread function'))
+    doc.preamble.append(kgpy.latex.Acronym('PSF', 'point-spread function', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
     doc.preamble.append(kgpy.latex.Acronym('MHD', 'magnetohydrodynamic'))
-    doc.preamble.append(kgpy.latex.Acronym('EE', 'explosive event'))
+    doc.preamble.append(kgpy.latex.Acronym('EE', 'explosive event', plural=True))
 
     # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
     # doc.set_variable(name='MOSES', value=pylatex.Command('ac', 'MOSES'))
@@ -363,13 +365,13 @@ orthogonal planes."""
             with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
                 moses_schematic.add_image('figures/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
                 moses_schematic.append(kgpy.latex.Label('fig:mosesSchematic'))
-                moses_schematic.add_caption(
+                moses_schematic.add_caption(pylatex.NoEscape(
                     r"""Schematic diagram of the MOSES instrument.
 Incident light on the right forms an undispersed image on the central $m=0$ CCD.
 Dispersed images are formed on the outboard $m=\pm1$ CCDs."""
-                )
-
-            r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
+                ))
+            doc.append(pylatex.NoEscape(
+                r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
 allow efficient placement of the dispersed image order cameras.  
 For all practical purposes, the diameter of the payload (\SI{0.56}{\meter}) can only accommodate three diffraction 
 orders ($m=-1, 0, +1$).
@@ -440,6 +442,7 @@ In summary, our experience leads us to conclude that the \MOSES\ design has the 
 \end{enumerate}
 In designing \ESIS, we have sought to improve upon each of these points.
 """
+            ))
 
         with doc.create(pylatex.Subsection('ESIS Features')):
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
@@ -448,17 +451,17 @@ In designing \ESIS, we have sought to improve upon each of these points.
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
                 esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
                 esis_figure_3d.append(kgpy.latex.Label('fig:layout'))
-                esis_figure_3d.add_caption(
+                esis_figure_3d.add_caption(pylatex.NoEscape(
                     r"""The \ESIS\ instrument is a pseudo-Gregorian design.
 The secondary mirror is replaced by a segmented array of concave diffraction gratings.
 The field stop at prime focus defines instrument spatial/spectral \FOV.
 CCDs are arrayed around the primary mirror, each associated with a particular grating.
 Eight grating positions appear in this schematic; only six fit within the volume of the rocket payload.
 Four channels are populated for the first flight."""
-                )
+                ))
 
             doc.append(pylatex.NoEscape(
-                r"""The layout of \ESIS\ (Fig.~\ref{fig: layout}) is a modified form of Gregorian telescope.
+                r"""The layout of \ESIS\ (Fig.~\ref{fig:layout}) is a modified form of Gregorian telescope.
 Incoming light is brought to focus at an octagonal field stop by a parabolic primary mirror.
 In the \ESIS\ layout, the secondary mirror of a typical Gregorian telescope is replaced by a segmented, octagonal array 
 of diffraction gratings.
@@ -502,15 +505,15 @@ to the \MOSES\ design (\S\,\ref{subsec:LimitationsoftheMOSESDesign} item \ref{it
 A disadvantage of this arrangement is that \ESIS\ lacks a zero order focus.
 In its flight configuration with gratings optimized around a \OVwavelength\ wavelength, the instrument cannot be 
 aligned and focused in visible light like \MOSES.
-Visible gratings and a special alignment transfer apparatus (\S\,\ref{SS-AlaF}) must be used for alignment and focus of 
-\ESIS.
+Visible gratings and a special alignment transfer apparatus (\S\,\ref{subsec:AlignmentandFocus}) must be used for 
+alignment and focus of \ESIS.
 
 The \ESIS\ design also includes an octagonal field stop placed at prime focus.
 This confers two advantages.
 First, the field stop fully defines the instrument \FOV, so that \ESIS\ is not susceptible to the spectral contamination 
 observed in \MOSES\ data (\S\,\ref{subsec:LimitationsoftheMOSESDesign} limitation~\ref{item-FOV}).
 Second, each spectral image observed by \ESIS\ will be bordered by the outline of the field stop 
-(\eg\,\S\,\ref{SS-Optics}).
+(\eg\,\S\,\ref{subsec:Optics}).
 This aids the inversion process since outside of this sharp edge the intensity is zero for any look angle through an 
 ESIS data cube.
 Additionally, the symmetry of the field stop gives multiple checkpoints where the edge inversion is duplicated in the 
@@ -542,10 +545,10 @@ dispersion planes, and a field stop."""
 This concept adds a unique capability to the science that we can obtain from the \EUV\ solar atmosphere.
 \ESIS, sharing the same payload volume as \MOSES, is manifested to fly in 2019.
 In this section, we set forth specific scientific objectives for the combined \ESIS/\MOSES mission.
-From these objectives, and with an eye toward synergistic operation of \MOSES\ and \ESIS, in \S\,\ref{SS-SCIREQ} we 
-derive the quantitative science requirements that drive the \ESIS\ design.
+From these objectives, and with an eye toward synergistic operation of \MOSES\ and \ESIS, in 
+\S\,\ref{subsec:ScienceRequirements} we derive the quantitative science requirements that drive the \ESIS\ design.
 
-The combined \ESIS/\MOSES mission will address the following two overarching science goals: \begin{inparaenum}[(1)] 
+The combined \ESIS/\MOSES/ mission will address the following two overarching science goals: \begin{inparaenum}[(1)] 
 \item observe magnetic reconnection in the \TR\label{item-goal1}, and \item map the transfer of energy through the \TR\ 
 with emphasis on \MHD\ waves\label{item-goal2}. \end{inparaenum}
 These objectives have significant overlap with the missions of \IRIS~\citep{IRIS14}, the \EIS~\citep{Culhane07}
@@ -664,7 +667,7 @@ of waves and whether they are able to propagate upward into the corona.
 Independent of the two propagation modes discussed above, there is a range of possible sources for Alfv\'en 
 (and other \MHD) waves in the solar atmosphere.
 Three potential scenarios are: \begin{inparaenum}[(1)] \item Waves originate in the chromosphere or below and propagate 
-through the \TR\ at a spatially uniform intensity \label{wave-1};
+through the \TR\ at a spatially uniform intensity; \label{wave-1}
 \item Intense sources are localized in the \TR, but fill only a fraction of the surface\label{wave-2}; and \item Weak 
 sources are localized in the \TR, but cover the surface densely enough to appear like the first case\label{wave-3}. 
 \end{inparaenum}
@@ -683,8 +686,40 @@ A spatial resolution of $\sim$\SI{2}{\mega\meter} will be sufficient to localize
 tubes that are rooted in photospheric inter-granular network lanes (\eg\,\citet{Berger95ApJ})."""
             ))
 
+            with doc.create(pylatex.Subsection('Science Requirements')):
+                pass
+
     with doc.create(pylatex.Section('The ESIS Instrument')):
-        pass
+
+        with doc.create(pylatex.Subsection('Optics')):
+            pass
+
+        with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
+            pass
+
+        with doc.create(pylatex.Subsection('Coatings and Filters')):
+            pass
+
+        with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
+            pass
+
+        with doc.create(pylatex.Subsection('Alignment and Focus')):
+            pass
+
+        with doc.create(pylatex.Subsection('Apertures and Baffles')):
+            pass
+
+        with doc.create(pylatex.Subsection('Cameras')):
+            pass
+
+        with doc.create(pylatex.Subsection('Avionics')):
+            pass
+
+        with doc.create(pylatex.Subsection('Pointing System')):
+            pass
+
+        with doc.create(pylatex.Subsection('Mechanical')):
+            pass
 
     with doc.create(pylatex.Section('Mission Profile')):
         pass
