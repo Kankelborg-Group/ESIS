@@ -28,9 +28,9 @@ def document() -> kgpy.latex.Document:
     doc.packages.append(pylatex.Package('acronym'))
     doc.packages.append(pylatex.Package('savesym'))
     doc.preamble.append(pylatex.NoEscape(
-        '\\savesymbol{tablenum}'
-        '\\usepackage{siunitx}'
-        '\\restoresymbol{SIX}{tablenum}'
+        '\\savesymbol{tablenum}\n'
+        '\\usepackage{siunitx}\n'
+        '\\restoresymbol{SIX}{tablenum}\n'
     ))
 
     doc.preamble.append(pylatex.NoEscape(
@@ -580,7 +580,7 @@ Instead, we will search for signatures of magnetic reconnection in \TR\ spectral
 A particular signature of reconnection in the \TR\ is the explosive energy release by ubiquitous, small scale events.
 These \EEs\ are characterized as spatially compact ($\approx$\SI{1.5}{\mega\meter} length~\citep{Dere94}) line 
 broadenings on the order of \SI{100}{\kilo\meter\per\second}~\citep{Dere91}.
-They are observed across a range of \TR\ emission lines that span temperatures of \SI{20,000}{}--\SI{250,000}{\kelvin} 
+They are observed across a range of \TR\ emission lines that span temperatures of \SI{20000}{}--\SI{250000}{\kelvin} 
 (C\,\textsc{ii}--O\,\textsc{v})~\citep{1994Moses}.
 The typical lifetime of an \EE\ is 60-\SI{90}{\second}~\citep{1994Moses,Dere94,Dere91}.
 Due to their location near quiet sun magnetic network elements, and the presence of supersonic flows near the Alfv\`en 
