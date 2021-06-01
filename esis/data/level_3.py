@@ -355,7 +355,8 @@ class Level_3(Pickleable):
                 c = np.cos(np.deg2rad(rot_angle))
                 s = np.sin(np.deg2rad(rot_angle))
 
-                x_ = (c * (x - x0 - x_drift * l3_seq) - s * (y - y0 - y_drift * l3_seq)) + x0
+                # x_ = (c * (x - x0 - x_drift * l3_seq) - s * (y - y0 - y_drift * l3_seq)) + x0
+                x_ = (c * (x - x0 - x_drift * l3_seq) - s * (y - y0 - y_drift * l3_seq))
 
                 rot_z = scale_factor[l3_cam] / octagon_size_pix * (x_ - octagon_edge_pix) + 1
 
