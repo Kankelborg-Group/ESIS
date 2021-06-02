@@ -131,8 +131,8 @@ class Optics(
         return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
 
     @property
-    def resolution_spatial(self) -> u.Quantity:
-        return 2 * self.plate_scale
+    def resolution_spatial(self) -> vector.Vector2D:
+        return 2 * u.pix * self.plate_scale
 
     @property
     def dispersion(self) -> u.Quantity:
