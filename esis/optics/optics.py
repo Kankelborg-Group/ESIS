@@ -131,6 +131,10 @@ class Optics(
         return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
 
     @property
+    def resolution_spatial(self) -> u.Quantity:
+        return 2 * self.plate_scale
+
+    @property
     def dispersion(self) -> u.Quantity:
         val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
         return val.to(u.Angstrom / u.pix)
