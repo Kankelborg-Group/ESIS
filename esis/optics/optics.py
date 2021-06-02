@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.visualization
 import astropy.time
+import astropy.constants
 import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
 import kgpy.chianti
@@ -133,6 +134,11 @@ class Optics(
     def dispersion(self) -> u.Quantity:
         val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
         return val.to(u.Angstrom / u.pix)
+
+    @property
+    def dispersion_doppler(self) -> u.Quantity:
+        val = self.dispersion / self.bunch.wavelength[..., 0] * astropy.constants.c
+        return val.to(u.km / u.s / u.pix)
     
     @property
     def field_of_view(self) -> kgpy.vector.Vector2D:
