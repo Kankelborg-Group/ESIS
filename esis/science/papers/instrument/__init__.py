@@ -137,8 +137,20 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='minSpatialResolution',
+        value=optics_single.resolution_spatial.quantity.min(),
+        digits_after_decimal=2,
+    )
+
+    doc.set_variable_quantity(
         name='dispersion',
         value=optics_single.dispersion.to(kgpy.units.mAA / u.pix),
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='dispersionDoppler',
+        value=optics_single.dispersion_doppler,
         digits_after_decimal=0,
     )
 
@@ -224,10 +236,14 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
     doc.preamble.append(kgpy.latex.Acronym('CTIS', 'computed tomography imaging spectrograph', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('FOV', 'field of view'))
+    doc.preamble.append(kgpy.latex.Acronym('SNR', 'signal-to-noise ratio'))
     doc.preamble.append(kgpy.latex.Acronym('PSF', 'point-spread function', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
     doc.preamble.append(kgpy.latex.Acronym('MHD', 'magnetohydrodynamic'))
     doc.preamble.append(kgpy.latex.Acronym('EE', 'explosive event', plural=True))
+    doc.preamble.append(kgpy.latex.Acronym('QS', 'quiet sun'))
+    doc.preamble.append(kgpy.latex.Acronym('AR', 'active region'))
+    doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole'))
 
     # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
     # doc.set_variable(name='MOSES', value=pylatex.Command('ac', 'MOSES'))
@@ -687,9 +703,85 @@ tubes that are rooted in photospheric inter-granular network lanes (\eg\,\citet{
             ))
 
             with doc.create(pylatex.Subsection('Science Requirements')):
-                pass
+                doc.append(pylatex.NoEscape(
+                    r"""\ESIS\ will investigate two science targets; 
+reconnection in explosive events, and the transport of mass and energy through the transition region.
+The latter may take many forms, from \MHD\ waves of various modes to \EUV\ jets or macro-spicules.
+To fulfill these goals, \ESIS\ will obtain simultaneous intensity, Doppler shift and line width images of the \OV\ line 
+in the solar transition region at rapid cadence.
+This is a lower \TR\ line (\SI{.25}{\mega\kelvin}) that complements the MOSES Ne\,\textsc{vii}.
+The bright, optically thin \OVion\ emission line is well isolated except for the two coronal \MgXion\ lines.
+These coronal lines can be viewed as contamination or as a bonus;
+we expect that with the four \ESIS\ projections it will be possible to separate the \OVion\ emission from that of 
+\MgXion.
+From the important temporal, spatial, and velocity scales referenced Sections~\ref{subsec:MagneticReconnectionEvents} 
+and \ref{subsec:EnergyTransfer} we define the instrument requirements in Table~\ref{table:scireq} that are needed to 
+meet our science goals."""
+                ))
+
+                with doc.create(pylatex.Table()) as table:
+                    with doc.create(pylatex.Center()):
+                        table._star_latex_name = True
+                        table.append(kgpy.latex.Label('table:scireq'))
+                        with doc.create(pylatex.Tabular(table_spec='llll', )) as tabular:
+                            tabular.add_row(['Parameter', 'Requirement', 'Science Driver', 'Capabilities'])
+                            tabular.add_hline()
+                            tabular.add_row([
+                                'Spectral line',
+                                pylatex.NoEscape(r'\OVion'),
+                                'Explosive Events',
+                                pylatex.NoEscape(r'\OVion, \MgXion, \HeIion, Table~\ref{table:prescription}'),
+                            ])
+                            tabular.add_row([
+                                'Spectral resolution',
+                                pylatex.NoEscape(r'\SI{18}{\kilo\meter\per\second} broadening'),
+                                pylatex.NoEscape(r'\MHD\ waves'),
+                                pylatex.NoEscape(r'\dispersionDoppler, Table~\ref{table:prescription}'),
+                            ])
+                            tabular.add_row([
+                                'Spatial resolution',
+                                pylatex.NoEscape(r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter})'),
+                                'Explosive events',
+                                pylatex.NoEscape(r'\minSpatialResolution, Table~\ref{table:prescription}'),
+                            ])
+                            tabular.add_row([
+                                pylatex.NoEscape('Desired \SNR'),
+                                pylatex.NoEscape(r'\SI{17.3}{} in \CH'),
+                                pylatex.NoEscape(r'\MHD\ waves in \CH'),
+                                pylatex.NoEscape(
+                                    r'$>$\SI{17.7}{} w/$20\times$\SI{10}{\second} exp., '
+                                    r'\S~\ref{subsec:SensitivityandCadence}'
+                                )
+                            ])
+                            tabular.add_row([
+                                'Cadence',
+                                pylatex.NoEscape(r'\SI{15}{\second}'),
+                                'Torsional waves',
+                                pylatex.NoEscape(r'\SI{10}{\second} eff., \S~\ref{subsec:SensitivityandCadence}'),
+                            ])
+                            tabular.add_row([
+                                'Observing time',
+                                pylatex.NoEscape(r'$> \SI{150}{\second}$'),
+                                'Explosive events',
+                                pylatex.NoEscape(r'\SI{270}{\second}, \S~\ref{sec:MissionProfile}'),
+                            ])
+                            tabular.add_row([
+                                pylatex.NoEscape(r'\FOV'),
+                                pylatex.NoEscape(r'\SI{10}{\arcminute} diameter'),
+                                pylatex.NoEscape(r'Span \QS, \AR, and limb'),
+                                pylatex.NoEscape(r'\fov, Table~\ref{table:prescription}')
+                            ])
+                        table.add_caption(pylatex.NoEscape(
+                            r"""ESIS instrument requirements.  
+AR is active region, QS quiet sun, and CH coronal hole."""
+                        ))
 
     with doc.create(pylatex.Section('The ESIS Instrument')):
+
+        with doc.create(pylatex.Table()) as table:
+            with doc.create(pylatex.Center()):
+                table._star_latex_name = True
+                table.append(kgpy.latex.Label('table:prescription'))
 
         with doc.create(pylatex.Subsection('Optics')):
             pass
