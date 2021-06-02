@@ -720,56 +720,55 @@ meet our science goals."""
                 ))
 
                 with doc.create(pylatex.Table()) as table:
-                    with doc.create(pylatex.Center()):
-                        table._star_latex_name = True
-                        table.append(kgpy.latex.Label('table:scireq'))
-                        with doc.create(pylatex.Tabular(table_spec='llll', )) as tabular:
+                    table._star_latex_name = True
+                    table.append(kgpy.latex.Label('table:scireq'))
+                    with table.create(pylatex.Center()) as centering:
+                        with centering.create(pylatex.Tabular(table_spec='llll', )) as tabular:
+                            tabular.escape = False
                             tabular.add_row(['Parameter', 'Requirement', 'Science Driver', 'Capabilities'])
                             tabular.add_hline()
                             tabular.add_row([
-                                'Spectral line',
-                                pylatex.NoEscape(r'\OVion'),
-                                'Explosive Events',
-                                pylatex.NoEscape(r'\OVion, \MgXion, \HeIion, Table~\ref{table:prescription}'),
+                                r'Spectral line',
+                                r'\OVion\ \roy{\OV}',
+                                r'Explosive events',
+                                r'\OVion, \MgXion, \HeIion, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
-                                'Spectral resolution',
-                                pylatex.NoEscape(r'\SI{18}{\kilo\meter\per\second} broadening'),
-                                pylatex.NoEscape(r'\MHD\ waves'),
-                                pylatex.NoEscape(r'\dispersionDoppler, Table~\ref{table:prescription}'),
+                                r'Spectral resolution',
+                                r'\SI{18}{\kilo\meter\per\second} broadening',
+                                r'\MHD\ waves',
+                                r'\dispersionDoppler, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
-                                'Spatial resolution',
-                                pylatex.NoEscape(r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter})'),
-                                'Explosive events',
-                                pylatex.NoEscape(r'\minSpatialResolution, Table~\ref{table:prescription}'),
+                                r'Spatial resolution',
+                                r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter})',
+                                r'Explosive events',
+                                r'\minSpatialResolution, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
-                                pylatex.NoEscape('Desired \SNR'),
-                                pylatex.NoEscape(r'\SI{17.3}{} in \CH'),
-                                pylatex.NoEscape(r'\MHD\ waves in \CH'),
-                                pylatex.NoEscape(
-                                    r'$>$\SI{17.7}{} w/$20\times$\SI{10}{\second} exp., '
-                                    r'\S~\ref{subsec:SensitivityandCadence}'
-                                )
+                                r'Desired \SNR',
+                                r'\SI{17.3}{} in \CH',
+                                r'\MHD\ waves in \CH',
+                                r'$>$\SI{17.7}{} w/$20\times$\SI{10}{\second} exp., '
+                                r'\S~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
-                                'Cadence',
-                                pylatex.NoEscape(r'\SI{15}{\second}'),
-                                'Torsional waves',
-                                pylatex.NoEscape(r'\SI{10}{\second} eff., \S~\ref{subsec:SensitivityandCadence}'),
+                                r'Cadence',
+                                r'\SI{15}{\second}',
+                                r'Torsional waves',
+                                r'\SI{10}{\second} eff., \S~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
-                                'Observing time',
-                                pylatex.NoEscape(r'$> \SI{150}{\second}$'),
-                                'Explosive events',
-                                pylatex.NoEscape(r'\SI{270}{\second}, \S~\ref{sec:MissionProfile}'),
+                                r'Observing time',
+                                r'$>$\SI{150}{\second}',
+                                r'Explosive events',
+                                r'\SI{270}{\second}, \S~\ref{sec:MissionProfile}',
                             ])
                             tabular.add_row([
-                                pylatex.NoEscape(r'\FOV'),
-                                pylatex.NoEscape(r'\SI{10}{\arcminute} diameter'),
-                                pylatex.NoEscape(r'Span \QS, \AR, and limb'),
-                                pylatex.NoEscape(r'\fov, Table~\ref{table:prescription}')
+                                r'\FOV',
+                                r'\SI{10}{\arcminute} diameter',
+                                r'Span \QS, \AR, and limb',
+                                r'\fov, Table~\ref{table:prescription}',
                             ])
                         table.add_caption(pylatex.NoEscape(
                             r"""ESIS instrument requirements.  
