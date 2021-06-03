@@ -158,14 +158,14 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
-        name='avgPlateScale',
-        value=optics_single.plate_scale.quantity.mean(),
+        name='plateScale',
+        value=optics_single.plate_scale.quantity,
         digits_after_decimal=2,
     )
 
     doc.set_variable_quantity(
-        name='minSpatialResolution',
-        value=optics_single.resolution_spatial.quantity.min(),
+        name='spatialResolution',
+        value=optics_single.resolution_spatial.quantity,
         digits_after_decimal=2,
     )
 
@@ -327,9 +327,9 @@ from prime focus, an array of spherical diffraction gratings re-image with diffe
 This field stop is re-imaged  using an array of \numChannelsWords\ spherical diffraction gratings with differing 
 ispersion angles relative to ...? [ I want to say relative to solar north or field stop north or something], with each 
 diffraction grating projecting the spectrum onto a unique detector.}
-The slitless multi-projection design will obtain co-temporal spatial (\avgPlateScale) and spectral (\dispersion) images 
+The slitless multi-projection design will obtain co-temporal spatial (\plateScale) and spectral (\dispersion) images 
 at high cadence ($>=$\minCadence). 
-\amy{The instrument is designed to be capable of obtaining co-temporal spatial (\avgPlateScale) and spectral 
+\amy{The instrument is designed to be capable of obtaining co-temporal spatial (\plateScale) and spectral 
 (\dispersion) images at high cadence ($>=$\minCadence).}
 \amy{Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
 at high spatial and spectral resolution over a large (\fov) \FOV. 
@@ -810,7 +810,7 @@ meet our science goals."""
                                 r'Spatial resolution',
                                 r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter})',
                                 r'Explosive events',
-                                r'\minSpatialResolution, Table~\ref{table:prescription}',
+                                r'\spatialResolution, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
                                 r'Desired \SNR',
