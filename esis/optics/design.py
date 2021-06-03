@@ -198,7 +198,7 @@ def final(
         filter.plot_kwargs['linestyle'] = dashstyle_channels
 
     detector = Detector()
-    detector.name = 'E2V CCD230-42'
+    detector.name = Name('E2V CCD230-42')
     detector.piston = filter.piston - 200 * u.mm
     detector.cylindrical_radius = 108 * u.mm
     detector.cylindrical_azimuth = channel_angle.copy()
