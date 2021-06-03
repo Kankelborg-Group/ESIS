@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 import numpy as np
 import pylatex
+import num2words
+import kgpy.format
 import kgpy.latex
 import kgpy.units
 import kgpy.chianti
@@ -117,11 +119,36 @@ def document() -> kgpy.latex.Document:
         all_channels=False,
     )
 
-    optics = esis.optics.design.final(
+    optics = esis.optics.design.final_active(
         pupil_samples=11,
         pupil_is_stratified_random=True,
         field_samples=11,
         field_is_stratified_random=True,
+    )
+
+    doc.set_variable(
+        name='numChannels',
+        value=str(optics.num_channels),
+    )
+
+    doc.set_variable(
+        name='numChannelsWords',
+        value=num2words.num2words(optics.num_channels)
+    )
+
+    doc.set_variable(
+        name='NumChannelsWords',
+        value=num2words.num2words(optics.num_channels).capitalize()
+    )
+
+    doc.set_variable_quantity(
+        name='magnification',
+        value=optics_single.magnification,
+    )
+
+    doc.set_variable_quantity(
+        name='radiusRatio',
+        value=optics_single.radius_ratio,
     )
 
     doc.set_variable_quantity(
@@ -193,6 +220,11 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='gratingRulingDensity',
         value=optics_single.grating.ruling_density,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingRadius',
+        value=optics_single.grating.tangential_radius,
     )
 
     wavelength = optics.bunch.wavelength
@@ -292,9 +324,9 @@ and energy transport in the solar atmosphere
 The instrument is a pseudo Gregorian telescope; 
 from prime focus, an array of spherical diffraction gratings re-image with differing dispersion angles. 
 \amy{The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
-This field stop is re-imaged  using an array of four spherical diffraction gratings with differing dispersion angles 
-relative to ...? [ I want to say relative to solar north or field stop north or something], with each diffraction 
-grating projecting the spectrum onto a unique detector.}
+This field stop is re-imaged  using an array of \numChannelsWords\ spherical diffraction gratings with differing 
+ispersion angles relative to ...? [ I want to say relative to solar north or field stop north or something], with each 
+diffraction grating projecting the spectrum onto a unique detector.}
 The slitless multi-projection design will obtain co-temporal spatial (\avgPlateScale) and spectral (\dispersion) images 
 at high cadence ($>=$\minCadence). 
 \amy{The instrument is designed to be capable of obtaining co-temporal spatial (\avgPlateScale) and spectral 
@@ -508,7 +540,7 @@ The secondary mirror is replaced by a segmented array of concave diffraction gra
 The field stop at prime focus defines instrument spatial/spectral \FOV.
 CCDs are arrayed around the primary mirror, each associated with a particular grating.
 Eight grating positions appear in this schematic; only six fit within the volume of the rocket payload.
-Four channels are populated for the first flight."""
+\NumChannelsWords\ channels are populated for the first flight."""
                 ))
 
             doc.append(pylatex.NoEscape(
@@ -537,8 +569,8 @@ Taken together, these three design features make \ESIS\ more compact than \MOSES
 (\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-disp_con}) and allow the collection of more projections to 
 better constrain the interpretation of the data (\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-orders}).
  
-The \ESIS\ gratings are arranged in a segmented array, clocked in \SI{45}{\degree} increments, so that there are four 
-distinct dispersion planes.
+The \ESIS\ gratings are arranged in a segmented array, clocked in \SI{45}{\degree} increments, so that there are 
+\numChannelsWords\ distinct dispersion planes.
 This will greatly aid in reconstructing spectral line profiles since the dispersion space of \ESIS\ occupies a 3D 
 volume rather than a 2D plane as with \MOSES.
 For \ESIS, there will always be a dispersion plane within \SI{22.5}{\degree} of the normal to any loop-like feature in 
@@ -747,8 +779,8 @@ in the solar transition region at rapid cadence.
 This is a lower \TR\ line (\SI{.25}{\mega\kelvin}) that complements the MOSES Ne\,\textsc{vii}.
 The bright, optically thin \OVion\ emission line is well isolated except for the two coronal \MgXion\ lines.
 These coronal lines can be viewed as contamination or as a bonus;
-we expect that with the four \ESIS\ projections it will be possible to separate the \OVion\ emission from that of 
-\MgXion.
+we expect that with the \numChannelsWords\ \ESIS\ projections it will be possible to separate the \OVion\ emission from 
+that of \MgXion.
 From the important temporal, spatial, and velocity scales referenced Sections~\ref{subsec:MagneticReconnectionEvents} 
 and \ref{subsec:EnergyTransfer} we define the instrument requirements in Table~\ref{table:scireq} that are needed to 
 meet our science goals."""
@@ -834,18 +866,26 @@ of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and
                     tabular.add_row(['', r'Octagonal aperture, D=\primaryDiameter'])
                     tabular.add_row(['', r'\roy{Octagonal aperture, \primaryDiameter\ diameter}'])
                     tabular.add_row(['', r'Focal length \primaryFocalLength'])
-                    tabular.add_row(['', r'roy{\primaryFocalLength\ focal length}'])
-                    tabular.add_row(['', r'SiC single layer coating optimized for \OVwavelength}'])
+                    tabular.add_row(['', r'\roy{\primaryFocalLength\ focal length}'])
+                    tabular.add_row(['', r'SiC single layer coating optimized for \OVwavelength'])
                     tabular.add_row(['', r'Transparent vis/IR'])
 
                     tabular.add_row(['Field stop', r'\fov, projected on sky plane'])
                     tabular.add_row(['', r'Octagonal'])
 
-                    tabular.add_row(['Gratings (4)', 'Spherical varied line space'])
+                    tabular.add_row([r'Gratings (\numChannels)', 'Spherical varied line space'])
                     tabular.add_row(['', r'(Individual master gratings)'])
                     tabular.add_row(['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter} \roy{\gratingHeight},'])
-                    tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter} \gratingLongWidth, Short Base: \SI{3.8}{\milli\meter} \gratingShortWidth'])
-                    tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter} \gratingRulingFrequency'])
+                    tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter} \roy{\gratingLongWidth}, Short Base: \SI{3.8}{\milli\meter} \roy{\gratingShortWidth}'])
+                    tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter} \roy{\gratingRulingDensity}'])
+                    tabular.add_row(['', r'Magnification M=3.9 \roy{\magnification}'])
+                    tabular.add_row(['', r'\roy{\gratingRadius\ radius}'])
+                    tabular.add_row(['', r'\roy{\radiusRatio\ primary to grating radius ratio}'])
+                    tabular.add_row(['', r'Mg/Al/SiC multilayer, $\lambda 63$\,nm \roy{\OVwavelength}'])
+                    tabular.add_row(['', r'Efficiency \SI{14}{\percent} (Uncoated \SI{39}{\percent})'])
+
+                    tabular.add_row([r'Filters (\numChannels)', ''])
+
 
 
         with doc.create(pylatex.Subsection('Optics')):
