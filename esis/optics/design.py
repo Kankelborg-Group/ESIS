@@ -192,6 +192,8 @@ def final(
     filter.inclination = -3.45 * u.deg
     filter.clear_radius = 15.9 * u.mm
     filter.thickness = 100 * u.nm
+    filter.thickness_oxide = 4 * u.nm
+    filter.mesh_ratio = 82 * u.percent
     if all_channels:
         filter.plot_kwargs['linestyle'] = dashstyle_channels
 
