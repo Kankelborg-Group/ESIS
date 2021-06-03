@@ -18,6 +18,10 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
     border_width: u.Quantity = 0 * u.mm
 
     @property
+    def clear_diameter(self) -> u.Quantity:
+        return 2 * self.clear_radius
+
+    @property
     def transform(self) -> transform.rigid.TransformList:
         return super().transform + transform.rigid.TransformList([
             transform.rigid.TiltY(-self.inclination)
