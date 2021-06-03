@@ -191,6 +191,7 @@ def final(
     filter.cylindrical_azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
     filter.clear_radius = 15.9 * u.mm
+    filter.thickness = 100 * u.nm
     if all_channels:
         filter.plot_kwargs['linestyle'] = dashstyle_channels
 

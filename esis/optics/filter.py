@@ -16,6 +16,7 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
     inclination: u.Quantity = 0 * u.deg
     clear_radius: u.Quantity = 0 * u.mm
     border_width: u.Quantity = 0 * u.mm
+    thickness: u.Quantity = 0 * u.mm
 
     @property
     def clear_diameter(self) -> u.Quantity:
