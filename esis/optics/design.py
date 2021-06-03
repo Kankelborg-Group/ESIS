@@ -209,6 +209,7 @@ def final(
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
     detector.exposure_length_min = 1.2 * u.s
+    detector.quantum_efficiency = 33 * u.percent
     if all_channels:
         detector.plot_kwargs['linestyle'] = dashstyle_channels
 
