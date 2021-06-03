@@ -160,6 +160,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=1,
     )
 
+    doc.set_variable_quantity(
+        name='primaryDiameter',
+        value=2 * optics_single.primary.clear_half_width,
+        digits_after_decimal=0,
+    )
+
     wavelength = optics.bunch.wavelength
     ion = kgpy.chianti.to_spectroscopic(optics.bunch.ion)
 
@@ -777,10 +783,27 @@ AR is active region, QS quiet sun, and CH coronal hole."""
 
     with doc.create(pylatex.Section('The ESIS Instrument')):
 
+        doc.append(pylatex.NoEscape(
+            r"""\ESIS\ is a multiple projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
+widths in a single snapshot over a 2D \FOV.
+Starting from the notional instrument described in Sec.~\ref{sec:TheESISConcept}, \ESIS\ has been designed to ensure all 
+of the science requirements set forth in Table~\ref{table:scireq} are met.
+The final design parameters are summarized in Table~\ref{table:prescription}.
+
+A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{F-ESIS_AP} [A], while the mechanical features 
+of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and [C], respectively."""
+        ))
+
         with doc.create(pylatex.Table()) as table:
-            with doc.create(pylatex.Center()):
-                table._star_latex_name = True
-                table.append(kgpy.latex.Label('table:prescription'))
+            table._star_latex_name = True
+            table.append(kgpy.latex.Label('table:prescription'))
+            with table.create(pylatex.Center()) as centering:
+                with centering.create(pylatex.Tabular('ll')) as tabular:
+                    tabular.escape = False
+                    tabular.add_hline()
+                    tabular.add_row(['Primary', 'Parabolic'])
+                    tabular.add_row(['', r'Octagonal aperture, D=\primaryDiameter'])
+                    tabular.add_row(['', r'\roy{Octagonal aperture, \primaryDiameter\ diameter}'])
 
         with doc.create(pylatex.Subsection('Optics')):
             pass
