@@ -108,7 +108,15 @@ class Optics(
         return -self.detector.piston
 
     @property
-    def magnification(self) -> u.Quantity:
+    def magnification(self):
+        rays_detector = self.system.rays_output
+        rays_fs = self.system.raytrace[self.system.surfaces_all.flat_local.index(self.field_stop.surface)]
+        scale_detector = rays_detector.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        scale_fs = rays_fs.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        return scale_fs / scale_detector
+
+    @property
+    def arm_ratio(self) -> u.Quantity:
         arm_entrance = (self.field_stop.transform.inverse + self.grating.transform).translation_eff
         transform_ov = kgpy.transform.rigid.TransformList([
             kgpy.transform.rigid.Translate(x=self.detector.clear_half_width / 2)
