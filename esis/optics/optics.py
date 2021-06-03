@@ -50,6 +50,8 @@ class Optics(
     pointing: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.angular)
     roll: u.Quantity = 0 * u.deg
     stray_light: u.Quantity = 0 * u.adu
+    distortion_polynomial_degree: int = 2
+    vignetting_polynomial_degree: int = 1
     vignetting_correction: polynomial.Polynomial3D = dataclasses.field(
         default_factory=lambda: polynomial.Polynomial3D(
             degree=1,
@@ -138,7 +140,7 @@ class Optics(
 
     @property
     def plate_scale(self) -> vector.Vector2D:
-        return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
+        return self.rays_output.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
 
     @property
     def resolution_spatial(self) -> vector.Vector2D:
@@ -146,7 +148,7 @@ class Optics(
 
     @property
     def dispersion(self) -> u.Quantity:
-        val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
+        val = self.rays_output.distortion(self.distortion_polynomial_degree).dispersion[..., 0, 0, 0]
         return val.to(u.Angstrom / u.pix)
 
     @property
@@ -225,6 +227,8 @@ class Optics(
         other.pointing = self.pointing.copy()
         other.roll = self.roll.copy()
         other.stray_light = self.stray_light.copy()
+        other.distortion_polynomial_degree = self.distortion_polynomial_degree
+        other.vignetting_polynomial_degree = self.vignetting_polynomial_degree
         other.vignetting_correction = self.vignetting_correction.copy()
         return other
 
