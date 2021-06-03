@@ -166,6 +166,35 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    doc.set_variable_quantity(
+        name='primaryFocalLength',
+        value=optics_single.primary.focal_length,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingHeight',
+        value=optics_single.grating.height,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingShortWidth',
+        value=optics_single.grating.width_short,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingLongWidth',
+        value=optics_single.grating.width_long,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingRulingDensity',
+        value=optics_single.grating.ruling_density,
+    )
+
     wavelength = optics.bunch.wavelength
     ion = kgpy.chianti.to_spectroscopic(optics.bunch.ion)
 
@@ -804,6 +833,20 @@ of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and
                     tabular.add_row(['Primary', 'Parabolic'])
                     tabular.add_row(['', r'Octagonal aperture, D=\primaryDiameter'])
                     tabular.add_row(['', r'\roy{Octagonal aperture, \primaryDiameter\ diameter}'])
+                    tabular.add_row(['', r'Focal length \primaryFocalLength'])
+                    tabular.add_row(['', r'roy{\primaryFocalLength\ focal length}'])
+                    tabular.add_row(['', r'SiC single layer coating optimized for \OVwavelength}'])
+                    tabular.add_row(['', r'Transparent vis/IR'])
+
+                    tabular.add_row(['Field stop', r'\fov, projected on sky plane'])
+                    tabular.add_row(['', r'Octagonal'])
+
+                    tabular.add_row(['Gratings (4)', 'Spherical varied line space'])
+                    tabular.add_row(['', r'(Individual master gratings)'])
+                    tabular.add_row(['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter} \roy{\gratingHeight},'])
+                    tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter} \gratingLongWidth, Short Base: \SI{3.8}{\milli\meter} \gratingShortWidth'])
+                    tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter} \gratingRulingFrequency'])
+
 
         with doc.create(pylatex.Subsection('Optics')):
             pass
