@@ -66,7 +66,7 @@ class Optics(
 
     @property
     def num_channels(self) -> int:
-        return self.system.shape[0]
+        return self.grating.cylindrical_azimuth.shape[~0]
 
     @property
     def system(self) -> optics.System:
