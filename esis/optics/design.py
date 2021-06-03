@@ -234,6 +234,30 @@ def final(
     )
 
 
+def final_active(
+        pupil_samples: int = 10,
+        pupil_is_stratified_random: bool = False,
+        field_samples: int = 10,
+        field_is_stratified_random: bool = False,
+) -> Optics:
+    opt = final(
+        pupil_samples=pupil_samples,
+        pupil_is_stratified_random=pupil_is_stratified_random,
+        field_samples=field_samples,
+        field_is_stratified_random=field_is_stratified_random,
+    )
+
+    opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[1:~0]
+    opt.grating.plot_kwargs['linestyle'] = None
+
+    opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[1:~0]
+    opt.filter.plot_kwargs['linestyle'] = None
+
+    opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[1:~0]
+    opt.detector.plot_kwargs['linestyle'] = None
+
+    return opt
+
 def final_from_poletto(
         pupil_samples: int = 10,
         field_samples: int = 10,
