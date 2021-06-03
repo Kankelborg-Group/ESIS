@@ -109,14 +109,16 @@ class Optics(
 
     @property
     def magnification(self) -> u.Quantity:
-        grating = self.grating
-        detector = self.detector
-        source_pos = vector.from_components(self.primary.focal_length)
-        grating_pos = vector.from_components(grating.piston, grating.cylindrical_radius)
-        detector_pos = vector.from_components(detector.piston, detector.cylindrical_radius)
-        entrance_arm = grating_pos - source_pos
-        exit_arm = detector_pos - grating_pos
-        return vector.length(exit_arm, keepdims=False) / vector.length(entrance_arm, keepdims=False)
+        arm_entrance = (self.field_stop.transform.inverse + self.grating.transform).translation_eff
+        transform_ov = kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate(x=self.detector.clear_half_width / 2)
+        ])
+        arm_exit = (self.grating.transform.inverse + self.detector.transform + transform_ov).translation_eff
+        return arm_exit.length / arm_entrance.length
+
+    @property
+    def radius_ratio(self) -> u.Quantity:
+        return self.primary.radius / self.grating.tangential_radius
 
     @property
     def effective_focal_length(self) -> u.Quantity:
