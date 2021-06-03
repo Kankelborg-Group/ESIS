@@ -16,6 +16,7 @@ setup(
         'ndcube',
         'tensorflow',
         'pylatex',
+        'num2words'
     ],
     url='https://github.com/Kankelborg-Group/ESIS',
     license='',
