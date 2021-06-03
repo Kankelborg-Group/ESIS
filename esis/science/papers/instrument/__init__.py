@@ -143,12 +143,17 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable_quantity(
         name='magnification',
-        value=optics_single.magnification,
+        value=optics_single.magnification.quantity,
     )
 
     doc.set_variable_quantity(
         name='radiusRatio',
         value=optics_single.radius_ratio,
+    )
+
+    doc.set_variable_quantity(
+        name='armRatio',
+        value=optics_single.arm_ratio,
     )
 
     doc.set_variable_quantity(
@@ -225,6 +230,54 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='gratingRadius',
         value=optics_single.grating.tangential_radius,
+    )
+
+    doc.set_variable_quantity(
+        name='filterDiameter',
+        value=optics_single.filter.clear_diameter,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='filterThickness',
+        value=optics_single.filter.thickness,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='filterOxideThickness',
+        value=optics_single.filter.thickness_oxide,
+    )
+
+    doc.set_variable(
+        name='filterMaterial',
+        value=optics_single.filter.surface.material.name,
+    )
+
+    doc.set_variable(
+        name='FilterMaterial',
+        value=optics_single.filter.surface.material.name[0].upper() + optics_single.filter.surface.material.name[1:],
+    )
+
+    doc.set_variable_quantity(
+        name='filterMeshRatio',
+        value=optics_single.filter.mesh_ratio,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='detectorNumPixelsX',
+        value=str(optics_single.detector.num_pixels[0]),
+    )
+
+    doc.set_variable(
+        name='detectorName',
+        value=optics_single.detector.name,
+    )
+
+    doc.set_variable(
+        name='detectorNumPixelsY',
+        value=str(optics_single.detector.num_pixels[1]),
     )
 
     wavelength = optics.bunch.wavelength
@@ -878,13 +931,19 @@ of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and
                     tabular.add_row(['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter} \roy{\gratingHeight},'])
                     tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter} \roy{\gratingLongWidth}, Short Base: \SI{3.8}{\milli\meter} \roy{\gratingShortWidth}'])
                     tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter} \roy{\gratingRulingDensity}'])
-                    tabular.add_row(['', r'Magnification M=3.9 \roy{\magnification}'])
                     tabular.add_row(['', r'\roy{\gratingRadius\ radius}'])
-                    tabular.add_row(['', r'\roy{\radiusRatio\ primary to grating radius ratio}'])
+                    tabular.add_row(['', r'Magnification M=3.9 \roy{\magnification}'])
+                    tabular.add_row(['', r'\roy{\radiusRatio\ primary radius to grating radius ratio}'])
+                    tabular.add_row(['', r'\roy{\armRatio\ exit arm length to entrance arm length ratio}'])
                     tabular.add_row(['', r'Mg/Al/SiC multilayer, $\lambda 63$\,nm \roy{\OVwavelength}'])
                     tabular.add_row(['', r'Efficiency \SI{14}{\percent} (Uncoated \SI{39}{\percent})'])
 
-                    tabular.add_row([r'Filters (\numChannels)', ''])
+                    tabular.add_row([r'Filters (\numChannels)', r'\SI{30}{\milli\meter} clear aperture'])
+                    tabular.add_row(['', r'\roy{\filterDiameter\ clear aperture}'])
+                    tabular.add_row(['', r'Thin film, \SI{100}{\nano\meter} Al'])
+                    tabular.add_row(['', r'\roy{\FilterMaterial, \filterThickness\ thickness}'])
+                    tabular.add_row(['', r'\SI{82}{\percent} open Ni mesh'])
+                    tabular.add_row(['', r'\roy{\filterMeshRatio\ open Ni mesh}'])
 
 
 
