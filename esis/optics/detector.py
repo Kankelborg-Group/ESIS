@@ -128,6 +128,11 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.border_width_top = self.border_width_top.copy()
         other.border_width_bottom = self.border_width_bottom.copy()
         other.dynamic_clearance = self.dynamic_clearance.copy()
+        other.npix_overscan = self.npix_overscan
+        other.npix_blank = self.npix_blank
+        other.gain = self.gain.copy()
+        other.readout_noise = self.readout_noise.copy()
+        other.exposure_length_min = self.exposure_length_min.copy()
         return other
 
     @property
@@ -141,6 +146,11 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['top border width'] = [format.quantity(self.border_width_top.to(u.mm))]
         dataframe['bottom border width'] = [format.quantity(self.border_width_bottom.to(u.mm))]
         dataframe['dynamic clearance'] = [format.quantity(self.dynamic_clearance.to(u.mm))]
+        dataframe['overscan pixels'] = [self.npix_overscan]
+        dataframe['blank pixels'] = [self.npix_blank]
+        dataframe['gain'] = [format.quantity(self.gain)]
+        dataframe['readout noise'] = [format.quantity(self.readout_noise)]
+        dataframe['minimum exposure length'] = [format.quantity(self.exposure_length_min)]
         return dataframe
 
     def apply_poletto_prescription(
