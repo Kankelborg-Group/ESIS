@@ -382,6 +382,8 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('QS', 'quiet sun'))
     doc.preamble.append(kgpy.latex.Acronym('AR', 'active region'))
     doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole'))
+    doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
+    doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
 
     # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
     # doc.set_variable(name='MOSES', value=pylatex.Command('ac', 'MOSES'))
@@ -501,7 +503,7 @@ of \ESIS\ addresses these issues."""
         ))
         with doc.create(pylatex.Subsection('Limitations of the MOSES Design')):
             doc.append(pylatex.NoEscape(
-                r"""The \MOSES\ design features a single concave diffraction grating forming images on three CCD 
+                r"""The \MOSES\ design features a single concave diffraction grating forming images on three \CCD\ 
 detectors~\citep{Fox10} (Fig.~\ref{fig:mosesSchematic}). 
 The optical path is folded in half by a single flat secondary mirror (omitted in Fig.~\ref{fig:mosesSchematic}).
 Provided that the three cameras are positioned correctly, this arragement allows the entire telescope to be brought 
@@ -521,8 +523,8 @@ orthogonal planes."""
                 moses_schematic.append(kgpy.latex.Label('fig:mosesSchematic'))
                 moses_schematic.add_caption(pylatex.NoEscape(
                     r"""Schematic diagram of the MOSES instrument.
-Incident light on the right forms an undispersed image on the central $m=0$ CCD.
-Dispersed images are formed on the outboard $m=\pm1$ CCDs."""
+Incident light on the right forms an undispersed image on the central $m=0$ \CCD.
+Dispersed images are formed on the outboard $m=\pm1$ \CCDs."""
                 ))
             doc.append(pylatex.NoEscape(
                 r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
@@ -563,23 +565,23 @@ consideration~\citep{Atwood18} and further increase the complexity of the invers
  
 Another complication is that the spatial and spectral content differs slightly between the three \MOSES\ image orders.
 This is because the \MOSES\ \FOV\ is defined by a combination of the aperture of the grating (\ie\,the entrance 
-aperture of the telescope) and the spatial extent of the CCDs.
+aperture of the telescope) and the spatial extent of the \CCDs.
 The \FOV\ in the $m=\pm1$ orders is shifted along the dispersion axis as a function of wavelength, dependant upon where 
-the dispersed spectral images intercept the $m=\pm1$ CCDs.
+the dispersed spectral images intercept the $m=\pm1$ \CCDs.
 Spatially, this effect is limited to only a handful of pixel columns at the edges of each image order.
 Of higher concern is the `spectral contamination' allowed by this layout; 
 \citet{Parker16} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
-\FOV\ could be diffracted onto the outboard order CCDs.
+\FOV\ could be diffracted onto the outboard order \CCDs.
 This off-band contamination is detected as systematic intensity variation that lacks an anti-symmetric pairing in the 
 opposite dispersed image order.
 Analysis of the spectral contamination is ongoing. 
 
 Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the 
-CCDs~\citep{Fox11}.
+\CCDs~\citep{Fox11}.
 The observing interval for a solar sounding rocket flight is very short, typically about five minutes.
 Consequently, every second of observing time is precious, both to achieve adequate exposure time and to catch the full 
 development of dynamical phenomena.
-The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of the CCDs.
+The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of the \CCDs.
 Thus, valuable observing time is lost.
 The readout data gap impelled us to develop a \MOSES\ exposure sequence with exposures ranging from 
 $0.25$-\SI{24}{\second}, a careful trade-off between deep and fast exposures. 
@@ -609,7 +611,7 @@ In designing \ESIS, we have sought to improve upon each of these points.
                     r"""The \ESIS\ instrument is a pseudo-Gregorian design.
 The secondary mirror is replaced by a segmented array of concave diffraction gratings.
 The field stop at prime focus defines instrument spatial/spectral \FOV.
-CCDs are arrayed around the primary mirror, each associated with a particular grating.
+\CCDs\ are arrayed around the primary mirror, each associated with a particular grating.
 Eight grating positions appear in this schematic; only six fit within the volume of the rocket payload.
 \NumChannelsWords\ channels are populated for the first flight."""
                 ))
@@ -619,8 +621,8 @@ Eight grating positions appear in this schematic; only six fit within the volume
 Incoming light is brought to focus at an octagonal field stop by a parabolic primary mirror.
 In the \ESIS\ layout, the secondary mirror of a typical Gregorian telescope is replaced by a segmented, octagonal array 
 of diffraction gratings.
-From the field stop, the gratings re-image to CCD detectors arranged radially around the primary mirror.
-The gratings are blazed for first order, so that each CCD is fed by a single corresponding grating, and all the 
+From the field stop, the gratings re-image to \CCD\ detectors arranged radially around the primary mirror.
+The gratings are blazed for first order, so that each \CCD\ is fed by a single corresponding grating, and all the 
 gratings are identical in design.
 The features of this new layout address all of the limitations described in 
 Sect.~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
@@ -672,10 +674,10 @@ This aids the inversion process since outside of this sharp edge the intensity i
 ESIS data cube.
 Additionally, the symmetry of the field stop gives multiple checkpoints where the edge inversion is duplicated in the 
 dispersed images produced by adjacent orders.
-The size and octagonal shape of the field stop are defined by the requirement that all CCDs must see the entire \FOV\ 
+The size and octagonal shape of the field stop are defined by the requirement that all \CCDs\ must see the entire \FOV\ 
 from edge to edge, while leaving a small margin for alignment. 
 
-Lastly, in contrast to \MOSES, \ESIS\ employs frame transfer CCDs to make optimum use of our five minutes of observing 
+Lastly, in contrast to \MOSES, \ESIS\ employs frame transfer \CCDs\ to make optimum use of our five minutes of observing 
 time.
 The \ESIS\ design is shutterless, so that each detector is always integrating.
 The result is a \SI{100}{\percent} duty cycle.
