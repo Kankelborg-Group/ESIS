@@ -126,6 +126,19 @@ def document() -> kgpy.latex.Document:
         field_is_stratified_random=True,
     )
 
+    doc.set_variable_quantity(
+        name='minWavelength',
+        value=optics_single.wavelength_min,
+        digits_after_decimal=1,
+    )
+
+
+    doc.set_variable_quantity(
+        name='maxWavelength',
+        value=optics_single.wavelength_max,
+        digits_after_decimal=1,
+    )
+
     doc.set_variable(
         name='numEmissionLines',
         value=str(optics.num_emission_lines),
@@ -1002,6 +1015,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
 
                     tabular.add_row([r'Resolution', r'\SI{1.52}{\arcsecond} (Nyquist limited)'])
                     tabular.add_row([r'\roy{Resolution}', r'\roy{\spatialResolution (Nyquist limited)}'])
+                    tabular.add_row([r'\roy{Passband}', r'\roy{\minWavelength\ to \maxWavelength}'])
 
                     tabular.add_hline()
 
