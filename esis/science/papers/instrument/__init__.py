@@ -599,8 +599,8 @@ In designing \ESIS, we have sought to improve upon each of these points.
             ))
 
         with doc.create(pylatex.Subsection('ESIS Features')):
-            with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
-                esis_figure_3d.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
+            with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
+                figure.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
 
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
                 esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
@@ -914,7 +914,6 @@ AR is active region, QS quiet sun, and CH coronal hole."""
                         ))
 
     with doc.create(pylatex.Section('The ESIS Instrument')):
-
         doc.append(pylatex.NoEscape(
             r"""\ESIS\ is a multiple projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
 widths in a single snapshot over a 2D \FOV.
@@ -922,8 +921,8 @@ Starting from the notional instrument described in Sec.~\ref{sec:TheESISConcept}
 of the science requirements set forth in Table~\ref{table:scireq} are met.
 The final design parameters are summarized in Table~\ref{table:prescription}.
 
-A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{F-ESIS_AP} [A], while the mechanical features 
-of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and [C], respectively."""
+A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{fig:schematic} [A], while the mechanical features 
+of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B] and [C], respectively."""
         ))
 
         with doc.create(pylatex.Table()) as table:
@@ -946,8 +945,10 @@ of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and
 
                     tabular.add_row([r'Gratings (\numChannels)', 'Spherical varied line space'])
                     tabular.add_row(['', r'(Individual master gratings)'])
-                    tabular.add_row(['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter} \roy{\gratingHeight},'])
-                    tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter} \roy{\gratingLongWidth}, Short Base: \SI{3.8}{\milli\meter} \roy{\gratingShortWidth}'])
+                    tabular.add_row(
+                        ['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter} \roy{\gratingHeight},'])
+                    tabular.add_row(['',
+                                     r'Long Base: \SI{18.0}{\milli\meter} \roy{\gratingLongWidth}, Short Base: \SI{3.8}{\milli\meter} \roy{\gratingShortWidth}'])
                     tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter} \roy{\gratingRulingDensity}'])
                     tabular.add_row(['', r'\roy{\gratingRadius\ radius}'])
                     tabular.add_row(['', r'Magnification M=3.9 \roy{\magnification}'])
@@ -988,12 +989,21 @@ of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and
 
         with doc.create(pylatex.Subsection('Optics')):
             doc.append(pylatex.NoEscape(
-                r"""Figure~\ref{F-ESIS_AP} [A] shows the relative layout of the optics and detectors for a single 
+                r"""Figure~\ref{fig:schematic} [A] shows the relative layout of the optics and detectors for a single 
 \ESIS\ channel.
-Here we give specific details of the primary mirror and gratings (Fig.~\ref{F-ESIS_AP} [B] and [C], respectively).
+Here we give specific details of the primary mirror and gratings (Fig.~\ref{fig:schematic} [B] and [C], respectively).
 The features of the field stop have been described previously in Sec.~\ref{subsec:ESISFeatures}, while the CCD and 
 cameras are covered in Sec.~\ref{subsec:Cameras}. """
             ))
+
+            with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
+                figure.add_image('figures/layout_apertures_5', width=pylatex.NoEscape(r'\textwidth'))
+                # figure.add_image(str(figures.layout_pdf()), width=None)
+                figure.append(kgpy.latex.Label('fig:schematic'))
+                figure.add_caption(pylatex.NoEscape(
+                    r"""[A] Schematic diagram of the ESIS optical train.
+Dimensions and clear aperture of the ESIS [B] primary mirror and [C] diffraction gratings."""
+                ))
 
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
             pass
