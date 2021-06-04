@@ -1015,7 +1015,7 @@ A triangular aperture mask in front of the primary mirror defines the clear aper
 single grating.
 Figure~\ref{fig:schematic} [B] shows one such aperture mask superimposed upon the primary mirror.
 The octagonal shape of the primary also allows dynamic clearance for filter tubes that are arranged radially around the 
-mirror (\S\,\ref{subsec:Filters}).
+mirror (\S\,\ref{subsec:CoatingsandFilters}).
 The mirror is attached to a backing plate by three ``bipods'';
 thin titanium structures that are flexible in the radial dimension, perpendicular to the mirror edge, but rigid in the 
 other two dimensions.
@@ -1024,8 +1024,8 @@ The bipods form a kinematic mount, isolating the primary mirror figure from moun
 The mirror will have to maintain its figure under direct solar illumination, so low expansion (Corning \ULE) substrates 
 were used.
 The transparency of \ULE, in conjunction with the transparency of the mirror coating in visible and near IR 
-\roy{near-IR} wavelengths (\eg, Table~\ref{table:prescription} and \S\,\ref{subsec:Filters}), helps minimize the heating 
-of the mirror.
+\roy{near-IR} wavelengths (\eg, Table~\ref{table:prescription} and \S\,\ref{subsec:CoatingsandFilters}), helps minimize 
+the heating of the mirror.
 Surface figure specifications for the \ESIS\ optics are described in Sec.~\ref{subsec:OptimizationandTolerancing}.
 
 The spherical gratings (Fig.~\ref{fig:schematic} [C]) re-image light from the field stop to form dispersed images at the 
