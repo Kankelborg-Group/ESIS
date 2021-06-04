@@ -1007,6 +1007,33 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
 Dimensions and clear aperture of the ESIS [B] primary mirror and [C] diffraction gratings."""
                 ))
 
+            doc.append(pylatex.NoEscape(
+                r"""The primary mirror is octagonal in shape.
+A triangular aperture mask in front of the primary mirror defines the clear aperture of each channel, imaged by a 
+single grating.
+Figure~\ref{fig:schematic} [B] shows one such aperture mask superimposed upon the primary mirror.
+The octagonal shape of the primary also allows dynamic clearance for filter tubes that are arranged radially around the 
+mirror (\S\,\ref{subsec:Filters}).
+The mirror is attached to a backing plate by three ``bipods'';
+thin titanium structures that are flexible in the radial dimension, perpendicular to the mirror edge, but rigid in the 
+other two dimensions.
+The bipods form a kinematic mount, isolating the primary mirror figure from mounting stress. 
+
+The mirror will have to maintain its figure under direct solar illumination, so low expansion (Corning \ULE) substrates 
+were used.
+The transparency of \ULE, in conjunction with the transparency of the mirror coating in visible and near IR 
+\roy{near-IR} wavelengths (\eg, Table~\ref{table:prescription} and \S\,\ref{subsec:Filters}), helps minimize the heating 
+of the mirror.
+Surface figure specifications for the \ESIS\ optics are described in Sec.~\ref{subsec:OptimizationandTolerancing}.
+
+The spherical gratings (Fig.~\ref{fig:schematic} [C]) re-image light from the field stop to form dispersed images at the 
+\CCDs.
+Each grating is individually mounted to a backing plate in a similar fashion as the primary mirror.
+For these much smaller optics, lightweight bipods were wire EDM cut from thin titanium sheet.
+The bipods are bonded to both the grating and backing plate along the three long edges of each grating.
+The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
+            ))
+
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
             pass
 
