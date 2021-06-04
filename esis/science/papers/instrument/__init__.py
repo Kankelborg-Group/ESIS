@@ -171,7 +171,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='plateScale',
         value=optics_single.plate_scale.quantity,
-        digits_after_decimal=2,
+        digits_after_decimal=3,
     )
 
     doc.set_variable_quantity(
