@@ -316,6 +316,22 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0
     )
 
+    doc.set_variable(
+        name='chiantiDEM',
+        value=pylatex.NoEscape(pylatex.Command('texttt', kgpy.chianti.dem_qs_file).dumps())
+    )
+
+    doc.set_variable(
+        name='chiantiAbundances',
+        value=pylatex.NoEscape(pylatex.Command('texttt', kgpy.chianti.abundance_qs_tr_file).dumps())
+    )
+
+    doc.set_variable_quantity(
+        name='chiantiPressure',
+        value=kgpy.chianti.pressure_qs,
+        scientific_notation=True,
+    )
+
     wavelength = optics.bunch.wavelength
     ion = kgpy.chianti.to_spectroscopic(optics.bunch.ion)
 
@@ -403,6 +419,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
     doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
+    doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
@@ -885,7 +902,8 @@ meet our science goals."""
                     figure.append(kgpy.latex.Label('fig:bunch'))
                     figure.add_caption(pylatex.NoEscape(
                         r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
-Calculated using ChiantiPy, Schmelz 2012 abundances, \QS\ DEM, Constant pressure of $1\times10^{15}$.
+Calculated using ChiantiPy, with the \chiantiAbundances\ abundances file, the \chiantiDEM\ \DEM\ file, and a constant
+pressure of \chiantiPressure.
 The two Ne VI lines and the Si IV lines may or may not be in the actual passband due to instrument build up errors.}"""
                     ))
 
