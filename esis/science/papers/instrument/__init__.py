@@ -132,7 +132,6 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=1,
     )
 
-
     doc.set_variable_quantity(
         name='maxWavelength',
         value=optics_single.wavelength_max,
@@ -201,13 +200,13 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='dispersion',
         value=optics_single.dispersion.to(kgpy.units.mAA / u.pix),
-        digits_after_decimal=1,
+        digits_after_decimal=2,
     )
 
     doc.set_variable_quantity(
         name='dispersionDoppler',
         value=optics_single.dispersion_doppler.to(u.km / u.s / u.pix),
-        digits_after_decimal=1,
+        digits_after_decimal=2,
     )
 
     doc.set_variable_quantity(
