@@ -384,6 +384,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole'))
     doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
+    doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
@@ -1031,7 +1032,7 @@ Surface figure specifications for the \ESIS\ optics are described in Sec.~\ref{s
 The spherical gratings (Fig.~\ref{fig:schematic} [C]) re-image light from the field stop to form dispersed images at the 
 \CCDs.
 Each grating is individually mounted to a backing plate in a similar fashion as the primary mirror.
-For these much smaller optics, lightweight bipods were wire EDM cut from thin titanium sheet.
+For these much smaller optics, lightweight bipods were wire \EDM\ cut from thin titanium sheet.
 The bipods are bonded to both the grating and backing plate along the three long edges of each grating.
 The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
             ))
