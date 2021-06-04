@@ -10,8 +10,8 @@ __all__ = [
     'layout_pdf'
 ]
 
-fig_width = 7.1
-
+fig_width = 513.11743 / 72
+column_width = 242.26653 / 72
 
 def layout() -> matplotlib.figure.Figure:
     fig_layout = plt.figure(figsize=(fig_width, fig_width))
