@@ -147,6 +147,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='backFocalLength',
+        value=optics_single.back_focal_length,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
         name='radiusRatio',
         value=optics_single.radius_ratio,
     )
@@ -177,13 +183,13 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='dispersion',
         value=optics_single.dispersion.to(kgpy.units.mAA / u.pix),
-        digits_after_decimal=0,
+        digits_after_decimal=1,
     )
 
     doc.set_variable_quantity(
         name='dispersionDoppler',
-        value=optics_single.dispersion_doppler,
-        digits_after_decimal=0,
+        value=optics_single.dispersion_doppler.to(u.km / u.s / u.pix),
+        digits_after_decimal=1,
     )
 
     doc.set_variable_quantity(
@@ -266,18 +272,30 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable(
-        name='detectorNumPixelsX',
+        name='detectorName',
+        value=str(optics_single.detector.name),
+    )
+
+    doc.set_variable(
+        name='detectorPixelsX',
         value=str(optics_single.detector.num_pixels[0]),
     )
 
     doc.set_variable(
-        name='detectorName',
-        value=optics_single.detector.name,
+        name='detectorPixelsY',
+        value=str(optics_single.detector.num_pixels[1]),
     )
 
-    doc.set_variable(
-        name='detectorNumPixelsY',
-        value=str(optics_single.detector.num_pixels[1]),
+    doc.set_variable_quantity(
+        name='detectorPixelSize',
+        value=optics_single.detector.pixel_width,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='detectorQuantumEfficiency',
+        value=optics_single.detector.quantum_efficiency,
+        digits_after_decimal=0
     )
 
     wavelength = optics.bunch.wavelength
@@ -945,7 +963,28 @@ of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and
                     tabular.add_row(['', r'\SI{82}{\percent} open Ni mesh'])
                     tabular.add_row(['', r'\roy{\filterMeshRatio\ open Ni mesh}'])
 
+                    tabular.add_row([r'Detectors (\numChannels)', r'\detectorName'])
+                    tabular.add_row([r'', r'Active area $2048 \times 1024$'])
+                    tabular.add_row([r'', r'\roy{\detectorPixelsX\ $\times$ \detectorPixelsY\ active area}'])
+                    tabular.add_row([r'', r'Pixel size \SI{15}{\micro\meter}'])
+                    tabular.add_row([r'', r'\roy{\detectorPixelSize\ pixel size}'])
+                    tabular.add_row([r'', r'QE \SI{33}{\percent}, $\lambda$\SI{63}{\nano\meter}'])
+                    tabular.add_row([r'', r'\roy{\detectorQuantumEfficiency\ quantum efficiency at \OVwavelength}'])
+                    tabular.add_row([r'', r'{Max readout time or min cadence here for ver. table 1?}'])
+                    tabular.add_row([r'', r'\roy{\minCadence\ minimum cadence}'])
 
+                    tabular.add_row([r'Back focal length', r'\SI{127}{\milli\meter}'])
+                    tabular.add_row([r'\roy{Back focal length}', r'\roy{\backFocalLength}'])
+
+                    tabular.add_row([r'Plate scale', r'\SI{0.76}{\arcsecond} per pixel'])
+                    tabular.add_row([r'\roy{Plate scale}', r'\roy{\plateScale}'])
+                    tabular.add_row([r'', r'\SI{37}{\milli\angstrom} (\SI{18}{\kilo\meter\per\second}) per pixel'])
+                    tabular.add_row([r'', r'\roy{\dispersion\ (\dispersionDoppler)}'])
+
+                    tabular.add_row([r'Resolution', r'\SI{1.52}{\arcsecond} (Nyquist limited)'])
+                    tabular.add_row([r'\roy{Resolution}', r'\roy{\spatialResolution (Nyquist limited)}'])
+
+                    tabular.add_hline()
 
         with doc.create(pylatex.Subsection('Optics')):
             pass
