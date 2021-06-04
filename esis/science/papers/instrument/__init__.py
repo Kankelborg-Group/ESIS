@@ -385,6 +385,8 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
 
+    doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
+
     # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
     # doc.set_variable(name='MOSES', value=pylatex.Command('ac', 'MOSES'))
 
