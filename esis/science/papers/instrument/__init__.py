@@ -602,10 +602,10 @@ In designing \ESIS, we have sought to improve upon each of these points.
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
                 figure.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
 
-            with doc.create(kgpy.latex.FigureStar(position='!ht')) as esis_figure_3d:
-                esis_figure_3d.add_image(str(figures.layout_pdf()), width=None)
-                esis_figure_3d.append(kgpy.latex.Label('fig:layout'))
-                esis_figure_3d.add_caption(pylatex.NoEscape(
+            with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
+                figure.add_image(str(figures.layout_pdf()), width=None)
+                figure.append(kgpy.latex.Label('fig:layout'))
+                figure.add_caption(pylatex.NoEscape(
                     r"""The \ESIS\ instrument is a pseudo-Gregorian design.
 The secondary mirror is replaced by a segmented array of concave diffraction gratings.
 The field stop at prime focus defines instrument spatial/spectral \FOV.
