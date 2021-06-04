@@ -100,3 +100,20 @@ def layout_pdf() -> pathlib.Path:
     )
     plt.close(fig)
     return path
+
+
+def bunch() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
+    opt = esis.optics.design.final()
+    opt.bunch.plot(ax=ax, num_emission_lines=opt.num_emission_lines)
+    return fig
+
+
+def bunch_pdf() -> pathlib.Path:
+    fig = bunch()
+    path = pathlib.Path(__file__).parent / 'bunch.pdf'
+    fig.savefig(
+        fname=path
+    )
+    plt.close(fig)
+    return path

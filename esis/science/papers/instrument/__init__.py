@@ -127,6 +127,11 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable(
+        name='numEmissionLines',
+        value=str(optics.num_emission_lines),
+    )
+
+    doc.set_variable(
         name='numChannels',
         value=str(optics.num_channels),
     )
@@ -862,6 +867,14 @@ and \ref{subsec:EnergyTransfer} we define the instrument requirements in Table~\
 meet our science goals."""
                 ))
 
+                with doc.create(kgpy.latex.FigureStar()) as figure:
+                    figure.add_image(str(figures.bunch_pdf()), width=None)
+                    figure.append(kgpy.latex.Label('fig:bunch'))
+                    figure.add_caption(pylatex.NoEscape(
+                        r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
+Calculated using ChiantiPy, Schmelz 2012 abundances, \QS\ DEM, Constant pressure of $1\times10^{15}.$}"""
+                    ))
+
                 with doc.create(pylatex.Table()) as table:
                     table._star_latex_name = True
                     table.append(kgpy.latex.Label('table:scireq'))
@@ -1080,7 +1093,7 @@ if __name__ == '__main__':
     # plt.rcParams['xtick.labelsize'] = 9
     # plt.rcParams['ytick.labelsize'] = 9
     # plt.rcParams['legend.fontsize'] = 9
-    plt.rcParams['font.size'] = 9
+    plt.rcParams['font.size'] = 7
     plt.rcParams['lines.linewidth'] = 1
 
     doc = document()
