@@ -987,7 +987,13 @@ of the primary mirror and gratings are detailed in Figs.~\ref{F-ESIS_AP} [B] and
                     tabular.add_hline()
 
         with doc.create(pylatex.Subsection('Optics')):
-            pass
+            doc.append(pylatex.NoEscape(
+                r"""Figure~\ref{F-ESIS_AP} [A] shows the relative layout of the optics and detectors for a single 
+\ESIS\ channel.
+Here we give specific details of the primary mirror and gratings (Fig.~\ref{F-ESIS_AP} [B] and [C], respectively).
+The features of the field stop have been described previously in Sec.~\ref{subsec:ESISFeatures}, while the CCD and 
+cameras are covered in Sec.~\ref{subsec:Cameras}. """
+            ))
 
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
             pass
