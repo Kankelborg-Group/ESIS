@@ -328,6 +328,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='chiantiPressure',
         value=kgpy.chianti.pressure_qs,
+        digits_after_decimal=0,
         scientific_notation=True,
     )
 
