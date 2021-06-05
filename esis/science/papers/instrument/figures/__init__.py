@@ -13,6 +13,14 @@ __all__ = [
 fig_width = 513.11743 / 72
 column_width = 242.26653 / 72
 
+
+def save_pdf(fig: matplotlib.figure.Figure, name: str) -> pathlib.Path:
+    path = pathlib.Path(__file__).parent / (name + '.pdf')
+    fig.savefig(fname=path)
+    plt.close(fig)
+    return path
+
+
 def layout() -> matplotlib.figure.Figure:
     fig_layout = plt.figure(figsize=(fig_width, fig_width))
     ax_layout = fig_layout.add_subplot(111, projection='3d')
@@ -117,3 +125,16 @@ def bunch_pdf() -> pathlib.Path:
     )
     plt.close(fig)
     return path
+
+
+def field_stop_projections() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(figsize=(column_width, 3), constrained_layout=True)
+    opt = esis.optics.design.final()
+    opt.plot_field_stop_projections_local(ax=ax)
+    ax.set_aspect('equal')
+    ax.legend(bbox_to_anchor=(0.5, -0.5), loc='upper center', ncol=3)
+    return fig
+
+
+def field_stop_projections_pdf() -> pathlib.Path:
+    return save_pdf(field_stop_projections(), 'field_stop_projections')

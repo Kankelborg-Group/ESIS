@@ -15,6 +15,7 @@ import astropy.constants
 import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
 import kgpy.chianti
+import kgpy.format
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
@@ -86,7 +87,7 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                wavelength=self.bunch.wavelength[:self.num_emission_lines],
+                wavelength=self.wavelength,
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
                 pupil_samples=self.pupil_samples,
@@ -153,7 +154,7 @@ class Optics(
 
     @property
     def dispersion_doppler(self) -> u.Quantity:
-        val = self.dispersion / self.bunch.wavelength[..., 0] * astropy.constants.c
+        val = self.dispersion / self.wavelength[..., 0] * astropy.constants.c
         return val.to(u.km / u.s / u.pix)
     
     @property
@@ -204,6 +205,10 @@ class Optics(
             self._bunch.wavelength_min = self.wavelength_min.min()
             self._bunch.wavelength_max = self.wavelength_max.max()
         return self._bunch
+
+    @property
+    def wavelength(self) -> u.Quantity:
+        return self.bunch.wavelength[:self.num_emission_lines]
 
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
@@ -1852,5 +1857,59 @@ class Optics(
                         color=wavelength_color[w],
                     )
 
+    def plot_field_stop_projections_local(
+            self,
+            ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None
+    ):
 
+        subsystem = optics.System(
+            object_surface=self.field_stop.surface,
+            surfaces=optics.surface.SurfaceList([
+                self.grating.surface,
+                self.detector.surface,
+            ]),
+            wavelength=self.wavelength,
+            field_samples=self.field_samples,
+            field_margin=1 * u.nm,
+            field_is_stratified_random=self.field_is_stratified_random,
+            pupil_samples=self.pupil_samples,
+            pupil_is_stratified_random=self.pupil_is_stratified_random,
+            grid_velocity_los=self.grid_velocity_los,
+            pointing=self.pointing,
+            roll=self.roll,
+        )
+
+        self.detector.surface.plot(
+            ax=ax,
+            plot_annotations=False,
+        )
+
+        with astropy.visualization.quantity_support():
+
+            wire = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
+            wire.z = self.wavelength
+
+            if wavelength_color is None:
+                colormap = plt.cm.viridis
+                colornorm = plt.Normalize(vmin=self.wavelength.min().value, vmax=self.wavelength.max().value)
+                wavelength_color = [colormap(colornorm(self.wavelength[..., w].value))
+                                    for w in range(self.wavelength.shape[~0])]
+
+            subsystem_model = subsystem.rays_output.distortion(polynomial_degree=2).model()
+            wire = subsystem_model(wire)
+            wire = wire.to_3d()
+
+            for i in range(wire.shape[0]):
+                for w in range(wire.shape[~0]):
+                    if i == 0:
+                        label_kwarg = dict(label=kgpy.format.quantity(self.wavelength[..., w]))
+                    else:
+                        label_kwarg = dict()
+                    ax.plot(
+                        wire.x[i, ..., w],
+                        wire.y[i, ..., w],
+                        color=wavelength_color[w],
+                        **label_kwarg,
+                    )
 
