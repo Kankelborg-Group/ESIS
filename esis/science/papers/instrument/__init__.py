@@ -1083,6 +1083,9 @@ The bipods are bonded to both the grating and backing plate along the three long
 The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
             ))
 
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image('figures/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
+
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
             pass
 
