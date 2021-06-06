@@ -210,6 +210,10 @@ class Optics(
     def wavelength(self) -> u.Quantity:
         return self.bunch.wavelength[:self.num_emission_lines]
 
+    @property
+    def wavelength_sorted(self) -> u.Quantity:
+        return np.sort(self.wavelength)
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
         other.num_emission_lines = self.num_emission_lines
@@ -1860,11 +1864,14 @@ class Optics(
     def plot_field_stop_projections_local(
             self,
             ax: matplotlib.axes.Axes,
-            wavelength_color: typ.Optional[typ.List[str]] = None
+            wavelength_color: typ.Optional[typ.List[str]] = None,
+            digits_after_decimal: int = 3,
     ):
 
+        fs = self.field_stop.surface
+        fs.transform.append(kgpy.transform.rigid.TiltZ(self.roll))
         subsystem = optics.System(
-            object_surface=self.field_stop.surface,
+            object_surface=fs,
             surfaces=optics.surface.SurfaceList([
                 self.grating.surface,
                 self.detector.surface,
@@ -1880,36 +1887,44 @@ class Optics(
             roll=self.roll,
         )
 
-        self.detector.surface.plot(
-            ax=ax,
-            plot_annotations=False,
-        )
-
         with astropy.visualization.quantity_support():
 
             wire = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
-            wire.z = self.wavelength
+            wavelength = self.wavelength_sorted
+            wire.z = wavelength
 
             if wavelength_color is None:
-                colormap = plt.cm.viridis
-                colornorm = plt.Normalize(vmin=self.wavelength.min().value, vmax=self.wavelength.max().value)
-                wavelength_color = [colormap(colornorm(self.wavelength[..., w].value))
-                                    for w in range(self.wavelength.shape[~0])]
+                colormap = plt.cm.rainbow_r
+                colornorm = plt.Normalize(vmin=wavelength.min().value, vmax=wavelength.max().value)
+                wavelength_color = [colormap(colornorm(wavelength[..., w].value)) for w in range(wavelength.shape[~0])]
 
-            subsystem_model = subsystem.rays_output.distortion(polynomial_degree=2).model()
+            rays = subsystem.rays_output
+            rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
+            rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
+            rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
+            subsystem_model = rays.distortion(polynomial_degree=2).model()
             wire = subsystem_model(wire)
             wire = wire.to_3d()
+
+            if wire.ndim == 3:
+                wire = wire[np.newaxis]
+            transition = self.bunch.fullname(digits_after_decimal=digits_after_decimal)[np.argsort(self.wavelength)]
 
             for i in range(wire.shape[0]):
                 for w in range(wire.shape[~0]):
                     if i == 0:
-                        label_kwarg = dict(label=kgpy.format.quantity(self.wavelength[..., w]))
+                        label_kwarg = dict(label=transition[w])
                     else:
                         label_kwarg = dict()
+                    wire_iw = wire[i, ..., w]
                     ax.plot(
-                        wire.x[i, ..., w],
-                        wire.y[i, ..., w],
+                        wire_iw.x,
+                        wire_iw.y,
                         color=wavelength_color[w],
                         **label_kwarg,
                     )
+
+        ax.set_xlim(left=0, right=self.detector.num_pixels[0])
+        ax.set_ylim(bottom=0, top=self.detector.num_pixels[1])
+
 

@@ -16,7 +16,11 @@ column_width = 242.26653 / 72
 
 def save_pdf(fig: matplotlib.figure.Figure, name: str) -> pathlib.Path:
     path = pathlib.Path(__file__).parent / (name + '.pdf')
-    fig.savefig(fname=path)
+    fig.savefig(
+        fname=path,
+        bbox_inches='tight',
+        pad_inches=0.04,
+    )
     plt.close(fig)
     return path
 
@@ -110,15 +114,14 @@ def layout_pdf() -> pathlib.Path:
     return path
 
 
-def bunch() -> matplotlib.figure.Figure:
+def bunch(optics: esis.optics.Optics, digits_after_decimal: int) -> matplotlib.figure.Figure:
     fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
-    opt = esis.optics.design.final()
-    opt.bunch.plot(ax=ax, num_emission_lines=opt.num_emission_lines)
+    optics.bunch.plot(ax=ax, num_emission_lines=optics.num_emission_lines, digits_after_decimal=digits_after_decimal)
     return fig
 
 
-def bunch_pdf() -> pathlib.Path:
-    fig = bunch()
+def bunch_pdf(optics: esis.optics.Optics, digits_after_decimal: int) -> pathlib.Path:
+    fig = bunch(optics=optics, digits_after_decimal=digits_after_decimal)
     path = pathlib.Path(__file__).parent / 'bunch.pdf'
     fig.savefig(
         fname=path
@@ -127,14 +130,14 @@ def bunch_pdf() -> pathlib.Path:
     return path
 
 
-def field_stop_projections() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(column_width, 3), constrained_layout=True)
-    opt = esis.optics.design.final()
-    opt.plot_field_stop_projections_local(ax=ax)
+def field_stop_projections(optics: esis.optics.Optics, digits_after_decimal: int) -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(figsize=(column_width, 2.75), constrained_layout=True)
+    optics.plot_field_stop_projections_local(ax=ax, digits_after_decimal=digits_after_decimal)
     ax.set_aspect('equal')
-    ax.legend(bbox_to_anchor=(0.5, -0.5), loc='upper center', ncol=3)
+    ax.legend(bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
     return fig
 
 
-def field_stop_projections_pdf() -> pathlib.Path:
-    return save_pdf(field_stop_projections(), 'field_stop_projections')
+def field_stop_projections_pdf(optics: esis.optics.Optics, digits_after_decimal: int) -> pathlib.Path:
+    fig = field_stop_projections(optics=optics, digits_after_decimal=digits_after_decimal)
+    return save_pdf(fig, 'field_stop_projections')

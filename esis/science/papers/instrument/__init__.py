@@ -17,6 +17,8 @@ path_figures = path_base / 'figures'
 
 
 def document() -> kgpy.latex.Document:
+    wavl_digits = 2
+
     doc = kgpy.latex.Document(
         default_filepath=str(path_pdf),
         documentclass='aastex631',
@@ -339,7 +341,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='OVwavelength',
         value=wavelength[index_o5],
-        digits_after_decimal=3,
+        digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
         name='OVion',
@@ -354,7 +356,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='HeIwavelength',
         value=wavelength[index_he1],
-        digits_after_decimal=3,
+        digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
         name='HeIion',
@@ -369,7 +371,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='MgXwavelength',
         value=wavelength[index_mg10],
-        digits_after_decimal=3,
+        digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
         name='MgXion',
@@ -384,7 +386,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='MgXdimWavelength',
         value=wavelength[index_mg10_2],
-        digits_after_decimal=3,
+        digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
         name='MgXdimIon',
@@ -898,7 +900,7 @@ meet our science goals."""
                 ))
 
                 with doc.create(kgpy.latex.FigureStar()) as figure:
-                    figure.add_image(str(figures.bunch_pdf()), width=None)
+                    figure.add_image(str(figures.bunch_pdf(optics_single, wavl_digits)), width=None)
                     figure.append(kgpy.latex.Label('fig:bunch'))
                     figure.add_caption(pylatex.NoEscape(
                         r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
@@ -1086,7 +1088,7 @@ The individual mounts allow each grating to be adjusted in tip and tilt to cente
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image('figures/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
                 figure.append('\n')
-                figure.add_image(str(figures.field_stop_projections_pdf()), width=None)
+                figure.add_image(str(figures.field_stop_projections_pdf(optics_single, wavl_digits)), width=None)
                 figure.append(kgpy.latex.Label('fig:projections'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""Areas occupied by strong spectral lines on the ESIS detectors.
