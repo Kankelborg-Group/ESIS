@@ -114,6 +114,37 @@ def layout_pdf() -> pathlib.Path:
     return path
 
 
+def schematic() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(figsize=(fig_width, 5), constrained_layout=True)
+    # fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
+    ax.margins(x=.01, y=.01)
+    # ax.autoscale(enable=True, axis='both', tight=True)
+    ax.set_aspect('equal')
+    ax.set_axis_off()
+    optics = esis.optics.design.final(all_channels=False)
+    optics.plot_distance_annotations_zx(ax=ax)
+    lines, colorbar = optics.system.plot(
+        ax=ax,
+        components=('z', 'x'),
+        plot_rays=False,
+        # plot_annotations=False,
+        annotation_text_y=1.3,
+        plot_kwargs=dict(
+            linewidth=0.5,
+        ),
+    )
+    ax.set_ylabel(None)
+    ax.set_yticks([])
+    # ax.set_xticks([])
+    # colorbar.remove()
+
+    return fig
+
+
+def schematic_pdf() -> pathlib.Path:
+    return save_pdf(schematic(), 'schematic')
+
+
 def bunch(optics: esis.optics.Optics, digits_after_decimal: int) -> matplotlib.figure.Figure:
     fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
     optics.bunch.plot(ax=ax, num_emission_lines=optics.num_emission_lines, digits_after_decimal=digits_after_decimal)

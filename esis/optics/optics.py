@@ -1669,7 +1669,7 @@ class Optics(
                 point_1=position_fs.zx,
                 point_2=position_obscuration.zx,
                 component='x',
-                position_orthogonal=-0.3,
+                position_orthogonal=-0.4,
                 # position_parallel=1,
                 # horizontal_alignment='right',
                 transform=ax.get_xaxis_transform(),
@@ -1679,7 +1679,7 @@ class Optics(
                 point_1=position_primary.zx,
                 point_2=position_grating.zx,
                 component='y',
-                position_orthogonal=-1550,
+                position_orthogonal=-1200,
                 position_parallel=0,
                 vertical_alignment='top',
             )
@@ -1688,18 +1688,20 @@ class Optics(
                 point_1=position_primary.zx,
                 point_2=position_filter.zx,
                 component='x',
-                position_orthogonal=-0.3,
-                position_parallel=1,
-                horizontal_alignment='right',
+                position_orthogonal=-0.4,
+                position_parallel=0.5,
+                horizontal_alignment='center',
+                vertical_alignment='top',
                 transform=ax.get_xaxis_transform(),
+                transparent=True
             )
             annotation_primary_to_filter_y = plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx,
                 point_2=position_filter.zx,
                 component='y',
-                position_orthogonal=-650,
-                position_parallel=0.3,
+                position_orthogonal=-400,
+                # position_parallel=0.3,
             )
 
             annotation_primary_to_detector_x = plot.annotate_component(
@@ -1708,25 +1710,27 @@ class Optics(
                 point_2=position_detector.zx,
                 component='x',
                 position_orthogonal=-0.2,
-                position_parallel=1,
+                position_parallel=0,
                 horizontal_alignment='left',
+                vertical_alignment='top',
                 transform=ax.get_xaxis_transform(),
+                transparent=True,
             )
             annotation_primary_to_detector_y = plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx,
                 point_2=position_detector.zx,
                 component='y',
-                position_orthogonal=-400,
-                position_parallel=0.4,
+                position_orthogonal=-200,
+                # position_parallel=0.4,
             )
 
             annotation_grating_tip = plot.annotate_angle(
                 ax=ax,
                 point_center=position_grating.zx,
-                radius=10 * self.grating.surface.aperture_mechanical.max.y,
-                angle_1=90 * u.deg,
-                angle_2=90 * u.deg + self.grating.inclination,
+                radius=30 * self.grating.surface.aperture_mechanical.max.y,
+                angle_1=-90 * u.deg,
+                angle_2=-90 * u.deg + self.grating.inclination,
                 angle_label=90 * u.deg + self.grating.inclination / 2,
             )
 

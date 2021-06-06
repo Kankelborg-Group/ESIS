@@ -1050,8 +1050,9 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
             ))
 
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
+                figure.add_image(str(figures.schematic_pdf()), width=None)
+                figure.append('\n')
                 figure.add_image('figures/layout_apertures_5', width=pylatex.NoEscape(r'\textwidth'))
-                # figure.add_image(str(figures.layout_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:schematic'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""[A] Schematic diagram of the ESIS optical train.
