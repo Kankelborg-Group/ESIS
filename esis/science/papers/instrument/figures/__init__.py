@@ -127,8 +127,8 @@ def schematic() -> matplotlib.figure.Figure:
         ax=ax,
         components=('z', 'x'),
         plot_rays=False,
-        # plot_annotations=False,
-        annotation_text_y=1.3,
+        plot_annotations=False,
+        annotation_text_y=2,
         plot_kwargs=dict(
             linewidth=0.5,
         ),

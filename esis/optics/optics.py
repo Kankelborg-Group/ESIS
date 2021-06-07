@@ -1728,9 +1728,9 @@ class Optics(
             annotation_grating_tip = plot.annotate_angle(
                 ax=ax,
                 point_center=position_grating.zx,
-                radius=30 * self.grating.surface.aperture_mechanical.max.y,
-                angle_1=-90 * u.deg,
-                angle_2=-90 * u.deg + self.grating.inclination,
+                radius=20 * self.grating.surface.aperture_mechanical.max.y,
+                angle_1=90 * u.deg,
+                angle_2=90 * u.deg + self.grating.inclination,
                 angle_label=90 * u.deg + self.grating.inclination / 2,
             )
 
