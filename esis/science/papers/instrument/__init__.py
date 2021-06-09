@@ -905,9 +905,8 @@ meet our science goals."""
                     figure.append(kgpy.latex.Label('fig:bunch'))
                     figure.add_caption(pylatex.NoEscape(
                         r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
-Calculated using ChiantiPy, with the \chiantiAbundances\ abundances file, the \chiantiDEM\ \DEM\ file, and a constant
-pressure of \chiantiPressure.
-The two Ne VI lines and the Si IV lines may or may not be in the actual passband due to instrument build up errors.}"""
+Calculated using ChiantiPy, with the \chiantiAbundances\ abundances file, the \chiantiDEM\ \DEM\ file, and
+$n_e T = $\,\chiantiPressure.}"""
                     ))
 
                 with doc.create(pylatex.Table()) as table:
