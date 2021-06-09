@@ -131,13 +131,13 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='minWavelength',
         value=optics_single.wavelength_min,
-        digits_after_decimal=1,
+        digits_after_decimal=wavl_digits,
     )
 
     doc.set_variable_quantity(
         name='maxWavelength',
         value=optics_single.wavelength_max,
-        digits_after_decimal=1,
+        digits_after_decimal=wavl_digits,
     )
 
     doc.set_variable(
