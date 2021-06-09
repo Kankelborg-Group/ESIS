@@ -39,6 +39,10 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
         return (self.clear_half_width + self.border_width) / np.cos(360 * u.deg / self.num_sides / 2)
 
     @property
+    def mech_half_width(self) -> u.Quantity:
+        return self.clear_half_width + self.border_width
+
+    @property
     def surface(self) -> SurfaceT:
         surface = super().surface  # type: SurfaceT
         surface.sag = optics.surface.sag.Standard(
