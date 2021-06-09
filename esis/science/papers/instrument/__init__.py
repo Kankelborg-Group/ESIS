@@ -163,6 +163,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='magnification',
         value=optics_single.magnification.quantity,
+        digits_after_decimal=1,
     )
 
     doc.set_variable_quantity(
