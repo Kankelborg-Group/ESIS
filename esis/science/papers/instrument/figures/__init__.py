@@ -122,7 +122,7 @@ def schematic() -> matplotlib.figure.Figure:
     ax.set_aspect('equal')
     ax.set_axis_off()
     optics = esis.optics.design.final(all_channels=False)
-    optics.plot_distance_annotations_zx(ax=ax)
+    obs = optics.central_obscuration
     lines, colorbar = optics.system.plot(
         ax=ax,
         components=('z', 'x'),
@@ -132,10 +132,116 @@ def schematic() -> matplotlib.figure.Figure:
         plot_kwargs=dict(
             linewidth=0.5,
         ),
+        # surface_first=optics.central_obscuration.surface,
     )
+    optics.plot_distance_annotations_zx(ax=ax)
+
+    ax.axhline(linewidth=0.4, color='gray')
+    ax.text(
+        x=-500,
+        y=0,
+        s='axis of symmetry',
+        ha='center',
+        va='bottom',
+        fontsize='small'
+    )
+
+    xh = kgpy.vector.x_hat.zx
+    zh = kgpy.vector.z_hat.zx
+    obs_zx = obs.transform.translation_eff.zx - obs.obscured_half_width * xh
+    default_offset_x = -200 * u.mm
+    default_offset_z_2 = -150 * u.mm
+    apkw = dict(
+        arrowstyle='->',
+        linewidth=0.5,
+        relpos=(0.5, 0.5),
+    )
+    kwargs_annotate = dict(
+        fontsize='small',
+        ha='center',
+    )
+    ax.annotate(
+        text=str(obs.name),
+        xy=obs_zx.to_tuple(),
+        xytext=(obs_zx.x, default_offset_x),
+        arrowprops=dict(
+            # relpos=(0.5, 0.5),
+            # connectionstyle='arc,angleA=90,angleB=-90,armA=10,armB=10',
+            **apkw,
+        ),
+        # ha='center',
+        **kwargs_annotate
+    )
+    width = optics.grating.inner_half_width + optics.grating.inner_border_width
+    grating_z = optics.grating.substrate_thickness / 2 * zh
+    grating_zx = optics.grating.transform.translation_eff.zx - (width * xh) - grating_z
+    ax.annotate(
+        text=str(optics.grating.name),
+        xy=grating_zx.to_tuple(),
+        xytext=(grating_zx.x + 100 * u.mm, default_offset_x),
+        arrowprops=dict(
+            # relpos=(0.5, 0.5),
+            connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=20',
+            **apkw,
+        ),
+        **kwargs_annotate,
+
+    )
+    fs_zx = optics.field_stop.transform.translation_eff.zx
+    ax.annotate(
+        text=str(optics.field_stop.name),
+        xy=fs_zx.to_tuple(),
+        xytext=(fs_zx.x, default_offset_x),
+        arrowprops=dict(
+            # relpos=(0.5, 0.5),
+            **apkw,
+        ),
+        # ha='center',
+        **kwargs_annotate,
+    )
+    primary_z = optics.primary.substrate_thickness / 2 * zh
+    primary_zx = optics.primary.transform.translation_eff.zx - optics.primary.mech_half_width * xh + primary_z
+    ax.annotate(
+        text=str(optics.primary.name),
+        xy=primary_zx.to_tuple(),
+        xytext=(primary_zx.x, default_offset_x),
+        arrowprops=dict(
+            # relpos=(0.5, 0.5),
+            **apkw,
+        ),
+        # ha='center',
+        **kwargs_annotate,
+    )
+    filter_zx = optics.filter.transform.translation_eff.zx - optics.filter.clear_radius * xh
+    ax.annotate(
+        text=str(optics.filter.name),
+        xy=filter_zx.to_tuple(),
+        xytext=(filter_zx.x - 100 * u.mm, default_offset_x),
+        arrowprops=dict(
+            # relpos=(0.5, 0.5),
+            connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=30',
+            **apkw,
+        ),
+        # ha='center',
+        **kwargs_annotate,
+    )
+    detector_zx = optics.detector.transform.translation_eff.zx - optics.detector.clear_half_width * xh
+    ax.annotate(
+        text='detector',
+        xy=detector_zx.to_tuple(),
+        xytext=(detector_zx.x + 100 * u.mm, default_offset_x),
+        arrowprops=dict(
+            # relpos=(0.5, 0.5),
+            connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=35',
+            **apkw,
+        ),
+        # ha='center',
+        **kwargs_annotate,
+    )
+
     ax.set_ylabel(None)
     ax.set_yticks([])
-    # ax.set_xticks([])
+    ax.set_xticks([])
     # colorbar.remove()
 
     return fig
