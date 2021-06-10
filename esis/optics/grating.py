@@ -101,6 +101,10 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         return self.surface.rulings.diffraction_angle(wavelength=wavelength, input_angle=input_angle)
 
     @property
+    def magnification_anamorphic(self) -> u.Quantity:
+        return np.cos(self.nominal_input_angle) / np.cos(self.nominal_output_angle)
+
+    @property
     def transform(self) -> transform.rigid.TransformList:
         return super().transform + transform.rigid.TransformList([
             transform.rigid.TiltY(self.inclination),
