@@ -163,12 +163,19 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='magnification',
         value=optics_single.magnification.quantity,
-        digits_after_decimal=1,
+        digits_after_decimal=3,
     )
 
     doc.set_variable_quantity(
         name='anamorphicMagnification',
-        value=optics_single.magnification_anamorphic,
+        value=optics_single.grating.magnification_anamorphic,
+    )
+
+    dr = optics_single.detector.cylindrical_radius - optics_single.grating.cylindrical_radius
+    dz = optics_single.detector.piston - optics_single.grating.piston
+    doc.set_variable_quantity(
+        name='tiltMagnification',
+        value=1 / np.cos(optics_single.detector.inclination + np.arctan(dr / dz))
     )
 
     doc.set_variable_quantity(
@@ -208,13 +215,13 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='dispersion',
         value=optics_single.dispersion.to(kgpy.units.mAA / u.pix),
-        digits_after_decimal=2,
+        digits_after_decimal=1,
     )
 
     doc.set_variable_quantity(
         name='dispersionDoppler',
         value=optics_single.dispersion_doppler.to(u.km / u.s / u.pix),
-        digits_after_decimal=2,
+        digits_after_decimal=1,
     )
 
     doc.set_variable_quantity(
@@ -265,8 +272,28 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='gratingLinearRulingDensityCoefficient',
+        value=optics_single.grating.ruling_density_coeff_linear,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingQuadraticRulingDensityCoefficient',
+        value=optics_single.grating.ruling_density_coeff_quadratic,
+    )
+
+    doc.set_variable_quantity(
         name='gratingRadius',
         value=optics_single.grating.tangential_radius,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingInputAngle',
+        value=optics_single.grating.nominal_input_angle,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingOutputAngle',
+        value=optics_single.grating.nominal_output_angle,
     )
 
     doc.set_variable_quantity(
@@ -997,9 +1024,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_hline()
                     tabular.add_row(['Primary', 'Parabolic'])
                     tabular.add_row(['', r'Octagonal aperture, D=\primaryDiameter'])
-                    tabular.add_row(['', r'\roy{Octagonal aperture, \primaryDiameter\ diameter}'])
                     tabular.add_row(['', r'Focal length \primaryFocalLength'])
-                    tabular.add_row(['', r'\roy{\primaryFocalLength\ focal length}'])
                     tabular.add_row(['', r'SiC single layer coating optimized for \OVwavelength'])
                     tabular.add_row(['', r'Transparent vis/IR'])
 
@@ -1008,46 +1033,108 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
 
                     tabular.add_row([r'Gratings (\numChannels)', 'Spherical varied line space'])
                     tabular.add_row(['', r'(Individual master gratings)'])
-                    tabular.add_row(
-                        ['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter} \roy{\gratingHeight},'])
-                    tabular.add_row(['',
-                                     r'Long Base: \SI{18.0}{\milli\meter} \roy{\gratingLongWidth}, Short Base: \SI{3.8}{\milli\meter} \roy{\gratingShortWidth}'])
-                    tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter} \roy{\gratingRulingDensity}'])
-                    tabular.add_row(['', r'\roy{\gratingRadius\ radius}'])
-                    tabular.add_row(['', r'Magnification M=3.9 \roy{\magnification}'])
-                    tabular.add_row(['', r'\roy{\radiusRatio\ primary radius to grating radius ratio}'])
-                    tabular.add_row(['', r'\roy{\armRatio\ exit arm length to entrance arm length ratio}'])
-                    tabular.add_row(['', r'Mg/Al/SiC multilayer, $\lambda 63$\,nm \roy{\OVwavelength}'])
+                    tabular.add_row(['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter},'])
+                    tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter}, Short Base: \SI{3.8}{\milli\meter}'])
+                    tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter}'])
+                    tabular.add_row(['', r'Magnification M=3.9'])
+                    tabular.add_row(['', r'Mg/Al/SiC multilayer, $\lambda 63$\,nm'])
                     tabular.add_row(['', r'Efficiency \SI{14}{\percent} (Uncoated \SI{39}{\percent})'])
 
                     tabular.add_row([r'Filters (\numChannels)', r'\SI{30}{\milli\meter} clear aperture'])
-                    tabular.add_row(['', r'\roy{\filterDiameter\ clear aperture}'])
                     tabular.add_row(['', r'Thin film, \SI{100}{\nano\meter} Al'])
-                    tabular.add_row(['', r'\roy{\FilterMaterial, \filterThickness\ thickness}'])
                     tabular.add_row(['', r'\SI{82}{\percent} open Ni mesh'])
-                    tabular.add_row(['', r'\roy{\filterMeshRatio\ open Ni mesh}'])
 
                     tabular.add_row([r'Detectors (\numChannels)', r'\detectorName'])
                     tabular.add_row([r'', r'Active area $2048 \times 1024$'])
-                    tabular.add_row([r'', r'\roy{\detectorPixelsX\ $\times$ \detectorPixelsY\ active area}'])
                     tabular.add_row([r'', r'Pixel size \SI{15}{\micro\meter}'])
-                    tabular.add_row([r'', r'\roy{\detectorPixelSize\ pixel size}'])
                     tabular.add_row([r'', r'QE \SI{33}{\percent}, $\lambda$\SI{63}{\nano\meter}'])
-                    tabular.add_row([r'', r'\roy{\detectorQuantumEfficiency\ quantum efficiency at \OVwavelength}'])
                     tabular.add_row([r'', r'{Max readout time or min cadence here for ver. table 1?}'])
-                    tabular.add_row([r'', r'\roy{\minCadence\ minimum cadence}'])
 
                     tabular.add_row([r'Back focal length', r'\SI{127}{\milli\meter}'])
-                    tabular.add_row([r'\roy{Back focal length}', r'\roy{\backFocalLength}'])
-
                     tabular.add_row([r'Plate scale', r'\SI{0.76}{\arcsecond} per pixel'])
-                    tabular.add_row([r'\roy{Plate scale}', r'\roy{\plateScale}'])
                     tabular.add_row([r'', r'\SI{37}{\milli\angstrom} (\SI{18}{\kilo\meter\per\second}) per pixel'])
-                    tabular.add_row([r'', r'\roy{\dispersion\ (\dispersionDoppler)}'])
-
                     tabular.add_row([r'Resolution', r'\SI{1.52}{\arcsecond} (Nyquist limited)'])
-                    tabular.add_row([r'\roy{Resolution}', r'\roy{\spatialResolution (Nyquist limited)}'])
-                    tabular.add_row([r'\roy{Passband}', r'\roy{\minWavelength\ to \maxWavelength}'])
+
+                    tabular.add_hline()
+
+        with doc.create(pylatex.Table()) as table:
+            table._star_latex_name = True
+            table.append(kgpy.latex.Label('table:prescription2'))
+            with table.create(pylatex.Center()) as centering:
+                with centering.create(pylatex.Tabular('lll')) as tabular:
+                    tabular.escape = False
+                    tabular.add_hline()
+                    tabular.add_row([r'Primary', r'Surface shape', r'Parabolic'])
+                    tabular.add_row([r'', r'Focal length ', r'\primaryFocalLength'])
+                    tabular.add_row([r'', r'Aperture shape', r'Octagonal'])
+                    tabular.add_row([r'', r'Aperture diameter', r'\primaryDiameter'])
+                    tabular.add_row([r'', r'Coating', r'SiC single layer, optimized for \OVwavelength'])
+
+                    tabular.add_hline()
+                    tabular.add_row([r'Field stop', r'Sky plane diameter', r'\fov'])
+                    tabular.add_row([r'', r'Aperture shape', r'Octagonal'])
+                    tabular.add_row([r'', r'Aperture diameter', r'\fieldStopDiameter'])
+
+                    tabular.add_hline()
+                    tabular.add_row([r'Gratings (\numChannels)', r'Surface shape', r'Spherical'])
+                    tabular.add_row([r'', r'Surface radius', r'\gratingRadius'])
+                    tabular.add_row([r'', r'Aperture shape', r'Trapezoidal'])
+                    tabular.add_row([r'', r'Aperture height', r'\gratingHeight'])
+                    tabular.add_row([r'', r'Aperture long base', r'\gratingLongWidth'])
+                    tabular.add_row([r'', r'Aperture short base', r'\gratingShortWidth'])
+                    tabular.add_row([r'', r'Ruling type', r'Varied line spacing'])
+                    tabular.add_row([r'', r'Constant ruling density coefficient', r'\gratingRulingDensity'])
+                    tabular.add_row([r'', r'Linear ruling density coefficient', r'\gratingLinearRulingDensityCoefficient'])
+                    tabular.add_row([r'', r'Quadratic ruling density coefficient', r'\gratingQuadraticRulingDensityCoefficient'])
+                    tabular.add_row([r'', r'Input angle', r'\gratingInputAngle'])
+                    tabular.add_row([r'', r'Output angle (\OV)', r'\gratingOutputAngle'])
+                    tabular.add_row([r'', r'Anamorphic magnification factor', r'\anamorphicMagnification'])
+                    tabular.add_row([r'', r'Manufacturing process', r'Individual master gratings'])
+                    tabular.add_row([r'', r'Coating', r'Mg/Al/SiC multilayer, optimized for \OVwavelength'])
+                    tabular.add_row([r'', r'Efficiency', r'\SI{14}{\percent}'])
+                    tabular.add_row([r'', r'Uncoated efficiency', r'\SI{39}{\percent}'])
+
+
+
+                    # tabular.add_row(['', r'Magnification M=3.9 \roy{\magnification}'])
+                    # tabular.add_row(['', r'\roy{\radiusRatio\ primary radius to grating radius ratio}'])
+                    # tabular.add_row(['', r'\roy{\armRatio\ exit arm length to entrance arm length ratio}'])
+
+                    tabular.add_hline()
+                    tabular.add_row([r'Filters (\numChannels)', r'Aperture shape', r'Circular'])
+                    tabular.add_row([r'', r'Aperture diameter', r'\filterDiameter'])
+                    tabular.add_row([r'', r'Material', r'\filterMaterial'])
+                    tabular.add_row([r'', r'Thickness', r'\filterThickness'])
+                    tabular.add_row([r'', r'Mesh ratio', r'\filterMeshRatio'])
+                    tabular.add_row([r'', r'Mesh material', r'Ni'])
+
+
+
+                    # tabular.add_row([r'Filters (\numChannels)', r'\SI{30}{\milli\meter} clear aperture'])
+                    # tabular.add_row(['', r'\roy{\filterDiameter\ clear aperture}'])
+                    # tabular.add_row(['', r'Thin film, \SI{100}{\nano\meter} Al'])
+                    # tabular.add_row(['', r'\roy{\FilterMaterial, \filterThickness\ thickness}'])
+                    # tabular.add_row(['', r'\SI{82}{\percent} open Ni mesh'])
+                    # tabular.add_row(['', r'\roy{\filterMeshRatio\ open Ni mesh}'])
+
+                    tabular.add_hline()
+                    tabular.add_row([r'Detectors (\numChannels)', r'Model', r'\detectorName'])
+                    tabular.add_row([r'', r'Active area', r'\detectorPixelsX\ $\times$ \detectorPixelsY'])
+                    tabular.add_row([r'', r'Pixel size', r'\detectorPixelSize'])
+                    tabular.add_row([r'', r'Quantum efficiency', r'\detectorQuantumEfficiency'])
+                    tabular.add_row([r'', r'Minumum cadence', r'\minCadence'])
+
+                    tabular.add_hline()
+                    tabular.add_row([r'System', r'Magnification', r'\magnification'])
+                    tabular.add_row([r'', r'Tilt magnification factor', r'\tiltMagnification'])
+                    tabular.add_row([r'', r'Plate scale', r'\plateScale'])
+                    tabular.add_row([r'', r'Nyquist resolution', r'\spatialResolution'])
+                    tabular.add_row([r'', r'Dispersion', r'\dispersion\ (\dispersionDoppler)'])
+                    tabular.add_row([r'', r'Passband', r'\minWavelength\ to \maxWavelength'])
+
+
+
+                    # tabular.add_row([r'Back focal length', r'\SI{127}{\milli\meter}'])
 
                     tabular.add_hline()
 
