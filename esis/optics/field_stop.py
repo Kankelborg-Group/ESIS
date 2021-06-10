@@ -1,5 +1,6 @@
 import typing as typ
 import dataclasses
+import numpy as np
 import pandas
 import astropy.units as u
 from kgpy import Name, transform, optics, format
@@ -16,6 +17,10 @@ class FieldStop(optics.component.PistonComponent[SurfaceT]):
     clear_radius: u.Quantity = 0 * u.mm
     mech_radius: u.Quantity = 0 * u.mm
     num_sides: int = 0
+
+    @property
+    def clear_width(self) -> u.Quantity:
+        return 2 * np.cos(360 * u.deg / self.num_sides / 2)
 
     @property
     def surface(self) -> SurfaceT:

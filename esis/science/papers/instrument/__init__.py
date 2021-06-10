@@ -236,6 +236,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='fieldStopDiameter',
+        value=optics_single.field_stop.clear_width,
+        digits_after_decimal=3,
+    )
+
+    doc.set_variable_quantity(
         name='gratingHeight',
         value=optics_single.grating.height,
         digits_after_decimal=1,
