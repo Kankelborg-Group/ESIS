@@ -20,7 +20,7 @@ class FieldStop(optics.component.PistonComponent[SurfaceT]):
 
     @property
     def clear_width(self) -> u.Quantity:
-        return 2 * np.cos(360 * u.deg / self.num_sides / 2)
+        return 2 * self.clear_radius * np.cos(360 * u.deg / self.num_sides / 2)
 
     @property
     def surface(self) -> SurfaceT:
