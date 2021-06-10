@@ -193,10 +193,8 @@ def schematic() -> matplotlib.figure.Figure:
         xy=fs_zx.to_tuple(),
         xytext=(fs_zx.x, default_offset_x),
         arrowprops=dict(
-            # relpos=(0.5, 0.5),
             **apkw,
         ),
-        # ha='center',
         **kwargs_annotate,
     )
     primary_z = optics.primary.substrate_thickness / 2 * zh
@@ -206,10 +204,8 @@ def schematic() -> matplotlib.figure.Figure:
         xy=primary_zx.to_tuple(),
         xytext=(primary_zx.x, default_offset_x),
         arrowprops=dict(
-            # relpos=(0.5, 0.5),
             **apkw,
         ),
-        # ha='center',
         **kwargs_annotate,
     )
     filter_zx = optics.filter.transform.translation_eff.zx - optics.filter.clear_radius * xh
@@ -218,11 +214,9 @@ def schematic() -> matplotlib.figure.Figure:
         xy=filter_zx.to_tuple(),
         xytext=(filter_zx.x - 100 * u.mm, default_offset_x),
         arrowprops=dict(
-            # relpos=(0.5, 0.5),
             connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=30',
             **apkw,
         ),
-        # ha='center',
         **kwargs_annotate,
     )
     detector_zx = optics.detector.transform.translation_eff.zx - optics.detector.clear_half_width * xh
@@ -231,11 +225,9 @@ def schematic() -> matplotlib.figure.Figure:
         xy=detector_zx.to_tuple(),
         xytext=(detector_zx.x + 100 * u.mm, default_offset_x),
         arrowprops=dict(
-            # relpos=(0.5, 0.5),
             connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=35',
             **apkw,
         ),
-        # ha='center',
         **kwargs_annotate,
     )
 
