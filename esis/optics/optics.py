@@ -120,7 +120,7 @@ class Optics(
 
     @property
     def magnification_anamorphic(self) -> u.Quantity:
-        return np.cos(self.angle_alpha) / np.cos(self.angle_beta)
+        return np.cos(self.angle_alpha.mean()) / np.cos(self.angle_beta.mean())
 
     @property
     def arm_ratio(self) -> u.Quantity:
