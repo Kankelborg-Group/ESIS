@@ -167,6 +167,11 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='anamorphicMagnification',
+        value=optics_single.magnification_anamorphic,
+    )
+
+    doc.set_variable_quantity(
         name='backFocalLength',
         value=optics_single.back_focal_length,
         digits_after_decimal=0,

@@ -119,6 +119,10 @@ class Optics(
         return scale_fs / scale_detector
 
     @property
+    def magnification_anamorphic(self) -> u.Quantity:
+        return np.cos(self.angle_alpha) / np.cos(self.angle_beta)
+
+    @property
     def arm_ratio(self) -> u.Quantity:
         arm_entrance = (self.field_stop.transform.inverse + self.grating.transform).translation_eff
         transform_ov = kgpy.transform.rigid.TransformList([
