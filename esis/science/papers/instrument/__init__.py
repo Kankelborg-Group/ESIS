@@ -1157,6 +1157,12 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
 Dimensions and clear aperture of the ESIS [B] primary mirror and [C] diffraction gratings."""
                 ))
 
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.schematic_primary_and_obscuration_pdf(
+                    optics=optics_single,
+                    digits_after_decimal=2
+                )), width=pylatex.NoEscape(r'\columnwidth'))
+
             doc.append(pylatex.NoEscape(
                 r"""The primary mirror is octagonal in shape.
 A triangular aperture mask in front of the primary mirror defines the clear aperture of each channel, imaged by a 

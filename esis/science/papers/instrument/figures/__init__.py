@@ -2,7 +2,9 @@ import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
+import astropy.visualization
 import kgpy.vector
+import kgpy.plot
 import esis.optics
 
 __all__ = [
@@ -242,6 +244,84 @@ def schematic() -> matplotlib.figure.Figure:
 
 def schematic_pdf() -> pathlib.Path:
     return save_pdf(schematic(), 'schematic')
+
+
+def schematic_primary_and_obscuration(
+        optics: esis.optics.Optics,
+        digits_after_decimal: int,
+) -> matplotlib.figure.Figure:
+
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(figsize=(column_width, 3), constrained_layout=True)
+        ax.set_aspect('equal')
+        ax.set_axis_off()
+        kwargs_plot = dict(
+            ax=ax,
+            transform_extra=optics.system.transform_all,
+            plot_annotations=False,
+        )
+        # optics.primary.plot(**kwargs_plot)
+        vertices_primary_mech = optics.primary.surface.aperture_mechanical.vertices
+        vertices_primary_mech = optics.system.transform_all(vertices_primary_mech)
+        ax.fill(
+            vertices_primary_mech.x,
+            vertices_primary_mech.y,
+            # hatch='/',
+            # fill=False,
+            facecolor='gray',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, -22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, -22.5 * u.deg),
+            position_orthogonal=-1.4 * optics.primary.mech_half_width.value,
+            position_parallel=1,
+            horizontal_alignment='left',
+            transparent=True,
+        )
+
+        vertices_primary = optics.primary.surface.aperture.vertices
+        vertices_primary = optics.system.transform_all(vertices_primary)
+        ax.fill(
+            vertices_primary.x,
+            vertices_primary.y,
+            facecolor='white',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, -22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, (180 + 22.5) * u.deg),
+            position_orthogonal=-1.4 * optics.primary.mech_half_width.value,
+        )
+
+        vertices_obscuration = optics.central_obscuration.surface.aperture.vertices
+        vertices_obscuration = optics.system.transform_all(vertices_obscuration)
+        ax.fill(
+            vertices_obscuration.x,
+            vertices_obscuration.y,
+            # hatch='x',
+            # fill=False,
+            facecolor='gray',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, -22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, (180 + 22.5) * u.deg),
+            position_orthogonal=-1.2*optics.primary.mech_half_width.value,
+        )
+
+    return fig
+
+
+def schematic_primary_and_obscuration_pdf(
+        optics: esis.optics.Optics,
+        digits_after_decimal: int,
+) -> pathlib.Path:
+    fig = schematic_primary_and_obscuration(optics=optics, digits_after_decimal=digits_after_decimal)
+    return save_pdf(fig, 'schematic_primary_and_obscuration')
 
 
 def bunch(optics: esis.optics.Optics, digits_after_decimal: int) -> matplotlib.figure.Figure:
