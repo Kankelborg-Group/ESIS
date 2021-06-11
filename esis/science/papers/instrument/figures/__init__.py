@@ -119,6 +119,7 @@ def schematic() -> matplotlib.figure.Figure:
     # fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
     ax.margins(x=.01, y=.01)
     # ax.autoscale(enable=True, axis='both', tight=True)
+
     ax.set_aspect('equal')
     ax.set_axis_off()
     optics = esis.optics.design.final(all_channels=False)
@@ -130,13 +131,14 @@ def schematic() -> matplotlib.figure.Figure:
         plot_annotations=False,
         annotation_text_y=2,
         plot_kwargs=dict(
-            linewidth=0.5,
+            linewidth=1.5,
+            solid_joinstyle='miter',
         ),
         # surface_first=optics.central_obscuration.surface,
     )
     optics.plot_distance_annotations_zx(ax=ax)
 
-    ax.axhline(linewidth=0.4, color='gray')
+    ax.axhline(linestyle=(0, (20, 10)), linewidth=0.4, color='gray')
     ax.text(
         x=-500,
         y=0,
@@ -149,11 +151,10 @@ def schematic() -> matplotlib.figure.Figure:
     xh = kgpy.vector.x_hat.zx
     zh = kgpy.vector.z_hat.zx
     obs_zx = obs.transform.translation_eff.zx - obs.obscured_half_width * xh
-    default_offset_x = -200 * u.mm
-    default_offset_z_2 = -150 * u.mm
+    default_offset_x = -150 * u.mm
     apkw = dict(
         arrowstyle='->',
-        linewidth=0.5,
+        linewidth=0.75,
         relpos=(0.5, 0.5),
     )
     kwargs_annotate = dict(
@@ -180,8 +181,7 @@ def schematic() -> matplotlib.figure.Figure:
         xy=grating_zx.to_tuple(),
         xytext=(grating_zx.x + 100 * u.mm, default_offset_x),
         arrowprops=dict(
-            # relpos=(0.5, 0.5),
-            connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=20',
+            connectionstyle='arc,angleA=90,angleB=-90,armA=15,armB=15',
             **apkw,
         ),
         **kwargs_annotate,
@@ -212,7 +212,7 @@ def schematic() -> matplotlib.figure.Figure:
     ax.annotate(
         text=str(optics.filter.name),
         xy=filter_zx.to_tuple(),
-        xytext=(filter_zx.x - 100 * u.mm, default_offset_x),
+        xytext=(filter_zx.x, default_offset_x),
         arrowprops=dict(
             connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=30',
             **apkw,
@@ -223,7 +223,7 @@ def schematic() -> matplotlib.figure.Figure:
     ax.annotate(
         text='detector',
         xy=detector_zx.to_tuple(),
-        xytext=(detector_zx.x + 100 * u.mm, default_offset_x),
+        xytext=(detector_zx.x, default_offset_x),
         arrowprops=dict(
             connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=35',
             **apkw,
@@ -234,6 +234,7 @@ def schematic() -> matplotlib.figure.Figure:
     ax.set_ylabel(None)
     ax.set_yticks([])
     ax.set_xticks([])
+    ax.set_xlim(right=250)
     # colorbar.remove()
 
     return fig

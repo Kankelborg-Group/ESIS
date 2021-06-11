@@ -1684,11 +1684,12 @@ class Optics(
                 point_1=position_primary.zx,
                 point_2=position_grating.zx,
                 component='y',
-                position_orthogonal=-1200,
+                position_orthogonal=-1300,
                 position_parallel=0.25,
                 horizontal_alignment='left',
                 vertical_alignment='baseline',
                 transparent=True,
+                plot_bar_1=False,
             )
             annotation_primary_to_filter_x = plot.annotate_component(
                 ax=ax,
@@ -1709,6 +1710,7 @@ class Optics(
                 component='y',
                 position_orthogonal=-200,
                 # position_parallel=0.3,
+                plot_bar_1=False,
             )
 
             annotation_primary_to_detector_x = plot.annotate_component(
@@ -1730,6 +1732,7 @@ class Optics(
                 component='y',
                 position_orthogonal=225,
                 # position_parallel=0.4,
+                plot_bar_1=False,
             )
 
             diff = (self.grating.transform)
