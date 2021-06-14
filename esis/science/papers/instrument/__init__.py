@@ -1159,7 +1159,7 @@ Dimensions and clear aperture of the ESIS [B] primary mirror and [C] diffraction
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.schematic_primary_and_obscuration_pdf(
-                    optics=optics_single,
+                    optics=optics,
                     digits_after_decimal=2
                 )), width=pylatex.NoEscape(r'\columnwidth'))
 

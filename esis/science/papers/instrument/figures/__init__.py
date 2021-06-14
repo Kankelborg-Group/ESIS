@@ -1,6 +1,8 @@
 import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.spatial
 import astropy.units as u
 import astropy.visualization
 import kgpy.vector
@@ -20,8 +22,8 @@ def save_pdf(fig: matplotlib.figure.Figure, name: str) -> pathlib.Path:
     path = pathlib.Path(__file__).parent / (name + '.pdf')
     fig.savefig(
         fname=path,
-        bbox_inches='tight',
-        pad_inches=0.04,
+        # bbox_inches='tight',
+        # pad_inches=0.04,
     )
     plt.close(fig)
     return path
@@ -117,7 +119,7 @@ def layout_pdf() -> pathlib.Path:
 
 
 def schematic() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(fig_width, 5), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
     # fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
     ax.margins(x=.01, y=.01)
     # ax.autoscale(enable=True, axis='both', tight=True)
@@ -251,8 +253,16 @@ def schematic_primary_and_obscuration(
         digits_after_decimal: int,
 ) -> matplotlib.figure.Figure:
 
+    optics = esis.optics.design.final_active(
+        pupil_samples=21,
+        pupil_is_stratified_random=True,
+        field_samples=7,
+        field_is_stratified_random=True,
+    )
+    optics.roll = -22.5 * u.deg
+
     with astropy.visualization.quantity_support():
-        fig, ax = plt.subplots(figsize=(column_width, 3), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(column_width, 4.2), constrained_layout=True)
         ax.set_aspect('equal')
         ax.set_axis_off()
         kwargs_plot = dict(
@@ -273,12 +283,31 @@ def schematic_primary_and_obscuration(
         )
         kgpy.plot.annotate_component(
             ax=ax,
-            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, -22.5 * u.deg),
-            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, -22.5 * u.deg),
-            position_orthogonal=-1.4 * optics.primary.mech_half_width.value,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, 22.5 * u.deg),
+            position_orthogonal=1.4 * optics.primary.mech_half_width.value,
             position_parallel=1,
             horizontal_alignment='left',
             transparent=True,
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.6 * optics.primary.mech_half_width.value,
+        )
+        plt.annotate(
+            text='primary\nsubstrate',
+            xy=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_half_width, -135 * u.deg).to_tuple(),
+            xytext=(-0.8 * optics.primary.mech_half_width.value, -1.4 * optics.primary.mech_half_width.value),
+            ha='center',
+            fontsize='small',
+            arrowprops=dict(
+                arrowstyle='->',
+                relpos=(0.5, 0.5),
+                connectionstyle='angle,angleA=90,angleB=-135',
+                shrinkB=0,
+            )
         )
 
         vertices_primary = optics.primary.surface.aperture.vertices
@@ -291,9 +320,22 @@ def schematic_primary_and_obscuration(
         )
         kgpy.plot.annotate_component(
             ax=ax,
-            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, -22.5 * u.deg),
-            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, (180 + 22.5) * u.deg),
-            position_orthogonal=-1.4 * optics.primary.mech_half_width.value,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.4 * optics.primary.mech_half_width.value,
+        )
+        plt.annotate(
+            text='primary\nclear aperture',
+            xy=(0, -optics.primary.clear_half_width),
+            xytext=(0, -1.4 * optics.primary.mech_half_width.value),
+            ha='center',
+            fontsize='small',
+            arrowprops=dict(
+                arrowstyle='->',
+                relpos=(0.5, 0.5),
+                shrinkB=0,
+                # connectionstyle='arc,angleA=90,angleB=-135,armA=15,armB=15'
+            )
         )
 
         vertices_obscuration = optics.central_obscuration.surface.aperture.vertices
@@ -308,10 +350,40 @@ def schematic_primary_and_obscuration(
         )
         kgpy.plot.annotate_component(
             ax=ax,
-            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, -22.5 * u.deg),
-            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, (180 + 22.5) * u.deg),
-            position_orthogonal=-1.2*optics.primary.mech_half_width.value,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.2*optics.primary.mech_half_width.value,
         )
+
+        plt.annotate(
+            text=str(optics.central_obscuration.name),
+            xy=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_half_width, -45 * u.deg).to_tuple(),
+            xytext=(0.8 * optics.primary.mech_half_width.value, -1.4 * optics.primary.mech_half_width.value),
+            ha='center',
+            fontsize='small',
+            arrowprops=dict(
+                arrowstyle='->',
+                relpos=(0.5, 0.5),
+                connectionstyle='angle,angleA=90,angleB=-45',
+                shrinkB=0,
+            )
+        )
+
+        rays = optics.system.raytrace[optics.system.surfaces_all.flat_local.index(optics.primary.surface)]
+        mask = optics.system.rays_output.mask
+        for i in range(rays.size):
+            index = np.unravel_index(i, rays.shape)
+            points = np.broadcast_to(rays.position, mask.shape, subok=True)
+            points = points[index, mask[index]]
+            hull = scipy.spatial.ConvexHull(points.xy.quantity)
+            vertices = optics.system.transform_all(points[hull.vertices])
+            ax.fill(
+                vertices.x,
+                vertices.y,
+                fill=False,
+                edgecolor='red',
+            )
+
 
     return fig
 
