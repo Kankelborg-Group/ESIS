@@ -17,15 +17,19 @@ __all__ = [
 fig_width = 513.11743 / 72
 column_width = 242.26653 / 72
 
+digits_after_decimal = 2
+
 
 def save_pdf(fig: matplotlib.figure.Figure, name: str) -> pathlib.Path:
     path = pathlib.Path(__file__).parent / (name + '.pdf')
-    fig.savefig(
-        fname=path,
-        # bbox_inches='tight',
-        # pad_inches=0.04,
-    )
-    plt.close(fig)
+    if not path.exists():
+        fig.savefig(
+            fname=path,
+            # bbox_inches='tight',
+            # pad_inches=0.04,
+            facecolor='lightblue'
+        )
+        plt.close(fig)
     return path
 
 
@@ -106,15 +110,16 @@ def layout() -> matplotlib.figure.Figure:
 
 
 def layout_pdf() -> pathlib.Path:
-    fig = layout()
     path = pathlib.Path(__file__).parent / 'layout_mpl.pdf'
-    h = 1.5
-    offset = (fig_width - h) / 2
-    fig.savefig(
-        fname=path,
-        bbox_inches=fig.bbox_inches.from_bounds(0, offset, fig_width, h)
-    )
-    plt.close(fig)
+    if not path.exists():
+        fig = layout()
+        h = 1.5
+        offset = (fig_width - h) / 2
+        fig.savefig(
+            fname=path,
+            bbox_inches=fig.bbox_inches.from_bounds(0, offset, fig_width, h)
+        )
+        plt.close(fig)
     return path
 
 
@@ -248,10 +253,7 @@ def schematic_pdf() -> pathlib.Path:
     return save_pdf(schematic(), 'schematic')
 
 
-def schematic_primary_and_obscuration(
-        optics: esis.optics.Optics,
-        digits_after_decimal: int,
-) -> matplotlib.figure.Figure:
+def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
 
     optics = esis.optics.design.final_active(
         pupil_samples=21,
@@ -262,7 +264,8 @@ def schematic_primary_and_obscuration(
     optics.roll = -22.5 * u.deg
 
     with astropy.visualization.quantity_support():
-        fig, ax = plt.subplots(figsize=(column_width, 4.2), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(column_width, 4.4), constrained_layout=True)
+        ax.margins(x=.01, y=.01)
         ax.set_aspect('equal')
         ax.set_axis_off()
         kwargs_plot = dict(
@@ -388,38 +391,34 @@ def schematic_primary_and_obscuration(
     return fig
 
 
-def schematic_primary_and_obscuration_pdf(
-        optics: esis.optics.Optics,
-        digits_after_decimal: int,
-) -> pathlib.Path:
-    fig = schematic_primary_and_obscuration(optics=optics, digits_after_decimal=digits_after_decimal)
+def schematic_primary_and_obscuration_pdf() -> pathlib.Path:
+    fig = schematic_primary_and_obscuration()
     return save_pdf(fig, 'schematic_primary_and_obscuration')
 
 
-def bunch(optics: esis.optics.Optics, digits_after_decimal: int) -> matplotlib.figure.Figure:
+def bunch() -> matplotlib.figure.Figure:
     fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
+    optics = esis.optics.design.final()
     optics.bunch.plot(ax=ax, num_emission_lines=optics.num_emission_lines, digits_after_decimal=digits_after_decimal)
     return fig
 
 
-def bunch_pdf(optics: esis.optics.Optics, digits_after_decimal: int) -> pathlib.Path:
-    fig = bunch(optics=optics, digits_after_decimal=digits_after_decimal)
-    path = pathlib.Path(__file__).parent / 'bunch.pdf'
-    fig.savefig(
-        fname=path
-    )
-    plt.close(fig)
-    return path
+def bunch_pdf() -> pathlib.Path:
+    fig = bunch()
+    return save_pdf(fig, 'bunch')
 
 
-def field_stop_projections(optics: esis.optics.Optics, digits_after_decimal: int) -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(column_width, 2.75), constrained_layout=True)
+def field_stop_projections() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(figsize=(column_width, 2.8), constrained_layout=True)
+    fig.set_constrained_layout_pads(h_pad=.15)
+    # ax.margins(x=.01, y=.01)
+    optics = esis.optics.design.final(all_channels=False)
     optics.plot_field_stop_projections_local(ax=ax, digits_after_decimal=digits_after_decimal)
     ax.set_aspect('equal')
     ax.legend(bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
     return fig
 
 
-def field_stop_projections_pdf(optics: esis.optics.Optics, digits_after_decimal: int) -> pathlib.Path:
-    fig = field_stop_projections(optics=optics, digits_after_decimal=digits_after_decimal)
+def field_stop_projections_pdf() -> pathlib.Path:
+    fig = field_stop_projections()
     return save_pdf(fig, 'field_stop_projections')

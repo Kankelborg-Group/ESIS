@@ -939,7 +939,7 @@ meet our science goals."""
                 ))
 
                 with doc.create(kgpy.latex.FigureStar()) as figure:
-                    figure.add_image(str(figures.bunch_pdf(optics_single, wavl_digits)), width=None)
+                    figure.add_image(str(figures.bunch_pdf()), width=None)
                     figure.append(kgpy.latex.Label('fig:bunch'))
                     figure.add_caption(pylatex.NoEscape(
                         r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
@@ -1158,10 +1158,10 @@ Dimensions and clear aperture of the ESIS [B] primary mirror and [C] diffraction
                 ))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.schematic_primary_and_obscuration_pdf(
-                    optics=optics,
-                    digits_after_decimal=2
-                )), width=pylatex.NoEscape(r'\columnwidth'))
+                figure.add_image(
+                    filename=str(figures.schematic_primary_and_obscuration_pdf()),
+                    width=pylatex.NoEscape(r'\columnwidth')
+                )
 
             doc.append(pylatex.NoEscape(
                 r"""The primary mirror is octagonal in shape.
@@ -1193,7 +1193,7 @@ The individual mounts allow each grating to be adjusted in tip and tilt to cente
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image('figures/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
                 figure.append('\n')
-                figure.add_image(str(figures.field_stop_projections_pdf(optics_single, wavl_digits)), width=None)
+                figure.add_image(str(figures.field_stop_projections_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:projections'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""Areas occupied by strong spectral lines on the ESIS detectors.
