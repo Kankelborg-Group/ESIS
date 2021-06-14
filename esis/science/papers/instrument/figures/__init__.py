@@ -1,3 +1,4 @@
+import typing as typ
 import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -20,9 +21,10 @@ column_width = 242.26653 / 72
 digits_after_decimal = 2
 
 
-def save_pdf(fig: matplotlib.figure.Figure, name: str) -> pathlib.Path:
-    path = pathlib.Path(__file__).parent / (name + '.pdf')
+def save_pdf(fig_factory: typ.Callable[[], matplotlib.figure.Figure]) -> pathlib.Path:
+    path = pathlib.Path(__file__).parent / (fig_factory.__name__ + '.pdf')
     if not path.exists():
+        fig = fig_factory()
         fig.savefig(
             fname=path,
             # bbox_inches='tight',
@@ -250,12 +252,12 @@ def schematic() -> matplotlib.figure.Figure:
 
 
 def schematic_pdf() -> pathlib.Path:
-    return save_pdf(schematic(), 'schematic')
+    return save_pdf(schematic)
 
 
 def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
 
-    optics = esis.optics.design.final_active(
+    optics = esis.optics.design.final(
         pupil_samples=21,
         pupil_is_stratified_random=True,
         field_samples=7,
@@ -387,13 +389,11 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
                 edgecolor='red',
             )
 
-
     return fig
 
 
 def schematic_primary_and_obscuration_pdf() -> pathlib.Path:
-    fig = schematic_primary_and_obscuration()
-    return save_pdf(fig, 'schematic_primary_and_obscuration')
+    return save_pdf(schematic_primary_and_obscuration)
 
 
 def bunch() -> matplotlib.figure.Figure:
@@ -404,8 +404,7 @@ def bunch() -> matplotlib.figure.Figure:
 
 
 def bunch_pdf() -> pathlib.Path:
-    fig = bunch()
-    return save_pdf(fig, 'bunch')
+    return save_pdf(bunch)
 
 
 def field_stop_projections() -> matplotlib.figure.Figure:
@@ -420,5 +419,4 @@ def field_stop_projections() -> matplotlib.figure.Figure:
 
 
 def field_stop_projections_pdf() -> pathlib.Path:
-    fig = field_stop_projections()
-    return save_pdf(fig, 'field_stop_projections')
+    return save_pdf(field_stop_projections)
