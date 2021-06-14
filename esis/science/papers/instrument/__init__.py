@@ -17,6 +17,10 @@ path_figures = path_base / 'figures'
 
 
 def document() -> kgpy.latex.Document:
+
+    plt.rcParams['font.size'] = 7
+    plt.rcParams['lines.linewidth'] = 1
+
     wavl_digits = 2
 
     doc = kgpy.latex.Document(
@@ -1240,14 +1244,18 @@ The ESIS passband is defined by a combination of the field stop and grating disp
     return doc
 
 
-if __name__ == '__main__':
-    # plt.rcParams['axes.labelsize'] = 9
-    # plt.rcParams['xtick.labelsize'] = 9
-    # plt.rcParams['ytick.labelsize'] = 9
-    # plt.rcParams['legend.fontsize'] = 9
-    plt.rcParams['font.size'] = 7
-    plt.rcParams['lines.linewidth'] = 1
 
-    doc = document()
-    doc.generate_pdf()
-    doc.generate_tex()
+
+
+
+# if __name__ == '__main__':
+#     # plt.rcParams['axes.labelsize'] = 9
+#     # plt.rcParams['xtick.labelsize'] = 9
+#     # plt.rcParams['ytick.labelsize'] = 9
+#     # plt.rcParams['legend.fontsize'] = 9
+#     plt.rcParams['font.size'] = 7
+#     plt.rcParams['lines.linewidth'] = 1
+#
+#     doc = document()
+#     doc.generate_pdf()
+#     doc.generate_tex()
