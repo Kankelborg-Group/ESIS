@@ -1219,7 +1219,7 @@ find out which it is} at \SI{63}{\nano\meter} \roy{\OV}.
 
 Figure specification and groove profile are not well controlled near the edges of the gratings.
 Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
-Fig.~\ref{figure:aperture} (c).
+Fig.~\ref{fig:schematic} (c).
 
 The ESIS passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
 The passband includes the He\,\textsc{i} (\SI{58.43}{\nano\meter}) \roy{\HeI} spectral line through Mg\,\textsc{x} 
