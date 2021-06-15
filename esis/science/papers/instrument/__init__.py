@@ -1019,51 +1019,51 @@ A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{fig:sch
 of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B] and [C], respectively."""
         ))
 
+        # with doc.create(pylatex.Table()) as table:
+        #     table._star_latex_name = True
+        #     table.append(kgpy.latex.Label('table:prescription'))
+        #     with table.create(pylatex.Center()) as centering:
+        #         with centering.create(pylatex.Tabular('ll')) as tabular:
+        #             tabular.escape = False
+        #             tabular.add_hline()
+        #             tabular.add_row(['Primary', 'Parabolic'])
+        #             tabular.add_row(['', r'Octagonal aperture, D=\primaryDiameter'])
+        #             tabular.add_row(['', r'Focal length \primaryFocalLength'])
+        #             tabular.add_row(['', r'SiC single layer coating optimized for \OVwavelength'])
+        #             tabular.add_row(['', r'Transparent vis/IR'])
+        #
+        #             tabular.add_row(['Field stop', r'\fov, projected on sky plane'])
+        #             tabular.add_row(['', r'Octagonal'])
+        #
+        #             tabular.add_row([r'Gratings (\numChannels)', 'Spherical varied line space'])
+        #             tabular.add_row(['', r'(Individual master gratings)'])
+        #             tabular.add_row(['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter},'])
+        #             tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter}, Short Base: \SI{3.8}{\milli\meter}'])
+        #             tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter}'])
+        #             tabular.add_row(['', r'Magnification M=3.9'])
+        #             tabular.add_row(['', r'Mg/Al/SiC multilayer, $\lambda 63$\,nm'])
+        #             tabular.add_row(['', r'Efficiency \SI{14}{\percent} (Uncoated \SI{39}{\percent})'])
+        #
+        #             tabular.add_row([r'Filters (\numChannels)', r'\SI{30}{\milli\meter} clear aperture'])
+        #             tabular.add_row(['', r'Thin film, \SI{100}{\nano\meter} Al'])
+        #             tabular.add_row(['', r'\SI{82}{\percent} open Ni mesh'])
+        #
+        #             tabular.add_row([r'Detectors (\numChannels)', r'\detectorName'])
+        #             tabular.add_row([r'', r'Active area $2048 \times 1024$'])
+        #             tabular.add_row([r'', r'Pixel size \SI{15}{\micro\meter}'])
+        #             tabular.add_row([r'', r'QE \SI{33}{\percent}, $\lambda$\SI{63}{\nano\meter}'])
+        #             tabular.add_row([r'', r'{Max readout time or min cadence here for ver. table 1?}'])
+        #
+        #             tabular.add_row([r'Back focal length', r'\SI{127}{\milli\meter}'])
+        #             tabular.add_row([r'Plate scale', r'\SI{0.76}{\arcsecond} per pixel'])
+        #             tabular.add_row([r'', r'\SI{37}{\milli\angstrom} (\SI{18}{\kilo\meter\per\second}) per pixel'])
+        #             tabular.add_row([r'Resolution', r'\SI{1.52}{\arcsecond} (Nyquist limited)'])
+        #
+        #             tabular.add_hline()
+
         with doc.create(pylatex.Table()) as table:
             table._star_latex_name = True
             table.append(kgpy.latex.Label('table:prescription'))
-            with table.create(pylatex.Center()) as centering:
-                with centering.create(pylatex.Tabular('ll')) as tabular:
-                    tabular.escape = False
-                    tabular.add_hline()
-                    tabular.add_row(['Primary', 'Parabolic'])
-                    tabular.add_row(['', r'Octagonal aperture, D=\primaryDiameter'])
-                    tabular.add_row(['', r'Focal length \primaryFocalLength'])
-                    tabular.add_row(['', r'SiC single layer coating optimized for \OVwavelength'])
-                    tabular.add_row(['', r'Transparent vis/IR'])
-
-                    tabular.add_row(['Field stop', r'\fov, projected on sky plane'])
-                    tabular.add_row(['', r'Octagonal'])
-
-                    tabular.add_row([r'Gratings (\numChannels)', 'Spherical varied line space'])
-                    tabular.add_row(['', r'(Individual master gratings)'])
-                    tabular.add_row(['', r'Trapezoidal aperture, Height: \SI{16.9}{\milli\meter},'])
-                    tabular.add_row(['', r'Long Base: \SI{18.0}{\milli\meter}, Short Base: \SI{3.8}{\milli\meter}'])
-                    tabular.add_row(['', r'Groove spacing $d_0$=\SI{0.3866}{\micro\meter}'])
-                    tabular.add_row(['', r'Magnification M=3.9'])
-                    tabular.add_row(['', r'Mg/Al/SiC multilayer, $\lambda 63$\,nm'])
-                    tabular.add_row(['', r'Efficiency \SI{14}{\percent} (Uncoated \SI{39}{\percent})'])
-
-                    tabular.add_row([r'Filters (\numChannels)', r'\SI{30}{\milli\meter} clear aperture'])
-                    tabular.add_row(['', r'Thin film, \SI{100}{\nano\meter} Al'])
-                    tabular.add_row(['', r'\SI{82}{\percent} open Ni mesh'])
-
-                    tabular.add_row([r'Detectors (\numChannels)', r'\detectorName'])
-                    tabular.add_row([r'', r'Active area $2048 \times 1024$'])
-                    tabular.add_row([r'', r'Pixel size \SI{15}{\micro\meter}'])
-                    tabular.add_row([r'', r'QE \SI{33}{\percent}, $\lambda$\SI{63}{\nano\meter}'])
-                    tabular.add_row([r'', r'{Max readout time or min cadence here for ver. table 1?}'])
-
-                    tabular.add_row([r'Back focal length', r'\SI{127}{\milli\meter}'])
-                    tabular.add_row([r'Plate scale', r'\SI{0.76}{\arcsecond} per pixel'])
-                    tabular.add_row([r'', r'\SI{37}{\milli\angstrom} (\SI{18}{\kilo\meter\per\second}) per pixel'])
-                    tabular.add_row([r'Resolution', r'\SI{1.52}{\arcsecond} (Nyquist limited)'])
-
-                    tabular.add_hline()
-
-        with doc.create(pylatex.Table()) as table:
-            table._star_latex_name = True
-            table.append(kgpy.latex.Label('table:prescription2'))
             with table.create(pylatex.Center()) as centering:
                 with centering.create(pylatex.Tabular('lll')) as tabular:
                     tabular.escape = False
