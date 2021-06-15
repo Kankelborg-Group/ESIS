@@ -1169,7 +1169,6 @@ channel.
 (c) Clear aperture of Channel 1's diffraction grating."""
                 ))
 
-
             doc.append(pylatex.NoEscape(
                 r"""The primary mirror is octagonal in shape.
 A triangular aperture mask in front of the primary mirror defines the clear aperture of each channel, imaged by a 
@@ -1198,8 +1197,8 @@ The individual mounts allow each grating to be adjusted in tip and tilt to cente
             ))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image('figures/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
-                figure.append('\n')
+                # figure.add_image('figures/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
+                # figure.append('\n')
                 figure.add_image(str(figures.field_stop_projections_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:projections'))
                 figure.add_caption(pylatex.NoEscape(
@@ -1208,6 +1207,29 @@ The plot axes are sized exactly to the CCD active area.
 The ESIS passband is defined by a combination of the field stop and grating dispersion."""
                 ))
 
+            doc.append(pylatex.NoEscape(
+                r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, pixel 
+limited \roy{pixel-limited} imaging from the field stop to the CCDs.
+The pitch at the center of the grating is $d_0=$\SI{.3866}{\micro\meter} \roy{the ruling density at the center of the 
+grating is \gratingRulingDensity} resulting in a dispersion of \SI{17.5}{\kilo\meter\per\second} 
+\roy{\dispersionDoppler} at the center of the \OV\ \FOV.
+The groove profile is optimized for the $m=1$ order, so that each grating serves only a single \CCD.
+The modeled grating groove efficiency in this order is \SI{36}{\percent} \roy{We said \SI{39}{\percent} above, need to 
+find out which it is} at \SI{63}{\nano\meter} \roy{\OV}. 
+
+Figure specification and groove profile are not well controlled near the edges of the gratings.
+Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
+Fig.~\ref{figure:aperture} (c).
+
+The ESIS passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
+The passband includes the He\,\textsc{i} (\SI{58.43}{\nano\meter}) \roy{\HeI} spectral line through Mg\,\textsc{x} 
+(60.98 and \SI{62.49}{\nano\meter}) \roy{\MgXion\ (\MgXwavelength\ and \MgXdimWavelength)} to O\,\textsc{v} 
+(\SI{62.97}{\nano\meter}) \roy{\OV}.
+Figure~\ref{fig:projections} shows where images of each of the strong spectral lines will fall on the \CCD.
+The instrument dispersion satisfies the spectral resolution requirement in Table~\ref{table:scireq} and ensures that the 
+spectral images are well separated; Figure~\ref{fig:projections} shows that He\,\textsc{i} \roy{\HeI} will be completely 
+separated from the target O\,\textsc{v} \roy{\OV} line."""
+            ))
 
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
             pass
