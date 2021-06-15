@@ -942,7 +942,7 @@ and \ref{subsec:EnergyTransfer} we define the instrument requirements in Table~\
 meet our science goals."""
                 ))
 
-                with doc.create(kgpy.latex.FigureStar()) as figure:
+                with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
                     figure.add_image(str(figures.bunch_pdf()), width=None)
                     figure.append(kgpy.latex.Label('fig:bunch'))
                     figure.add_caption(pylatex.NoEscape(
@@ -951,7 +951,7 @@ Calculated using ChiantiPy, with the \chiantiAbundances\ abundances file, the \c
 $n_e T = $\,\chiantiPressure.}"""
                     ))
 
-                with doc.create(pylatex.Table()) as table:
+                with doc.create(pylatex.Table(position='htb!')) as table:
                     table._star_latex_name = True
                     table.append(kgpy.latex.Label('table:scireq'))
                     with table.create(pylatex.Center()) as centering:
