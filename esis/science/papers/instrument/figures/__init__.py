@@ -19,6 +19,7 @@ fig_width = 513.11743 / 72
 column_width = 242.26653 / 72
 
 digits_after_decimal = 2
+digits_after_decimal_schematic = 1
 
 
 def save_pdf(fig_factory: typ.Callable[[], matplotlib.figure.Figure]) -> pathlib.Path:
@@ -147,7 +148,7 @@ def schematic() -> matplotlib.figure.Figure:
         ),
         # surface_first=optics.central_obscuration.surface,
     )
-    optics.plot_distance_annotations_zx(ax=ax)
+    optics.plot_distance_annotations_zx(ax=ax, digits_after_decimal=digits_after_decimal_schematic,)
 
     ax.axhline(linestyle=(0, (20, 10)), linewidth=0.4, color='gray')
     ax.text(
@@ -263,10 +264,12 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
         field_samples=7,
         field_is_stratified_random=True,
     )
-    optics.roll = -22.5 * u.deg
+    optics.roll = -optics.detector.cylindrical_azimuth[1]
+    primary = optics.primary
+    obscuration = optics.central_obscuration
 
     with astropy.visualization.quantity_support():
-        fig, ax = plt.subplots(figsize=(column_width, 4.4), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(column_width, 3.5), constrained_layout=True)
         ax.margins(x=.01, y=.01)
         ax.set_aspect('equal')
         ax.set_axis_off()
@@ -276,46 +279,24 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             plot_annotations=False,
         )
         # optics.primary.plot(**kwargs_plot)
-        vertices_primary_mech = optics.primary.surface.aperture_mechanical.vertices
+
+        vertices_primary_mech = primary.surface.aperture_mechanical.vertices
         vertices_primary_mech = optics.system.transform_all(vertices_primary_mech)
         ax.fill(
             vertices_primary_mech.x,
             vertices_primary_mech.y,
-            # hatch='/',
-            # fill=False,
             facecolor='gray',
             edgecolor='black',
         )
         kgpy.plot.annotate_component(
             ax=ax,
-            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, 22.5 * u.deg),
-            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, 22.5 * u.deg),
-            position_orthogonal=1.4 * optics.primary.mech_half_width.value,
-            position_parallel=1,
-            horizontal_alignment='left',
-            transparent=True,
-        )
-        kgpy.plot.annotate_component(
-            ax=ax,
-            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, 22.5 * u.deg),
-            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_radius, (180 - 22.5) * u.deg),
-            position_orthogonal=1.6 * optics.primary.mech_half_width.value,
-        )
-        plt.annotate(
-            text='primary\nsubstrate',
-            xy=kgpy.vector.Vector2D.from_cylindrical(optics.primary.mech_half_width, -135 * u.deg).to_tuple(),
-            xytext=(-0.8 * optics.primary.mech_half_width.value, -1.4 * optics.primary.mech_half_width.value),
-            ha='center',
-            fontsize='small',
-            arrowprops=dict(
-                arrowstyle='->',
-                relpos=(0.5, 0.5),
-                connectionstyle='angle,angleA=90,angleB=-135',
-                shrinkB=0,
-            )
+            point_1=kgpy.vector.Vector2D.from_cylindrical(primary.mech_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(primary.mech_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.6 * primary.mech_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
         )
 
-        vertices_primary = optics.primary.surface.aperture.vertices
+        vertices_primary = primary.surface.aperture.vertices
         vertices_primary = optics.system.transform_all(vertices_primary)
         ax.fill(
             vertices_primary.x,
@@ -325,56 +306,46 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
         )
         kgpy.plot.annotate_component(
             ax=ax,
-            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, 22.5 * u.deg),
-            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.primary.clear_radius, (180 - 22.5) * u.deg),
-            position_orthogonal=1.4 * optics.primary.mech_half_width.value,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(primary.clear_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(primary.clear_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.4 * primary.mech_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
         )
-        plt.annotate(
-            text='primary\nclear aperture',
-            xy=(0, -optics.primary.clear_half_width),
-            xytext=(0, -1.4 * optics.primary.mech_half_width.value),
+        ax.text(
+            x=0,
+            y=(obscuration.obscured_half_width + primary.mech_half_width) / 2,
+            s='primary\nclear aperture',
             ha='center',
+            va='center',
             fontsize='small',
-            arrowprops=dict(
-                arrowstyle='->',
-                relpos=(0.5, 0.5),
-                shrinkB=0,
-                # connectionstyle='arc,angleA=90,angleB=-135,armA=15,armB=15'
-            )
         )
 
-        vertices_obscuration = optics.central_obscuration.surface.aperture.vertices
+
+        vertices_obscuration = obscuration.surface.aperture.vertices
         vertices_obscuration = optics.system.transform_all(vertices_obscuration)
         ax.fill(
             vertices_obscuration.x,
             vertices_obscuration.y,
-            # hatch='x',
-            # fill=False,
-            facecolor='gray',
+            facecolor='darkgray',
             edgecolor='black',
         )
         kgpy.plot.annotate_component(
             ax=ax,
-            point_1=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, 22.5 * u.deg),
-            point_2=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_radius, (180 - 22.5) * u.deg),
-            position_orthogonal=1.2*optics.primary.mech_half_width.value,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(obscuration.obscured_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(obscuration.obscured_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.2 * primary.mech_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
         )
-
-        plt.annotate(
-            text=str(optics.central_obscuration.name),
-            xy=kgpy.vector.Vector2D.from_cylindrical(optics.central_obscuration.obscured_half_width, -45 * u.deg).to_tuple(),
-            xytext=(0.8 * optics.primary.mech_half_width.value, -1.4 * optics.primary.mech_half_width.value),
+        ax.text(
+            x=0,
+            y=0,
+            s='central\nobscuration',
             ha='center',
+            va='center',
             fontsize='small',
-            arrowprops=dict(
-                arrowstyle='->',
-                relpos=(0.5, 0.5),
-                connectionstyle='angle,angleA=90,angleB=-45',
-                shrinkB=0,
-            )
         )
 
-        rays = optics.system.raytrace[optics.system.surfaces_all.flat_local.index(optics.primary.surface)]
+        rays = optics.system.raytrace[optics.system.surfaces_all.flat_local.index(primary.surface)]
         mask = optics.system.rays_output.mask
         for i in range(rays.size):
             index = np.unravel_index(i, rays.shape)
@@ -382,11 +353,33 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             points = points[index, mask[index]]
             hull = scipy.spatial.ConvexHull(points.xy.quantity)
             vertices = optics.system.transform_all(points[hull.vertices])
+            if optics.grating.plot_kwargs['linestyle'][i] is None:
+                alpha = 1.0
+                inactive = ''
+            else:
+                alpha = 0.5
+                inactive = '\n(inactive)'
             ax.fill(
                 vertices.x,
                 vertices.y,
                 fill=False,
                 edgecolor='red',
+                alpha=alpha,
+            )
+            position_label_channel = kgpy.vector.Vector2D.from_cylindrical(
+                radius=(obscuration.obscured_half_width + primary.mech_half_width) / 2,
+                azimuth=optics.grating.cylindrical_azimuth[i] + 180 * u.deg,
+            )
+            position_label_channel = optics.system.transform_all(position_label_channel.to_3d()).xy
+            ax.text(
+                x=position_label_channel.x.value,
+                y=position_label_channel.y.value,
+                s='Channel {}{}'.format(i, inactive),
+                ha='center',
+                va='center',
+                color='red',
+                alpha=alpha,
+                fontsize='small',
             )
 
     return fig
@@ -394,6 +387,83 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
 
 def schematic_primary_and_obscuration_pdf() -> pathlib.Path:
     return save_pdf(schematic_primary_and_obscuration)
+
+
+def schematic_grating() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(all_channels=False)
+    grating = optics.grating
+
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(figsize=(column_width, 3.5), constrained_layout=True)
+        ax.margins(x=.01, y=.01)
+        ax.set_aspect('equal')
+        ax.set_axis_off()
+
+        vertices_grating_mech = optics.grating.surface.aperture_mechanical.vertices
+        # vertices_grating_mech = optics.system.transform_all(vertices_primary_mech)
+        ax.fill(
+            vertices_grating_mech.x,
+            vertices_grating_mech.y,
+            facecolor='gray',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(-grating.inner_half_width - grating.inner_border_width, grating.width_mech_short / 2),
+            point_2=kgpy.vector.Vector2D(grating.outer_half_width + grating.border_width, grating.width_mech_long / 2),
+            # point_2=kgpy.vector.Vector2D(grating.height_mech / 2, grating.width_mech_long / 2),
+            position_orthogonal=1.2 * grating.width_mech_long.value / 2,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+
+        vertices_grating_clear = optics.grating.surface.aperture.vertices
+        # vertices_grating_mech = optics.system.transform_all(vertices_primary_mech)
+        ax.fill(
+            vertices_grating_clear.x,
+            vertices_grating_clear.y,
+            # hatch='/',
+            # fill=False,
+            facecolor='white',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(grating.outer_half_width, -grating.width_long / 2),
+            point_2=kgpy.vector.Vector2D(grating.outer_half_width, grating.width_long / 2),
+            component='y',
+            position_orthogonal=1.3 * (grating.outer_half_width + grating.border_width).value,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(-grating.inner_half_width, -grating.width_short / 2),
+            point_2=kgpy.vector.Vector2D(-grating.inner_half_width, grating.width_short / 2),
+            component='y',
+            position_orthogonal=-0.5 * grating.inner_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(-grating.inner_half_width, grating.width_short / 2),
+            point_2=kgpy.vector.Vector2D(grating.outer_half_width, grating.width_long / 2),
+            position_orthogonal=1 * grating.width_mech_long.value / 2,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+
+        ax.text(
+            x=0.3 * grating.outer_half_width.value,
+            y=0,
+            s='grating\nclear aperture',
+            fontsize='small',
+            ha='center',
+            va='center',
+        )
+
+    return fig
+
+
+def schematic_grating_pdf() -> pathlib.Path:
+    return save_pdf(schematic_grating)
 
 
 def bunch() -> matplotlib.figure.Figure:

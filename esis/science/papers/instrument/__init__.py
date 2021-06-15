@@ -1151,21 +1151,24 @@ The features of the field stop have been described previously in Sec.~\ref{subse
 cameras are covered in Sec.~\ref{subsec:Cameras}. """
             ))
 
-            with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
-                figure.add_image(str(figures.schematic_pdf()), width=None)
-                figure.append('\n')
-                figure.add_image('figures/layout_apertures_5', width=pylatex.NoEscape(r'\textwidth'))
+            with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
                 figure.append(kgpy.latex.Label('fig:schematic'))
+                figure.append(kgpy.latex.aas.Gridline([
+                    kgpy.latex.aas.Fig(figures.schematic_pdf(), kgpy.latex.textwidth, '(a)')
+                ]))
+
+                figure.append(kgpy.latex.aas.Gridline([
+                    kgpy.latex.aas.LeftFig(figures.schematic_primary_and_obscuration_pdf(), kgpy.latex.columnwidth, '(b)'),
+                    kgpy.latex.aas.RightFig(figures.schematic_grating_pdf(), kgpy.latex.columnwidth, '(c)'),
+                ]))
+
                 figure.add_caption(pylatex.NoEscape(
-                    r"""[A] Schematic diagram of the ESIS optical train.
-Dimensions and clear aperture of the ESIS [B] primary mirror and [C] diffraction gratings."""
+                    r"""(a) Schematic diagram of Channel 1 of the ESIS optical system.
+(b) Clear aperture of the primary mirror, size of the central obscuration, and the footprint of the beam for each 
+channel.
+(c) Clear aperture of Channel 1's diffraction grating."""
                 ))
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(
-                    filename=str(figures.schematic_primary_and_obscuration_pdf()),
-                    width=pylatex.NoEscape(r'\columnwidth')
-                )
 
             doc.append(pylatex.NoEscape(
                 r"""The primary mirror is octagonal in shape.
