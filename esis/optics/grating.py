@@ -86,12 +86,26 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         return self.outer_half_width + self.inner_half_width
 
     @property
+    def height_mech(self):
+        return self.height + self.border_width + self.inner_border_width
+
+    @property
     def width_short(self) -> u.Quantity:
         return 2 * np.tan(self.aper_wedge_half_angle) * (-self.surface.aperture.apex_offset - self.inner_half_width)
 
     @property
     def width_long(self) -> u.Quantity:
         return 2 * np.tan(self.aper_wedge_half_angle) * (-self.surface.aperture.apex_offset + self.outer_half_width)
+
+    @property
+    def width_mech_short(self) -> u.Quantity:
+        pos_x = -self.surface.aperture_mechanical.apex_offset - self.inner_half_width - self.inner_border_width
+        return 2 * np.tan(self.aper_wedge_half_angle) * pos_x
+
+    @property
+    def width_mech_long(self) -> u.Quantity:
+        pos_x = -self.surface.aperture_mechanical.apex_offset + self.outer_half_width + self.border_width
+        return 2 * np.tan(self.aper_wedge_half_angle) * pos_x
 
     @property
     def dynamic_clearance_x(self):
