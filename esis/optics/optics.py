@@ -1608,6 +1608,7 @@ class Optics(
             self,
             ax: matplotlib.axes.Axes,
             transform_extra: typ.Optional[kgpy.transform.rigid.TransformList] = None,
+            digits_after_decimal: int = 3,
     ):
         with astropy.visualization.quantity_support():
             if transform_extra is None:
@@ -1660,6 +1661,7 @@ class Optics(
                 component='x',
                 position_orthogonal=1.3,
                 transform=ax.get_xaxis_transform(),
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_fs_to_grating_x = plot.annotate_component(
                 ax=ax,
@@ -1668,6 +1670,7 @@ class Optics(
                 component='x',
                 position_orthogonal=1.1,
                 transform=ax.get_xaxis_transform(),
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_fs_to_obscuration_x = plot.annotate_component(
                 ax=ax,
@@ -1678,6 +1681,7 @@ class Optics(
                 # position_parallel=1,
                 # horizontal_alignment='right',
                 transform=ax.get_xaxis_transform(),
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_grating_y = plot.annotate_component(
                 ax=ax,
@@ -1690,6 +1694,7 @@ class Optics(
                 vertical_alignment='baseline',
                 transparent=True,
                 plot_bar_1=False,
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_filter_x = plot.annotate_component(
                 ax=ax,
@@ -1701,7 +1706,8 @@ class Optics(
                 horizontal_alignment='right',
                 vertical_alignment='center',
                 transform=ax.get_xaxis_transform(),
-                transparent=True
+                transparent=True,
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_filter_y = plot.annotate_component(
                 ax=ax,
@@ -1711,6 +1717,7 @@ class Optics(
                 position_orthogonal=-200,
                 # position_parallel=0.3,
                 plot_bar_1=False,
+                digits_after_decimal=digits_after_decimal,
             )
 
             annotation_primary_to_detector_x = plot.annotate_component(
@@ -1724,6 +1731,7 @@ class Optics(
                 vertical_alignment='bottom',
                 transform=ax.get_xaxis_transform(),
                 transparent=True,
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_detector_y = plot.annotate_component(
                 ax=ax,
@@ -1733,6 +1741,7 @@ class Optics(
                 position_orthogonal=225,
                 # position_parallel=0.4,
                 plot_bar_1=False,
+                digits_after_decimal=digits_after_decimal,
             )
 
             diff = (self.grating.transform)
@@ -1747,7 +1756,8 @@ class Optics(
                 # angle_2=90 * u.deg - 90 * u.deg,
                 angle_label=90 * u.deg + self.grating.inclination - 2 * u.deg,
                 horizontal_alignment='left',
-                radius_inner=self.grating.outer_half_width + self.grating.border_width
+                radius_inner=self.grating.outer_half_width + self.grating.border_width,
+                digits_after_decimal=digits_after_decimal,
             )
 
             annotation_filter_tip = plot.annotate_angle(
@@ -1761,6 +1771,7 @@ class Optics(
                 angle_label=92 * u.deg - self.filter.inclination,
                 horizontal_alignment='right',
                 radius_inner=self.filter.clear_radius,
+                digits_after_decimal=digits_after_decimal,
             )
 
             annotation_detector_tip = plot.annotate_angle(
@@ -1774,6 +1785,7 @@ class Optics(
                 angle_label=86 * u.deg + self.detector.inclination,
                 horizontal_alignment='left',
                 radius_inner=self.detector.clear_half_width,
+                digits_after_decimal=digits_after_decimal,
             )
 
     def plot_field_stop_projections(
