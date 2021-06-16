@@ -112,12 +112,22 @@ __all__ = [
 
 @dataclasses.dataclass
 class Requirements:
-    resolution: u.Quantity
+    resolution_spatial: u.Quantity
+    resolution_spectral: u.Quantity
+    fov: u.Quantity
+    snr: u.Quantity
+    cadence: u.Quantity
+    length_observation: u.Quantity
 
 
 def requirements() -> Requirements:
     return Requirements(
-        resolution=2 * u.arcsec
+        resolution_spatial=2 * u.arcsec,
+        resolution_spectral=18 * u.km / u.s,
+        fov=10 * u.arcmin,
+        snr=17.3 * u.dimensionless_unscaled,
+        cadence=15 * u.s,
+        length_observation=150 * u.s,
     )
 
 
