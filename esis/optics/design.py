@@ -94,12 +94,31 @@ Distortion
               &=  a^2 + 2ab + b^2
 
 """
+import dataclasses
+
 import numpy as np
 from astropy import units as u
 from kgpy import Name, vector
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
 
-__all__ = ['final', 'final_from_poletto']
+__all__ = [
+    'Requirements',
+    'requirements',
+    'final',
+    'final_active',
+    'final_from_poletto',
+]
+
+
+@dataclasses.dataclass
+class Requirements:
+    resolution: u.Quantity
+
+
+def requirements() -> Requirements:
+    return Requirements(
+        resolution=2 * u.arcsec
+    )
 
 
 def final(
