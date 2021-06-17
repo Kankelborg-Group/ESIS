@@ -509,6 +509,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
     doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
     doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
+    doc.preamble.append(kgpy.latex.Acronym('MTF', 'modulation transfer function'))
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
