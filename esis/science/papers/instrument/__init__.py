@@ -117,6 +117,8 @@ def document() -> kgpy.latex.Document:
     doc.append(kgpy.latex.aas.Author('Larry Springer', affil_msu))
     doc.append(kgpy.latex.aas.Author('David L. Windt', affil_rxo))
 
+    requirements = esis.optics.design.requirements()
+
     optics_single = esis.optics.design.final(
         pupil_samples=11,
         pupil_is_stratified_random=True,
@@ -130,6 +132,48 @@ def document() -> kgpy.latex.Document:
         pupil_is_stratified_random=True,
         field_samples=11,
         field_is_stratified_random=True,
+    )
+
+    doc.set_variable_quantity(
+        name='spatialResolutionRequirement',
+        value=requirements.resolution_spatial,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='angularResolutionRequirement',
+        value=requirements.resolution_angular,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='spectralResolutionRequirement',
+        value=requirements.resolution_spectral,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='fovRequirement',
+        value=requirements.fov,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='snrRequirement',
+        value=requirements.snr,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='cadenceRequirement',
+        value=requirements.cadence,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='observingTimeRequirement',
+        value=requirements.length_observation,
+        digits_after_decimal=0,
     )
 
     doc.set_variable_quantity(
@@ -967,38 +1011,38 @@ $n_e T = $\,\chiantiPressure.}"""
                             ])
                             tabular.add_row([
                                 r'Spectral resolution',
-                                r'\SI{18}{\kilo\meter\per\second} broadening',
+                                r'\SI{18}{\kilo\meter\per\second} broadening \roy{\spectralResolutionRequirement}',
                                 r'\MHD\ waves',
                                 r'\dispersionDoppler, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
                                 r'Spatial resolution',
-                                r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter})',
+                                r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter}) \roy{\angularResolutionRequirement (\spatialResolutionRequirement)}',
                                 r'Explosive events',
                                 r'\spatialResolution, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
                                 r'Desired \SNR',
-                                r'\SI{17.3}{} in \CH',
+                                r'\SI{17.3}{} \roy{\snrRequirement} in \CH',
                                 r'\MHD\ waves in \CH',
                                 r'$>$\SI{17.7}{} w/$20\times$\SI{10}{\second} exp., '
                                 r'\S~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
                                 r'Cadence',
-                                r'\SI{15}{\second}',
+                                r'\SI{15}{\second} \roy{\cadenceRequirement}',
                                 r'Torsional waves',
                                 r'\SI{10}{\second} eff., \S~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
                                 r'Observing time',
-                                r'$>$\SI{150}{\second}',
+                                r'$>$\SI{150}{\second} \roy{\observingTimeRequirement}',
                                 r'Explosive events',
                                 r'\SI{270}{\second}, \S~\ref{sec:MissionProfile}',
                             ])
                             tabular.add_row([
                                 r'\FOV',
-                                r'\SI{10}{\arcminute} diameter',
+                                r'\SI{10}{\arcminute} \roy{\fovRequirement} diameter ',
                                 r'Span \QS, \AR, and limb',
                                 r'\fov, Table~\ref{table:prescription}',
                             ])
