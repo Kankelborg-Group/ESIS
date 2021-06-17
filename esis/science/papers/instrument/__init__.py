@@ -1186,6 +1186,8 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
 
                     tabular.add_hline()
 
+            table.add_caption(r"""\ESIS\ design parameters.""")
+
         with doc.create(pylatex.Subsection('Optics')):
             doc.append(pylatex.NoEscape(
                 r"""Figure~\ref{fig:schematic} [A] shows the relative layout of the optics and detectors for a single 
