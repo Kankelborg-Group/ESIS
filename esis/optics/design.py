@@ -119,10 +119,14 @@ class Requirements:
     cadence: u.Quantity
     length_observation: u.Quantity
 
+    @property
+    def resolution_angular(self) -> u.Quantity:
+        return np.arctan2(self.resolution_spatial, 1 * u.AU).to(u.arcsec)
+
 
 def requirements() -> Requirements:
     return Requirements(
-        resolution_spatial=2 * u.arcsec,
+        resolution_spatial=1.5 * u.Mm,
         resolution_spectral=18 * u.km / u.s,
         fov=10 * u.arcmin,
         snr=17.3 * u.dimensionless_unscaled,
