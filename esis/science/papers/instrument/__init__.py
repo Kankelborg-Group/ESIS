@@ -1282,7 +1282,83 @@ separated from the target O\,\textsc{v} \roy{\OV} line."""
             ))
 
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
-            pass
+            doc.append(pylatex.NoEscape(
+                r"""The science resolution requirement of \angularResolutionRequirement (Table~\ref{table:scireq}) was 
+flowed down to specifications for the ESIS optics.
+To ensure that ESIS meets this requirement, an imaging error budget was developed to track parameters that significantly 
+influence instrument resolution.
+The budget is roughly divided into two categories;
+the first includes `variable' parameters that can be directly controlled (\eg, the figure and finish of the optics, 
+grating radius and ruling, placement of the elements in the system, and the accuracy to which the instrument is 
+focused).
+The second category consists of `fixed' contributions (\eg, \CCD\ charge diffusion, pointing stability, and diffraction 
+from the entrance aperture).
+In this sub-section we describe the optimization of the first category to balance the contributions of the second. 
+
+Figure and surface roughness specifications for the primary mirror and gratings were developed first by a rule of thumb 
+and then validated through a Fourier optics based model \roy{Fourier-optics-based model} and MonteCarlo simulations.
+Surface figure errors were randomly generated, using a power law distribution in frequency.
+The model explored a range of power spectral distributions for the surface figure errors, with power laws ranging from 
+0.1 to 4.0.
+For each randomly generated array of optical figure errors, the amplitude was adjusted to yield a target \MTF\ 
+degradation factor, as compared to the diffraction limited \roy{diffraction-limited} \MTF.
+For the primary mirror, the figure of merit was a \MTF\ degradation of 0.7 at \angularResolutionRequirement\ resolution.
+Though the grating is smaller and closer to the focal plane, it was allocated somewhat more significant \MTF\ 
+degradation of 0.6 based on manufacturing capabilities.
+The derived requirements are described in table~\ref{table:error}.
+Note that this modeling exercise was undertaken before the baffle designs were finalized.
+The estimated diffraction \MTF\ and aberrations were therefore modeled for a rough estimate of the ESIS single sector 
+aperture."""
+            ))
+
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                table.append(kgpy.latex.Label('table:error'))
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('llrr')) as tabular:
+                        tabular.escape = False
+                        tabular.add_row([r'Element', r'Parameter', r'Requirement', r'Measured'])
+                        tabular.add_hline()
+                        tabular.add_row([r'Primary', r'RMS slope error ($\mu$rad)', r'$<1.0$', r''])
+                        tabular.add_row([r'', r'Integration length (mm)', r'4.0', r''])
+                        tabular.add_row([r'', r'Sample length (mm)', r'2.0', r''])
+                        tabular.add_hline()
+                        tabular.add_row([r'Primary', r'RMS roughness (mm)', r'$<2.5$', r''])
+                        tabular.add_row([r'', r'Periods (mm)', r'0.1-6', r''])
+                        tabular.add_hline()
+                        tabular.add_row([r'Grating', r'RMS slope error ($\mu$rad)', r'$<3.0$', r''])
+                        tabular.add_row([r'', r'Integration length (mm)', r'2 \roy{why fewer sigfigs?}', r''])
+                        tabular.add_row([r'', r'Sample length (mm)', r'1', r''])
+                        tabular.add_hline()
+                        tabular.add_row([r'Grating', r'RMS roughness (mm)', r'$<2.3$', r''])
+                        tabular.add_row([r'', r'Periods (mm)', r'0.02-2', r''])
+                        tabular.add_hline()
+                table.add_caption(
+                    r"""Figure and surface roughness requirements compared to metrology for the \ESIS\ optics.
+Slope error (both the numerical estimates and the measurements) is worked out with integration length and sample length 
+defined per ISO 10110."""
+                )
+
+            doc.append(pylatex.NoEscape(
+                r"""The initial grating radius of curvature, $R_g$, and ruling pattern of the \ESIS\ gratings were 
+derived from the analytical equations developed by \citet{Poletto04} for stigmatic spectrometers.
+A second order polynomial describes the ruling pattern,
+\begin{equation} \label{Eq-d}
+    d = d_0 + d_1 r + d_2 r^2 \, ,
+\end{equation}
+where $r$ runs radially outward from the optical axis with its origin at the center of the grating \roy{shouldn't we be talking about $x$ here?}
+(Fig.~\ref{figure:prescription} (c)).
+The parameters of Equation~\ref{Eq-d} and $R_g$ were chosen so that the spatial and spectral focal curves intersect at 
+the center of the O\,\textsc{v} \roy{\OV} image on the \CCD.
+
+Starting from the analytically derived optical prescription, a model of the system was developed in ray-trace \roy{raytrace} software.
+Since the instrument is radially symmetric, only one grating and its associated lightpath was analyzed. \roy{delete previous sentence, all lightpaths were analyzed}
+In the ray trace model, $R_g$, $d_1$, $d_2$, grating cant angle, \CCD\ cant angle, and focus position were then 
+optimized to minimize the RMS spot at select positions in the O\,\textsc{v} \roy{\OV} \FOV, illustrated in Fig.~\ref{figure:psf}.
+The optical prescription derived from the ray trace is listed in Table~\ref{table:prescription} and 
+Figure~\ref{fig:schematic}. """
+            ))
+
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
             pass
