@@ -16,7 +16,8 @@ setup(
         'ndcube',
         'tensorflow',
         'pylatex',
-        'num2words'
+        'num2words',
+        'bokeh',
     ],
     url='https://github.com/Kankelborg-Group/ESIS',
     license='',
