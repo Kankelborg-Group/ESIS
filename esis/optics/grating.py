@@ -30,9 +30,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     nominal_output_angle: u.Quantity = 0 * u.deg
     diffraction_order: u.Quantity = 0 << u.dimensionless_unscaled
     ruling_density: u.Quantity = 0 / u.mm
-    ruling_density_coeff_linear: u.Quantity = 0 / (u.mm ** 2)
-    ruling_density_coeff_quadratic: u.Quantity = 0 / (u.mm ** 3)
-    ruling_density_coeff_cubic: u.Quantity = 0 / (u.mm ** 4)
+    ruling_spacing_coeff_linear: u.Quantity = 0 * u.dimensionless_unscaled
+    ruling_spacing_coeff_quadratic: u.Quantity = 0 / u.mm
+    ruling_spacing_coeff_cubic: u.Quantity = 0 / u.mm ** 2
     aper_wedge_angle: u.Quantity = 0 * u.deg
     inner_half_width: u.Quantity = 0 * u.mm
     outer_half_width: u.Quantity = 0 * u.mm
@@ -52,11 +52,11 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['diffraction order'] = [format.quantity(self.diffraction_order)]
         dataframe['nominal ruling density'] = [format.quantity(self.ruling_density.to(1 / u.mm))]
         dataframe['linear ruling coefficient'] = [
-            format.quantity(self.ruling_density_coeff_linear.to(1 / u.mm ** 2), scientific_notation=True)]
+            format.quantity(self.ruling_spacing_coeff_linear, scientific_notation=True)]
         dataframe['quadratic ruling coefficient'] = [
-            format.quantity(self.ruling_density_coeff_quadratic.to(1 / u.mm ** 3), scientific_notation=True)]
+            format.quantity(self.ruling_spacing_coeff_quadratic, scientific_notation=True)]
         dataframe['cubic ruling coefficient'] = [
-            format.quantity(self.ruling_density_coeff_cubic.to(1 / u.mm ** 4), scientific_notation=True)]
+            format.quantity(self.ruling_spacing_coeff_cubic, scientific_notation=True)]
         dataframe['aperture wedge angle'] = [format.quantity(self.aper_wedge_angle.to(u.deg))]
         dataframe['inner half-width'] = [format.quantity(self.inner_half_width.to(u.mm))]
         dataframe['outer half-width'] = [format.quantity(self.outer_half_width.to(u.mm))]
@@ -72,9 +72,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
 
     @property
     def is_vls(self) -> bool:
-        a = self.ruling_density_coeff_linear != 0
-        b = self.ruling_density_coeff_quadratic != 0
-        c = self.ruling_density_coeff_cubic != 0
+        a = self.ruling_spacing_coeff_linear != 0
+        b = self.ruling_spacing_coeff_quadratic != 0
+        c = self.ruling_spacing_coeff_cubic != 0
         return a or b or c
 
     @property
@@ -134,12 +134,12 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
             radius=self.sagittal_radius,
             radius_of_rotation=self.tangential_radius
         )
-        surface.rulings = optics.surface.rulings.CubicPolyDensity(
+        surface.rulings = optics.surface.rulings.CubicPolySpacing(
             diffraction_order=self.diffraction_order,
             ruling_density=self.ruling_density,
-            ruling_density_linear=self.ruling_density_coeff_linear,
-            ruling_density_quadratic=self.ruling_density_coeff_quadratic,
-            ruling_density_cubic=self.ruling_density_coeff_cubic,
+            ruling_spacing_linear=self.ruling_spacing_coeff_linear,
+            ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic,
+            ruling_spacing_cubic=self.ruling_spacing_coeff_cubic,
         )
         if self.substrate_thickness is not None:
             thickness = -self.substrate_thickness
@@ -172,9 +172,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.nominal_output_angle = self.nominal_output_angle.copy()
         other.diffraction_order = self.diffraction_order.copy()
         other.ruling_density = self.ruling_density.copy()
-        other.ruling_density_coeff_linear = self.ruling_density_coeff_linear.copy()
-        other.ruling_density_coeff_quadratic = self.ruling_density_coeff_quadratic.copy()
-        other.ruling_density_coeff_cubic = self.ruling_density_coeff_cubic.copy()
+        other.ruling_spacing_coeff_linear = self.ruling_spacing_coeff_linear.copy()
+        other.ruling_spacing_coeff_quadratic = self.ruling_spacing_coeff_quadratic.copy()
+        other.ruling_spacing_coeff_cubic = self.ruling_spacing_coeff_cubic.copy()
         other.aper_wedge_angle = self.aper_wedge_angle.copy()
         other.inner_half_width = self.inner_half_width.copy()
         other.outer_half_width = self.outer_half_width.copy()
