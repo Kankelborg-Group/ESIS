@@ -482,7 +482,22 @@ def field_stop_projections() -> matplotlib.figure.Figure:
     fig.set_constrained_layout_pads(h_pad=.15)
     # ax.margins(x=.01, y=.01)
     optics = esis.optics.design.final(all_channels=False)
-    optics.plot_field_stop_projections_local(ax=ax, digits_after_decimal=digits_after_decimal)
+    optics.plot_field_stop_projections_local(
+        ax=ax,
+        wavelength_color=[
+            'darkviolet',
+            'indigo',
+            'blue',
+            'dodgerblue',
+            'lime',
+            'green',
+            'yellow',
+            'orange',
+            'orangered',
+            'red',
+        ],
+        digits_after_decimal=digits_after_decimal
+    )
     ax.set_aspect('equal')
     ax.legend(bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
     return fig
