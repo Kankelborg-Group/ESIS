@@ -315,18 +315,20 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
-        name='gratingRulingDensity',
-        value=optics_single.grating.ruling_density,
+        name='gratingRulingSpacing',
+        value=optics_single.grating.surface.rulings.ruling_spacing.to(u.um),
     )
 
     doc.set_variable_quantity(
-        name='gratingLinearRulingDensityCoefficient',
-        value=optics_single.grating.ruling_density_coeff_linear,
+        name='gratingLinearRulingSpacingCoefficient',
+        value=optics_single.grating.ruling_spacing_coeff_linear,
+        scientific_notation=True,
     )
 
     doc.set_variable_quantity(
-        name='gratingQuadraticRulingDensityCoefficient',
-        value=optics_single.grating.ruling_density_coeff_quadratic,
+        name='gratingQuadraticRulingSpacingCoefficient',
+        value=optics_single.grating.ruling_spacing_coeff_quadratic,
+        scientific_notation=True,
     )
 
     doc.set_variable_quantity(
@@ -1132,9 +1134,9 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'', r'Aperture long base', r'\gratingLongWidth'])
                     tabular.add_row([r'', r'Aperture short base', r'\gratingShortWidth'])
                     tabular.add_row([r'', r'Ruling type', r'Varied line spacing'])
-                    tabular.add_row([r'', r'Constant ruling density coefficient', r'\gratingRulingDensity'])
-                    tabular.add_row([r'', r'Linear ruling density coefficient', r'\gratingLinearRulingDensityCoefficient'])
-                    tabular.add_row([r'', r'Quadratic ruling density coefficient', r'\gratingQuadraticRulingDensityCoefficient'])
+                    tabular.add_row([r'', r'Constant ruling spacing coefficient', r'\gratingRulingSpacing'])
+                    tabular.add_row([r'', r'Linear ruling spacing coefficient', r'\gratingLinearRulingSpacingCoefficient'])
+                    tabular.add_row([r'', r'Quadratic ruling spacing coefficient', r'\gratingQuadraticRulingSpacingCoefficient'])
                     tabular.add_row([r'', r'Input angle', r'\gratingInputAngle'])
                     tabular.add_row([r'', r'Output angle (\OV)', r'\gratingOutputAngle'])
                     tabular.add_row([r'', r'Anamorphic magnification factor', r'\anamorphicMagnification'])
@@ -1258,7 +1260,7 @@ The ESIS passband is defined by a combination of the field stop and grating disp
                 r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, pixel 
 limited \roy{pixel-limited} imaging from the field stop to the CCDs.
 The pitch at the center of the grating is $d_0=$\SI{.3866}{\micro\meter} \roy{the ruling density at the center of the 
-grating is \gratingRulingDensity} resulting in a dispersion of \SI{17.5}{\kilo\meter\per\second} 
+grating is \gratingRulingSpacing} resulting in a dispersion of \SI{17.5}{\kilo\meter\per\second} 
 \roy{\dispersionDoppler} at the center of the \OV\ \FOV.
 The groove profile is optimized for the $m=1$ order, so that each grating serves only a single \CCD.
 The modeled grating groove efficiency in this order is \SI{36}{\percent} \roy{We said \SI{39}{\percent} above, need to 
