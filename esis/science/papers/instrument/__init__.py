@@ -830,11 +830,11 @@ dispersion planes, and a field stop."""
 \MOSES, in turn, demonstrated a working concept of simultaneous \EUV\ imaging and spectroscopy.
 This concept adds a unique capability to the science that we can obtain from the \EUV\ solar atmosphere.
 \ESIS, sharing the same payload volume as \MOSES, is manifested to fly in 2019.
-In this section, we set forth specific scientific objectives for the combined \ESIS/\MOSES mission.
+In this section, we set forth specific scientific objectives for the combined \ESIS/\MOSES\ mission.
 From these objectives, and with an eye toward synergistic operation of \MOSES\ and \ESIS, in 
 \S\,\ref{subsec:ScienceRequirements} we derive the quantitative science requirements that drive the \ESIS\ design.
 
-The combined \ESIS/\MOSES/ mission will address the following two overarching science goals: \begin{inparaenum}[(1)] 
+The combined \ESIS/\MOSES\ mission will address the following two overarching science goals: \begin{inparaenum}[(1)] 
 \item observe magnetic reconnection in the \TR\label{item-goal1}, and \item map the transfer of energy through the \TR\ 
 with emphasis on \MHD\ waves\label{item-goal2}. \end{inparaenum}
 These objectives have significant overlap with the missions of \IRIS~\citep{IRIS14}, the \EIS~\citep{Culhane07}
@@ -1110,6 +1110,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
 
         with doc.create(pylatex.Table()) as table:
             table._star_latex_name = True
+            table.escape = False
             table.append(kgpy.latex.Label('table:prescription'))
             with table.create(pylatex.Center()) as centering:
                 with centering.create(pylatex.Tabular('lll')) as tabular:
@@ -1258,7 +1259,7 @@ The ESIS passband is defined by a combination of the field stop and grating disp
 
             doc.append(pylatex.NoEscape(
                 r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, pixel 
-limited \roy{pixel-limited} imaging from the field stop to the CCDs.
+limited \roy{pixel-limited} imaging from the field stop to the \CCDs.
 The pitch at the center of the grating is $d_0=$\SI{.3866}{\micro\meter} \roy{the ruling density at the center of the 
 grating is \gratingRulingSpacing} resulting in a dispersion of \SI{17.5}{\kilo\meter\per\second} 
 \roy{\dispersionDoppler} at the center of the \OV\ \FOV.
@@ -1270,7 +1271,7 @@ Figure specification and groove profile are not well controlled near the edges o
 Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
 Fig.~\ref{fig:schematic} (c).
 
-The ESIS passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
+The \ESIS\ passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
 The passband includes the He\,\textsc{i} (\SI{58.43}{\nano\meter}) \roy{\HeI} spectral line through Mg\,\textsc{x} 
 (60.98 and \SI{62.49}{\nano\meter}) \roy{\MgXion\ (\MgXwavelength\ and \MgXdimWavelength)} to O\,\textsc{v} 
 (\SI{62.97}{\nano\meter}) \roy{\OV}.
