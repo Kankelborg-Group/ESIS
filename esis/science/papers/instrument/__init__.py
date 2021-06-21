@@ -1359,6 +1359,16 @@ The optical prescription derived from the ray trace is listed in Table~\ref{tabl
 Figure~\ref{fig:schematic}. """
             ))
 
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.psf_pdf()), width=None)
+                figure.append(kgpy.latex.Label('fig:psf'))
+                figure.add_caption(pylatex.NoEscape(
+                    r"""(Left:)  Ray traced spot diagrams for ESIS, illustrated at the center and vertices of the O\,\textsc{v} FOV on the CCD.
+					The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (overplotted on each spot) radius is \SI{2}{\micro\meter}.
+					Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
+					(Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
+                ))
+
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
             pass

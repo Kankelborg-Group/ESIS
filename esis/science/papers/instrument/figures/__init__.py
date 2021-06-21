@@ -1,6 +1,7 @@
 import typing as typ
 import pathlib
 import matplotlib.figure
+import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial
@@ -499,3 +500,38 @@ def field_stop_projections() -> matplotlib.figure.Figure:
 
 def field_stop_projections_pdf() -> pathlib.Path:
     return save_pdf(field_stop_projections)
+
+
+def psf() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(
+        pupil_samples=201,
+        pupil_is_stratified_random=True,
+        field_samples=3,
+        all_channels=False,
+    )
+    optics.num_emission_lines = 1
+
+    rays = optics.rays_output
+
+    bins = rays.input_grid.pupil.num_samples_normalized.x // 2
+
+    fig = rays.plot_pupil_hist2d_vs_field(
+        wavlen_index=0,
+        norm=matplotlib.colors.PowerNorm(1 / 3),
+        bins=bins,
+        cmap='gray_r',
+        # kwargs_colorbar=dict(
+        #     location='bottom',
+        #     shrink=1.2,
+        #     anchor=(1.0, 1.0),
+        # ),
+    )
+    fig.set_figheight(3)
+    fig.set_figwidth(column_width)
+    fig.suptitle(None)
+
+    return fig
+
+
+def psf_pdf() -> pathlib.Path:
+    return save_pdf(psf)
