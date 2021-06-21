@@ -157,7 +157,6 @@ def schematic() -> matplotlib.figure.Figure:
         s='axis of symmetry',
         ha='center',
         va='bottom',
-        fontsize='small'
     )
 
     xh = kgpy.vector.x_hat.zx
@@ -170,7 +169,6 @@ def schematic() -> matplotlib.figure.Figure:
         relpos=(0.5, 0.5),
     )
     kwargs_annotate = dict(
-        fontsize='small',
         ha='center',
     )
     ax.annotate(
@@ -317,7 +315,6 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             s='primary\nclear aperture',
             ha='center',
             va='center',
-            fontsize='small',
         )
 
 
@@ -342,7 +339,6 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             s='central\nobscuration',
             ha='center',
             va='center',
-            fontsize='small',
         )
 
         rays = optics.system.raytrace[optics.system.surfaces_all.flat_local.index(primary.surface)]
@@ -379,7 +375,6 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
                 va='center',
                 color='red',
                 alpha=alpha,
-                fontsize='small',
             )
 
     return fig
@@ -454,7 +449,6 @@ def schematic_grating() -> matplotlib.figure.Figure:
             x=0.3 * grating.outer_half_width.value,
             y=0,
             s='grating\nclear aperture',
-            fontsize='small',
             ha='center',
             va='center',
         )
