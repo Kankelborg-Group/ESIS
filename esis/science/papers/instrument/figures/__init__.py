@@ -535,3 +535,26 @@ def psf() -> matplotlib.figure.Figure:
 
 def psf_pdf() -> pathlib.Path:
     return save_pdf(psf)
+
+
+def spot_size() -> matplotlib.figure.Figure():
+    optics = esis.optics.design.final(
+        pupil_samples=21,
+        pupil_is_stratified_random=True,
+        field_samples=21,
+        field_is_stratified_random=False,
+        all_channels=False,
+    )
+    fig, axs = plt.subplots(ncols=2, figsize=(column_width, 4), sharex=True, sharey=True, constrained_layout=True)
+    optics.rays_output.plot_spot_size_vs_field(
+        axs=axs,
+        kwargs_colorbar=dict(
+            location='bottom',
+        )
+    )
+    return fig
+
+
+def spot_size_pdf() -> pathlib.Path:
+    return save_pdf(spot_size)
+
