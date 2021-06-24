@@ -1967,6 +1967,9 @@ class Optics(
             if wire.ndim == 3:
                 wire = wire[np.newaxis]
             transition = self.bunch.fullname(digits_after_decimal=digits_after_decimal)[np.argsort(self.wavelength)]
+            intensity = self.bunch.intensity[np.argsort(self.wavelength)]
+            intensity = np.log2(intensity.value)
+            intensity = intensity / intensity.max()
 
             for i in range(wire.shape[0]):
                 for w in range(wire.shape[~0]):
@@ -1979,6 +1982,7 @@ class Optics(
                         wire_iw.x,
                         wire_iw.y,
                         color=wavelength_color[w],
+                        alpha=intensity[w],
                         **label_kwarg,
                     )
 
