@@ -1788,14 +1788,12 @@ class Optics(
                 digits_after_decimal=digits_after_decimal,
             )
 
-    def plot_field_stop_projections(
-            self,
-            ax: matplotlib.axes.Axes,
-            wavelength_color: typ.Optional[typ.List[str]] = None
-    ):
-
-        subsystem = optics.System(
-            object_surface=self.field_stop.surface,
+    @property
+    def subsystem_spectrograph(self) -> optics.System:
+        fs = self.field_stop.surface
+        fs.transform.append(kgpy.transform.rigid.TiltZ(self.roll))
+        return optics.System(
+            object_surface=fs,
             surfaces=optics.surface.SurfaceList([
                 self.grating.surface,
                 self.detector.surface,
@@ -1810,6 +1808,13 @@ class Optics(
             pointing=self.pointing,
             roll=self.roll,
         )
+
+    def plot_field_stop_projections(
+            self,
+            ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None
+    ):
+        subsystem = self.subsystem_spectrograph
 
         transform_detectors = kgpy.transform.rigid.TransformList([
             kgpy.transform.rigid.TiltZ(self.detector.cylindrical_azimuth),
@@ -1925,26 +1930,6 @@ class Optics(
             wavelength_color: typ.Optional[typ.List[str]] = None,
             digits_after_decimal: int = 3,
     ):
-
-        fs = self.field_stop.surface
-        fs.transform.append(kgpy.transform.rigid.TiltZ(self.roll))
-        subsystem = optics.System(
-            object_surface=fs,
-            surfaces=optics.surface.SurfaceList([
-                self.grating.surface,
-                self.detector.surface,
-            ]),
-            wavelength=self.wavelength,
-            field_samples=self.field_samples,
-            field_margin=1 * u.nm,
-            field_is_stratified_random=self.field_is_stratified_random,
-            pupil_samples=self.pupil_samples,
-            pupil_is_stratified_random=self.pupil_is_stratified_random,
-            grid_velocity_los=self.grid_velocity_los,
-            pointing=self.pointing,
-            roll=self.roll,
-        )
-
         with astropy.visualization.quantity_support():
 
             wire = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
@@ -1956,6 +1941,7 @@ class Optics(
                 colornorm = plt.Normalize(vmin=wavelength.min().value, vmax=wavelength.max().value)
                 wavelength_color = [colormap(colornorm(wavelength[..., w].value)) for w in range(wavelength.shape[~0])]
 
+            subsystem = self.subsystem_spectrograph
             rays = subsystem.rays_output
             rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
             rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
