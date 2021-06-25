@@ -519,21 +519,27 @@ def psf() -> matplotlib.figure.Figure:
 
     bins = rays.input_grid.pupil.num_samples_normalized.x // 2
 
-    fig = rays.plot_pupil_hist2d_vs_field(
+    fig, axs = rays.plot_pupil_hist2d_vs_field(
         wavlen_index=0,
         norm=matplotlib.colors.PowerNorm(1 / 3),
         bins=bins,
         cmap='gray_r',
-        # kwargs_colorbar=dict(
-        #     location='bottom',
-        #     shrink=1.2,
-        #     anchor=(1.0, 1.0),
-        # ),
+        limits=((-0.5, 0.5), (-0.5, 0.5)),
     )
-    fig.set_figheight(3)
+    fig.set_figheight(2.6)
     fig.set_figwidth(column_width)
     fig.suptitle(None)
+    for i, axs_i in enumerate(axs):
+        for j, axs_ij in enumerate(axs_i):
+            ax = axs_ij
+            if i + 1 == axs.shape[0]:
+                ax.set_xlabel(None)
+            if j == 0:
+                ax.set_ylabel(None)
+            ax.set_xticks([])
+            ax.set_yticks([])
 
+    fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
     return fig
 
 
