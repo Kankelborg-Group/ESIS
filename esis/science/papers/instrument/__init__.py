@@ -1373,10 +1373,17 @@ Figure~\ref{fig:schematic}. """
                 figure.add_image(str(figures.psf_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:psf'))
                 figure.add_caption(pylatex.NoEscape(
-                    r"""(Left:)  Ray traced spot diagrams for ESIS, illustrated at the center and vertices of the O\,\textsc{v} FOV on the CCD.
-					The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (overplotted on each spot) radius is \SI{2}{\micro\meter}.
-					Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
-					(Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
+                    r"""
+\roy{
+Raytraced spot diagrams for \OV\ with $\psfFieldSamples \times \psfFieldSamples$ field angles across the \FOV.
+The box around each spot represents a single pixel on the detector.
+Each spot was traced using a stratified random grid across the pupil with $\psfPupilSamples \times \psfPupilSamples$ 
+positions per spot.
+}
+(Left:)  Ray traced spot diagrams for ESIS, illustrated at the center and vertices of the O\,\textsc{v} FOV on the CCD.
+The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (overplotted on each spot) radius is \SI{2}{\micro\meter}.
+Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
+(Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
                 ))
 
 
