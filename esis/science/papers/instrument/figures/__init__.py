@@ -502,11 +502,15 @@ def field_stop_projections_pdf() -> pathlib.Path:
     return save_pdf(field_stop_projections)
 
 
+psf_pupil_samples = 201
+psf_field_samples = 4
+
+
 def psf() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(
-        pupil_samples=201,
+        pupil_samples=psf_pupil_samples,
         pupil_is_stratified_random=True,
-        field_samples=3,
+        field_samples=psf_field_samples,
         all_channels=False,
     )
     optics.num_emission_lines = 1

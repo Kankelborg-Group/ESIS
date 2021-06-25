@@ -486,6 +486,16 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
     )
 
+    doc.set_variable(
+        name='psfPupilSamples',
+        value=figures.psf_pupil_samples,
+    )
+
+    doc.set_variable(
+        name='psfFieldSamples',
+        value=figures.psf_field_samples,
+    )
+
     doc.preamble.append(kgpy.latex.Acronym('ESIS', r'EUV Snapshot Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('MOSES', r'Multi-order Solar EUV Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'))
