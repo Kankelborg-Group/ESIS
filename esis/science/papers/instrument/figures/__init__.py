@@ -31,7 +31,7 @@ def save_pdf(fig_factory: typ.Callable[[], matplotlib.figure.Figure]) -> pathlib
             fname=path,
             # bbox_inches='tight',
             # pad_inches=0.04,
-            facecolor='lightblue'
+            # facecolor='lightblue'
         )
         plt.close(fig)
     return path
@@ -546,21 +546,27 @@ def psf() -> matplotlib.figure.Figure:
 def psf_pdf() -> pathlib.Path:
     return save_pdf(psf)
 
+kwargs_optics_default = dict(
+    pupil_samples=21,
+    pupil_is_stratified_random=True,
+    field_samples=21,
+    field_is_stratified_random=False,
+    all_channels=False,
+)
+
 
 def spot_size() -> matplotlib.figure.Figure():
-    optics = esis.optics.design.final(
-        pupil_samples=21,
-        pupil_is_stratified_random=True,
-        field_samples=21,
-        field_is_stratified_random=False,
-        all_channels=False,
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics.num_emission_lines = 3
+    fig, axs = plt.subplots(
+        ncols=optics.num_emission_lines,
+        figsize=(fig_width, 2.5),
+        sharex=True,
+        sharey=True,
+        constrained_layout=True
     )
-    fig, axs = plt.subplots(ncols=2, figsize=(column_width, 4), sharex=True, sharey=True, constrained_layout=True)
     optics.rays_output.plot_spot_size_vs_field(
         axs=axs,
-        kwargs_colorbar=dict(
-            location='bottom',
-        )
     )
     return fig
 
@@ -568,3 +574,23 @@ def spot_size() -> matplotlib.figure.Figure():
 def spot_size_pdf() -> pathlib.Path:
     return save_pdf(spot_size)
 
+
+def vignetting() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    fig, axs = plt.subplots(
+        ncols=1,
+        nrows=2,
+        figsize=(column_width, 5),
+        sharex=True,
+        sharey=True,
+        constrained_layout=True,
+        squeeze=False,
+    )
+    model = optics.rays_output.vignetting(polynomial_degree=optics.vignetting_polynomial_degree)
+    model.plot_unvignetted(axs=axs[0], use_xlabels=False)
+    model.plot_residual(axs=axs[1], use_titles=False,)
+    return fig
+
+
+def vignetting_pdf() -> pathlib.Path:
+    return save_pdf(vignetting)
