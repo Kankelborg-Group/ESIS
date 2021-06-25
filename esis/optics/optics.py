@@ -1975,4 +1975,76 @@ class Optics(
         ax.set_xlim(left=0, right=self.detector.num_pixels[0])
         ax.set_ylim(bottom=0, top=self.detector.num_pixels[1])
 
+    def plot_field_stop_distortion(
+            self,
+            ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None,
+            digits_after_decimal: int = 3,
+    ):
+        with astropy.visualization.quantity_support():
+
+            wire_fs = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
+            wavelength = self.wavelength_sorted
+            wire_fs.z = wavelength
+
+            if wavelength_color is None:
+                colormap = plt.cm.rainbow_r
+                colornorm = plt.Normalize(vmin=wavelength.min().value, vmax=wavelength.max().value)
+                wavelength_color = [colormap(colornorm(wavelength[..., w].value)) for w in range(wavelength.shape[~0])]
+
+            subsystem = self.subsystem_spectrograph
+            rays = subsystem.rays_output
+            rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
+            rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
+            rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
+            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
+            wire = subsystem_model(wire_fs)
+            wire = wire.to_3d()
+
+            print(wire.shape)
+
+            wire.x = wire.x - wire.x.mean(0)
+            wire.y = wire.y - wire.y.mean(0)
+
+            wire_fs.z = 0 * u.mm
+            wire_fs = subsystem.transform_roll(wire_fs)
+
+            # mag = wire.length.mean() / wire_fs.length.mean()
+            mag = self.arm_ratio * u.pix / self.detector.pixel_width.to(u.mm)
+            print(mag)
+            wire_fs.x = wire_fs.x * mag
+            wire_fs.y = wire_fs.y * mag
+
+            if wire.ndim == 3:
+                wire = wire[np.newaxis]
+            transition = self.bunch.fullname(digits_after_decimal=digits_after_decimal)[np.argsort(self.wavelength)]
+            intensity = self.bunch.intensity[np.argsort(self.wavelength)]
+            intensity = np.log2(intensity.value)
+            intensity = intensity / intensity.max()
+
+            ax.plot(
+                wire_fs.x[..., 0, 0],
+                wire_fs.y[..., 0, 0],
+                color='black',
+                label='undistorted field stop',
+            )
+
+            for i in range(wire.shape[0]):
+                for w in range(wire.shape[~0]):
+                    if i == 0:
+                        label_kwarg = dict(label=transition[w])
+                    else:
+                        label_kwarg = dict()
+                    wire_iw = wire[i, ..., w]
+                    ax.plot(
+                        wire_iw.x,
+                        wire_iw.y,
+                        color=wavelength_color[w],
+                        alpha=intensity[w],
+                        **label_kwarg,
+                    )
+
+        # ax.set_xlim(left=0, right=self.detector.num_pixels[0])
+        # ax.set_ylim(bottom=0, top=self.detector.num_pixels[1])
+
 
