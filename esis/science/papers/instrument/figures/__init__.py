@@ -546,6 +546,7 @@ def psf() -> matplotlib.figure.Figure:
 def psf_pdf() -> pathlib.Path:
     return save_pdf(psf)
 
+
 kwargs_optics_default = dict(
     pupil_samples=21,
     pupil_is_stratified_random=True,
@@ -594,3 +595,24 @@ def vignetting() -> matplotlib.figure.Figure:
 
 def vignetting_pdf() -> pathlib.Path:
     return save_pdf(vignetting)
+
+
+def distortion() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics.num_emission_lines = 1
+    fig, ax = plt.subplots(
+        figsize=(column_width, 3.5),
+        constrained_layout=True,
+    )
+    # fig.set_constrained_layout_pads(h_pad=.15)
+    optics.plot_field_stop_distortion(
+        ax=ax,
+    )
+    ax.set_aspect('equal')
+    ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center')
+    return fig
+
+
+def distortion_pdf() -> pathlib.Path:
+    return save_pdf(distortion)
+

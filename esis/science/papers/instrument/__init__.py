@@ -1394,6 +1394,9 @@ Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
                 figure.add_image(str(figures.vignetting_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:vignetting'))
 
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.distortion_pdf()), width=None)
+                figure.append(kgpy.latex.Label('fig:distortion'))
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
             pass
