@@ -1386,6 +1386,14 @@ Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
 (Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
                 ))
 
+            with doc.create(kgpy.latex.FigureStar()) as figure:
+                figure.add_image(str(figures.spot_size_pdf()), width=None)
+                figure.append(kgpy.latex.Label('fig:spot-size'))
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.vignetting_pdf()), width=None)
+                figure.append(kgpy.latex.Label('fig:vignetting'))
+
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
             pass
