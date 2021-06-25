@@ -1946,7 +1946,7 @@ class Optics(
             rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
             rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
             rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
-            subsystem_model = rays.distortion(polynomial_degree=2).model()
+            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
             wire = subsystem_model(wire)
             wire = wire.to_3d()
 
