@@ -487,6 +487,26 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable(
+        name='defaultPupilSamples',
+        value=figures.kwargs_optics_default['pupil_samples'],
+    )
+
+    doc.set_variable(
+        name='defaultFieldSamples',
+        value=figures.kwargs_optics_default['field_samples']
+    )
+
+    doc.set_variable(
+        name='defaultNumEmissionLines',
+        value=figures.num_emission_lines_default,
+    )
+
+    doc.set_variable(
+        name='defaultNumEmissionLinesWords',
+        value=num2words.num2words(figures.num_emission_lines_default),
+    )
+
+    doc.set_variable(
         name='psfPupilSamples',
         value=figures.psf_pupil_samples,
     )
@@ -1388,7 +1408,15 @@ Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
 
             with doc.create(kgpy.latex.FigureStar()) as figure:
                 figure.add_image(str(figures.spot_size_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:spot-size'))
+                figure.append(kgpy.latex.Label('fig:spotSize'))
+                figure.add_caption(pylatex.NoEscape(
+                    r"""2D histogram of RMS spot sizes for the \defaultNumEmissionLines\ brightest wavelengths in the 
+\ESIS\ passband. 
+Each wavelength has $\defaultFieldSamples \times \defaultFieldSamples$ field points across the \FOV, and each field point
+has a stratified random grid containing $\defaultPupilSamples \times \defaultPupilSamples$ pupil positions.
+The \HeI\ line appears cropped since it is cut off by the edge of the detector.
+The images appear flipped compared to Figure~\ref{fig:projections} since the optical system inverts the image of the skyplane."""
+                ))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.vignetting_pdf()), width=None)
