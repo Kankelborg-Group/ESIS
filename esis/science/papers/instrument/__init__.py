@@ -1421,6 +1421,14 @@ The images appear flipped compared to Figure~\ref{fig:projections} since the opt
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.vignetting_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:vignetting'))
+                figure.add_caption(pylatex.NoEscape(
+                    r"""(Top) 2D histogram counting the number of rays that were unvignetted by the \ESIS\ optical 
+system as a function of field position.
+The count is normalized to the maximum number of unvignetted rays at any field point.
+The field and pupil grids have the same parameters as the grid for Figure~\ref{fig:spotSize}.
+(Bottom) Residual between the top histogram and the vignetting model described in Table~\ref{table:vignetting}
+"""
+                ))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.distortion_pdf()), width=None)
