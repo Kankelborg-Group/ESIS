@@ -680,12 +680,13 @@ orthogonal planes."""
 
             with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
                 moses_schematic.add_image('figures/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
-                moses_schematic.append(kgpy.latex.Label('fig:mosesSchematic'))
                 moses_schematic.add_caption(pylatex.NoEscape(
                     r"""Schematic diagram of the MOSES instrument.
 Incident light on the right forms an undispersed image on the central $m=0$ \CCD.
 Dispersed images are formed on the outboard $m=\pm1$ \CCDs."""
                 ))
+                moses_schematic.append(kgpy.latex.Label('fig:mosesSchematic'))
+
             doc.append(pylatex.NoEscape(
                 r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
 allow efficient placement of the dispersed image order cameras.  
@@ -766,7 +767,6 @@ In designing \ESIS, we have sought to improve upon each of these points.
 
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
                 figure.add_image(str(figures.layout_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:layout'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""The \ESIS\ instrument is a pseudo-Gregorian design.
 The secondary mirror is replaced by a segmented array of concave diffraction gratings.
@@ -775,6 +775,7 @@ The field stop at prime focus defines instrument spatial/spectral \FOV.
 Eight grating positions appear in this schematic; only six fit within the volume of the rocket payload.
 \NumChannelsWords\ channels are populated for the first flight."""
                 ))
+                figure.append(kgpy.latex.Label('fig:layout'))
 
             doc.append(pylatex.NoEscape(
                 r"""The layout of \ESIS\ (Fig.~\ref{fig:layout}) is a modified form of Gregorian telescope.
@@ -1021,16 +1022,15 @@ meet our science goals."""
 
                 with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
                     figure.add_image(str(figures.bunch_pdf()), width=None)
-                    figure.append(kgpy.latex.Label('fig:bunch'))
                     figure.add_caption(pylatex.NoEscape(
                         r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
 Calculated using ChiantiPy, with the \chiantiAbundances\ abundances file, the \chiantiDEM\ \DEM\ file, and
 $n_e T = $\,\chiantiPressure.}"""
                     ))
+                    figure.append(kgpy.latex.Label('fig:bunch'))
 
                 with doc.create(pylatex.Table(position='htb!')) as table:
                     table._star_latex_name = True
-                    table.append(kgpy.latex.Label('table:scireq'))
                     with table.create(pylatex.Center()) as centering:
                         with centering.create(pylatex.Tabular(table_spec='llll', )) as tabular:
                             tabular.escape = False
@@ -1083,6 +1083,7 @@ $n_e T = $\,\chiantiPressure.}"""
                             r"""ESIS instrument requirements.  
 AR is active region, QS quiet sun, and CH coronal hole."""
                         ))
+                        table.append(kgpy.latex.Label('table:scireq'))
 
     with doc.create(pylatex.Section('The ESIS Instrument')):
         doc.append(pylatex.NoEscape(
@@ -1141,7 +1142,6 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
         with doc.create(pylatex.Table()) as table:
             table._star_latex_name = True
             table.escape = False
-            table.append(kgpy.latex.Label('table:prescription'))
             with table.create(pylatex.Center()) as centering:
                 with centering.create(pylatex.Tabular('lll')) as tabular:
                     tabular.escape = False
@@ -1221,6 +1221,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_hline()
 
             table.add_caption(pylatex.NoEscape(r"""\ESIS\ design parameters."""))
+            table.append(kgpy.latex.Label('table:prescription'))
 
         with doc.create(pylatex.Subsection('Optics')):
             doc.append(pylatex.NoEscape(
@@ -1232,7 +1233,6 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
             ))
 
             with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
-                figure.append(kgpy.latex.Label('fig:schematic'))
                 figure.append(kgpy.latex.aas.Gridline([
                     kgpy.latex.aas.Fig(figures.schematic_pdf(), kgpy.latex.textwidth, '(a)')
                 ]))
@@ -1248,6 +1248,7 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
 channel.
 (c) Clear aperture of Channel 1's diffraction grating."""
                 ))
+                figure.append(kgpy.latex.Label('fig:schematic'))
 
             doc.append(pylatex.NoEscape(
                 r"""The primary mirror is octagonal in shape.
@@ -1280,12 +1281,12 @@ The individual mounts allow each grating to be adjusted in tip and tilt to cente
                 # figure.add_image('figures/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
                 # figure.append('\n')
                 figure.add_image(str(figures.field_stop_projections_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:projections'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""Areas occupied by strong spectral lines on the ESIS detectors.
 The plot axes are sized exactly to the CCD active area.
 The ESIS passband is defined by a combination of the field stop and grating dispersion."""
                 ))
+                figure.append(kgpy.latex.Label('fig:projections'))
 
             doc.append(pylatex.NoEscape(
                 r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, pixel 
@@ -1343,7 +1344,6 @@ aperture."""
 
             with doc.create(pylatex.Table()) as table:
                 # table._star_latex_name = True
-                table.append(kgpy.latex.Label('table:error'))
                 with table.create(pylatex.Center()) as centering:
                     with centering.create(pylatex.Tabular('llrr')) as tabular:
                         tabular.escape = False
@@ -1368,6 +1368,7 @@ aperture."""
 Slope error (both the numerical estimates and the measurements) is worked out with integration length and sample length 
 defined per ISO 10110."""
                 ))
+                table.append(kgpy.latex.Label('table:error'))
 
             doc.append(pylatex.NoEscape(
                 r"""The initial grating radius of curvature, $R_g$, and ruling pattern of the \ESIS\ gratings were 
@@ -1384,14 +1385,13 @@ the center of the O\,\textsc{v} \roy{\OV} image on the \CCD.
 Starting from the analytically derived optical prescription, a model of the system was developed in ray-trace \roy{raytrace} software.
 Since the instrument is radially symmetric, only one grating and its associated lightpath was analyzed. \roy{delete previous sentence, all lightpaths were analyzed}
 In the ray trace model, $R_g$, $d_1$, $d_2$, grating cant angle, \CCD\ cant angle, and focus position were then 
-optimized to minimize the RMS spot at select positions in the O\,\textsc{v} \roy{\OV} \FOV, illustrated in Fig.~\ref{figure:psf}.
+optimized to minimize the RMS spot at select positions in the O\,\textsc{v} \roy{\OV} \FOV, illustrated in Fig.~\ref{fig:psf}.
 The optical prescription derived from the ray trace is listed in Table~\ref{table:prescription} and 
 Figure~\ref{fig:schematic}. """
             ))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.psf_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:psf'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""
 \roy{
@@ -1405,6 +1405,7 @@ The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (ov
 Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
 (Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
                 ))
+                figure.append(kgpy.latex.Label('fig:psf'))
 
             with doc.create(kgpy.latex.FigureStar()) as figure:
                 figure.add_image(str(figures.spot_size_pdf()), width=None)
@@ -1421,17 +1422,16 @@ The images appear flipped compared to Figure~\ref{fig:projections} since the opt
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.focus_curve_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:focusCurve'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 Focus curve for the field angle at the middle of the \ESIS\ \FOV\ for the 
 \defaultNumEmissionLines\ brightest wavelengths in the passband.
 }"""
                 ))
+                figure.append(kgpy.latex.Label('fig:focusCurve'))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.vignetting_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:vignetting'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 (Top) 2D histogram counting the number of rays that were unvignetted by the \ESIS\ optical 
@@ -1441,10 +1441,10 @@ The field and pupil grids have the same parameters as the grid for Figure~\ref{f
 (Bottom) Residual between the top histogram and the vignetting model described in Table~\ref{table:vignetting}
 }"""
                 ))
+                figure.append(kgpy.latex.Label('fig:vignetting'))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.distortion_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:distortion'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 Plot of the magnified, undistorted field stop aperture vs. the distorted \OV\ image of the 
@@ -1455,6 +1455,7 @@ The distorted image of the field stop aperture was calculated using the \ESIS\ d
 Table~\ref{table:distortion}.
 }"""
                 ))
+                figure.append(kgpy.latex.Label('fig:distortion'))
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
             pass
@@ -1489,8 +1490,6 @@ Table~\ref{table:distortion}.
     doc.append(pylatex.Command('bibliography', arguments='sources'))
 
     return doc
-
-
 
 
 
