@@ -1342,7 +1342,7 @@ aperture."""
             ))
 
             with doc.create(pylatex.Table()) as table:
-                table._star_latex_name = True
+                # table._star_latex_name = True
                 table.append(kgpy.latex.Label('table:error'))
                 with table.create(pylatex.Center()) as centering:
                     with centering.create(pylatex.Tabular('llrr')) as tabular:
