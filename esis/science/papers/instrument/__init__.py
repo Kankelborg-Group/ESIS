@@ -1410,37 +1410,40 @@ Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
                 figure.add_image(str(figures.spot_size_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:spotSize'))
                 figure.add_caption(pylatex.NoEscape(
-                    r"""2D histogram of RMS spot sizes for the \defaultNumEmissionLines\ brightest wavelengths in the 
-\ESIS\ passband. 
+                    r"""\roy{
+2D histogram of RMS spot sizes for the \defaultNumEmissionLines\ brightest wavelengths in the \ESIS\ passband. 
 Each wavelength has $\defaultFieldSamples \times \defaultFieldSamples$ field points across the \FOV, and each field point
 has a stratified random grid containing $\defaultPupilSamples \times \defaultPupilSamples$ pupil positions.
 The \HeI\ line appears cropped since it is cut off by the edge of the detector.
-The images appear flipped compared to Figure~\ref{fig:projections} since the optical system inverts the image of the skyplane."""
+The images appear flipped compared to Figure~\ref{fig:projections} since the optical system inverts the image of the skyplane.
+}"""
                 ))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.vignetting_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:vignetting'))
                 figure.add_caption(pylatex.NoEscape(
-                    r"""(Top) 2D histogram counting the number of rays that were unvignetted by the \ESIS\ optical 
+                    r"""\roy{
+(Top) 2D histogram counting the number of rays that were unvignetted by the \ESIS\ optical 
 system as a function of field position.
 The count is normalized to the maximum number of unvignetted rays at any field point.
 The field and pupil grids have the same parameters as the grid for Figure~\ref{fig:spotSize}.
 (Bottom) Residual between the top histogram and the vignetting model described in Table~\ref{table:vignetting}
-"""
+}"""
                 ))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.distortion_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:distortion'))
                 figure.add_caption(pylatex.NoEscape(
-                    r"""Plot of the magnified, undistorted field stop aperture vs. the distorted \OV\ image of the 
+                    r"""\roy{
+Plot of the magnified, undistorted field stop aperture vs. the distorted \OV\ image of the 
 field stop aperture on the \ESIS\ detector.
 The magnification factor used for the undistorted field stop aperture is the ratio of the grating exit arm to the 
 grating entrance arm (\armRatio).
 The distorted image of the field stop aperture was calculated using the \ESIS\ distortion model, described in 
 Table~\ref{table:distortion}.
-"""
+}"""
                 ))
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
