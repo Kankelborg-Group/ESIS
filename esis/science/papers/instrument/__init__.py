@@ -1220,7 +1220,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
 
                     tabular.add_hline()
 
-            table.add_caption(r"""\ESIS\ design parameters.""")
+            table.add_caption(pylatex.NoEscape(r"""\ESIS\ design parameters."""))
 
         with doc.create(pylatex.Subsection('Optics')):
             doc.append(pylatex.NoEscape(
@@ -1363,11 +1363,11 @@ aperture."""
                         tabular.add_row([r'Grating', r'RMS roughness (mm)', r'$<2.3$', r''])
                         tabular.add_row([r'', r'Periods (mm)', r'0.02-2', r''])
                         tabular.add_hline()
-                table.add_caption(
+                table.add_caption(pylatex.NoEscape(
                     r"""Figure and surface roughness requirements compared to metrology for the \ESIS\ optics.
 Slope error (both the numerical estimates and the measurements) is worked out with integration length and sample length 
 defined per ISO 10110."""
-                )
+                ))
 
             doc.append(pylatex.NoEscape(
                 r"""The initial grating radius of curvature, $R_g$, and ruling pattern of the \ESIS\ gratings were 
