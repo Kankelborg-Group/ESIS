@@ -1409,7 +1409,6 @@ Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
 
             with doc.create(kgpy.latex.FigureStar()) as figure:
                 figure.add_image(str(figures.spot_size_pdf()), width=None)
-                figure.append(kgpy.latex.Label('fig:spotSize'))
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 2D histogram of RMS spot sizes for the \defaultNumEmissionLines\ brightest wavelengths in the \ESIS\ passband. 
@@ -1419,6 +1418,7 @@ The \HeI\ line appears cropped since it is cut off by the edge of the detector.
 The images appear flipped compared to Figure~\ref{fig:projections} since the optical system inverts the image of the skyplane.
 }"""
                 ))
+                figure.append(kgpy.latex.Label('fig:spotSize'))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.focus_curve_pdf()), width=None)
