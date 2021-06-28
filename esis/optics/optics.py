@@ -2044,7 +2044,31 @@ class Optics(
                         **label_kwarg,
                     )
 
-        # ax.set_xlim(left=0, right=self.detector.num_pixels[0])
-        # ax.set_ylim(bottom=0, top=self.detector.num_pixels[1])
+    def plot_focus_curve(self, ax: matplotlib.axes.Axes, delta_detector: u.Quantity, num_samples: int):
+
+        delta = np.linspace(-delta_detector, delta_detector, num_samples)
+
+        spot_sizes = []
+
+        for d in delta:
+            other = self.copy()
+            other.detector.piston = other.detector.piston - d
+            s = other.rays_output.spot_size_rms
+            spot_sizes.append(s)
+
+        spot_sizes = u.Quantity(spot_sizes)
+
+        spot_sizes = np.nanmean(spot_sizes, axis=(~3, ~2, ~0))
+
+        with astropy.visualization.quantity_support():
+            for i, spot_size in enumerate(spot_sizes.T):
+                ax.plot(
+                    delta,
+                    spot_size,
+                    label=kgpy.format.quantity(self.wavelength[i])
+                )
+
+        ax.set_xlabel('detector piston (' + str(delta.unit) + ')')
+        ax.set_ylabel('RMS spot radius (' + str(spot_sizes.unit) + ')')
 
 
