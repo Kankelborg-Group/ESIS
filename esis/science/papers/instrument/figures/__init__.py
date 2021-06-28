@@ -555,10 +555,11 @@ kwargs_optics_default = dict(
     all_channels=False,
 )
 
+num_emission_lines_default = 3
 
 def spot_size() -> matplotlib.figure.Figure():
     optics = esis.optics.design.final(**kwargs_optics_default)
-    optics.num_emission_lines = 3
+    optics.num_emission_lines = num_emission_lines_default
     fig, axs = plt.subplots(
         ncols=optics.num_emission_lines,
         figsize=(fig_width, 2.5),
