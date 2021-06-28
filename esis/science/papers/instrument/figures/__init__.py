@@ -578,6 +578,30 @@ def spot_size_pdf() -> pathlib.Path:
     return save_pdf(spot_size)
 
 
+def focus_curve() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(
+        pupil_samples=11,
+        pupil_is_stratified_random=True,
+        field_samples=1,
+        # field_is_stratified_random=True,
+        all_channels=False,
+    )
+    optics.num_emission_lines = num_emission_lines_default
+    fig, ax = plt.subplots(
+        figsize=(column_width, 2),
+        constrained_layout=True,
+    )
+
+    optics.plot_focus_curve(ax=ax, delta_detector=5 * u.mm, num_samples=51)
+    ax.legend(bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=num_emission_lines_default)
+
+    return fig
+
+
+def focus_curve_pdf() -> pathlib.Path:
+    return save_pdf(focus_curve)
+
+
 def vignetting() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(**kwargs_optics_default)
     fig, axs = plt.subplots(

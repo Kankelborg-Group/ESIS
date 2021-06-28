@@ -1420,6 +1420,16 @@ The images appear flipped compared to Figure~\ref{fig:projections} since the opt
                 ))
 
             with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.focus_curve_pdf()), width=None)
+                figure.append(kgpy.latex.Label('fig:focusCurve'))
+                figure.add_caption(pylatex.NoEscape(
+                    r"""\roy{
+Focus curve for the field angle at the middle of the \ESIS\ \FOV\ for the 
+\defaultNumEmissionLines\ brightest wavelengths in the passband.
+}"""
+                ))
+
+            with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.vignetting_pdf()), width=None)
                 figure.append(kgpy.latex.Label('fig:vignetting'))
                 figure.add_caption(pylatex.NoEscape(
