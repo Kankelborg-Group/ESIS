@@ -1457,6 +1457,67 @@ Table~\ref{table:distortion}.
                 ))
                 figure.append(kgpy.latex.Label('fig:distortion'))
 
+            doc.append(pylatex.NoEscape(
+                r"""The ray trace model was also used to quantify how mirror and positional tolerances affect the 
+instrument's spatial resolution.
+Each element of the model was individually perturbed, then a compensation applied to adjust the image on the \CCD.
+The compensation optimized grating tip/tilt angle and \CCD focus position, so that the image was re-centered and RMS 
+spot size minimized at the positions in Fig.~\ref{F-spot} \roy{minimized at the vertices of the field stop and the central field angle}.
+We then computed the maximum change in RMS spot size over all spot positions between the optimized and perturbed models.
+The computed positional tolerances for each element in the ESIS optical system are listed in Table~\ref{table:tol}  
+
+The imaging error budget is displayed in Table~\ref{table:tol}.
+For the primary mirror and grating surface figure contributions, we choose the MTF figures of merit from the surface 
+roughness specifications described earlier.
+To quantify the remaining entries, we assume that each term can be represented by a gaussian function of width 
+$\sigma^2$ that ``blurs'' the final image.
+The value of $\sigma$ then corresponds to the maximum change in RMS spot size for each term as it is perturbed in the 
+tolerance analysis described above.
+The value of the modulation transfer function (MTF) in the right-most column of Table~\ref{table:tol} is computed from 
+each of the gaussian blur terms at the Nyquist frequency (\SI{0.5}{cycles\per arcsecond}).
+From Table~\ref{table:tol}, we estimate the total MTF of ESIS to be $0.109$ at the Nyquist frequency.
+Compared to, for example, the Rayleigh criterion of \SI{0.09}{cycles\per arcsecond}~\citep{Rayleigh_1879} we estimate 
+the resolution of ESIS to be essentially pixel limited.
+Since ESIS pixels span \SI{0.76}{\arcsecond}, the resolution target in Table~\ref{table:scireq} is obtained by this 
+design."""
+            ))
+
+            doc.append(pylatex.NoEscape(
+                r"""
+\begin{table*}[!htb]
+\caption{Imaging error budget and tolerance analysis results.  MTF is given at \protect\SI{0.5}{cycles\per arcsecond}.}
+\begin{tabular}{llrcc}
+Element 	&	  		& Tolerance & $\sigma^2$ $[\mu m]$ & MTF \\
+\hline %-----------------------------------------------------------------------------
+Primary M.	& Surface figure & (Ref. Table~\ref{table:surfaces}) & & 0.700 \\
+			& Decenter	& 1 \si{\milli\meter}		& 1.700 	& 0.881 \\
+            %& Defocus	& .08			& 3.9 		&  \\
+Grating		& Surface figure & (Ref. Table~\ref{table:surfaces}) & & 0.600 \\
+			& Radius	& 2.5 \si{\milli\meter}		& 1.410		& 0.916 \\
+            & Decenter	& 1 \si{\milli\meter}		& 0.001		& 1.000 \\
+            & Defocus	& 0.015 \si{\milli\meter}	& 0.801		& 0.972 \\
+            & Clocking  & 13 \si{\milli\radian} 	& 1.300 	& 0.929 \\
+CCD			& Decenter	& 1 \si{\milli\meter}		& 0.310		& 0.996 \\
+			& Defocus 	& 0.229 \si{\milli\meter}	& 0.706 	& 0.978 \\            
+\hline %-----------------------------------------------------------------------------
+\multicolumn{2}{l}{Max RMS spot radius (modeled)} 	&				& 1.720			& 0.878 \\
+\multicolumn{2}{l}{CCD charge diffusion (est.)} &				& 2.000			& 0.839 \\
+Thermal drift	& 		&				& 0.192			& 0.998 \\
+SPARCS drift	& 		&				& 1.920			& 0.998 \\
+Pointing jitter & 		&				& 3.430			& 0.597 \\
+Diff. Limit 	& 		&				&				& 0.833 \\
+\hline %-----------------------------------------------------------------------------
+Total MTF	 	& 		&				&				& 0.109 \\
+\end{tabular}
+\label{table:tol}
+\end{table*}
+"""
+            ))
+            # with doc.create(pylatex.Table()) as table:
+            #     # table._star_latex_name = True
+            #     with table.create(pylatex.Center()) as centering:
+            #         with centering.create(pylatex.Tabular('llrcc')) as tabular:
+
         with doc.create(pylatex.Subsection('Coatings and Filters')):
             pass
 
