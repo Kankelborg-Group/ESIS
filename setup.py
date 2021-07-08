@@ -18,6 +18,7 @@ setup(
         'pylatex',
         'num2words',
         'bokeh',
+        'pandas',
     ],
     url='https://github.com/Kankelborg-Group/ESIS',
     license='',
