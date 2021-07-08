@@ -2,6 +2,7 @@ import typing as typ
 import pathlib
 import astropy.units as u
 import pandas
+from . import witness
 
 __all__ = [
     'vs_angle_at_0aoi',
