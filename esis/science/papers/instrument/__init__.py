@@ -545,9 +545,6 @@ def document() -> kgpy.latex.Document:
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
-    # doc.set_variable(name='ESIS', value=pylatex.Command('ac', 'ESIS'))
-    # doc.set_variable(name='MOSES', value=pylatex.Command('ac', 'MOSES'))
-
     with doc.create(kgpy.latex.Abstract()):
         doc.append(pylatex.NoEscape(
             r"""The \ESIS\ is a next generation rocket borne instrument that will investigate magnetic reconnection 
@@ -1519,7 +1516,75 @@ Total MTF	 	& 		&				&				& 0.109 \\
             #         with centering.create(pylatex.Tabular('llrcc')) as tabular:
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
-            pass
+            with doc.create(pylatex.Figure()) as figure:
+                figure._star_latex_name = True
+                figure.add_image('figures/Grating_Multilayer_2', width=kgpy.latex.textwidth)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""
+(A) Measured efficiency of a single grating as a function of reflection angle.
+Note flat response in first order over instrument FOV and suppression of zero order.
+(B) Schematic of the Al/SiC/Mg multilayer with $N=4$ layers.
+(C) Measured reflectance for several multilayer coated witness samples.
+Dashed lines mark He\,\textsc{i} (left, \SI{58.4}{\nano\meter}) and O\,\textsc{v} (right, \SI{63.0}{\nano\meter}) 
+emission line wavelengths, with additional vertical line showing suppression of He\,\textsc{ii} emission (far left 
+dashed line, \SI{30.4}{\nano\meter})
+(D) Measured multilayer coated grating efficiency as a function of wavelength.
+Dashed lines mark the same emission lines as in (C).
+"""
+                ))
+                figure.append(kgpy.latex.Label('F-multilayer'))
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.grating_multilayer_schematic_pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""
+Schematic of the Al/SiC/Mg multilayer with $N=4$ layers.
+"""
+                ))
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.grating_efficiency_vs_angle_pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""
+Measured efficiency of a single grating as a function of reflection angle.
+Note flat response in first order over instrument FOV and suppression of zero order.
+"""
+                ))
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.grating_efficiency_vs_wavelength_pdf()), width=None)
+
+            doc.append(pylatex.NoEscape(r"""
+The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter}, 
+developed by a collaboration between Reflective X-Ray Optics LLC and Lawrence Berkeley National Laboratory (LBNL).
+In Fig.~\ref{F-multilayer} (A), characterization of a single, randomly selected multilayer coated grating at LBNL shows 
+that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
+completely suppressed.
+Figure~\ref{F-multilayer} (B) shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
+$m=0$ order using four layer pairs of silicon carbide (SiC) and magnesium (Mg).
+The Aluminum (Al) layers are deposited adjacent to each Mg layer to mitigate corrosion.
+
+The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} in 
+Fig.~\ref{F-multilayer} (C), measured from witness samples coated at the same time as the diffraction gratings.
+Combined with the predicted groove efficiency from \S\,\ref{SS-Optics} and, given the relatively shallow groove profile 
+and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} at 
+\SI{63}{\nano\meter}.
+This is confirmed by the first order efficiency measured from a single ESIS grating in Fig.~\ref{F-multilayer} (D).  
+
+Unlike EUV imagers (\eg, \textit{TRACE}~\citep{Handy99}, \textit{AIA}~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
+the ESIS passband is defined by a combination of the field stop and grating (\S\,\ref{SS-Optics}, Fig.~\ref{F-disp}) 
+rather than multi-layer coatings.
+The coating selectivity is therefore not critical in this respect, allowing the multi-layer to be manipulated to 
+suppress out-of-band bright, nearby emission lines.
+Figure~\ref{F-multilayer} (D) shows the peak reflectance of the grating multilayer is shifted slightly towards longer 
+wavelengths to attenuate the He\,\textsc{i} emission line, reducing the likelihood of detector saturation.
+A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) line.
+Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} of that 
+at \SI{63}{\nano\meter} (Fig.~\ref{F-multilayer} (D)).
+In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} is 
+$\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the CCD.
+"""
+            ))
 
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
             pass
