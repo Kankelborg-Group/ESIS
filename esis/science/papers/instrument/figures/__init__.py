@@ -701,3 +701,42 @@ def grating_efficiency_vs_angle_pdf() -> pathlib.Path:
     return save_pdf(grating_efficiency_vs_angle)
 
 
+def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    fig, axs = plt.subplots(
+        nrows=2,
+        sharex=True,
+        figsize=(column_width, 3),
+        constrained_layout=True,
+    )
+    eff_unit = u.percent
+    wavl_unit = u.Angstrom
+    witness = esis.optics.grating.efficiency.witness
+    with astropy.visualization.quantity_support():
+        for func in [witness.vs_wavelength_g17, witness.vs_wavelength_g19, witness.vs_wavelength_g24]:
+            serial, angle_input, wavelength, efficiency = func()
+            axs[0].plot(
+                wavelength.to(wavl_unit),
+                efficiency.to(eff_unit),
+                label=serial,
+            )
+        axs[0].legend()
+        axs[0].set_xlabel(None)
+        axs[0].set_ylabel(f'efficiency ({eff_unit})')
+
+        angle_input, wavelength, efficiency = esis.optics.grating.efficiency.vs_wavelength()
+        axs[1].plot(
+            wavelength.to(wavl_unit),
+            efficiency.to(eff_unit),
+        )
+        axs[1].set_xlabel(f'wavelength ({wavl_unit})')
+        axs[1].set_ylabel(f'efficiency ({eff_unit})')
+
+
+    return fig
+
+
+def grating_efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(grating_efficiency_vs_wavelength)
+
+
+
