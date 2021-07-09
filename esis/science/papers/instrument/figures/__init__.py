@@ -8,6 +8,7 @@ import scipy.spatial
 import astropy.units as u
 import astropy.visualization
 import kgpy.vector
+import kgpy.format
 import kgpy.plot
 import esis.optics
 
@@ -673,4 +674,30 @@ def grating_multilayer_schematic() -> matplotlib.figure.Figure:
 
 def grating_multilayer_schematic_pdf() -> pathlib.Path:
     return save_pdf(grating_multilayer_schematic)
+
+
+def grating_efficiency_vs_angle() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(
+        figsize=(column_width, 2),
+        constrained_layout=True,
+    )
+    eff_unit = u.percent
+    output_angle_unit = u.deg
+    for func in [esis.optics.grating.efficiency.vs_angle_at_0aoi, esis.optics.grating.efficiency.vs_angle_at_3aoi]:
+        input_angle, output_angle, wavelength, eff = func()
+        ax.plot(
+            output_angle.to(output_angle_unit),
+            eff.to(eff_unit),
+            label=f'input angle = {kgpy.format.quantity(input_angle, digits_after_decimal=0)}'
+        )
+    ax.set_xlabel(f'output angle ({output_angle_unit:latex})')
+    ax.set_ylabel(f'efficiency ({eff_unit})')
+    ax.legend()
+
+    return fig
+
+
+def grating_efficiency_vs_angle_pdf() -> pathlib.Path:
+    return save_pdf(grating_efficiency_vs_angle)
+
 
