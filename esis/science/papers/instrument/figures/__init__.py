@@ -642,3 +642,35 @@ def distortion() -> matplotlib.figure.Figure:
 def distortion_pdf() -> pathlib.Path:
     return save_pdf(distortion)
 
+
+def grating_multilayer_schematic() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    fig, ax = plt.subplots(
+        figsize=(column_width, 2.2),
+        constrained_layout=True,
+    )
+    optics.grating.surface.material.plot_layers(
+        ax=ax,
+        layer_material_color=dict(
+            Al='lightblue',
+            Mg='pink',
+            SiC='gray',
+        ),
+        layer_label_x=dict(
+            Al=1.0,
+            Mg=0.5,
+            SiC=0.0,
+        ),
+        layer_label_x_text=dict(
+            Al=1.2,
+            Mg=0.5,
+            SiC=-0.2,
+        )
+    )
+    fig.set_constrained_layout_pads(w_pad=0.2)
+    return fig
+
+
+def grating_multilayer_schematic_pdf() -> pathlib.Path:
+    return save_pdf(grating_multilayer_schematic)
+
