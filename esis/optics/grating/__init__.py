@@ -11,7 +11,7 @@ __all__ = ['Grating']
 
 SurfaceT = optics.surface.Surface[
     optics.surface.sag.Toroidal,
-    optics.surface.material.Mirror,
+    optics.surface.material.MultilayerMirror,
     optics.surface.aperture.IsoscelesTrapezoid,
     optics.surface.aperture.IsoscelesTrapezoid,
     optics.surface.rulings.CubicPolyDensity,
@@ -40,6 +40,8 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     inner_border_width: u.Quantity = 0 * u.mm
     dynamic_clearance: u.Quantity = 0 * u.mm
     substrate_thickness: typ.Optional[u.Quantity] = None
+    multilayer_material: typ.Optional[np.ndarray] = None
+    multilayer_thickness: typ.Optional[u.Quantity] = None
 
     @property
     def dataframe(self) -> pandas.DataFrame:
@@ -145,7 +147,11 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
             thickness = -self.substrate_thickness
         else:
             thickness = None
-        surface.material = optics.surface.material.Mirror(thickness=thickness)
+        surface.material = optics.surface.material.MultilayerMirror(
+            thickness=thickness,
+            layer_material=self.multilayer_material,
+            layer_thickness=self.multilayer_thickness,
+        )
         side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
         surface.aperture = optics.surface.aperture.IsoscelesTrapezoid(
             apex_offset=-(self.cylindrical_radius - side_border_x),
