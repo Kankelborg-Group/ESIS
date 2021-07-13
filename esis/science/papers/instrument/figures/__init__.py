@@ -749,10 +749,15 @@ def grating_efficiency_vs_angle_pdf() -> pathlib.Path:
 
 
 def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics.num_emission_lines = 2
+    optics2 = optics.copy()
+    optics2.grating.diffraction_order = 2
+    optics2.num_emission_lines = 2
     fig, axs = plt.subplots(
         nrows=2,
         sharex=True,
-        figsize=(column_width, 3),
+        figsize=(column_width, 5),
         constrained_layout=True,
     )
     eff_unit = u.percent
@@ -767,17 +772,65 @@ def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
                 label=serial,
             )
         axs[0].legend()
+
         axs[0].set_xlabel(None)
-        axs[0].set_ylabel(f'efficiency ({eff_unit})')
+        axs[0].set_ylabel(f'efficiency ({eff_unit:latex})')
+        optics.plot_wavelength_range(ax=axs[0])
+        axs[0].text(
+            x=(optics.wavelength_min + optics.wavelength_max) / 2,
+            y=1.01,
+            s='$m=1$',
+            transform=axs[0].get_xaxis_transform(),
+            ha='center',
+            va='bottom',
+        )
+        optics.bunch.plot_wavelength(
+            ax=axs[0],
+            num_emission_lines=optics.num_emission_lines,
+            digits_after_decimal=digits_after_decimal,
+            colors=['orangered', 'blue'],
+        )
+
+        optics2.plot_wavelength_range(ax=axs[0])
+        axs[0].text(
+            x=(optics2.wavelength_min + optics2.wavelength_max) / 2,
+            y=1.01,
+            s='$m=2$',
+            transform=axs[0].get_xaxis_transform(),
+            ha='center',
+            va='bottom',
+        )
+        optics2.bunch.plot_wavelength(
+            ax=axs[0],
+            num_emission_lines=optics2.num_emission_lines,
+            digits_after_decimal=digits_after_decimal,
+            colors=['gray', 'black'],
+        )
 
         angle_input, wavelength, efficiency = esis.optics.grating.efficiency.vs_wavelength()
         axs[1].plot(
             wavelength.to(wavl_unit),
             efficiency.to(eff_unit),
+            label='grating 017',
         )
-        axs[1].set_xlabel(f'wavelength ({wavl_unit})')
-        axs[1].set_ylabel(f'efficiency ({eff_unit})')
-
+        axs[1].add_artist(axs[1].legend())
+        optics.plot_wavelength_range(ax=axs[1])
+        optics2.plot_wavelength_range(ax=axs[1])
+        lines = optics.bunch.plot_wavelength(
+            ax=axs[1],
+            num_emission_lines=optics.num_emission_lines,
+            digits_after_decimal=digits_after_decimal,
+            colors=['orangered', 'blue'],
+        )
+        lines += optics2.bunch.plot_wavelength(
+            ax=axs[1],
+            num_emission_lines=optics2.num_emission_lines,
+            digits_after_decimal=digits_after_decimal,
+            colors=['gray', 'black'],
+        )
+        axs[1].set_xlabel(f'wavelength ({wavl_unit:latex})')
+        axs[1].set_ylabel(f'efficiency ({eff_unit:latex})')
+        axs[1].legend(handles=lines, bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
 
     return fig
 
