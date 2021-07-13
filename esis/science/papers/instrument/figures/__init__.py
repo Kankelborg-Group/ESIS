@@ -465,7 +465,12 @@ def schematic_grating_pdf() -> pathlib.Path:
 def bunch() -> matplotlib.figure.Figure:
     fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
     optics = esis.optics.design.final()
-    optics.bunch.plot(ax=ax, num_emission_lines=optics.num_emission_lines, digits_after_decimal=digits_after_decimal)
+    optics.bunch.plot(
+        ax=ax,
+        num_emission_lines=optics.num_emission_lines,
+        digits_after_decimal=digits_after_decimal,
+        label_fontsize=6,
+    )
     return fig
 
 
