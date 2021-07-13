@@ -685,6 +685,14 @@ def grating_multilayer_schematic() -> matplotlib.figure.Figure:
             SiC=0.5,
         )
     )
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_xlabel(None)
+    ax.set_ylabel(None)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
     fig.set_constrained_layout_pads(w_pad=0.2)
     return fig
 
