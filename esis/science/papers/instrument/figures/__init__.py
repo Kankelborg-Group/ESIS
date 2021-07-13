@@ -623,9 +623,7 @@ def focus_curve_pdf() -> pathlib.Path:
 def vignetting() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(**kwargs_optics_default)
     fig, axs = plt.subplots(
-        ncols=1,
-        nrows=2,
-        figsize=(column_width, 5),
+        figsize=(column_width, 2.9),
         sharex=True,
         sharey=True,
         constrained_layout=True,
