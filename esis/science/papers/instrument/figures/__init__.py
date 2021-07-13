@@ -17,7 +17,7 @@ __all__ = [
     'layout_pdf'
 ]
 
-fig_width = 513.11743 / 72
+text_width = 513.11743 / 72
 column_width = 242.26653 / 72
 
 digits_after_decimal = 2
@@ -39,7 +39,7 @@ def save_pdf(fig_factory: typ.Callable[[], matplotlib.figure.Figure]) -> pathlib
 
 
 def layout() -> matplotlib.figure.Figure:
-    fig_layout = plt.figure(figsize=(fig_width, fig_width))
+    fig_layout = plt.figure(figsize=(text_width, text_width))
     ax_layout = fig_layout.add_subplot(111, projection='3d')
     # fig_layout, ax_layout = plt.subplots(figsize=(7.1, 4), constrained_layout=True)
     ax_layout.set_axis_off()
@@ -119,17 +119,17 @@ def layout_pdf() -> pathlib.Path:
     if not path.exists():
         fig = layout()
         h = 1.5
-        offset = (fig_width - h) / 2
+        offset = (text_width - h) / 2
         fig.savefig(
             fname=path,
-            bbox_inches=fig.bbox_inches.from_bounds(0, offset, fig_width, h)
+            bbox_inches=fig.bbox_inches.from_bounds(0, offset, text_width, h)
         )
         plt.close(fig)
     return path
 
 
 def schematic() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
     # fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
     ax.margins(x=.01, y=.01)
     # ax.autoscale(enable=True, axis='both', tight=True)
@@ -463,7 +463,7 @@ def schematic_grating_pdf() -> pathlib.Path:
 
 
 def bunch() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(fig_width, 2), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
     optics = esis.optics.design.final()
     optics.bunch.plot(
         ax=ax,
@@ -570,7 +570,7 @@ def spot_size() -> matplotlib.figure.Figure:
     optics.num_emission_lines = num_emission_lines_default
     fig, axs = plt.subplots(
         ncols=optics.num_emission_lines,
-        figsize=(fig_width, 2.5),
+        figsize=(text_width, 2.5),
         sharex=True,
         sharey=True,
         constrained_layout=True
