@@ -2030,7 +2030,7 @@ class Optics(
                 wire_fs.x[..., 0, 0],
                 wire_fs.y[..., 0, 0],
                 color='black',
-                label='undistorted field stop',
+                label='magnified field stop',
             )
 
             for i in range(wire.shape[0]):
