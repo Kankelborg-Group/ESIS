@@ -603,8 +603,15 @@ def focus_curve() -> matplotlib.figure.Figure:
         constrained_layout=True,
     )
 
-    optics.plot_focus_curve(ax=ax, delta_detector=5 * u.mm, num_samples=51)
-    ax.legend(bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=num_emission_lines_default)
+    optics.plot_focus_curve(
+        ax=ax,
+        delta_detector=5 * u.mm,
+        num_samples=51,
+        digits_after_decimal=2,
+        use_latex=True,
+    )
+    ax.legend(bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=2)
+    fig.set_constrained_layout_pads(w_pad=.10, h_pad=0.10)
 
     return fig
 
