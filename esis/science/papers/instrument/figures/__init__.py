@@ -497,7 +497,8 @@ def field_stop_projections() -> matplotlib.figure.Figure:
             'orangered',
             'red',
         ],
-        digits_after_decimal=digits_after_decimal
+        digits_after_decimal=digits_after_decimal,
+        use_latex=True,
     )
     ax.set_aspect('equal')
     ax.legend(bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
