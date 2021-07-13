@@ -662,6 +662,40 @@ def distortion_pdf() -> pathlib.Path:
     return save_pdf(distortion)
 
 
+def distortion_residual() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics.num_emission_lines = 3
+    fig, axs = plt.subplots(
+        nrows=2,
+        ncols=optics.num_emission_lines,
+        sharex=True,
+        sharey=True,
+        figsize=(text_width, 4.4),
+        constrained_layout=True,
+    )
+    distortion_linear = optics.rays_output.distortion(polynomial_degree=1)
+    distortion_quadratic = optics.rays_output.distortion(polynomial_degree=2)
+
+    distortion_linear.plot_residual(
+        axs=axs[0],
+        use_xlabels=False,
+    )
+    distortion_quadratic.plot_residual(
+        axs=axs[1],
+        use_titles=False,
+    )
+    fullname = optics.bunch.fullname(
+        digits_after_decimal=digits_after_decimal, use_latex=True)[np.argsort(optics.wavelength)]
+    for name, ax in zip(fullname, axs[0]):
+        ax.set_title(name, fontsize=10)
+
+    return fig
+
+
+def distortion_residual_pdf() -> pathlib.Path:
+    return save_pdf(distortion_residual)
+
+
 def grating_multilayer_schematic() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(**kwargs_optics_default)
     fig, ax = plt.subplots(

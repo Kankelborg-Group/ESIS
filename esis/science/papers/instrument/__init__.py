@@ -1456,6 +1456,18 @@ Table~\ref{table:distortion}.
                 ))
                 figure.append(kgpy.latex.Label('fig:distortion'))
 
+            with doc.create(pylatex.Figure()) as figure:
+                figure._star_latex_name = True
+                figure.add_image(str(figures.distortion_residual_pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""\roy{
+Magnitude of the residual between a linear distortion model and the raytrace model (top) and between a quadratic 
+distortion model and the raytrace model (bottom). This figure demonstrates that a quadratic distortion model is
+sufficient to achieve sub-pixel accuracy.
+}"""
+                ))
+                figure.append(kgpy.latex.Label('fig:distortionResidual'))
+
             doc.append(pylatex.NoEscape(
                 r"""The ray trace model was also used to quantify how mirror and positional tolerances affect the 
 instrument's spatial resolution.
