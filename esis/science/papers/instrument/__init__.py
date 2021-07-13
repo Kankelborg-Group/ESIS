@@ -18,7 +18,9 @@ path_figures = path_base / 'figures'
 
 def document() -> kgpy.latex.Document:
 
-    plt.rcParams['font.size'] = 7
+    plt.rcParams['text.usetex'] = True
+    plt.rcParams['font.family'] = 'serif'
+    plt.rcParams['font.size'] = 9
     plt.rcParams['lines.linewidth'] = 1
 
     wavl_digits = 2
