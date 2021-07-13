@@ -630,8 +630,8 @@ def vignetting() -> matplotlib.figure.Figure:
         squeeze=False,
     )
     model = optics.rays_output.vignetting(polynomial_degree=optics.vignetting_polynomial_degree)
-    model.plot_unvignetted(axs=axs[0], use_xlabels=False)
-    model.plot_residual(axs=axs[1], use_titles=False,)
+    model.plot_unvignetted(axs=axs[0])
+    axs[0, 0].set_title(optics.bunch.fullname(digits_after_decimal=digits_after_decimal, use_latex=True)[0])
     return fig
 
 
