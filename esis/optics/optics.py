@@ -1929,6 +1929,7 @@ class Optics(
             ax: matplotlib.axes.Axes,
             wavelength_color: typ.Optional[typ.List[str]] = None,
             digits_after_decimal: int = 3,
+            use_latex: bool = False,
     ):
         with astropy.visualization.quantity_support():
 
@@ -1952,7 +1953,8 @@ class Optics(
 
             if wire.ndim == 3:
                 wire = wire[np.newaxis]
-            transition = self.bunch.fullname(digits_after_decimal=digits_after_decimal)[np.argsort(self.wavelength)]
+            transition = self.bunch.fullname(
+                digits_after_decimal=digits_after_decimal, use_latex=use_latex)[np.argsort(self.wavelength)]
             intensity = self.bunch.intensity[np.argsort(self.wavelength)]
             intensity = np.log2(intensity.value)
             intensity = intensity / intensity.max()
