@@ -578,6 +578,10 @@ def spot_size() -> matplotlib.figure.Figure:
     optics.rays_output.plot_spot_size_vs_field(
         axs=axs,
     )
+    fullname = optics.bunch.fullname(
+        digits_after_decimal=digits_after_decimal, use_latex=True)[np.argsort(optics.wavelength)]
+    for name, ax in zip(fullname, axs):
+        ax.set_title(name)
     return fig
 
 
