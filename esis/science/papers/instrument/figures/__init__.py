@@ -677,12 +677,12 @@ def grating_multilayer_schematic() -> matplotlib.figure.Figure:
         layer_label_x=dict(
             Al=1.0,
             Mg=0.5,
-            SiC=0.0,
+            SiC=0.5,
         ),
         layer_label_x_text=dict(
             Al=1.2,
             Mg=0.5,
-            SiC=-0.2,
+            SiC=0.5,
         )
     )
     fig.set_constrained_layout_pads(w_pad=0.2)
