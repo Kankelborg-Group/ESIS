@@ -1990,6 +1990,19 @@ class Optics(
             wavelength = self.wavelength_sorted
             wire_fs.z = wavelength
 
+            vertices = self.field_stop.surface.aperture.vertices
+            num_grid_points = 100
+            mesh_fs = np.stack(
+                arrays=[
+                    np.linspace(vertices[1], vertices[4], num_grid_points),
+                    np.linspace(vertices[0], vertices[~2], num_grid_points),
+                    np.linspace(vertices[2], vertices[~0], num_grid_points),
+                    np.linspace(vertices[3], vertices[~1], num_grid_points),
+                ],
+                axis=~0,
+            )[..., np.newaxis]
+            mesh_fs.z = wavelength
+
             if wavelength_color is None:
                 colormap = plt.cm.rainbow_r
                 colornorm = plt.Normalize(vmin=wavelength.min().value, vmax=wavelength.max().value)
@@ -2002,24 +2015,32 @@ class Optics(
             rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
             subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
             wire = subsystem_model(wire_fs)
+            mesh = subsystem_model(mesh_fs)
             wire = wire.to_3d()
+            mesh = mesh.to_3d()
 
-            print(wire.shape)
-
-            wire.x = wire.x - wire.x.mean(0)
-            wire.y = wire.y - wire.y.mean(0)
+            shift_x = wire.x.mean(0)
+            shift_y = wire.y.mean(0)
+            wire.x = wire.x - shift_x
+            wire.y = wire.y - shift_y
+            mesh.x = mesh.x - shift_x
+            mesh.y = mesh.y - shift_y
 
             wire_fs.z = 0 * u.mm
+            mesh_fs.z = 0 * u.mm
             wire_fs = subsystem.transform_roll(wire_fs)
+            mesh_fs = subsystem.transform_roll(mesh_fs)
 
             # mag = wire.length.mean() / wire_fs.length.mean()
             mag = self.arm_ratio * u.pix / self.detector.pixel_width.to(u.mm)
-            print(mag)
             wire_fs.x = wire_fs.x * mag
             wire_fs.y = wire_fs.y * mag
+            mesh_fs.x = mesh_fs.x * mag
+            mesh_fs.y = mesh_fs.y * mag
 
             if wire.ndim == 3:
                 wire = wire[np.newaxis]
+                mesh = mesh[np.newaxis]
             transition = self.bunch.fullname(
                 digits_after_decimal=digits_after_decimal, use_latex=use_latex)[np.argsort(self.wavelength)]
             intensity = self.bunch.intensity[np.argsort(self.wavelength)]
@@ -2031,6 +2052,14 @@ class Optics(
                 wire_fs.y[..., 0, 0],
                 color='black',
                 label='magnified field stop',
+                zorder=10,
+            )
+
+            ax.plot(
+                mesh_fs.x[..., 0],
+                mesh_fs.y[..., 0],
+                color='black',
+                zorder=10,
             )
 
             for i in range(wire.shape[0]):
@@ -2040,12 +2069,19 @@ class Optics(
                     else:
                         label_kwarg = dict()
                     wire_iw = wire[i, ..., w]
+                    mesh_iw = mesh[i, ..., w]
                     ax.plot(
                         wire_iw.x,
                         wire_iw.y,
                         color=wavelength_color[w],
                         alpha=intensity[w],
                         **label_kwarg,
+                    )
+                    ax.plot(
+                        mesh_iw.x,
+                        mesh_iw.y,
+                        color=wavelength_color[w],
+                        alpha=intensity[w],
                     )
 
     def plot_focus_curve(
