@@ -2079,7 +2079,15 @@ class Optics(
                     label=self.bunch.fullname(digits_after_decimal=digits_after_decimal, use_latex=use_latex)[i]
                 )
 
-        ax.set_xlabel('detector piston (' + str(delta.unit) + ')')
-        ax.set_ylabel('RMS spot radius (' + str(spot_sizes.unit) + ')')
+            ax.set_xlabel(f'detector position ({ax.get_xlabel()})')
+            ax.set_ylabel(f'RMS spot radius ({ax.get_ylabel()})')
+
+    def plot_wavelength_range(
+            self,
+            ax: matplotlib.axes.Axes,
+    ):
+        ax.set_facecolor('lightgray')
+
+        ax.axvspan(xmin=self.wavelength_min, xmax=self.wavelength_max, facecolor='white', edgecolor='none')
 
 
