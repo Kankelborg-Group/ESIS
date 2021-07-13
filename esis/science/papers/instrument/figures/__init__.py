@@ -599,7 +599,7 @@ def focus_curve() -> matplotlib.figure.Figure:
     )
     optics.num_emission_lines = num_emission_lines_default
     fig, ax = plt.subplots(
-        figsize=(column_width, 2),
+        figsize=(column_width, 2.5),
         constrained_layout=True,
     )
 
