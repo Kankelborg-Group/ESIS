@@ -40,9 +40,10 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     border_width: u.Quantity = 0 * u.mm
     inner_border_width: u.Quantity = 0 * u.mm
     dynamic_clearance: u.Quantity = 0 * u.mm
-    substrate_thickness: typ.Optional[u.Quantity] = None
-    multilayer_material: typ.Optional[np.ndarray] = None
-    multilayer_thickness: typ.Optional[u.Quantity] = None
+    material: optics.surface.material.MultilayerMirror = dataclasses.field(
+        default_factory=optics.surface.material.MultilayerMirror)
+    witness: optics.surface.material.MultilayerMirror = dataclasses.field(
+        default_factory=optics.surface.material.MultilayerMirror)
 
     @property
     def dataframe(self) -> pandas.DataFrame:
@@ -144,15 +145,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
             ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic,
             ruling_spacing_cubic=self.ruling_spacing_coeff_cubic,
         )
-        if self.substrate_thickness is not None:
-            thickness = -self.substrate_thickness
-        else:
-            thickness = None
-        surface.material = optics.surface.material.MultilayerMirror(
-            thickness=thickness,
-            layer_material=self.multilayer_material,
-            layer_thickness=self.multilayer_thickness,
-        )
+        surface.material = self.material
         side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
         surface.aperture = optics.surface.aperture.IsoscelesTrapezoid(
             apex_offset=-(self.cylindrical_radius - side_border_x),
@@ -188,10 +181,8 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.border_width = self.border_width.copy()
         other.inner_border_width = self.inner_border_width.copy()
         other.dynamic_clearance = self.dynamic_clearance.copy()
-        if self.substrate_thickness is not None:
-            other.substrate_thickness = self.substrate_thickness.copy()
-        else:
-            other.substrate_thickness = self.substrate_thickness
+        other.material = self.material.copy()
+        other.witness = self.witness.copy()
         return other
 
     def apply_gregorian_layout(
