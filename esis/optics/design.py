@@ -216,29 +216,14 @@ def final(
     grating.inner_half_width = 13.02 * u.mm - grating.inner_border_width
     grating.outer_half_width = 10.49 * u.mm - grating.border_width
     grating.dynamic_clearance = 1.25 * u.mm
-    grating.substrate_thickness = 10 * u.mm
-    grating.multilayer_material = np.array([
-        'Al',
-    ] + 3 * [
-        'Mg',
-        'SiC',
-        'Al',
-    ] + [
-        'Mg',
-        'Al',
-        'SiC',
-    ])
-    grating.multilayer_thickness = u.Quantity([
-        10 * u.nm,
-    ] + 3 * [
-        30 * u.nm,
-        10 * u.nm,
-        1 * u.nm,
-    ] + [
-        30 * u.nm,
-        4 * u.nm,
-        10 * u.nm,
-    ])
+    grating.material.thickness = -10 * u.mm
+    grating.material.base.material = np.array(['Al'])
+    grating.material.base.thickness = [10] * u.nm
+    grating.material.main.material = np.array(['Mg', 'SiC', 'Al'])
+    grating.material.main.thickness = [30, 10, 1] * u.nm
+    grating.material.main.num_periods = 3
+    grating.material.cap.material = np.array(['Mg', 'Al', 'SiC'])
+    grating.material.cap.thickness = [30, 4, 10] * u.nm
     if all_channels:
         grating.plot_kwargs['linestyle'] = dashstyle_channels
 
