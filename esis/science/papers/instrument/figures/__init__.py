@@ -672,7 +672,7 @@ def grating_multilayer_schematic() -> matplotlib.figure.Figure:
         layer_material_color=dict(
             Al='lightblue',
             Mg='pink',
-            SiC='gray',
+            SiC='lightgray',
         ),
         layer_label_x=dict(
             Al=1.0,
