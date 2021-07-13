@@ -649,6 +649,8 @@ def distortion() -> matplotlib.figure.Figure:
     # fig.set_constrained_layout_pads(h_pad=.15)
     optics.plot_field_stop_distortion(
         ax=ax,
+        digits_after_decimal=digits_after_decimal,
+        use_latex=True,
     )
     ax.set_aspect('equal')
     ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center')
