@@ -479,7 +479,7 @@ def bunch_pdf() -> pathlib.Path:
 
 
 def field_stop_projections() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(column_width, 2.8), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(column_width, 3), constrained_layout=True)
     fig.set_constrained_layout_pads(h_pad=.15)
     # ax.margins(x=.01, y=.01)
     optics = esis.optics.design.final(all_channels=False)
