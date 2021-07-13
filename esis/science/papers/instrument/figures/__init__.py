@@ -186,7 +186,7 @@ def schematic() -> matplotlib.figure.Figure:
         **kwargs_annotate
     )
     width = optics.grating.inner_half_width + optics.grating.inner_border_width
-    grating_z = optics.grating.substrate_thickness / 2 * zh
+    grating_z = -optics.grating.material.thickness / 2 * zh
     grating_zx = optics.grating.transform.translation_eff.zx - (width * xh) - grating_z
     ax.annotate(
         text=str(optics.grating.name),
