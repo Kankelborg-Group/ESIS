@@ -2048,7 +2048,14 @@ class Optics(
                         **label_kwarg,
                     )
 
-    def plot_focus_curve(self, ax: matplotlib.axes.Axes, delta_detector: u.Quantity, num_samples: int):
+    def plot_focus_curve(
+            self,
+            ax: matplotlib.axes.Axes,
+            delta_detector: u.Quantity,
+            num_samples: int,
+            digits_after_decimal: int = 3,
+            use_latex: bool = False
+    ):
 
         delta = np.linspace(-delta_detector, delta_detector, num_samples)
 
@@ -2069,7 +2076,7 @@ class Optics(
                 ax.plot(
                     delta,
                     spot_size,
-                    label=kgpy.format.quantity(self.wavelength[i])
+                    label=self.bunch.fullname(digits_after_decimal=digits_after_decimal, use_latex=use_latex)[i]
                 )
 
         ax.set_xlabel('detector piston (' + str(delta.unit) + ')')
