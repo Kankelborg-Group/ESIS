@@ -191,7 +191,7 @@ def schematic() -> matplotlib.figure.Figure:
     ax.annotate(
         text=str(optics.grating.name),
         xy=grating_zx.to_tuple(),
-        xytext=(grating_zx.x + 100 * u.mm, default_offset_x),
+        xytext=(grating_zx.x + 150 * u.mm, default_offset_x),
         arrowprops=dict(
             connectionstyle='arc,angleA=90,angleB=-90,armA=15,armB=15',
             **apkw,
@@ -224,7 +224,7 @@ def schematic() -> matplotlib.figure.Figure:
     ax.annotate(
         text=str(optics.filter.name),
         xy=filter_zx.to_tuple(),
-        xytext=(filter_zx.x, default_offset_x),
+        xytext=(filter_zx.x - 100 * u.mm, default_offset_x),
         arrowprops=dict(
             connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=30',
             **apkw,
@@ -235,7 +235,7 @@ def schematic() -> matplotlib.figure.Figure:
     ax.annotate(
         text='detector',
         xy=detector_zx.to_tuple(),
-        xytext=(detector_zx.x, default_offset_x),
+        xytext=(detector_zx.x + 100 * u.mm, default_offset_x),
         arrowprops=dict(
             connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=35',
             **apkw,
