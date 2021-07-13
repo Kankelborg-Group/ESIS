@@ -581,7 +581,7 @@ def spot_size() -> matplotlib.figure.Figure:
     fullname = optics.bunch.fullname(
         digits_after_decimal=digits_after_decimal, use_latex=True)[np.argsort(optics.wavelength)]
     for name, ax in zip(fullname, axs):
-        ax.set_title(name)
+        ax.set_title(name, fontsize=10)
     return fig
 
 
@@ -631,7 +631,8 @@ def vignetting() -> matplotlib.figure.Figure:
     )
     model = optics.rays_output.vignetting(polynomial_degree=optics.vignetting_polynomial_degree)
     model.plot_unvignetted(axs=axs[0])
-    axs[0, 0].set_title(optics.bunch.fullname(digits_after_decimal=digits_after_decimal, use_latex=True)[0])
+    axs[0, 0].set_title(
+        optics.bunch.fullname(digits_after_decimal=digits_after_decimal, use_latex=True)[0], fontsize=10)
     return fig
 
 
