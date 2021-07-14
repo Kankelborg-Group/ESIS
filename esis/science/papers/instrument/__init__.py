@@ -1568,6 +1568,14 @@ Note flat response in first order over instrument FOV and suppression of zero or
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.grating_efficiency_vs_wavelength_pdf()), width=None)
 
+            with doc.create(pylatex.Figure()) as figure:
+                figure._star_latex_name = True
+                figure.add_image(str(figures.grating_efficiency_vs_position_pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""Grating efficiency vs. position for two orthogonal slices across the optical surface."""
+                ))
+                figure.append(kgpy.latex.Label('fig:gratingEfficiencyVsPosition'))
+
             doc.append(pylatex.NoEscape(r"""
 The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter}, 
 developed by a collaboration between Reflective X-Ray Optics LLC and Lawrence Berkeley National Laboratory (LBNL).
