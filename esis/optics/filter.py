@@ -41,6 +41,7 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
         )
         surface.material = optics.surface.material.AluminumThinFilm(
             thickness=self.thickness,
+            thickness_oxide=self.thickness_oxide,
             mesh_ratio=self.mesh_ratio,
         )
         return surface
