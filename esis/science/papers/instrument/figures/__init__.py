@@ -12,6 +12,7 @@ import astropy.visualization
 import kgpy.vector
 import kgpy.format
 import kgpy.plot
+import kgpy.optics
 import esis.optics
 
 __all__ = [
@@ -906,3 +907,34 @@ def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
 
 def grating_efficiency_vs_position_pdf() -> pathlib.Path:
     return save_pdf(grating_efficiency_vs_position)
+
+
+def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(
+            figsize=(column_width, 2.75),
+            constrained_layout=True,
+        )
+        optics = esis.optics.design.final(**kwargs_optics_default)
+        wavelength = esis.optics.grating.efficiency.witness.vs_wavelength_g17()[2].to(u.AA)
+        rays = kgpy.optics.rays.Rays(
+            wavelength=wavelength,
+        )
+        ax.plot(
+            wavelength,
+            optics.filter.surface.material.transmissivity(rays),
+            label=r'$\mathrm{Al}_2\mathrm{O}_3 / \mathrm{Al} / \mathrm{Al}_2\mathrm{O}_3$',
+        )
+        ax.add_artist(ax.legend())
+        lines = _annotate_wavelength(ax=ax)
+        ax.set_xlabel(f'wavelength ({ax.get_xlabel()})')
+        ax.set_ylabel(f'transmission ({ax.get_ylabel()})')
+        # ax.legend()
+        ax.legend(handles=lines, bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=2)
+
+        fig.set_constrained_layout_pads(h_pad=0.1)
+        return fig
+
+
+def filter_efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(filter_efficiency_vs_wavelength)
