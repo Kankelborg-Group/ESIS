@@ -4,6 +4,7 @@ import numpy as np
 import pandas
 import astropy.units as u
 from kgpy import Name, optics, format
+from . import efficiency
 
 __all__ = ['Primary']
 
