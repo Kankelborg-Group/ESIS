@@ -1611,6 +1611,8 @@ $\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely atte
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image('figures/CX180509A', width=kgpy.latex.columnwidth)
+                figure.append(pylatex.NoEscape(r'\\'))
+                figure.add_image(str(figures.primary_efficiency_vs_wavelength_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
 Measured reflectivity of the ESIS primary mirror \SI{25}{\nano\meter} thick SiC coating deposited on a Si witness 
