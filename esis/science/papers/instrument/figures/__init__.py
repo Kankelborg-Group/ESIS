@@ -2,6 +2,8 @@ import typing as typ
 import pathlib
 import matplotlib.figure
 import matplotlib.colors
+import matplotlib.lines
+import matplotlib.axes
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial
@@ -783,12 +785,51 @@ def grating_efficiency_vs_angle_pdf() -> pathlib.Path:
     return save_pdf(grating_efficiency_vs_angle)
 
 
-def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+def _annotate_wavelength(
+        ax: matplotlib.axes.Axes,
+        label_orders: bool = True
+) -> typ.List[matplotlib.lines.Line2D]:
     optics = esis.optics.design.final(**kwargs_optics_default)
     optics.num_emission_lines = 2
     optics2 = optics.copy()
     optics2.grating.diffraction_order = 2
     optics2.num_emission_lines = 2
+
+    optics.plot_wavelength_range(ax=ax)
+    optics2.plot_wavelength_range(ax=ax)
+    if label_orders:
+        ax.text(
+            x=(optics.wavelength_min + optics.wavelength_max) / 2,
+            y=1.01,
+            s='$m=1$',
+            transform=ax.get_xaxis_transform(),
+            ha='center',
+            va='bottom',
+        )
+        ax.text(
+            x=(optics2.wavelength_min + optics2.wavelength_max) / 2,
+            y=1.01,
+            s='$m=2$',
+            transform=ax.get_xaxis_transform(),
+            ha='center',
+            va='bottom',
+        )
+    lines = optics.bunch.plot_wavelength(
+        ax=ax,
+        num_emission_lines=optics.num_emission_lines,
+        digits_after_decimal=digits_after_decimal,
+        colors=['orangered', 'blue'],
+    )
+    lines += optics2.bunch.plot_wavelength(
+        ax=ax,
+        num_emission_lines=optics2.num_emission_lines,
+        digits_after_decimal=digits_after_decimal,
+        colors=['gray', 'black'],
+    )
+    return lines
+
+
+def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     fig, axs = plt.subplots(
         nrows=2,
         sharex=True,
@@ -810,37 +851,7 @@ def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
 
         axs[0].set_xlabel(None)
         axs[0].set_ylabel(f'efficiency ({eff_unit:latex})')
-        optics.plot_wavelength_range(ax=axs[0])
-        axs[0].text(
-            x=(optics.wavelength_min + optics.wavelength_max) / 2,
-            y=1.01,
-            s='$m=1$',
-            transform=axs[0].get_xaxis_transform(),
-            ha='center',
-            va='bottom',
-        )
-        optics.bunch.plot_wavelength(
-            ax=axs[0],
-            num_emission_lines=optics.num_emission_lines,
-            digits_after_decimal=digits_after_decimal,
-            colors=['orangered', 'blue'],
-        )
-
-        optics2.plot_wavelength_range(ax=axs[0])
-        axs[0].text(
-            x=(optics2.wavelength_min + optics2.wavelength_max) / 2,
-            y=1.01,
-            s='$m=2$',
-            transform=axs[0].get_xaxis_transform(),
-            ha='center',
-            va='bottom',
-        )
-        optics2.bunch.plot_wavelength(
-            ax=axs[0],
-            num_emission_lines=optics2.num_emission_lines,
-            digits_after_decimal=digits_after_decimal,
-            colors=['gray', 'black'],
-        )
+        _annotate_wavelength(ax=axs[0])
 
         angle_input, wavelength, efficiency = esis.optics.grating.efficiency.vs_wavelength()
         axs[1].plot(
@@ -849,20 +860,7 @@ def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
             label='grating 017',
         )
         axs[1].add_artist(axs[1].legend())
-        optics.plot_wavelength_range(ax=axs[1])
-        optics2.plot_wavelength_range(ax=axs[1])
-        lines = optics.bunch.plot_wavelength(
-            ax=axs[1],
-            num_emission_lines=optics.num_emission_lines,
-            digits_after_decimal=digits_after_decimal,
-            colors=['orangered', 'blue'],
-        )
-        lines += optics2.bunch.plot_wavelength(
-            ax=axs[1],
-            num_emission_lines=optics2.num_emission_lines,
-            digits_after_decimal=digits_after_decimal,
-            colors=['gray', 'black'],
-        )
+        lines = _annotate_wavelength(ax=axs[1], label_orders=False)
         axs[1].set_xlabel(f'wavelength ({wavl_unit:latex})')
         axs[1].set_ylabel(f'efficiency ({eff_unit:latex})')
         axs[1].legend(handles=lines, bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
