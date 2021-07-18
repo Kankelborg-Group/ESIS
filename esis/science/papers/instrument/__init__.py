@@ -1667,6 +1667,9 @@ To prevent oxidation, and to minimize the risk of tears, pinholes, and breakage 
 stored in a nitrogen purged environment until after payload vibration testing."""
             ))
 
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.efficiency_vs_wavelength_pdf()), width=None)
+
 
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
             pass

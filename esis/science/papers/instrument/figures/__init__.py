@@ -966,5 +966,44 @@ def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
         return fig
 
 
+def efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    import scipy.interpolate
+    _, _, wavelength_primary, efficiency_primary = esis.optics.primary.efficiency.witness.vs_wavelength_p1()
+    efficiency_primary_interp = scipy.interpolate.interp1d(wavelength_primary, efficiency_primary)
+    _, wavelength_grating, efficiency_grating = esis.optics.grating.efficiency.vs_wavelength()
+
+    wavelength = wavelength_grating
+
+    rays = kgpy.optics.rays.Rays(wavelength=wavelength)
+    efficiency_filter = esis.optics.design.final(**kwargs_optics_default).filter.surface.material.transmissivity(rays)
+    efficiency_primary = efficiency_primary_interp(wavelength) * u.percent
+
+    efficiency = efficiency_primary.to(u.dimensionless_unscaled) * efficiency_grating.to(u.dimensionless_unscaled) * efficiency_filter.to(u.dimensionless_unscaled) * 100 * u.percent
+
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(
+            figsize=(column_width, 2.75),
+            constrained_layout=True,
+        )
+        ax.plot(
+            wavelength,
+            efficiency,
+            label=r'ESIS',
+        )
+        ax.add_artist(ax.legend())
+        lines = _annotate_wavelength(ax=ax)
+        ax.set_xlabel(f'wavelength ({ax.get_xlabel()})')
+        ax.set_ylabel(f'transmission ({ax.get_ylabel()})')
+        # ax.legend()
+        ax.legend(handles=lines, bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=2)
+
+        fig.set_constrained_layout_pads(h_pad=0.1)
+        return fig
+
+
+def efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(efficiency_vs_wavelength)
+
+
 def filter_efficiency_vs_wavelength_pdf() -> pathlib.Path:
     return save_pdf(filter_efficiency_vs_wavelength)
