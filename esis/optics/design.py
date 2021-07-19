@@ -170,8 +170,12 @@ def final(
     primary.radius = 2000 * u.mm
     primary.num_sides = num_sides
     primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
-    primary.substrate_thickness = 30 * u.mm
     primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
+    primary.material.thickness = 30 * u.mm
+    primary.material.base.material = np.array(['Cr'])
+    primary.material.base.thickness = [5] * u.nm
+    primary.material.main.material = np.array(['SiC'])
+    primary.material.main.thickness = [25] * u.nm
 
     front_aperture = FrontAperture()
     front_aperture.piston = primary.focal_length + 500 * u.mm
