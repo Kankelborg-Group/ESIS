@@ -71,10 +71,7 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
         other.num_sides = self.num_sides
         other.clear_half_width = self.clear_half_width.copy()
         other.border_width = self.border_width.copy()
-        if self.substrate_thickness is not None:
-            other.substrate_thickness = self.substrate_thickness.copy()
-        else:
-            other.substrate_thickness = self.substrate_thickness
+        other.material = self.material.copy()
         return other
 
     @property
