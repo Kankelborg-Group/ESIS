@@ -25,7 +25,8 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
     num_sides: int = 0
     clear_half_width: u.Quantity = 0 * u.mm
     border_width: u.Quantity = 0 * u.mm
-    substrate_thickness: typ.Optional[u.Quantity] = None
+    material: optics.surface.material.MultilayerMirror = dataclasses.field(
+        default_factory=optics.surface.material.MultilayerMirror)
 
     @property
     def focal_length(self) -> u.Quantity:
@@ -50,7 +51,7 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
             radius=-self.radius,
             conic=self.conic,
         )
-        surface.material = optics.surface.material.Mirror(thickness=self.substrate_thickness)
+        surface.material = self.material.copy()
         surface.aperture = optics.surface.aperture.RegularPolygon(
             radius=self.clear_radius,
             num_sides=self.num_sides,
