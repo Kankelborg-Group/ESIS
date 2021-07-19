@@ -3,6 +3,7 @@ import pathlib
 import numpy as np
 import esis.optics
 import astropy.units as u
+import kgpy.optics
 import esis.optics
 
 __all__ = ['as_measured', 'as_flown']
@@ -16,6 +17,34 @@ def as_measured(
         pupil_samples=pupil_samples,
         field_samples=field_samples,
         all_channels=True,
+    )
+
+    primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_p1()
+    primary_serial, primary_angle_input, primary_wavelength, primary_efficiency = primary_witness
+    opt.primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
+        plot_kwargs=opt.primary.material.plot_kwargs,
+        name=primary_serial,
+        thickness=opt.primary.material.thickness,
+        cap=opt.primary.material.cap,
+        main=opt.primary.material.main,
+        base=opt.primary.material.base,
+        num_periods=opt.primary.material.num_periods,
+        efficiency_data=primary_efficiency,
+        wavelength_data=primary_wavelength,
+    )
+
+    grating_measurement = esis.optics.grating.efficiency.vs_wavelength()
+    grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
+    opt.grating.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
+        plot_kwargs=opt.grating.material.plot_kwargs,
+        name='grating 017',
+        thickness=opt.grating.material.thickness,
+        cap=opt.grating.material.cap,
+        main=opt.grating.material.main,
+        base=opt.grating.material.base,
+        num_periods=opt.grating.material.num_periods,
+        efficiency_data=grating_efficiency,
+        wavelength_data=grating_wavelength,
     )
 
     # opt.grating.tangential_radius = (597.46 * u.mm + 597.08 * u.mm) / 2
