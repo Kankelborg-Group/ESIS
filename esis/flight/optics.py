@@ -28,7 +28,6 @@ def as_measured(
         cap=opt.primary.material.cap,
         main=opt.primary.material.main,
         base=opt.primary.material.base,
-        num_periods=opt.primary.material.num_periods,
         efficiency_data=primary_efficiency,
         wavelength_data=primary_wavelength,
     )
@@ -42,7 +41,6 @@ def as_measured(
         cap=opt.grating.material.cap,
         main=opt.grating.material.main,
         base=opt.grating.material.base,
-        num_periods=opt.grating.material.num_periods,
         efficiency_data=grating_efficiency,
         wavelength_data=grating_wavelength,
     )
