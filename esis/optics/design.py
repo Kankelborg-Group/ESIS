@@ -264,6 +264,10 @@ def final(
         detector.plot_kwargs['linestyle'] = dashstyle_channels
 
     field_limit = (0.09561 * u.deg).to(u.arcmin)
+    if all_channels:
+        field_limit = np.arctan2(field_stop.clear_radius, primary.focal_length).to(u.arcmin)
+    else:
+        field_limit = np.arctan2(field_stop.clear_width / 2, primary.focal_length).to(u.arcmin)
     source = Source()
     source.piston = front_aperture.piston + 100 * u.mm
     source.half_width_x = field_limit
