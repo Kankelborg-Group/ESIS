@@ -115,7 +115,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
             width_y_neg=-(self.clear_half_height + self.border_width_bottom),
             width_y_pos=self.clear_half_height + self.border_width_top,
         )
-        surface.material = optics.surface.material.CCDStern1994()
+        surface.material = optics.surface.material.CCDStern2004()
         return surface
 
     def copy(self) -> 'Detector':
