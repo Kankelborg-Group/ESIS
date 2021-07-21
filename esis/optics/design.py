@@ -104,6 +104,7 @@ from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Gra
 __all__ = [
     'Requirements',
     'requirements',
+    'default_channel',
     'final',
     'final_active',
     'final_from_poletto',
@@ -135,6 +136,8 @@ def requirements() -> Requirements:
     )
 
 
+default_channel = 1
+
 def final(
         pupil_samples: int = 10,
         pupil_is_stratified_random: bool = False,
@@ -156,7 +159,7 @@ def final(
     channel_angle += channel_offset_angle
     # channel_angle = channel_angle[::-1]
     if not all_channels:
-        channel_angle = channel_angle[1]
+        channel_angle = channel_angle[default_channel]
 
     if not all_channels:
         roll = -channel_angle
