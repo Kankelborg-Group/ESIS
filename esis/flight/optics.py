@@ -11,12 +11,17 @@ __all__ = ['as_measured', 'as_flown']
 
 def as_measured(
         pupil_samples: int = 10,
+        pupil_is_stratified_random: bool = False,
         field_samples: int = 10,
+        field_is_stratified_random: bool = False,
+        all_channels: bool = True,
 ) -> esis.optics.Optics:
     opt = esis.optics.design.final(
         pupil_samples=pupil_samples,
+        pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
-        all_channels=True,
+        field_is_stratified_random=field_is_stratified_random,
+        all_channels=all_channels,
     )
 
     primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_p1()
@@ -49,17 +54,18 @@ def as_measured(
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
     opt.grating.ruling_density = 2585.5 / u.mm
 
-    i1 = 1
-    i4 = 4 + 1
+    if all_channels:
+        i1 = 1
+        i4 = 4 + 1
 
-    opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[i1:i4]
-    opt.grating.plot_kwargs['linestyle'] = opt.grating.plot_kwargs['linestyle'][i1:i4]
+        opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[i1:i4]
+        opt.grating.plot_kwargs['linestyle'] = opt.grating.plot_kwargs['linestyle'][i1:i4]
 
-    opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[i1:i4]
-    opt.filter.plot_kwargs['linestyle'] = opt.filter.plot_kwargs['linestyle'][i1:i4]
+        opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[i1:i4]
+        opt.filter.plot_kwargs['linestyle'] = opt.filter.plot_kwargs['linestyle'][i1:i4]
 
-    opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[i1:i4]
-    opt.detector.plot_kwargs['linestyle'] = opt.detector.plot_kwargs['linestyle'][i1:i4]
+        opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[i1:i4]
+        opt.detector.plot_kwargs['linestyle'] = opt.detector.plot_kwargs['linestyle'][i1:i4]
 
     # numbers sourced from ESIS instrument paper as of 09/10/20
     opt.detector.gain = [
@@ -75,6 +81,10 @@ def as_measured(
         [4.1, 4.1, 4.1, 4.3],
         [3.9, 3.9, 4.2, 4.1],
     ] * u.adu
+
+    if not all_channels:
+        opt.detector.gain = opt.detector.gain[esis.optics.design.default_channel]
+        opt.detector.readout_noise = opt.detector.readout_noise[esis.optics.design.default_channel]
 
     return opt
 
