@@ -26,7 +26,7 @@ def vs_angle_at_0aoi() -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quanti
     angle_input = 0 * u.deg
     angle_output = df.index.to_numpy() * u.deg
     wavelength = 63 * u.nm
-    efficiency = 100 * df.to_numpy() * u.percent
+    efficiency = df.to_numpy() * u.dimensionless_unscaled
     return angle_input, angle_output, wavelength, efficiency
 
 
@@ -35,7 +35,7 @@ def vs_angle_at_3aoi() -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quanti
     angle_input = 3 * u.deg
     angle_output = df.index.to_numpy() * u.deg
     wavelength = 63 * u.nm
-    efficiency = 100 * df.to_numpy() * u.percent
+    efficiency = df.to_numpy() * u.dimensionless_unscaled
     return angle_input, angle_output, wavelength, efficiency
 
 
@@ -45,7 +45,7 @@ def vs_position_x() -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]
     position_x = arr[..., 0] * u.mm
     position_y = 0 * u.mm
     wavelength = 63 * u.nm
-    efficiency = 100 * arr[..., 1] * u.percent
+    efficiency = arr[..., 1] * u.dimensionless_unscaled
     return position_x, position_y, wavelength, efficiency
 
 
@@ -55,7 +55,7 @@ def vs_position_y() -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]
     position_x = 0 * u.mm
     position_y = arr[..., 0] * u.mm
     wavelength = 63 * u.nm
-    efficiency = 100 * arr[..., 1] * u.percent
+    efficiency = arr[..., 1] * u.dimensionless_unscaled
     return position_x, position_y, wavelength, efficiency
 
 
@@ -64,6 +64,6 @@ def vs_wavelength() -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity]:
     arr = df.to_numpy()
     angle_input = 0 * u.deg
     wavelength = arr[..., 0] * u.nm
-    efficiency = 100 * arr[..., 1] * u.percent
+    efficiency = arr[..., 1] * u.dimensionless_unscaled
     return angle_input, wavelength, efficiency
 

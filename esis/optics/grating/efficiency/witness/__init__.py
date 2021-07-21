@@ -20,7 +20,7 @@ def _vs_wavelength(file: pathlib.Path) -> typ.Tuple[u.Quantity, u.Quantity, u.Qu
     arr = df.to_numpy()
     angle_input = 4 * u.deg
     wavelength = arr[..., 0] * u.nm
-    efficiency = 100 * arr[..., 1] * u.percent
+    efficiency = arr[..., 1] * u.dimensionless_unscaled
     return angle_input, wavelength, efficiency
 
 
