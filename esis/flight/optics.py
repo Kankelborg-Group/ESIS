@@ -24,7 +24,7 @@ def as_measured(
         all_channels=all_channels,
     )
 
-    primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_p1()
+    primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_recoat_1()
     primary_serial, primary_angle_input, primary_wavelength, primary_efficiency = primary_witness
     opt.primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
         plot_kwargs=opt.primary.material.plot_kwargs,
