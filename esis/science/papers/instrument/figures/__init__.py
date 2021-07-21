@@ -212,7 +212,7 @@ def schematic() -> matplotlib.figure.Figure:
         ),
         **kwargs_annotate,
     )
-    primary_z = optics.primary.substrate_thickness / 2 * zh
+    primary_z = optics.primary.material.thickness / 2 * zh
     primary_zx = optics.primary.transform.translation_eff.zx - optics.primary.mech_half_width * xh + primary_z
     ax.annotate(
         text=str(optics.primary.name),
@@ -885,7 +885,7 @@ def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
         position_x, position_y, wavelength, efficiency = esis.optics.grating.efficiency.vs_position_x()
         axs[0].plot(
             position_x,
-            efficiency,
+            efficiency.to(u.percent),
             label='grating 017',
         )
         axs[0].set_xlabel(f'$x$ position ({axs[0].get_xlabel()})')
