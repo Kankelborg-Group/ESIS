@@ -1735,7 +1735,7 @@ class Optics(
             )
             annotation_primary_to_detector_y = plot.annotate_component(
                 ax=ax,
-                point_1=position_primary.zx + self.primary.substrate_thickness * kgpy.vector.z_hat.zx,
+                point_1=position_primary.zx + self.primary.material.thickness * kgpy.vector.z_hat.zx,
                 point_2=position_detector.zx,
                 component='y',
                 position_orthogonal=225,
