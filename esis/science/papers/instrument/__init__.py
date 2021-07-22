@@ -425,10 +425,10 @@ def document() -> kgpy.latex.Document:
         scientific_notation=True,
     )
 
-    wavelength = optics.bunch.wavelength
-    ion = kgpy.chianti.to_spectroscopic(optics.bunch.ion)
+    wavelength = optics_single.bunch.wavelength
+    ion = kgpy.chianti.to_spectroscopic(optics_single.bunch.ion)
 
-    index_o5 = np.nonzero(optics.bunch.ion == 'o_5')[0][0]
+    index_o5 = np.nonzero(optics_single.bunch.ion == 'o_5')[0][0]
     doc.set_variable_quantity(
         name='OVwavelength',
         value=wavelength[index_o5],
@@ -443,7 +443,7 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\OVion\ \OVwavelength')
     )
 
-    index_he1 = np.nonzero(optics.bunch.ion == 'he_1')[0][0]
+    index_he1 = np.nonzero(optics_single.bunch.ion == 'he_1')[0][0]
     doc.set_variable_quantity(
         name='HeIwavelength',
         value=wavelength[index_he1],
@@ -458,7 +458,7 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\HeIion\ \HeIwavelength')
     )
 
-    index_mg10 = np.nonzero(optics.bunch.ion == 'mg_10')[0][0]
+    index_mg10 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][0]
     doc.set_variable_quantity(
         name='MgXwavelength',
         value=wavelength[index_mg10],
@@ -473,7 +473,7 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\MgXion\ \MgXwavelength')
     )
 
-    index_mg10_2 = np.nonzero(optics.bunch.ion == 'mg_10')[0][1]
+    index_mg10_2 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][1]
     doc.set_variable_quantity(
         name='MgXdimWavelength',
         value=wavelength[index_mg10_2],
