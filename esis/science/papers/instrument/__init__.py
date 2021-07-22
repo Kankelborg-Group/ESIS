@@ -192,7 +192,7 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable(
         name='numEmissionLines',
-        value=str(optics.num_emission_lines),
+        value=str(optics_single.num_emission_lines),
     )
 
     doc.set_variable(
