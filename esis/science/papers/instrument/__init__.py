@@ -129,7 +129,7 @@ def document() -> kgpy.latex.Document:
         all_channels=False,
     )
 
-    optics = esis.optics.design.final_active(
+    optics_all = esis.optics.design.final_active(
         pupil_samples=11,
         pupil_is_stratified_random=True,
         field_samples=11,
@@ -197,17 +197,17 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable(
         name='numChannels',
-        value=str(optics.num_channels),
+        value=str(optics_all.num_channels),
     )
 
     doc.set_variable(
         name='numChannelsWords',
-        value=num2words.num2words(optics.num_channels)
+        value=num2words.num2words(optics_all.num_channels)
     )
 
     doc.set_variable(
         name='NumChannelsWords',
-        value=num2words.num2words(optics.num_channels).capitalize()
+        value=num2words.num2words(optics_all.num_channels).capitalize()
     )
 
     doc.set_variable_quantity(
