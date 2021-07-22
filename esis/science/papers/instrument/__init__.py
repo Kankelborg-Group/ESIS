@@ -10,6 +10,7 @@ import kgpy.units
 import kgpy.chianti
 import esis.optics
 import esis.science.papers.instrument.figures as figures
+from . import optics
 
 path_base = pathlib.Path(__file__).parent
 path_pdf = path_base / 'instrument'
@@ -121,20 +122,9 @@ def document() -> kgpy.latex.Document:
 
     requirements = esis.optics.design.requirements()
 
-    optics_single = esis.optics.design.final(
-        pupil_samples=11,
-        pupil_is_stratified_random=True,
-        field_samples=11,
-        field_is_stratified_random=True,
-        all_channels=False,
-    )
+    optics_single = optics.as_designed_single_channel()
 
-    optics_all = esis.optics.design.final_active(
-        pupil_samples=11,
-        pupil_is_stratified_random=True,
-        field_samples=11,
-        field_is_stratified_random=True,
-    )
+    optics_all = optics.as_designed_active_channels()
 
     doc.set_variable_quantity(
         name='spatialResolutionRequirement',
