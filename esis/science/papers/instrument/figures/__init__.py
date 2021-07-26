@@ -600,10 +600,9 @@ num_emission_lines_default = 3
 
 
 def spot_size() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(**kwargs_optics_default)
-    optics.num_emission_lines = num_emission_lines_default
+    optics = optics_factories.as_designed_single_channel()
     fig, axs = plt.subplots(
-        ncols=optics.num_emission_lines,
+        ncols=num_emission_lines_default,
         figsize=(text_width, 2.5),
         sharex=True,
         sharey=True,
@@ -655,7 +654,7 @@ def focus_curve_pdf() -> pathlib.Path:
 
 
 def vignetting() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics = optics_factories.as_measured_single_channel()
     fig, axs = plt.subplots(
         figsize=(column_width, 2.9),
         sharex=True,
@@ -697,11 +696,10 @@ def distortion_pdf() -> pathlib.Path:
 
 
 def distortion_residual() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(**kwargs_optics_default)
-    optics.num_emission_lines = 3
+    optics = optics_factories.as_designed_single_channel()
     fig, axs = plt.subplots(
         nrows=2,
-        ncols=optics.num_emission_lines,
+        ncols=num_emission_lines_default,
         sharex=True,
         sharey=True,
         figsize=(text_width, 4.4),
