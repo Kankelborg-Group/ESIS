@@ -947,7 +947,7 @@ def primary_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     wavl_unit = u.Angstrom
     witness = esis.optics.primary.efficiency.witness
     with astropy.visualization.quantity_support():
-        for func in [witness.vs_wavelength_p1, witness.vs_wavelength_p2,]:
+        for func in [witness.vs_wavelength_p1, witness.vs_wavelength_p2, witness.vs_wavelength_recoat_1]:
             serial, angle_input, wavelength, efficiency = func()
             ax.plot(
                 wavelength.to(wavl_unit),
