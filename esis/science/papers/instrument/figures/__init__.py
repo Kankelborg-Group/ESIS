@@ -14,6 +14,7 @@ import kgpy.format
 import kgpy.plot
 import kgpy.optics
 import esis.optics
+from .. import optics as optics_factories
 
 __all__ = [
     'layout',
@@ -466,14 +467,44 @@ def schematic_grating_pdf() -> pathlib.Path:
 
 
 def bunch() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
-    optics = esis.optics.design.final()
-    optics.bunch.plot(
-        ax=ax,
-        num_emission_lines=optics.num_emission_lines,
-        digits_after_decimal=digits_after_decimal,
-        label_fontsize=6,
-    )
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
+        optics = esis.optics.design.final()
+        optics.bunch.plot(
+            ax=ax,
+            num_emission_lines=optics.num_emission_lines,
+            digits_after_decimal=digits_after_decimal,
+            label_fontsize=6,
+        )
+        ax_twin = ax.twinx()
+        optics_measured = esis.flight.optics.as_measured(**kwargs_optics_default)
+        wavelength = np.linspace(optics_measured.wavelength_min, optics_measured.wavelength_max, 100)
+        optics_measured.filter.clear_radius = 1000 * u.mm
+        optics_measured.detector.num_pixels = (4096, 2048)
+        sys = optics_measured.system
+        sys.wavelength = wavelength
+        rays = sys.rays_output
+        area = rays.intensity.copy()
+        area[~rays.mask] = np.nan
+        area = np.nansum(area, (rays.axis.pupil_x, rays.axis.pupil_y, rays.axis.velocity_los), keepdims=True)
+        area[area == 0] = np.nan
+        # plt.figure()
+        # plt.imshow(area.squeeze()[..., 0])
+        # plt.show()
+        area = np.nanmean(area, (rays.axis.field_x, rays.axis.field_y)).squeeze()
+        subtent = optics_measured.system.rays_input.input_grid.field.step_size
+        print('bunch subtent', subtent)
+        # area = (area / subtent.x / subtent.y).to(u.cm ** 2)
+
+        wavelength = rays.wavelength.squeeze()
+        sorted_indices = np.argsort(wavelength)
+        area = area[sorted_indices]
+        wavelength = wavelength[sorted_indices]
+        ax_twin.plot(wavelength, area, color='red', zorder=0)
+        bottom, top = ax_twin.get_ylim()
+        ax_twin.set_ylim(bottom=-0.001, top=1.1 * top)
+        ax_twin.set_ylabel(f'mean effective area ({ax_twin.get_ylabel()})')
+
     return fig
 
 
