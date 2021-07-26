@@ -124,7 +124,7 @@ def document() -> kgpy.latex.Document:
 
     optics_single = optics.as_designed_single_channel()
 
-    optics_all = optics.as_designed_active_channels()
+    optics_all = esis.optics.design.final_active()
 
     doc.set_variable_quantity(
         name='spatialResolutionRequirement',
