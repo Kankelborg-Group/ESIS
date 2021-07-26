@@ -1625,10 +1625,11 @@ The spare primary mirror (SN002) retains the corroded Al/SiC/Mg multilayer.
 
 The Si \CCDs\ are sensitive to visible light as well as \EUV.
 Visible solar radiation is much stronger than \EUV, and visible stray light can survive multiple scatterings while 
-retaining enough intensity to contaminate the \EUV images.
-Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be used to shield each \CCD\ from visible light.
-The Al film is supported by a 70 line per inch (lpi) Ni mesh, with 82\% transmission.
-The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in Fig.~\ref{F-filter}.
+retaining enough intensity to contaminate the \EUV\ images.
+Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be 
+used to shield each \CCD\ from visible light.
+The Al film is supported by a 70 line per inch (lpi) Ni mesh, with 82\% \roy{\filterMeshRatio} transmission.
+The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in Fig.~\ref{fig:f}.
 We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$."""
             ))
 
@@ -1638,27 +1639,27 @@ We conservatively estimate filter oxidation at the time of launch as a 4nm thick
                 figure.add_image(str(figures.filter_efficiency_vs_wavelength_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-Model of ESIS filter transmissivity, including filter mesh and \SI{4}{\nano\meter} thick oxidation layers on either side 
+Model of ESIS filter transmissivity, including filter mesh and \SI{4}{\nano\meter} thick oxide layers on either side 
 of the \SI{100}{\nano\meter} Al film."""
                 ))
-                figure.append(kgpy.latex.Label('fig:FilterEfficiencyVsWavelength'))
+                figure.append(kgpy.latex.Label('fig:filterEfficiencyVsWavelength'))
 
             doc.append(pylatex.NoEscape(
                 r"""
-An Al filter is positioned in front of the focal plane of each CCD by a filter tube, creating a light tight box with a 
+An Al filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight box with a 
 labyrinthine evacuation vent (e.g., Fig.~\ref{F-cameras}).
-The placement of the filter relative to the CCD is optimized so that the filter mesh shadow is not visible.
+The placement of the filter relative to the \CCD\ is optimized so that the filter mesh shadow is not visible.
 By modeling the filter mesh shadow, we find that a position far from the CCD ($>$\SI{200}{\milli\meter}) and mesh grid
 clocking of \SI{45}{\degree} to the detector array reduces the shadow amplitude well below photon statistics.
-The MOSES instrument utilizes a similar design; no detectable signature of the filter mesh is found in data and 
-inversion residuals from the 2006 MOSES flight.
+The \MOSES\ instrument utilizes a similar design; no detectable signature of the filter mesh is found in data and 
+inversion residuals from the 2006 \MOSES\ flight.
 
 To prevent oxidation, and to minimize the risk of tears, pinholes, and breakage from handling, the filters will be 
 stored in a nitrogen purged environment until after payload vibration testing."""
             ))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.efficiency_vs_wavelength_pdf()), width=None)
+                figure.add_image(str(figures.ccd_efficiency_vs_wavelength_pdf()), width=None)
 
 
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
