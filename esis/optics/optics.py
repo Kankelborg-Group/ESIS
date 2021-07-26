@@ -90,6 +90,7 @@ class Optics(
                 wavelength=self.wavelength,
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
+                field_margin=1.5 * u.arcsec,
                 pupil_samples=self.pupil_samples,
                 pupil_is_stratified_random=self.pupil_is_stratified_random,
                 grid_velocity_los=self.grid_velocity_los,
