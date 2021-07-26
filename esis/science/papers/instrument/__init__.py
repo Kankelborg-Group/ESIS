@@ -668,7 +668,7 @@ orthogonal planes."""
             ))
 
             with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
-                moses_schematic.add_image('figures/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
+                moses_schematic.add_image('figures/old/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
                 moses_schematic.add_caption(pylatex.NoEscape(
                     r"""Schematic diagram of the MOSES instrument.
 Incident light on the right forms an undispersed image on the central $m=0$ \CCD.
@@ -752,7 +752,7 @@ In designing \ESIS, we have sought to improve upon each of these points.
 
         with doc.create(pylatex.Subsection('ESIS Features')):
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
-                figure.add_image('figures/layout', width=pylatex.NoEscape(r'\textwidth'))
+                figure.add_image('figures/old/layout', width=pylatex.NoEscape(r'\textwidth'))
 
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
                 figure.add_image(str(figures.layout_pdf()), width=None)
@@ -1267,7 +1267,7 @@ The individual mounts allow each grating to be adjusted in tip and tilt to cente
             ))
 
             with doc.create(pylatex.Figure()) as figure:
-                # figure.add_image('figures/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
+                # figure.add_image('figures/old/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
                 # figure.append('\n')
                 figure.add_image(str(figures.field_stop_projections_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
@@ -1522,7 +1522,7 @@ Total MTF	 	& 		&				&				& 0.109 \\
         with doc.create(pylatex.Subsection('Coatings and Filters')):
             with doc.create(pylatex.Figure()) as figure:
                 figure._star_latex_name = True
-                figure.add_image('figures/Grating_Multilayer_2', width=kgpy.latex.textwidth)
+                figure.add_image('figures/old/Grating_Multilayer_2', width=kgpy.latex.textwidth)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
 (A) Measured efficiency of a single grating as a function of reflection angle.
@@ -1600,7 +1600,7 @@ $\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely atte
             ))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image('figures/CX180509A', width=kgpy.latex.columnwidth)
+                figure.add_image('figures/old/CX180509A', width=kgpy.latex.columnwidth)
                 figure.append(pylatex.NoEscape(r'\\'))
                 figure.add_image(str(figures.primary_efficiency_vs_wavelength_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
@@ -1633,7 +1633,7 @@ We conservatively estimate filter oxidation at the time of launch as a 4nm thick
             ))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image('figures/Luxel_trans', width=kgpy.latex.columnwidth)
+                figure.add_image('figures/old/Luxel_trans', width=kgpy.latex.columnwidth)
                 figure.append(pylatex.NoEscape(r'\\'))
                 figure.add_image(str(figures.filter_efficiency_vs_wavelength_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
