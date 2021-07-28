@@ -74,6 +74,8 @@ def as_measured(
         i1 = 1
         i4 = 4 + 1
 
+        opt.channel_name = opt.channel_name[i1:i4]
+
         opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[i1:i4]
         opt.grating.plot_kwargs['linestyle'] = opt.grating.plot_kwargs['linestyle'][i1:i4]
         opt.grating.serial_number = opt.grating.serial_number[i1:i4]

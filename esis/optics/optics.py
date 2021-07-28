@@ -30,6 +30,7 @@ class Optics(
     Add test docstring to see if this is the problem.
     """
     name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
+    channel_name: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     source: Source = dataclasses.field(default_factory=Source)
     front_aperture: FrontAperture = dataclasses.field(default_factory=FrontAperture)
     central_obscuration: typ.Optional[CentralObscuration] = dataclasses.field(default_factory=CentralObscuration)
@@ -224,6 +225,7 @@ class Optics(
 
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
+        other.channel_name = self.channel_name.copy()
         other.num_emission_lines = self.num_emission_lines
         other.pupil_samples = self.pupil_samples
         other.field_samples = self.field_samples

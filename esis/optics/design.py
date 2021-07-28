@@ -153,6 +153,11 @@ def final(
     """
     num_sides = 8
     num_channels = 6
+
+    channel_name = np.array([i for i in range(num_channels)])
+    if not all_channels:
+        channel_name = channel_name[default_channel]
+
     deg_per_channel = 360 * u.deg / num_sides
     channel_offset_angle = -deg_per_channel / 2
     channel_angle = np.linspace(0 * u.deg, num_channels * deg_per_channel, num_channels, endpoint=False)
@@ -276,6 +281,7 @@ def final(
 
     return Optics(
         name=Name('ESIS'),
+        channel_name=channel_name,
         source=source,
         front_aperture=front_aperture,
         central_obscuration=central_obscuration,
@@ -305,6 +311,8 @@ def final_active(
         field_samples=field_samples,
         field_is_stratified_random=field_is_stratified_random,
     )
+
+    opt.channel_name = opt.channel_name[1:~0]
 
     opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[1:~0]
     opt.grating.plot_kwargs['linestyle'] = None
