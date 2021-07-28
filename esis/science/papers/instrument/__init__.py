@@ -372,6 +372,11 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable(
+        name='filterMeshMaterial',
+        value=optics_single.filter.mesh_material,
+    )
+
+    doc.set_variable(
         name='detectorName',
         value=str(optics_single.detector.name),
     )
@@ -1177,7 +1182,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'', r'Material', r'\filterMaterial'])
                     tabular.add_row([r'', r'Thickness', r'\filterThickness'])
                     tabular.add_row([r'', r'Mesh ratio', r'\filterMeshRatio'])
-                    tabular.add_row([r'', r'Mesh material', r'Ni'])
+                    tabular.add_row([r'', r'Mesh material', r'\filterMeshMaterial'])
 
 
 

@@ -243,6 +243,7 @@ def final(
     filter.thickness = 100 * u.nm
     filter.thickness_oxide = 4 * u.nm
     filter.mesh_ratio = 82 * u.percent
+    filter.mesh_material = 'Ni'
     if all_channels:
         filter.plot_kwargs['linestyle'] = dashstyle_channels
 

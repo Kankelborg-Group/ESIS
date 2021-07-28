@@ -19,6 +19,7 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
     thickness: u.Quantity = 0 * u.mm
     thickness_oxide: u.Quantity = 0 * u.mm
     mesh_ratio: u.Quantity = 100 * u.percent
+    mesh_material: str = ''
 
     @property
     def clear_diameter(self) -> u.Quantity:
