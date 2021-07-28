@@ -138,6 +138,7 @@ def requirements() -> Requirements:
 
 default_channel = 1
 
+
 def final(
         pupil_samples: int = 10,
         pupil_is_stratified_random: bool = False,
@@ -324,6 +325,7 @@ def final_active(
     opt.detector.plot_kwargs['linestyle'] = None
 
     return opt
+
 
 def final_from_poletto(
         pupil_samples: int = 10,
