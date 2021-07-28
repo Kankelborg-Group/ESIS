@@ -299,6 +299,11 @@ def final(
         roll=roll,
     )
 
+channels_active_min = 1
+channels_active_max = 4
+slice_channels_active = slice(channels_active_min, channels_active_max + 1)
+default_channel_active = default_channel - channels_active_min
+
 
 def final_active(
         pupil_samples: int = 10,
@@ -313,15 +318,15 @@ def final_active(
         field_is_stratified_random=field_is_stratified_random,
     )
 
-    opt.channel_name = opt.channel_name[1:~0]
+    opt.channel_name = opt.channel_name[slice_channels_active]
 
-    opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[1:~0]
+    opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[slice_channels_active]
     opt.grating.plot_kwargs['linestyle'] = None
 
-    opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[1:~0]
+    opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[slice_channels_active]
     opt.filter.plot_kwargs['linestyle'] = None
 
-    opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[1:~0]
+    opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[slice_channels_active]
     opt.detector.plot_kwargs['linestyle'] = None
 
     return opt
