@@ -13,6 +13,7 @@ import kgpy.vector
 import kgpy.format
 import kgpy.plot
 import kgpy.optics
+import kgpy.grid
 import esis.optics
 from .. import optics as optics_factories
 
@@ -478,11 +479,16 @@ def bunch() -> matplotlib.figure.Figure:
         )
         ax_twin = ax.twinx()
         optics_measured = esis.flight.optics.as_measured(**kwargs_optics_default)
-        wavelength = np.linspace(optics_measured.wavelength_min, optics_measured.wavelength_max, 100)
+        wavelength_min = optics_measured.wavelength_min
+        wavelength_max = optics_measured.wavelength_max
         optics_measured.filter.clear_radius = 1000 * u.mm
         optics_measured.detector.num_pixels = (4096, 2048)
         sys = optics_measured.system
-        sys.wavelength = wavelength
+        sys.grid_wavelength = kgpy.grid.RegularGrid1D(
+            min=wavelength_min,
+            max=wavelength_max,
+            num_samples=100,
+        )
         rays = sys.rays_output
         area = rays.intensity.copy()
         area[~rays.mask] = np.nan
