@@ -667,7 +667,7 @@ def vignetting() -> matplotlib.figure.Figure:
         squeeze=False,
     )
     model = optics.rays_output.vignetting(polynomial_degree=optics.vignetting_polynomial_degree)
-    model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.ion_spectroscopic)
+    model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.fullname(digits_after_decimal))
     return fig
 
 
@@ -713,12 +713,11 @@ def distortion_residual() -> matplotlib.figure.Figure:
     distortion_linear.plot_residual(
         axs=axs[0],
         use_xlabels=False,
-        wavelength_name=optics.bunch.ion_spectroscopic,
+        wavelength_name=optics.bunch.fullname(digits_after_decimal),
     )
     distortion_quadratic.plot_residual(
         axs=axs[1],
         use_titles=False,
-        wavelength_name=optics.bunch.ion_spectroscopic,
     )
 
     return fig
