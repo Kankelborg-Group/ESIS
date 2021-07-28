@@ -87,17 +87,21 @@ def as_measured(
 
     # numbers sourced from ESIS instrument paper as of 09/10/20
     opt.detector.gain = [
+        [0.00, 0.00, 0.00, 0.00],
         [2.57, 2.50, 2.52, 2.53],
         [2.55, 2.58, 2.57, 2.63],
         [2.57, 2.53, 2.52, 2.59],
         [2.60, 2.60, 2.54, 2.58],
+        [0.00, 0.00, 0.00, 0.00],
     ] * u.electron / u.adu
 
     opt.detector.readout_noise = [
+        [0.0, 0.0, 0.0, 0.0],
         [3.9, 4.0, 4.1, 3.7],
         [3.9, 4.0, 4.0, 4.0],
         [4.1, 4.1, 4.1, 4.3],
         [3.9, 3.9, 4.2, 4.1],
+        [0.0, 0.0, 0.0, 0.0],
     ] * u.adu
 
     if not all_channels:
