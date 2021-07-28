@@ -1802,7 +1802,10 @@ class Optics(
                 self.grating.surface,
                 self.detector.surface,
             ]),
-            wavelength=self.wavelength,
+            grid_wavelength=kgpy.grid.IrregularGrid1D(
+                points=self.wavelength,
+                name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
+            ),
             field_samples=self.field_samples,
             field_margin=1 * u.nm,
             field_is_stratified_random=self.field_is_stratified_random,
