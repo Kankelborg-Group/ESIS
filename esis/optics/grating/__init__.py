@@ -22,6 +22,8 @@ SurfaceT = optics.surface.Surface[
 @dataclasses.dataclass
 class Grating(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('grating'))
+    serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
+    manufacturing_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     inclination: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
     twist: u.Quantity = 0 * u.deg
@@ -183,6 +185,8 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.dynamic_clearance = self.dynamic_clearance.copy()
         other.material = self.material.copy()
         other.witness = self.witness.copy()
+        other.serial_number = self.serial_number.copy()
+        other.manufacturing_number = self.manufacturing_number.copy()
         return other
 
     def apply_gregorian_layout(

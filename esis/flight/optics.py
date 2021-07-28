@@ -37,6 +37,22 @@ def as_measured(
         wavelength_data=primary_wavelength,
     )
 
+    opt.grating.serial_number = np.array([
+        '',
+        '89025',
+        '89024',
+        '89026',
+        '89027',
+        '',
+    ])
+    opt.grating.manufacturing_number = np.array([
+        '',
+        'UBO-16-024',
+        'UBO-16-017',
+        'UBO-16-019',
+        'UBO-16-014',
+        '',
+    ])
     grating_measurement = esis.optics.grating.efficiency.vs_wavelength()
     grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
     opt.grating.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
@@ -60,6 +76,8 @@ def as_measured(
 
         opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[i1:i4]
         opt.grating.plot_kwargs['linestyle'] = opt.grating.plot_kwargs['linestyle'][i1:i4]
+        opt.grating.serial_number = opt.grating.serial_number[i1:i4]
+        opt.grating.manufacturing_number = opt.grating.manufacturing_number[i1:i4]
 
         opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[i1:i4]
         opt.filter.plot_kwargs['linestyle'] = opt.filter.plot_kwargs['linestyle'][i1:i4]
@@ -83,6 +101,8 @@ def as_measured(
     ] * u.adu
 
     if not all_channels:
+        opt.grating.serial_number = opt.grating.serial_number[esis.optics.design.default_channel]
+        opt.grating.manufacturing_number = opt.grating.manufacturing_number[esis.optics.design.default_channel]
         opt.detector.gain = opt.detector.gain[esis.optics.design.default_channel]
         opt.detector.readout_noise = opt.detector.readout_noise[esis.optics.design.default_channel]
 
