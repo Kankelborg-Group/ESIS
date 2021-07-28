@@ -25,13 +25,13 @@ def _vs_wavelength(file: pathlib.Path) -> typ.Tuple[u.Quantity, u.Quantity, u.Qu
 
 
 def vs_wavelength_g17() -> typ.Tuple[str, u.Quantity, u.Quantity, u.Quantity]:
-    return ('witness 017', ) + _vs_wavelength(file_vs_wavelength_g17)
+    return ('UBO-16-017', ) + _vs_wavelength(file_vs_wavelength_g17)
 
 
 def vs_wavelength_g19() -> typ.Tuple[str, u.Quantity, u.Quantity, u.Quantity]:
-    return ('witness 019', ) +_vs_wavelength(file_vs_wavelength_g19)
+    return ('UBO-16-019', ) +_vs_wavelength(file_vs_wavelength_g19)
 
 
 def vs_wavelength_g24() -> typ.Tuple[str, u.Quantity, u.Quantity, u.Quantity]:
-    return ('witness 024', ) +_vs_wavelength(file_vs_wavelength_g24)
+    return ('UBO-16-024', ) +_vs_wavelength(file_vs_wavelength_g24)
 
