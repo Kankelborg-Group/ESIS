@@ -16,13 +16,16 @@ def as_measured(
         field_is_stratified_random: bool = False,
         all_channels: bool = True,
 ) -> esis.optics.Optics:
-    opt = esis.optics.design.final(
+    kwargs = dict(
         pupil_samples=pupil_samples,
         pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
         field_is_stratified_random=field_is_stratified_random,
-        all_channels=all_channels,
     )
+    if all_channels:
+        opt = esis.optics.design.final_active(**kwargs)
+    else:
+        opt = esis.optics.design.final(**kwargs, all_channels=all_channels, )
 
     primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_recoat_1()
     primary_serial, primary_angle_input, primary_wavelength, primary_efficiency = primary_witness
@@ -38,20 +41,16 @@ def as_measured(
     )
 
     opt.grating.serial_number = np.array([
-        '',
         '89025',
         '89024',
         '89026',
         '89027',
-        '',
     ])
     opt.grating.manufacturing_number = np.array([
-        '',
         'UBO-16-024',
         'UBO-16-017',
         'UBO-16-019',
         'UBO-16-014',
-        '',
     ])
     grating_measurement = esis.optics.grating.efficiency.vs_wavelength()
     grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
@@ -70,47 +69,27 @@ def as_measured(
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
     opt.grating.ruling_density = 2585.5 / u.mm
 
-    if all_channels:
-        i1 = 1
-        i4 = 4 + 1
-
-        opt.channel_name = opt.channel_name[i1:i4]
-
-        opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[i1:i4]
-        opt.grating.plot_kwargs['linestyle'] = opt.grating.plot_kwargs['linestyle'][i1:i4]
-        opt.grating.serial_number = opt.grating.serial_number[i1:i4]
-        opt.grating.manufacturing_number = opt.grating.manufacturing_number[i1:i4]
-
-        opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[i1:i4]
-        opt.filter.plot_kwargs['linestyle'] = opt.filter.plot_kwargs['linestyle'][i1:i4]
-
-        opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[i1:i4]
-        opt.detector.plot_kwargs['linestyle'] = opt.detector.plot_kwargs['linestyle'][i1:i4]
-
     # numbers sourced from ESIS instrument paper as of 09/10/20
     opt.detector.gain = [
-        [0.00, 0.00, 0.00, 0.00],
         [2.57, 2.50, 2.52, 2.53],
         [2.55, 2.58, 2.57, 2.63],
         [2.57, 2.53, 2.52, 2.59],
         [2.60, 2.60, 2.54, 2.58],
-        [0.00, 0.00, 0.00, 0.00],
     ] * u.electron / u.adu
 
     opt.detector.readout_noise = [
-        [0.0, 0.0, 0.0, 0.0],
         [3.9, 4.0, 4.1, 3.7],
         [3.9, 4.0, 4.0, 4.0],
         [4.1, 4.1, 4.1, 4.3],
         [3.9, 3.9, 4.2, 4.1],
-        [0.0, 0.0, 0.0, 0.0],
     ] * u.adu
 
     if not all_channels:
-        opt.grating.serial_number = opt.grating.serial_number[esis.optics.design.default_channel]
-        opt.grating.manufacturing_number = opt.grating.manufacturing_number[esis.optics.design.default_channel]
-        opt.detector.gain = opt.detector.gain[esis.optics.design.default_channel]
-        opt.detector.readout_noise = opt.detector.readout_noise[esis.optics.design.default_channel]
+        chan_index = esis.optics.design.default_channel_active
+        opt.grating.serial_number = opt.grating.serial_number[chan_index]
+        opt.grating.manufacturing_number = opt.grating.manufacturing_number[chan_index]
+        opt.detector.gain = opt.detector.gain[chan_index]
+        opt.detector.readout_noise = opt.detector.readout_noise[chan_index]
 
     return opt
 
