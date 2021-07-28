@@ -56,7 +56,7 @@ def as_measured(
     grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
     opt.grating.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
         plot_kwargs=opt.grating.material.plot_kwargs,
-        name='grating 017',
+        name='UBO-16-017',
         thickness=opt.grating.material.thickness,
         cap=opt.grating.material.cap,
         main=opt.grating.material.main,
