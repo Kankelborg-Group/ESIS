@@ -508,7 +508,8 @@ def bunch() -> matplotlib.figure.Figure:
         wavelength = wavelength[sorted_indices]
         ax_twin.plot(wavelength, area, color='red', zorder=0)
         bottom, top = ax_twin.get_ylim()
-        ax_twin.set_ylim(bottom=-0.001, top=1.1 * top)
+        margin = 0.05 * (top - bottom)
+        ax_twin.set_ylim(bottom=-margin, top=top + 4 * margin)
         ax_twin.set_ylabel(f'mean effective area ({ax_twin.get_ylabel()})')
 
     return fig
