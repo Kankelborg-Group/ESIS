@@ -1561,7 +1561,7 @@ Note flat response in first order over instrument FOV and suppression of zero or
                 ))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.grating_efficiency_vs_wavelength_pdf()), width=None)
+                figure.add_image(str(figures.component_efficiency_vs_wavelength_pdf()), width=None)
 
             with doc.create(pylatex.Figure()) as figure:
                 figure._star_latex_name = True
