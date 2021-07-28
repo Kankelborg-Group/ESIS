@@ -858,7 +858,7 @@ def _annotate_wavelength(
     return lines
 
 
-def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     fig, axs = plt.subplots(
         nrows=2,
         sharex=True,
@@ -869,12 +869,14 @@ def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     wavl_unit = u.Angstrom
     witness = esis.optics.grating.efficiency.witness
     with astropy.visualization.quantity_support():
-        for func in [witness.vs_wavelength_g17, witness.vs_wavelength_g19, witness.vs_wavelength_g24]:
+        optics = esis.flight.optics.as_measured()
+        for func in [witness.vs_wavelength_g24, witness.vs_wavelength_g17, witness.vs_wavelength_g19, ]:
             serial, angle_input, wavelength, efficiency = func()
+            chan_i = np.nonzero(optics.grating.manufacturing_number == serial)
             axs[0].plot(
                 wavelength.to(wavl_unit),
                 efficiency.to(eff_unit),
-                label=serial,
+                label=f'Channel {optics.channel_name[chan_i].squeeze()}',
             )
         axs[0].legend()
 
@@ -882,12 +884,34 @@ def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
         axs[0].set_ylabel(f'efficiency ({eff_unit:latex})')
         _annotate_wavelength(ax=axs[0])
 
-        angle_input, wavelength, efficiency = esis.optics.grating.efficiency.vs_wavelength()
-        axs[1].plot(
-            wavelength.to(wavl_unit),
-            efficiency.to(eff_unit),
-            label='grating 017',
+        wavelength = esis.optics.grating.efficiency.witness.vs_wavelength_g17()[2].to(wavl_unit)
+        rays = kgpy.optics.rays.Rays(
+            wavelength=wavelength,
         )
+
+        axs[1].plot(
+            wavelength,
+            optics.primary.material.transmissivity(rays).to(eff_unit),
+            label=f'primary',
+            color='tab:red'
+        )
+
+        # angle_input, wavelength, efficiency = esis.optics.grating.efficiency.vs_wavelength()
+        index_channel_name = np.nonzero(optics.grating.manufacturing_number == optics.grating.material.name)
+        axs[1].plot(
+            wavelength,
+            optics.grating.material.transmissivity(rays).to(eff_unit),
+            label=f'grating (Channel {optics.channel_name[index_channel_name].squeeze()})',
+            color='tab:purple'
+        )
+
+        axs[1].plot(
+            wavelength,
+            optics.filter.surface.material.transmissivity(rays).to(u.percent),
+            label=r'filter',
+            color='tab:cyan',
+        )
+
         axs[1].add_artist(axs[1].legend())
         lines = _annotate_wavelength(ax=axs[1], label_orders=False)
         axs[1].set_xlabel(f'wavelength ({wavl_unit:latex})')
@@ -897,8 +921,8 @@ def grating_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     return fig
 
 
-def grating_efficiency_vs_wavelength_pdf() -> pathlib.Path:
-    return save_pdf(grating_efficiency_vs_wavelength)
+def component_efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(component_efficiency_vs_wavelength)
 
 
 def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
