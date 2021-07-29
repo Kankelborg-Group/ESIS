@@ -539,7 +539,12 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable(
         name='filterMeshMaterial',
-        value=optics_single.filter.mesh_material,
+        value=pylatex.NoEscape(f'\\{optics_single.filter.mesh_material}'),
+    )
+
+    doc.set_variable(
+        name='filterMeshMaterialShort',
+        value=pylatex.NoEscape(f'\\{optics_single.filter.mesh_material}Short'),
     )
 
     doc.set_variable(
@@ -632,6 +637,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('Mg', 'magnesium', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Si', 'silicon', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Cr', 'chromium', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('Ni', 'nickel', short=True))
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
@@ -1275,7 +1281,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'', r'Material', r'\filterMaterial'])
                     tabular.add_row([r'', r'Thickness', r'\filterThickness'])
                     tabular.add_row([r'', r'Mesh ratio', r'\filterMeshRatio'])
-                    tabular.add_row([r'', r'Mesh material', r'\filterMeshMaterial'])
+                    tabular.add_row([r'', r'Mesh material', r'\filterMeshMaterialShort'])
 
 
 
@@ -1739,7 +1745,7 @@ Visible solar radiation is much stronger than \EUV, and visible stray light can 
 retaining enough intensity to contaminate the \EUV\ images.
 Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be 
 used to shield each \CCD\ from visible light.
-The Al film is supported by a 70 line per inch (lpi) Ni mesh, with 82\% \roy{\filterMeshRatio} transmission.
+The Al film is supported by a 70 line per inch (lpi) Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
 The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in Fig.~\ref{fig:f}.
 We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$."""
             ))
