@@ -282,6 +282,33 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=1,
     )
 
+    doc.set_variable(
+        name='primaryCoatingMaterial',
+        value=pylatex.NoEscape('\\' + optics_single.primary.material.main.material[0]),
+    )
+
+    doc.set_variable(
+        name='primaryCoatingMaterialShort',
+        value=pylatex.NoEscape('\\' + optics_single.primary.material.main.material[0] + 'Short'),
+    )
+
+    doc.set_variable_quantity(
+        name='primaryCoatingThickness',
+        value=optics_single.primary.material.main.thickness[0],
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='primaryCoatingBaseMaterial',
+        value=pylatex.NoEscape('\\' + optics_single.primary.material.base.material[0]),
+    )
+
+    doc.set_variable_quantity(
+        name='primaryCoatingBaseThickness',
+        value=optics_single.primary.material.base.thickness[0],
+        digits_after_decimal=0,
+    )
+
     doc.set_variable_quantity(
         name='fieldStopDiameter',
         value=optics_single.field_stop.clear_width,
@@ -1149,7 +1176,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'', r'Focal length ', r'\primaryFocalLength'])
                     tabular.add_row([r'', r'Aperture shape', r'Octagonal'])
                     tabular.add_row([r'', r'Aperture diameter', r'\primaryDiameter'])
-                    tabular.add_row([r'', r'Coating', r'SiC single layer, optimized for \OVwavelength'])
+                    tabular.add_row([r'', r'Coating', r'SiC \roy{\primaryCoatingMaterialShort} single layer, optimized for \OVwavelength'])
 
                     tabular.add_hline()
                     tabular.add_row([r'Field stop', r'Sky plane diameter', r'\fov'])
@@ -1627,8 +1654,8 @@ emission line wavelengths."""
 The flight and spare primary mirrors were coated with the same Al/SiC/Mg multilayer.
 Corrosion of this multilayer rendered both mirrors unusable.
 The failed coating was stripped from primary mirror SN001.
-The mirror was then re-coated with a \SI{5}{\nano\meter} thick layer of chromium (Cr) to improve adhesion followed by a 
-\SI{25}{\nano\meter} thick layer of SiC.
+The mirror was then re-coated with a \SI{5}{\nano\meter} \roy{\primaryCoatingBaseThickness} thick layer of chromium (Cr) \roy{\primaryCoatingBaseMaterial} to improve adhesion followed by a 
+\SI{25}{\nano\meter} \roy{\primaryCoatingThickness} thick layer of SiC \roy{\primaryCoatingMaterial}.
 The reflectance of this coating deposited on a silicon (Si) wafer witness sample appears in 
 Fig.~\ref{fig:PrimaryEfficiencyVsWavelength}.
 The spare primary mirror (SN002) retains the corroded Al/SiC/Mg multilayer.
