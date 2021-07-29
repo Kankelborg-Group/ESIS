@@ -1637,6 +1637,7 @@ Measured efficiency of a single grating as a function of reflection angle.
 Note flat response in first order over instrument FOV and suppression of zero order.
 """
                 ))
+                figure.append(kgpy.latex.Label('fig:gratingEfficiencyVsAngle'))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.component_efficiency_vs_wavelength_pdf()), width=None)
@@ -1653,7 +1654,7 @@ Note flat response in first order over instrument FOV and suppression of zero or
                 r"""
 The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter} \roy{\OV}, 
 developed by a collaboration between Reflective X-Ray Optics LLC and Lawrence Berkeley National Laboratory (LBNL).
-In Fig.~\ref{F-multilayer} (A), characterization of a single, randomly selected multilayer coated grating at LBNL shows 
+In Fig.~\ref{F-multilayer} (A) \roy{Figure~\ref{fig:gratingEfficiencyVsAngle}}, characterization of a single, randomly selected multilayer coated grating at LBNL shows 
 that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
 completely suppressed.
 Figure~\ref{F-multilayer} (B) \roy{Figure~\ref{fig:gratingMultilayerSchematic}} shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
