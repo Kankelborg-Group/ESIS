@@ -611,6 +611,8 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
     doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
     doc.preamble.append(kgpy.latex.Acronym('MTF', 'modulation transfer function'))
+    doc.preamble.append(kgpy.latex.Acronym('LBNL', 'Lawrence Berkley National Laboratory'))
+
     doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Mg', 'magnesium', short=True))
@@ -1653,8 +1655,8 @@ Note flat response in first order over instrument FOV and suppression of zero or
             doc.append(pylatex.NoEscape(
                 r"""
 The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter} \roy{\OV}, 
-developed by a collaboration between Reflective X-Ray Optics LLC and Lawrence Berkeley National Laboratory (LBNL).
-In Fig.~\ref{F-multilayer} (A) \roy{Figure~\ref{fig:gratingEfficiencyVsAngle}}, characterization of a single, randomly selected multilayer coated grating at LBNL shows 
+developed by a collaboration between Reflective X-Ray Optics LLC and \LBNL.
+In Fig.~\ref{F-multilayer} (A) \roy{Figure~\ref{fig:gratingEfficiencyVsAngle}}, characterization of a single, randomly selected multilayer coated grating at \LBNL\ shows 
 that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
 completely suppressed.
 Figure~\ref{F-multilayer} (B) \roy{Figure~\ref{fig:gratingMultilayerSchematic}} shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
