@@ -1654,7 +1654,7 @@ Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N
                 figure.add_caption(pylatex.NoEscape(
                     r"""
 Measured efficiency of a single grating as a function of reflection angle.
-Note flat response in first order over instrument FOV and suppression of zero order.
+Note flat response in first order over instrument \FOV\ and suppression of zero order.
 """
                 ))
                 figure.append(kgpy.latex.Label('fig:gratingEfficiencyVsAngle'))
