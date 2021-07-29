@@ -1651,7 +1651,7 @@ Note flat response in first order over instrument FOV and suppression of zero or
 
             doc.append(pylatex.NoEscape(
                 r"""
-The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter}, 
+The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter} \roy{\OV}, 
 developed by a collaboration between Reflective X-Ray Optics LLC and Lawrence Berkeley National Laboratory (LBNL).
 In Fig.~\ref{F-multilayer} (A), characterization of a single, randomly selected multilayer coated grating at LBNL shows 
 that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
@@ -1665,7 +1665,7 @@ The maximum reflectance for the coating alone in the nominal instrument passband
 Fig.~\ref{F-multilayer} (C), measured from witness samples coated at the same time as the diffraction gratings.
 Combined with the predicted groove efficiency from \S\,\ref{SS-Optics} and, given the relatively shallow groove profile 
 and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} at 
-\SI{63}{\nano\meter}.
+\SI{63}{\nano\meter} \roy{\OV}.
 This is confirmed by the first order efficiency measured from a single ESIS grating in Fig.~\ref{F-multilayer} (D).  
 
 Unlike EUV imagers (\eg, \textit{TRACE}~\citep{Handy99}, \textit{AIA}~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
@@ -1677,7 +1677,7 @@ Figure~\ref{F-multilayer} (D) shows the peak reflectance of the grating multilay
 wavelengths to attenuate the He\,\textsc{i} emission line, reducing the likelihood of detector saturation.
 A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) line.
 Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} of that 
-at \SI{63}{\nano\meter} (Fig.~\ref{F-multilayer} (D)).
+at \SI{63}{\nano\meter} \roy{\OV} (Fig.~\ref{F-multilayer} (D)).
 In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} is 
 $\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the CCD.
 """
