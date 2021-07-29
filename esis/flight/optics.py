@@ -65,6 +65,24 @@ def as_measured(
         wavelength_data=grating_wavelength,
     )
 
+    grating_witness_measurement = esis.optics.grating.efficiency.witness.vs_wavelength_g17()
+    (
+        grating_serial,
+        grating_witness_angle_input,
+        grating_witness_wavelength,
+        grating_witness_efficiency,
+    ) = grating_witness_measurement
+    opt.grating.witness = kgpy.optics.surface.material.MeasuredMultilayerMirror(
+        plot_kwargs=opt.grating.material.plot_kwargs,
+        name=grating_serial,
+        thickness=opt.grating.material.thickness,
+        cap=opt.grating.material.cap,
+        main=opt.grating.material.main,
+        base=opt.grating.material.base,
+        efficiency_data=grating_witness_efficiency,
+        wavelength_data=grating_witness_wavelength,
+    )
+
     # opt.grating.tangential_radius = (597.46 * u.mm + 597.08 * u.mm) / 2
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
     opt.grating.ruling_density = 2585.5 / u.mm
