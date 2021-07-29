@@ -1627,6 +1627,7 @@ Dashed lines mark the same emission lines as in (C).
 Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N=4$ \roy{$N=\gratingCoatingNumLayers$} layers.
 """
                 ))
+                figure.append(kgpy.latex.Label('fig:gratingMultilayerSchematic'))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.grating_efficiency_vs_angle_pdf()), width=None)
@@ -1655,7 +1656,7 @@ developed by a collaboration between Reflective X-Ray Optics LLC and Lawrence Be
 In Fig.~\ref{F-multilayer} (A), characterization of a single, randomly selected multilayer coated grating at LBNL shows 
 that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
 completely suppressed.
-Figure~\ref{F-multilayer} (B) shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
+Figure~\ref{F-multilayer} (B) \roy{Figure~\ref{fig:gratingMultilayerSchematic}} shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
 $m=0$ order using four \roy{\gratingCoatingNumLayersWords} layer pairs of silicon carbide (SiC) \roy{\firstGratingCoatingMaterial} and magnesium (Mg) \roy{\secondGratingCoatingMaterial}.
 The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjacent to each Mg layer to mitigate corrosion.
 
