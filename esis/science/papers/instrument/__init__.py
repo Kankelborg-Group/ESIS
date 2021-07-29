@@ -365,6 +365,41 @@ def document() -> kgpy.latex.Document:
         value=optics_single.grating.nominal_output_angle,
     )
 
+    doc.set_variable(
+        name='firstGratingCoatingMaterial',
+        value=pylatex.NoEscape(f'\\{optics_single.grating.material.main.material[0]}')
+    )
+    doc.set_variable(
+        name='firstGratingCoatingMaterialShort',
+        value=pylatex.NoEscape(f'\\{optics_single.grating.material.main.material[0]}Short')
+    )
+    doc.set_variable(
+        name='secondGratingCoatingMaterial',
+        value=pylatex.NoEscape(f'\\{optics_single.grating.material.main.material[1]}')
+    )
+    doc.set_variable(
+        name='secondGratingCoatingMaterialShort',
+        value=pylatex.NoEscape(f'\\{optics_single.grating.material.main.material[1]}Short')
+    )
+    doc.set_variable(
+        name='thirdGratingCoatingMaterial',
+        value=pylatex.NoEscape(f'\\{optics_single.grating.material.main.material[2]}')
+    )
+    doc.set_variable(
+        name='thirdGratingCoatingMaterialShort',
+        value=pylatex.NoEscape(f'\\{optics_single.grating.material.main.material[2]}Short')
+    )
+    doc.set_variable(
+        name='gratingCoatingMaterial',
+        value=pylatex.NoEscape(
+            r'\firstGratingCoatingMaterial, \secondGratingCoatingMaterial, and \thirdGratingCoatingMaterial')
+    )
+    doc.set_variable(
+        name='gratingCoatingMaterialShort',
+        value=pylatex.NoEscape(
+            r'\firstGratingCoatingMaterialShort/\secondGratingCoatingMaterialShort/\thirdGratingCoatingMaterialShort'),
+    )
+
     doc.set_variable_quantity(
         name='filterDiameter',
         value=optics_single.filter.clear_diameter,
@@ -1579,7 +1614,7 @@ Dashed lines mark the same emission lines as in (C).
                 figure.add_image(str(figures.grating_multilayer_schematic_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-Schematic of the Al/SiC/Mg multilayer with $N=4$ layers.
+Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N=4$ layers.
 """
                 ))
 
@@ -1611,8 +1646,8 @@ In Fig.~\ref{F-multilayer} (A), characterization of a single, randomly selected 
 that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
 completely suppressed.
 Figure~\ref{F-multilayer} (B) shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
-$m=0$ order using four layer pairs of silicon carbide (SiC) and magnesium (Mg).
-The Aluminum (Al) layers are deposited adjacent to each Mg layer to mitigate corrosion.
+$m=0$ order using four layer pairs of silicon carbide (SiC) \roy{\firstGratingCoatingMaterial} and magnesium (Mg) \roy{\secondGratingCoatingMaterial}.
+The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjacent to each Mg layer to mitigate corrosion.
 
 The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} in 
 Fig.~\ref{F-multilayer} (C), measured from witness samples coated at the same time as the diffraction gratings.
