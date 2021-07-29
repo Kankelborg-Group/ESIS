@@ -539,6 +539,11 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
     doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
     doc.preamble.append(kgpy.latex.Acronym('MTF', 'modulation transfer function'))
+    doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('Mg', 'magnesium', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('Si', 'silicon', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('Cr', 'chromium', short=True))
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
