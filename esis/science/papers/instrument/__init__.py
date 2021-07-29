@@ -1658,7 +1658,8 @@ that the grating reflectivity is constant over the instrument FOV in the $m=1$ o
 completely suppressed.
 Figure~\ref{F-multilayer} (B) \roy{Figure~\ref{fig:gratingMultilayerSchematic}} shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
 $m=0$ order using four \roy{\gratingCoatingNumLayersWords} layer pairs of silicon carbide (SiC) \roy{\firstGratingCoatingMaterial} and magnesium (Mg) \roy{\secondGratingCoatingMaterial}.
-The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjacent to each Mg layer to mitigate corrosion.
+The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjacent to each Mg \roy{\firstGratingCoatingMaterial} layer to mitigate corrosion.
+\roy{As Charles mentioned, this doesn't make sense. Why can it go \firstGratingCoatingMaterial\ to \secondGratingCoatingMaterial, but not \secondGratingCoatingMaterial\ to \firstGratingCoatingMaterial?}
 
 The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} in 
 Fig.~\ref{F-multilayer} (C), measured from witness samples coated at the same time as the diffraction gratings.
