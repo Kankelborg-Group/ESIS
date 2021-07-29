@@ -400,6 +400,16 @@ def document() -> kgpy.latex.Document:
             r'\firstGratingCoatingMaterialShort/\secondGratingCoatingMaterialShort/\thirdGratingCoatingMaterialShort'),
     )
 
+    grating_nlayers = optics_single.grating.material.cap.num_periods + optics_single.grating.material.main.num_periods
+    doc.set_variable(
+        name='gratingCoatingNumLayers',
+        value=str(grating_nlayers)
+    )
+    doc.set_variable(
+        name='gratingCoatingNumLayersWords',
+        value=num2words.num2words(grating_nlayers),
+    )
+
     doc.set_variable_quantity(
         name='filterDiameter',
         value=optics_single.filter.clear_diameter,
@@ -1614,7 +1624,7 @@ Dashed lines mark the same emission lines as in (C).
                 figure.add_image(str(figures.grating_multilayer_schematic_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N=4$ layers.
+Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N=4$ \roy{$N=\gratingCoatingNumLayers$} layers.
 """
                 ))
 
@@ -1646,7 +1656,7 @@ In Fig.~\ref{F-multilayer} (A), characterization of a single, randomly selected 
 that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
 completely suppressed.
 Figure~\ref{F-multilayer} (B) shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
-$m=0$ order using four layer pairs of silicon carbide (SiC) \roy{\firstGratingCoatingMaterial} and magnesium (Mg) \roy{\secondGratingCoatingMaterial}.
+$m=0$ order using four \roy{\gratingCoatingNumLayersWords} layer pairs of silicon carbide (SiC) \roy{\firstGratingCoatingMaterial} and magnesium (Mg) \roy{\secondGratingCoatingMaterial}.
 The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjacent to each Mg layer to mitigate corrosion.
 
 The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} in 
