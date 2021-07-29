@@ -186,6 +186,87 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable(
+        name='chiantiDEM',
+        value=pylatex.NoEscape(pylatex.Command('texttt', kgpy.chianti.dem_qs_file).dumps())
+    )
+
+    doc.set_variable(
+        name='chiantiAbundances',
+        value=pylatex.NoEscape(pylatex.Command('texttt', kgpy.chianti.abundance_qs_tr_file).dumps())
+    )
+
+    doc.set_variable_quantity(
+        name='chiantiPressure',
+        value=kgpy.chianti.pressure_qs,
+        digits_after_decimal=0,
+        scientific_notation=True,
+    )
+
+    wavelength = optics_single.bunch.wavelength
+    ion = kgpy.chianti.to_spectroscopic(optics_single.bunch.ion)
+
+    index_o5 = np.nonzero(optics_single.bunch.ion == 'o_5')[0][0]
+    wavelength_o5 = wavelength[index_o5]
+    doc.set_variable_quantity(
+        name='OVwavelength',
+        value=wavelength_o5,
+        digits_after_decimal=wavl_digits,
+    )
+    doc.set_variable(
+        name='OVion',
+        value=pylatex.NoEscape(ion[index_o5])
+    )
+    doc.set_variable(
+        name='OV',
+        value=pylatex.NoEscape(r'\OVion\ \OVwavelength')
+    )
+
+    index_he1 = np.nonzero(optics_single.bunch.ion == 'he_1')[0][0]
+    doc.set_variable_quantity(
+        name='HeIwavelength',
+        value=wavelength[index_he1],
+        digits_after_decimal=wavl_digits,
+    )
+    doc.set_variable(
+        name='HeIion',
+        value=pylatex.NoEscape(ion[index_he1])
+    )
+    doc.set_variable(
+        name='HeI',
+        value=pylatex.NoEscape(r'\HeIion\ \HeIwavelength')
+    )
+
+    index_mg10 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][0]
+    doc.set_variable_quantity(
+        name='MgXwavelength',
+        value=wavelength[index_mg10],
+        digits_after_decimal=wavl_digits,
+    )
+    doc.set_variable(
+        name='MgXion',
+        value=pylatex.NoEscape(ion[index_mg10])
+    )
+    doc.set_variable(
+        name='MgX',
+        value=pylatex.NoEscape(r'\MgXion\ \MgXwavelength')
+    )
+
+    index_mg10_2 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][1]
+    doc.set_variable_quantity(
+        name='MgXdimWavelength',
+        value=wavelength[index_mg10_2],
+        digits_after_decimal=wavl_digits,
+    )
+    doc.set_variable(
+        name='MgXdimIon',
+        value=pylatex.NoEscape(ion[index_mg10_2])
+    )
+    doc.set_variable(
+        name='MgXdim',
+        value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
+    )
+
+    doc.set_variable(
         name='numChannels',
         value=str(optics_all.num_channels),
     )
@@ -473,86 +554,6 @@ def document() -> kgpy.latex.Document:
         name='detectorQuantumEfficiency',
         value=optics_single.detector.quantum_efficiency,
         digits_after_decimal=0
-    )
-
-    doc.set_variable(
-        name='chiantiDEM',
-        value=pylatex.NoEscape(pylatex.Command('texttt', kgpy.chianti.dem_qs_file).dumps())
-    )
-
-    doc.set_variable(
-        name='chiantiAbundances',
-        value=pylatex.NoEscape(pylatex.Command('texttt', kgpy.chianti.abundance_qs_tr_file).dumps())
-    )
-
-    doc.set_variable_quantity(
-        name='chiantiPressure',
-        value=kgpy.chianti.pressure_qs,
-        digits_after_decimal=0,
-        scientific_notation=True,
-    )
-
-    wavelength = optics_single.bunch.wavelength
-    ion = kgpy.chianti.to_spectroscopic(optics_single.bunch.ion)
-
-    index_o5 = np.nonzero(optics_single.bunch.ion == 'o_5')[0][0]
-    doc.set_variable_quantity(
-        name='OVwavelength',
-        value=wavelength[index_o5],
-        digits_after_decimal=wavl_digits,
-    )
-    doc.set_variable(
-        name='OVion',
-        value=pylatex.NoEscape(ion[index_o5])
-    )
-    doc.set_variable(
-        name='OV',
-        value=pylatex.NoEscape(r'\OVion\ \OVwavelength')
-    )
-
-    index_he1 = np.nonzero(optics_single.bunch.ion == 'he_1')[0][0]
-    doc.set_variable_quantity(
-        name='HeIwavelength',
-        value=wavelength[index_he1],
-        digits_after_decimal=wavl_digits,
-    )
-    doc.set_variable(
-        name='HeIion',
-        value=pylatex.NoEscape(ion[index_he1])
-    )
-    doc.set_variable(
-        name='HeI',
-        value=pylatex.NoEscape(r'\HeIion\ \HeIwavelength')
-    )
-
-    index_mg10 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][0]
-    doc.set_variable_quantity(
-        name='MgXwavelength',
-        value=wavelength[index_mg10],
-        digits_after_decimal=wavl_digits,
-    )
-    doc.set_variable(
-        name='MgXion',
-        value=pylatex.NoEscape(ion[index_mg10])
-    )
-    doc.set_variable(
-        name='MgX',
-        value=pylatex.NoEscape(r'\MgXion\ \MgXwavelength')
-    )
-
-    index_mg10_2 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][1]
-    doc.set_variable_quantity(
-        name='MgXdimWavelength',
-        value=wavelength[index_mg10_2],
-        digits_after_decimal=wavl_digits,
-    )
-    doc.set_variable(
-        name='MgXdimIon',
-        value=pylatex.NoEscape(ion[index_mg10_2])
-    )
-    doc.set_variable(
-        name='MgXdim',
-        value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
     )
 
     doc.set_variable(
