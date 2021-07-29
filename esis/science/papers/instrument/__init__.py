@@ -1358,6 +1358,16 @@ The bipods are bonded to both the grating and backing plate along the three long
 The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
             ))
 
+            with doc.create(pylatex.Table()) as table:
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('rr')) as tabular:
+                        tabular.escape = False
+                        tabular.add_row(['Channel', 'Serial number'])
+                        tabular.add_hline()
+                        for i in range(optics_all.channel_name.size):
+                            index = np.unravel_index(i, optics_all.channel_name.shape)
+                            tabular.add_row([optics_all.channel_name[index], optics_all.grating.serial_number[index]])
+
             with doc.create(pylatex.Figure()) as figure:
                 # figure.add_image('figures/old/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
                 # figure.append('\n')
