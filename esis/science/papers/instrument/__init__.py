@@ -8,6 +8,7 @@ import kgpy.format
 import kgpy.latex
 import kgpy.units
 import kgpy.chianti
+import kgpy.optics
 import esis.optics
 import esis.science.papers.instrument.figures as figures
 from . import optics
@@ -489,6 +490,12 @@ def document() -> kgpy.latex.Document:
     doc.set_variable(
         name='gratingCoatingNumLayersWords',
         value=num2words.num2words(grating_nlayers),
+    )
+
+    doc.set_variable_quantity(
+        name='gratingWitnessEfficiency',
+        value=optics_all.grating.witness.transmissivity(kgpy.optics.rays.Rays(wavelength=wavelength_o5)).to(u.percent),
+        digits_after_decimal=0,
     )
 
     doc.set_variable_quantity(
@@ -1665,7 +1672,7 @@ $m=0$ order using four \roy{\gratingCoatingNumLayersWords} layer pairs of silico
 The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjacent to each Mg \roy{\firstGratingCoatingMaterial} layer to mitigate corrosion.
 \roy{As Charles mentioned, this doesn't make sense. Why can it go \firstGratingCoatingMaterial\ to \secondGratingCoatingMaterial, but not \secondGratingCoatingMaterial\ to \firstGratingCoatingMaterial?}
 
-The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} in 
+The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} \roy{\gratingWitnessEfficiency} in 
 Fig.~\ref{F-multilayer} (C), measured from witness samples coated at the same time as the diffraction gratings.
 Combined with the predicted groove efficiency from \S\,\ref{SS-Optics} and, given the relatively shallow groove profile 
 and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} at 
