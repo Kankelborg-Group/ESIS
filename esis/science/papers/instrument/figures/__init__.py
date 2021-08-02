@@ -896,12 +896,10 @@ def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
             color='tab:red'
         )
 
-        # angle_input, wavelength, efficiency = esis.optics.grating.efficiency.vs_wavelength()
-        index_channel_name = np.nonzero(optics.grating.manufacturing_number == optics.grating.material.name)
         axs[1].plot(
             wavelength,
             optics.grating.material.transmissivity(rays).to(eff_unit),
-            label=f'grating (Channel {optics.channel_name[index_channel_name].squeeze()})',
+            label=f'grating',
             color='tab:purple'
         )
 
