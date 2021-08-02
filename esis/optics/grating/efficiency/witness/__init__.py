@@ -18,11 +18,12 @@ manufacturing_number_g17 = 'UBO-16-017'
 manufacturing_number_g19 = 'UBO-16-019'
 manufacturing_number_g24 = 'UBO-16-024'
 
+angle_input = 4 * u.deg
+
 
 def _vs_wavelength(file: pathlib.Path) -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity]:
     df = pandas.read_table(file, sep=' ')
     arr = df.to_numpy()
-    angle_input = 4 * u.deg
     wavelength = arr[..., 0] * u.nm
     efficiency = arr[..., 1] * u.dimensionless_unscaled
     return angle_input, wavelength, efficiency
