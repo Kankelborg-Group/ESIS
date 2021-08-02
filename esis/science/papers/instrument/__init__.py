@@ -1704,18 +1704,18 @@ Fig.~\ref{F-multilayer} (C) \roy{the upper panel of Figure~\ref{fig:componentEff
 Combined with the predicted groove efficiency from \S\,\ref{SS-Optics} and, given the relatively shallow groove profile 
 and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} at 
 \SI{63}{\nano\meter} \roy{\OV}.
-This is confirmed by the first order efficiency measured from a single ESIS grating in Fig.~\ref{F-multilayer} (D).  
+This is confirmed by the first order efficiency measured from a single ESIS grating in Fig.~\ref{F-multilayer} (D) \roy{the lower panel in Figure~\ref{fig:componentEfficiencyVsWavelength}}.  
 
 Unlike EUV imagers (\eg, \textit{TRACE}~\citep{Handy99}, \textit{AIA}~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
 the ESIS passband is defined by a combination of the field stop and grating (\S\,\ref{SS-Optics}, Fig.~\ref{F-disp}) 
 rather than multi-layer coatings.
 The coating selectivity is therefore not critical in this respect, allowing the multi-layer to be manipulated to 
 suppress out-of-band bright, nearby emission lines.
-Figure~\ref{F-multilayer} (D) shows the peak reflectance of the grating multilayer is shifted slightly towards longer 
+Figure~\ref{F-multilayer} (D) \roy{the lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}} shows the peak reflectance of the grating multilayer is shifted slightly towards longer 
 wavelengths to attenuate the He\,\textsc{i} emission line, reducing the likelihood of detector saturation.
 A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) line.
 Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} of that 
-at \SI{63}{\nano\meter} \roy{\OV} (Fig.~\ref{F-multilayer} (D)).
+at \SI{63}{\nano\meter} \roy{\OV} (Fig.~\ref{F-multilayer} (D) \roy{the lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}}).
 In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} is 
 $\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the CCD.
 """
@@ -1742,7 +1742,7 @@ The failed coating was stripped from primary mirror SN001.
 The mirror was then re-coated with a \SI{5}{\nano\meter} \roy{\primaryCoatingBaseThickness} thick layer of chromium (Cr) \roy{\primaryCoatingBaseMaterial} to improve adhesion followed by a 
 \SI{25}{\nano\meter} \roy{\primaryCoatingThickness} thick layer of SiC \roy{\primaryCoatingMaterial}.
 The reflectance of this coating deposited on a silicon (Si) wafer witness sample appears in 
-Fig.~\ref{fig:PrimaryEfficiencyVsWavelength}.
+Fig.~\ref{fig:componentEfficiencyVsWavelength}.
 The spare primary mirror (SN002) retains the corroded Al/SiC/Mg multilayer.
 
 The Si \CCDs\ are sensitive to visible light as well as \EUV.
@@ -1751,7 +1751,8 @@ retaining enough intensity to contaminate the \EUV\ images.
 Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be 
 used to shield each \CCD\ from visible light.
 The Al film is supported by a 70 line per inch (lpi) Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
-The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in Fig.~\ref{fig:f}.
+The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in 
+Fig.~\ref{fig:componentEfficiencyVsWavelength}.
 We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$."""
             ))
 
