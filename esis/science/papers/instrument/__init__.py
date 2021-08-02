@@ -1664,6 +1664,20 @@ Note flat response in first order over instrument \FOV\ and suppression of zero 
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.component_efficiency_vs_wavelength_pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""(Top) Measured reflectance for several multilayer coated witness samples 
+\roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
+Note the suppression of second order relative to the first order.
+(Bottom) Comparison of the efficiency of the three main ESIS optical components: primary mirror, grating and filter.
+The primary mirror efficiency is based on measurements of a \Si\ witness sample taken on \primaryMeasurementDate\ at an 
+angle of incidence of \primaryWitnessMeasurementIncidenceAngle. 
+The grating efficiency is from a measurement of the Channel \testGratingChannelIndex\ grating taken on \testGratingDate\
+at an angle of incidence of \gratingMeasurementIncidenceAngle.
+The filter efficiency is a theoretical model that includes the filter mesh, \filterThickness\ of \filterMaterial\ and
+\filterOxideThickness\ of \filterMaterial\ oxide.
+}"""
+                ))
+                figure.append(kgpy.latex.Label('fig:componentEfficiencyVsWavelength'))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure._star_latex_name = True
@@ -1686,7 +1700,7 @@ The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjace
 \roy{As Charles mentioned, this doesn't make sense. Why can it go \firstGratingCoatingMaterial\ to \secondGratingCoatingMaterial, but not \secondGratingCoatingMaterial\ to \firstGratingCoatingMaterial?}
 
 The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} \roy{\gratingWitnessEfficiency} in 
-Fig.~\ref{F-multilayer} (C), measured from witness samples coated at the same time as the diffraction gratings.
+Fig.~\ref{F-multilayer} (C) \roy{the upper panel of Figure~\ref{fig:componentEfficiencyVsWavelength}}, measured from witness samples coated at the same time as the diffraction gratings.
 Combined with the predicted groove efficiency from \S\,\ref{SS-Optics} and, given the relatively shallow groove profile 
 and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} at 
 \SI{63}{\nano\meter} \roy{\OV}.
