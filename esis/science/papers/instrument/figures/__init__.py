@@ -596,10 +596,10 @@ def psf_pdf() -> pathlib.Path:
 
 
 kwargs_optics_default = dict(
-    pupil_samples=21,
-    pupil_is_stratified_random=True,
-    field_samples=21,
-    field_is_stratified_random=False,
+    pupil_samples=optics_factories.default_pupil_samples,
+    pupil_is_stratified_random=optics_factories.default_pupil_is_stratified_random,
+    field_samples=optics_factories.default_field_samples,
+    field_is_stratified_random=optics_factories.default_field_is_stratified_random,
     all_channels=False,
 )
 
