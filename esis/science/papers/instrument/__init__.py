@@ -1741,7 +1741,48 @@ stored in a nitrogen purged environment until after payload vibration testing.""
             ))
 
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
-            pass
+            doc.append(pylatex.NoEscape(
+                r"""
+Count rates for ESIS are estimated using the expected component throughput from Section~\ref{section:instrument:passband} and the CCD quantum efficiency (QE) listed in Table~\ref{table:prescription}.
+Line intensities are derived from \citet{Vernazza78} (V\&R) and the SOHO/Coronal Diagnostic Spectrometer (CDS) \citep{Harrison95} data.
+The \SI{100}{\percent} duty cycle of ESIS (\S\,\ref{section:instrument:cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
+So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant SNR penalty.
+Table~\ref{table:count} shows that ESIS is effectively shot noise limited with a \SI{10}{\second} exposure.
+The signal requirement in Table~\ref{table:scireq} is met by stacking exposures.
+Good quality images ($\sim300$ counts) in active regions can be obtained by stacking \SI{30}{\second} worth of exposures.
+This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en waves described in \S\,\ref{section:science}.
+However, by stacking multiple \SI{10}{\second} exposures, sufficient SNR \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained.
+We also note that the count rates given here are for an unvignetted system which is limited by the baffling of this design.
+While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{section:instrument:aperture}) to increase throughput.
+Thus, a faster exposure cadence may be obtained by accepting some vignetting in the system.
+
+\begin{table*}[!htb]
+    \centering
+    \begin{tabular}{lcccc}
+        Source & V\&R & V\&R & V\&R & CDS \\
+        Solar Context & QS & CH & AR & AR \\
+        \hline
+        \multicolumn{5}{c}{\SI{10}{\second} Exp.}\\
+        Mg\,\textsc{x} (\SI{62.5}{\nano\meter}) & 3 & 0 & 26 & 16  \\
+        O\,\textsc{V} (\SI{62.9}{\nano\meter}) & 22 & 19 & 66 & 34 \\
+        \hline
+        Total Counts & 25 & 19 & 92 & 50 \\
+        Shot Noise & 5.0 & 4.3 & 9.6 & 7.0 \\
+        Read Noise (est.) & \multicolumn{4}{c}{-- 1.9 --} \\
+        SNR & 4.7 & 4.0 & 9.4 & 6.8 \\
+        \hline \hline
+        \multicolumn{5}{c}{$3\times$\SI{10}{\second} Exp. Stack}\\
+        Total Counts & 75 & 56 & 276 & 148 \\
+        SNR & 8.1 & 6.8 & 16.3 & 11.7 \\
+        \hline
+    \end{tabular}
+    \caption{
+        Estimated signal statistics per channel (in photon counts) for ESIS lines in coronal hole (CH), quiet Sun (QS), and active region (AR).
+    }
+    \label{table:count}
+\end{table*}
+"""
+            ))
 
         with doc.create(pylatex.Subsection('Alignment and Focus')):
             pass
