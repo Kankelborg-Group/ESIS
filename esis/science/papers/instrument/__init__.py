@@ -554,6 +554,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='gratingTestWavelength',
+        value=esis.optics.grating.efficiency.wavelength_nominal,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
         name='filterDiameter',
         value=optics_single.filter.clear_diameter,
         digits_after_decimal=1,

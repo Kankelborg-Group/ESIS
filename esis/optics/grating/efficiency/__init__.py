@@ -22,9 +22,8 @@ file_vs_position_y = base_path / 'mul063282.txt'
 file_vs_wavelength = base_path / 'mul063315.abs'
 
 manufacturing_number = witness.manufacturing_number_g17
-
-
 date_measurement = astropy.time.Time('2018-01-21')
+wavelength_nominal = 63 * u.nm
 
 
 def vs_angle_at_0aoi() -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:
