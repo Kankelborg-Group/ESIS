@@ -1645,7 +1645,7 @@ Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N
                 figure.add_image(str(figures.grating_efficiency_vs_angle_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-Measured efficiency of a single grating \roy{the Channel \testGratingChannelIndex\ grating} as a function of reflection angle on \roy{\testGratingDate}.
+Measured efficiency \roy{at \gratingTestWavelength} of a single grating \roy{the Channel \testGratingChannelIndex\ grating} as a function of reflection angle on \roy{\testGratingDate}.
 Note flat response in first order over instrument \FOV\ and suppression of zero order.
 """
                 ))
