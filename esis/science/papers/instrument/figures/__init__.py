@@ -939,7 +939,6 @@ def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
         )
         axs[0].set_xlabel(f'$x$ position ({axs[0].get_xlabel()})')
         axs[0].set_ylabel(f'efficiency ({axs[0].get_ylabel()})')
-        axs[0].legend()
 
         position_x, position_y, wavelength, efficiency = esis.optics.grating.efficiency.vs_position_y()
         axs[1].plot(
@@ -949,7 +948,6 @@ def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
         )
         axs[1].set_xlabel(f'$y$ position ({axs[1].get_xlabel()})')
         axs[1].set_ylabel(None)
-        axs[1].legend()
 
         return fig
 
