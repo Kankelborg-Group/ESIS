@@ -492,15 +492,24 @@ def document() -> kgpy.latex.Document:
         value=num2words.num2words(grating_nlayers),
     )
 
+    rays_o5 = kgpy.optics.rays.Rays(wavelength=wavelength_o5)
+    grating_efficiency = optics_all.grating.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='gratingEfficiency',
-        value=optics_all.grating.material.transmissivity(kgpy.optics.rays.Rays(wavelength=wavelength_o5)).to(u.percent),
+        value=grating_efficiency,
+        digits_after_decimal=0,
+    )
+
+    grating_witness_efficiency = optics_all.grating.witness.transmissivity(rays_o5).to(u.percent)
+    doc.set_variable_quantity(
+        name='gratingWitnessEfficiency',
+        value=grating_witness_efficiency,
         digits_after_decimal=0,
     )
 
     doc.set_variable_quantity(
-        name='gratingWitnessEfficiency',
-        value=optics_all.grating.witness.transmissivity(kgpy.optics.rays.Rays(wavelength=wavelength_o5)).to(u.percent),
+        name='gratingGrooveEfficiency',
+        value=(grating_efficiency / grating_witness_efficiency).to(u.percent),
         digits_after_decimal=0,
     )
 
@@ -1266,8 +1275,8 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'', r'Anamorphic magnification factor', r'\anamorphicMagnification'])
                     tabular.add_row([r'', r'Manufacturing process', r'Individual master gratings'])
                     tabular.add_row([r'', r'Coating', r'Mg/Al/SiC \roy{\gratingCoatingMaterialShort} multilayer, optimized for \OVwavelength'])
-                    tabular.add_row([r'', r'Efficiency (\OV)', r'\SI{14}{\percent} \roy{\gratingEfficiency}'])
-                    tabular.add_row([r'', r'Uncoated efficiency', r'\SI{39}{\percent}'])
+                    tabular.add_row([r'', r'Efficiency \roy{(\OV)}', r'\SI{14}{\percent} \roy{\gratingEfficiency}'])
+                    tabular.add_row([r'', r'Uncoated efficiency \roy{(\OV)}', r'\SI{39}{\percent} \roy{\gratingGrooveEfficiency}'])
 
 
 
