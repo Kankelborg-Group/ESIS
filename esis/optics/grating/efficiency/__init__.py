@@ -1,6 +1,7 @@
 import typing as typ
 import pathlib
 import astropy.units as u
+import astropy.time
 import pandas
 from . import witness
 
@@ -19,6 +20,11 @@ file_vs_angle_at_3aoi = base_path / 'mul063281.txt'
 file_vs_position_x = base_path / 'mul063283.abs'
 file_vs_position_y = base_path / 'mul063282.txt'
 file_vs_wavelength = base_path / 'mul063315.abs'
+
+manufacturing_number = witness.manufacturing_number_g17
+
+
+date_measurement = astropy.time.Time('2018-01-21')
 
 
 def vs_angle_at_0aoi() -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity, u.Quantity]:

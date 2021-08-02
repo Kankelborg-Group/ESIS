@@ -519,6 +519,17 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    is_number = esis.optics.grating.efficiency.manufacturing_number == optics_all.grating.manufacturing_number
+    doc.set_variable(
+        name='testGratingChannelIndex',
+        value=optics_all.channel_name[np.nonzero(is_number)][0]
+    )
+
+    doc.set_variable(
+        name='testGratingDate',
+        value=esis.optics.grating.efficiency.date_measurement.strftime('%Y %B %d')
+    )
+
     doc.set_variable_quantity(
         name='filterDiameter',
         value=optics_single.filter.clear_diameter,
@@ -1626,7 +1637,7 @@ Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N
                 figure.add_image(str(figures.grating_efficiency_vs_angle_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-Measured efficiency of a single grating as a function of reflection angle.
+Measured efficiency of a single grating \roy{the Channel \testGratingChannelIndex\ grating} as a function of reflection angle on \roy{\testGratingDate}.
 Note flat response in first order over instrument \FOV\ and suppression of zero order.
 """
                 ))
