@@ -14,6 +14,10 @@ file_vs_wavelength_g17 = base_path / 'Witness_g17.txt'
 file_vs_wavelength_g19 = base_path / 'Witness_g19.txt'
 file_vs_wavelength_g24 = base_path / 'Witness_g24.txt'
 
+manufacturing_number_g17 = 'UBO-16-017'
+manufacturing_number_g19 = 'UBO-16-019'
+manufacturing_number_g24 = 'UBO-16-024'
+
 
 def _vs_wavelength(file: pathlib.Path) -> typ.Tuple[u.Quantity, u.Quantity, u.Quantity]:
     df = pandas.read_table(file, sep=' ')
@@ -25,13 +29,13 @@ def _vs_wavelength(file: pathlib.Path) -> typ.Tuple[u.Quantity, u.Quantity, u.Qu
 
 
 def vs_wavelength_g17() -> typ.Tuple[str, u.Quantity, u.Quantity, u.Quantity]:
-    return ('UBO-16-017', ) + _vs_wavelength(file_vs_wavelength_g17)
+    return (manufacturing_number_g17,) + _vs_wavelength(file_vs_wavelength_g17)
 
 
 def vs_wavelength_g19() -> typ.Tuple[str, u.Quantity, u.Quantity, u.Quantity]:
-    return ('UBO-16-019', ) +_vs_wavelength(file_vs_wavelength_g19)
+    return (manufacturing_number_g19, ) + _vs_wavelength(file_vs_wavelength_g19)
 
 
 def vs_wavelength_g24() -> typ.Tuple[str, u.Quantity, u.Quantity, u.Quantity]:
-    return ('UBO-16-024', ) +_vs_wavelength(file_vs_wavelength_g24)
+    return (manufacturing_number_g24, ) + _vs_wavelength(file_vs_wavelength_g24)
 
