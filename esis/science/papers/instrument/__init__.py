@@ -1625,23 +1625,6 @@ Total MTF	 	& 		&				&				& 0.109 \\
             #         with centering.create(pylatex.Tabular('llrcc')) as tabular:
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
-            with doc.create(pylatex.Figure()) as figure:
-                figure._star_latex_name = True
-                figure.add_image('figures/old/Grating_Multilayer_2', width=kgpy.latex.textwidth)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-(A) Measured efficiency of a single grating as a function of reflection angle.
-Note flat response in first order over instrument FOV and suppression of zero order.
-(B) Schematic of the Al/SiC/Mg multilayer with $N=4$ layers.
-(C) Measured reflectance for several multilayer coated witness samples.
-Dashed lines mark He\,\textsc{i} (left, \SI{58.4}{\nano\meter}) and O\,\textsc{v} (right, \SI{63.0}{\nano\meter}) 
-emission line wavelengths, with additional vertical line showing suppression of He\,\textsc{ii} emission (far left 
-dashed line, \SI{30.4}{\nano\meter})
-(D) Measured multilayer coated grating efficiency as a function of wavelength.
-Dashed lines mark the same emission lines as in (C).
-"""
-                ))
-                figure.append(kgpy.latex.Label('F-multilayer'))
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.grating_multilayer_schematic_pdf()), width=None)
@@ -1721,19 +1704,6 @@ $\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely atte
 """
             ))
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image('figures/old/CX180509A', width=kgpy.latex.columnwidth)
-                figure.append(pylatex.NoEscape(r'\\'))
-                figure.add_image(str(figures.primary_efficiency_vs_wavelength_pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-Measured reflectivity of the ESIS primary mirror \SI{25}{\nano\meter} thick SiC coating deposited on a Si witness 
-sample.
-Dashed lines mark He\,\textsc{I} (left, \SI{58.4}{\nano\meter}) and O\,\textsc{V} (right, \SI{63.0}{\nano\meter}) 
-emission line wavelengths."""
-                ))
-                figure.append(kgpy.latex.Label('fig:primaryEfficiencyVsWavelength'))
-
             doc.append(pylatex.NoEscape(
                 r"""
 The flight and spare primary mirrors were coated with the same Al/SiC/Mg multilayer.
@@ -1756,17 +1726,6 @@ Fig.~\ref{fig:componentEfficiencyVsWavelength}.
 We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$."""
             ))
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image('figures/old/Luxel_trans', width=kgpy.latex.columnwidth)
-                figure.append(pylatex.NoEscape(r'\\'))
-                figure.add_image(str(figures.filter_efficiency_vs_wavelength_pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-Model of ESIS filter transmissivity, including filter mesh and \SI{4}{\nano\meter} thick oxide layers on either side 
-of the \SI{100}{\nano\meter} Al film."""
-                ))
-                figure.append(kgpy.latex.Label('fig:filterEfficiencyVsWavelength'))
-
             doc.append(pylatex.NoEscape(
                 r"""
 An Al filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight box with a 
@@ -1780,10 +1739,6 @@ inversion residuals from the 2006 \MOSES\ flight.
 To prevent oxidation, and to minimize the risk of tears, pinholes, and breakage from handling, the filters will be 
 stored in a nitrogen purged environment until after payload vibration testing."""
             ))
-
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.ccd_efficiency_vs_wavelength_pdf()), width=None)
-
 
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
             pass
