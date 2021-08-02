@@ -568,6 +568,7 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='filterOxideThickness',
         value=optics_single.filter.thickness_oxide,
+        digits_after_decimal=0,
     )
 
     doc.set_variable(
