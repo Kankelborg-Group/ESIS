@@ -1285,7 +1285,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_hline()
                     tabular.add_row([r'Filters (\numChannels)', r'Aperture shape', r'Circular'])
                     tabular.add_row([r'', r'Aperture diameter', r'\filterDiameter'])
-                    tabular.add_row([r'', r'Material', r'\filterMaterial'])
+                    tabular.add_row([r'', r'Material', r'thin-film \filterMaterial'])
                     tabular.add_row([r'', r'Thickness', r'\filterThickness'])
                     tabular.add_row([r'', r'Mesh ratio', r'\filterMeshRatio'])
                     tabular.add_row([r'', r'Mesh material', r'\filterMeshMaterialShort'])
