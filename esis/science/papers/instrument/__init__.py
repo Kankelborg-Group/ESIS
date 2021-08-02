@@ -575,11 +575,6 @@ def document() -> kgpy.latex.Document:
         value=optics_single.filter.surface.material.name,
     )
 
-    doc.set_variable(
-        name='FilterMaterial',
-        value=optics_single.filter.surface.material.name[0].upper() + optics_single.filter.surface.material.name[1:],
-    )
-
     doc.set_variable_quantity(
         name='filterMeshRatio',
         value=optics_single.filter.mesh_ratio,
