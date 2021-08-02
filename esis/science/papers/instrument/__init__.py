@@ -391,6 +391,13 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    rays_o5 = kgpy.optics.rays.Rays(wavelength=wavelength_o5)
+    doc.set_variable_quantity(
+        name='primaryEfficiency',
+        value=optics_all.primary.material.transmissivity(rays_o5).to(u.percent),
+        digits_after_decimal=0,
+    )
+
     doc.set_variable_quantity(
         name='fieldStopDiameter',
         value=optics_single.field_stop.clear_width,
@@ -492,7 +499,6 @@ def document() -> kgpy.latex.Document:
         value=num2words.num2words(grating_nlayers),
     )
 
-    rays_o5 = kgpy.optics.rays.Rays(wavelength=wavelength_o5)
     grating_efficiency = optics_all.grating.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='gratingEfficiency',
@@ -1253,6 +1259,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'', r'Aperture shape', r'Octagonal'])
                     tabular.add_row([r'', r'Aperture diameter', r'\primaryDiameter'])
                     tabular.add_row([r'', r'Coating', r'SiC \roy{\primaryCoatingMaterialShort} single layer, optimized for \OVwavelength'])
+                    tabular.add_row([r'', r'\roy{Efficiency (\OV)}', r'\roy{\primaryEfficiency}'])
 
                     tabular.add_hline()
                     tabular.add_row([r'Field stop', r'Sky plane diameter', r'\fov'])
