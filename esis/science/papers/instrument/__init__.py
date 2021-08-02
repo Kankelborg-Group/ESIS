@@ -399,6 +399,17 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='primaryWitnessMeasurementIncidenceAngle',
+        value=esis.optics.primary.efficiency.witness.angle_input,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='primaryMeasurementDate',
+        value=esis.optics.primary.efficiency.witness.date_measurement.strftime('%Y %B %d'),
+    )
+
+    doc.set_variable_quantity(
         name='fieldStopDiameter',
         value=optics_single.field_stop.clear_width,
         digits_after_decimal=3,
