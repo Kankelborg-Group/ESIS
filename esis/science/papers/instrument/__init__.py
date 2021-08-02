@@ -548,6 +548,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='gratingMeasurementIncidenceAngle',
+        value=esis.optics.grating.efficiency.vs_wavelength()[0],
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
         name='filterDiameter',
         value=optics_single.filter.clear_diameter,
         digits_after_decimal=1,
