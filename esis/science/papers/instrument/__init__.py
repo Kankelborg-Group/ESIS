@@ -1266,7 +1266,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'', r'Anamorphic magnification factor', r'\anamorphicMagnification'])
                     tabular.add_row([r'', r'Manufacturing process', r'Individual master gratings'])
                     tabular.add_row([r'', r'Coating', r'Mg/Al/SiC \roy{\gratingCoatingMaterialShort} multilayer, optimized for \OVwavelength'])
-                    tabular.add_row([r'', r'Efficiency', r'\SI{14}{\percent} \roy{\gratingEfficiency}'])
+                    tabular.add_row([r'', r'Efficiency (\OV)', r'\SI{14}{\percent} \roy{\gratingEfficiency}'])
                     tabular.add_row([r'', r'Uncoated efficiency', r'\SI{39}{\percent}'])
 
 
