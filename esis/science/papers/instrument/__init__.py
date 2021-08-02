@@ -579,7 +579,7 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable_quantity(
         name='detectorQuantumEfficiency',
-        value=optics_single.detector.quantum_efficiency,
+        value=optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent),
         digits_after_decimal=0
     )
 
@@ -1305,7 +1305,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
                     tabular.add_row([r'Detectors (\numChannels)', r'Model', r'\detectorName'])
                     tabular.add_row([r'', r'Active area', r'\detectorPixelsX\ $\times$ \detectorPixelsY'])
                     tabular.add_row([r'', r'Pixel size', r'\detectorPixelSize'])
-                    tabular.add_row([r'', r'Quantum efficiency', r'\detectorQuantumEfficiency'])
+                    tabular.add_row([r'', r'Quantum efficiency \roy{(\OV)}', r'33\% \roy{\detectorQuantumEfficiency}'])
                     tabular.add_row([r'', r'Minumum cadence', r'\minCadence'])
 
                     tabular.add_hline()
