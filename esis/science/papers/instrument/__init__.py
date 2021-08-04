@@ -1709,11 +1709,7 @@ Through careful design of the grating multilayer, the reflectivity at this wavel
 at \SI{63}{\nano\meter} \roy{\OV} (lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}).
 In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} is 
 $\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the CCD.
-"""
-            ))
 
-            doc.append(pylatex.NoEscape(
-                r"""
 The flight and spare primary mirrors were coated with the same Al/SiC/Mg multilayer.
 Corrosion of this multilayer rendered both mirrors unusable.
 The failed coating was stripped from primary mirror SN001.
@@ -1731,11 +1727,8 @@ used to shield each \CCD\ from visible light.
 The Al film is supported by a 70 line per inch (lpi) Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
 The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in 
 Fig.~\ref{fig:componentEfficiencyVsWavelength}.
-We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$."""
-            ))
+We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$.
 
-            doc.append(pylatex.NoEscape(
-                r"""
 An Al filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight box with a 
 labyrinthine evacuation vent (e.g., Fig.~\ref{F-cameras}).
 The placement of the filter relative to the \CCD\ is optimized so that the filter mesh shadow is not visible.
