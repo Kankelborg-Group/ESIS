@@ -1914,7 +1914,102 @@ A model of the six baffles, showing cutouts and position on the optical bench, i
             ))
 
         with doc.create(pylatex.Subsection('Cameras')):
-            pass
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image('figures/old/ESIS_Cameras_1gr_text', width=kgpy.latex.columnwidth)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""
+ESIS camera assembly as built by MSFC.  
+Thin film filters and filter tubes are not installed in this image."""
+                ))
+                figure.append(kgpy.latex.Label('F-cameras'))
+
+            doc.append(pylatex.NoEscape(
+                r"""
+The ESIS CCD cameras were designed and constructed by Marshall Space Flight Center (MSFC), and are the latest in a 
+series of camera systems developed specifically for use on solar space flight instruments.
+The ESIS camera heritage includes those flown on both the Chromospheric Lyman-Alpha Spectro-Polarimeter 
+(CLASP)~\citep{Kano12,Kobayashi12} and the High-Resolution Coronal Imager (Hi-C)\citep{Kobayashi2014}.
+
+The ESIS detectors are CCD230-42 astro-process CCDs from E2V.
+For each camera, the CCD is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
+converter.
+The central $2048 \times 1024$ pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
+used for storage.
+Two overscan columns on either side of the imaging area and eight extra rows in each storage region will monitor read 
+noise and dark current.
+When the camera receives the trigger signal, it transfers the image from the imaging region to the storage regions and 
+starts image readout.
+The digitized data are sent to the Data Acquisition and Control System (DACS) through a SpaceWire interface immediately, 
+one line at a time.
+The frame transfer takes $<$\SI{60}{\milli\second}, and readout takes \SI{1.1}{\second}.
+The cadence is adjustable from 2-\SI{600}{\second} in increments of \SI{100}{\milli\second}, to satisfy the requirement 
+listed in Table~\ref{table:scireq}.
+Because the imaging region is continuously illuminated, the action of frame transfer (transferring the image from the 
+imaging region to the storage regions) also starts the next exposure without delay.
+Thus the exposure time is controlled by the time period between triggers.
+Camera 1 (Fig.~\ref{F-cameras}) generates the sync trigger, which is fed back into Camera 1's trigger input and provides 
+independently buffered triggers to the remaining three cameras.
+The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second}.
+Shutterless operation allows ESIS to observe with a \SI{100}{\percent} duty cycle.
+The cadence is limited only by the 1.1\,s readout time. 
+
+MSFC custom designed the camera board, enclosure, and mounting structure for ESIS to fit the unique packaging 
+requirements of this experiment (Fig~\ref{F-cameras}).
+The front part of the camera is a metal block which equalizes the temperature across the CCD while fastening it in 
+place.
+The carriers of all cameras are connected to a central two-piece copper (\SI{3}{\kilo\gram}) and aluminum 
+(\SI{1}{\kilo\gram}) thermal reservoir (cold block) by flexible copper cold straps.
+The flexible cold straps allow individual cameras to be translated parallel to the optical axis (by means of shims) up 
+to $\sim$\SI{13}{\milli\meter} to adjust focus in each channel prior to launch.
+The centrally located cold block will be cooled by LN2 flow from outside the payload until just before launch.
+The LN2 flow will be controlled automatically by a Ground Support Equipment (GSE) computer so that all cameras are 
+maintained above survival temperature but below the target temperature of \SI{-55}{\celsius} to insure a negligible dark 
+current level.
+
+The gain, read noise, and dark current of the four cameras were measured at MSFC using an ${}^{55}$Fe radioactive 
+source.
+Cameras are labeled 1, 2, 3, and 4 with associated serial numbers SN6, SN7, SN9, and SN10 respectively in 
+Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
+Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
+
+The Quantum Efficiency (QE) of the ESIS CCDs will not be measured before flight.
+Similar astro-process CCDs with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
+Orbiting Environmental Satellites (GOES) N and O.
+A QE range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the ESIS CCDs, based on QE measurements by 
+\citet{Stern04} for GOES SXI instruments.
+
+\begin{table}[!htb]
+\caption{ESIS Camera properties.}
+%\tableformat
+\begin{tabular}{ccccc}
+Camera & Quad & Gain & Read Noise & Dark Current \\
+ & & [$e^-/DN$] & [DN] & [$e^-/ms$] \\
+\hline %-----------------------------------------------------------------------------
+1 (SN6) & 1 & 2.57 & 3.9 & $1.37e^-4$ \\
+& 2 & 2.50 & 4.0 & $9.66e^-5$ \\
+& 3 & 2.52 & 4.1 & $6.85e^-5$ \\
+& 4 & 2.53 & 3.7 & $9.80e^-5$ \\ 
+\hline
+2 (SN7) & 1 & 2.55 & 3.9 & $6.77e^-5$ \\
+& 2 & 2.58 & 4.0 & $5.89e^-5$ \\
+& 3 & 2.57 & 4.0 & $8.98e^-5$ \\
+& 4 & 2.63 & 4.0 & $1.01e^-4$ \\ 
+\hline %-----------------------------------------------------------------------------
+3 (SN9) & 1 & 2.57 & 4.1 & $3.14e^-5$ \\
+& 2 & 2.53 & 4.1 & $2.68e^-5$ \\
+& 3 & 2.52 & 4.1 & $3.18e^-5$ \\
+& 4 & 2.59 & 4.3 & $3.72e^-5$ \\ 
+\hline
+4 (SN10) & 1 & 2.60 & 3.9 & $6.39e^-4$ \\
+& 2 & 2.60 & 3.9 & $5.07e^-5$ \\
+& 3 & 2.54 & 4.2 & $6.63e^-5$ \\
+& 4 & 2.58 & 4.1 & $8.24e^-5$ \\ 
+\hline
+\end{tabular}
+\label{T-cameras}
+\end{table}"""
+            ))
 
         with doc.create(pylatex.Subsection('Avionics')):
             pass
