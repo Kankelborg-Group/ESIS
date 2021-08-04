@@ -1478,7 +1478,7 @@ A second order polynomial describes the ruling pattern,
     d = d_0 + d_1 r + d_2 r^2 \, ,
 \end{equation}
 where $r$ runs radially outward from the optical axis with its origin at the center of the grating \roy{shouldn't we be talking about $x$ here?}
-(Fig.~\ref{figure:prescription} (c)).
+(Fig.~\ref{fig:schematic} (c)).
 The parameters of Equation~\ref{Eq-d} and $R_g$ were chosen so that the spatial and spectral focal curves intersect at 
 the center of the O\,\textsc{v} \roy{\OV} image on the \CCD.
 
@@ -1682,31 +1682,31 @@ surface on \testGratingDate.}"""
                 r"""
 The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter} \roy{\OV}, 
 developed by a collaboration between Reflective X-Ray Optics LLC and \LBNL.
-In Fig.~\ref{F-multilayer} (A) \roy{Figure~\ref{fig:gratingEfficiencyVsAngle}}, characterization of a single, randomly selected multilayer coated grating at \LBNL\ shows 
+In Fig.~\ref{fig:gratingEfficiencyVsAngle}, characterization of a single, randomly selected multilayer coated grating at \LBNL\ shows 
 that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
 completely suppressed.
-Figure~\ref{F-multilayer} (B) \roy{Figure~\ref{fig:gratingMultilayerSchematic}} shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
+Figure~\ref{fig:gratingMultilayerSchematic} shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
 $m=0$ order using four \roy{\gratingCoatingNumLayersWords} layer pairs of silicon carbide (SiC) \roy{\firstGratingCoatingMaterial} and magnesium (Mg) \roy{\secondGratingCoatingMaterial}.
 The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjacent to each Mg \roy{\firstGratingCoatingMaterial} layer to mitigate corrosion.
 \roy{As Charles mentioned, this doesn't make sense. Why can it go \firstGratingCoatingMaterial\ to \secondGratingCoatingMaterial, but not \secondGratingCoatingMaterial\ to \firstGratingCoatingMaterial?}
 
 The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} \roy{\gratingWitnessEfficiency} in 
-Fig.~\ref{F-multilayer} (C) \roy{the upper panel of Figure~\ref{fig:componentEfficiencyVsWavelength}}, measured from witness samples coated at the same time as the diffraction gratings.
-Combined with the predicted groove efficiency from \S\,\ref{SS-Optics} and, given the relatively shallow groove profile 
+the upper panel of Figure~\ref{fig:componentEfficiencyVsWavelength}, measured from witness samples coated at the same time as the diffraction gratings.
+Combined with the predicted groove efficiency from \S\,\ref{subsec:Optics} and, given the relatively shallow groove profile 
 and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} at 
 \SI{63}{\nano\meter} \roy{\OV}.
-This is confirmed by the first order efficiency measured from a single ESIS grating in Fig.~\ref{F-multilayer} (D) \roy{the lower panel in Figure~\ref{fig:componentEfficiencyVsWavelength}}.  
+This is confirmed by the first order efficiency measured from a single ESIS grating in the lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}.  
 
 Unlike EUV imagers (\eg, \textit{TRACE}~\citep{Handy99}, \textit{AIA}~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
-the ESIS passband is defined by a combination of the field stop and grating (\S\,\ref{SS-Optics}, Fig.~\ref{F-disp}) 
-rather than multi-layer coatings.
+the ESIS passband is defined by a combination of the field stop and grating (\S\,\ref{subsec:Optics}, 
+Fig.~\ref{fig:projections}) rather than multi-layer coatings.
 The coating selectivity is therefore not critical in this respect, allowing the multi-layer to be manipulated to 
 suppress out-of-band bright, nearby emission lines.
-Figure~\ref{F-multilayer} (D) \roy{the lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}} shows the peak reflectance of the grating multilayer is shifted slightly towards longer 
+The lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength} shows the peak reflectance of the grating multilayer is shifted slightly towards longer 
 wavelengths to attenuate the He\,\textsc{i} emission line, reducing the likelihood of detector saturation.
 A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) line.
 Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} of that 
-at \SI{63}{\nano\meter} \roy{\OV} (Fig.~\ref{F-multilayer} (D) \roy{the lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}}).
+at \SI{63}{\nano\meter} \roy{\OV} (lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}).
 In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} is 
 $\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the CCD.
 """
@@ -1751,17 +1751,17 @@ stored in a nitrogen purged environment until after payload vibration testing.""
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
             doc.append(pylatex.NoEscape(
                 r"""
-Count rates for ESIS are estimated using the expected component throughput from Section~\ref{section:instrument:passband} and the CCD quantum efficiency (QE) listed in Table~\ref{table:prescription}.
+Count rates for ESIS are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the CCD quantum efficiency (QE) listed in Table~\ref{table:prescription}.
 Line intensities are derived from \citet{Vernazza78} (V\&R) and the SOHO/Coronal Diagnostic Spectrometer (CDS) \citep{Harrison95} data.
-The \SI{100}{\percent} duty cycle of ESIS (\S\,\ref{section:instrument:cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
+The \SI{100}{\percent} duty cycle of ESIS (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
 So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant SNR penalty.
 Table~\ref{table:count} shows that ESIS is effectively shot noise limited with a \SI{10}{\second} exposure.
 The signal requirement in Table~\ref{table:scireq} is met by stacking exposures.
 Good quality images ($\sim300$ counts) in active regions can be obtained by stacking \SI{30}{\second} worth of exposures.
-This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en waves described in \S\,\ref{section:science}.
+This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en waves described in \S\,\ref{sec:ScienceObjectives}.
 However, by stacking multiple \SI{10}{\second} exposures, sufficient SNR \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained.
 We also note that the count rates given here are for an unvignetted system which is limited by the baffling of this design.
-While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{section:instrument:aperture}) to increase throughput.
+While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{subsec:AperturesandBaffles}) to increase throughput.
 Thus, a faster exposure cadence may be obtained by accepting some vignetting in the system.
 
 \begin{table*}[!htb]
@@ -1871,28 +1871,28 @@ Each channel of ESIS has two apertures: one at the surface of the grating and an
 The purpose of the aperture at the grating is to mask the out-of-figure margins at the edges of these optics.
 This provides a well defined edge to the clear aperture of each grating while also keeping unwanted rays from being 
 reflected from the grating margins and back onto the CCDs.
-The dimensions of the grating aperture match those of the grating clear aperture shown in Figure~\ref{F-ESIS_AP} [C]. 
+The dimensions of the grating aperture match those of the grating clear aperture shown in Figure~\ref{fig:schematic}c. 
 
 The aperture placed at the primary mirror is the stop for each individual channel.
 The area of the stop has been maximized under the constraint that no rays be vignetted anywhere else in the system.
 The gratings and their clear apertures were the most significant areas of concern for potential vignetting.
 Thus, the shape of stop at the primary is largely influenced by the shape of the grating clear aperture.
-The inner extent of the primary stop (the ``tip'' of the triangle in Figure~\ref{F-ESIS_AP} [B]) is defined by the 
+The inner extent of the primary stop (the ``tip'' of the triangle in Figure~\ref{fig:schematic}b) is defined by the 
 occultation of the primary by the shadow cast from the gratings and their mounts.
 This presented an intricate geometry problem, as the occultation is a function of the incoming field angle, 
 the radial extent of the grating mount, and the distance of the mount to the primary mirror along the optical axis.
 Hence, the inner extent of the primary stop was solved for iteratively with the optimization described in 
-Section~\ref{SS-OpTo}, which affected the placement of the gratings relative to the primary mirror.
-The resulting optimized and non-vignetting stop geometry is shown in Figure~\ref{F-ESIS_AP} [B].
+Section~\ref{subsec:OptimizationandTolerancing}, which affected the placement of the gratings relative to the primary mirror.
+The resulting optimized and non-vignetting stop geometry is shown in Figure~\ref{fig:schematic}b.
 
 After final optimization, the stop geometry was analyzed to check for vignetting at the grating with the optical model.
 A footprint diagram was generated at the grating from of multiple grids of rays.
 The incidence angle of each grid of rays corresponded to the extremes of FOV defined by the positions of the eight 
 points of the octagonal field stop.
 The footprint diagram showed that, with the stop completely filled, no ray landed outside of the grating clear aperture
-in Figure~\ref{F-ESIS_AP} [C], and no ray was intercepted by the central obscuration.
+in Figure~\ref{fig:schematic}c, and no ray was intercepted by the central obscuration.
 
-From Figure~\ref{F-ESIS_AP} [C] it is apparent that considerable surface area of the primary mirror is unused by the 
+From Figure~\ref{fig:schematic}c it is apparent that considerable surface area of the primary mirror is unused by the 
 non-vignetting stop design.
 The primary apertures could be enlarged considerably if the vignetting constraint were to be relaxed.
 
@@ -1901,10 +1901,10 @@ $<$\SI{1.4}{\degree} from the optical axis.
 This angle is purposefully larger than the angular diameter of the sun ($\sim$\SI{0.5}{\degree}) so that any direct 
 paths are excluded from bright sources in the solar corona.
 All baffles are bead-blasted, anodized Al sheet metal oriented perpendicular to the optical axis.
-The size and shape of the cutouts were determined using a combination of the ray trace from Section~\ref{SS-OpTo} and 
-3D modeling.
+The size and shape of the cutouts were determined using a combination of the ray trace from 
+Section~\ref{subsec:OptimizationandTolerancing} and 3D modeling.
 The light path from the primary mirror to the field stop is defined as the volume that connects each vertex of the 
-primary mirror aperture mask (e.g., Fig.~\ref{F-ESIS_AP}) to every vertex of the octagonal field stop.
+primary mirror aperture mask (e.g., Fig.~\ref{fig:schematic}) to every vertex of the octagonal field stop.
 This is a conservative definition that ensures no rays within the FOV are excluded, and therefore unintentionally 
 vignetted by the baffles.  Light paths from the field stop to the grating, and from the grating to the image formed on 
 the CCD, are defined in a similar manner.
@@ -2095,11 +2095,11 @@ gratings to the EUV flight gratings.
 
 A trade study was conducted, and it was decided to remove the primary aperture stop. The advantage was an increase in 
 sensitivity.
-The disadvantage was to sacrifice the unvignetted design described in section \ref{SS-apb}.
+The disadvantage was to sacrifice the unvignetted design described in Section \ref{subsec:AperturesandBaffles}.
 The effective aperture is increased by a factor of 1.7 to 2.7 as a function of FOV in the radial dimension.
 The corresponding signal gradient is oriented along the dispersion direction of each channel;
 vignetting increases (and signal decreases) when moving towards blue wavelengths 
-(\ie\,moving to the left in Figure~\ref{F-disp}).
+(\ie\,moving to the left in Figure~\ref{fig:projections}).
 This gradient is due almost entirely to vignetting by the central obscuration, and is linear across the entire FOV.
 The principal challenge is that the images cannot be corrected directly;
 rather, since the gradient is repeated for each of the overlapping spectral line images, the vignetting can only be 
