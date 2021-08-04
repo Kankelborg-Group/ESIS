@@ -1692,7 +1692,7 @@ The Aluminum (Al) \roy{\thirdGratingCoatingMaterial} layers are deposited adjace
 The maximum reflectance for the coating alone in the nominal instrument passband is $\sim$\SI{35}{\percent} \roy{\gratingWitnessEfficiency} in 
 the upper panel of Figure~\ref{fig:componentEfficiencyVsWavelength}, measured from witness samples coated at the same time as the diffraction gratings.
 Combined with the predicted groove efficiency from \S\,\ref{subsec:Optics} and, given the relatively shallow groove profile 
-and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} at 
+and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} \roy{\gratingEfficiency} at 
 \SI{63}{\nano\meter} \roy{\OV}.
 This is confirmed by the first order efficiency measured from a single ESIS grating in the lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}.  
 
