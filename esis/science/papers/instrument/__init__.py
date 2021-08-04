@@ -2146,18 +2146,3 @@ events, flare ribbons, and the flare reconnection region."""
     doc.append(pylatex.Command('bibliography', arguments='sources'))
 
     return doc
-
-
-
-
-# if __name__ == '__main__':
-#     # plt.rcParams['axes.labelsize'] = 9
-#     # plt.rcParams['xtick.labelsize'] = 9
-#     # plt.rcParams['ytick.labelsize'] = 9
-#     # plt.rcParams['legend.fontsize'] = 9
-#     plt.rcParams['font.size'] = 7
-#     plt.rcParams['lines.linewidth'] = 1
-#
-#     doc = document()
-#     doc.generate_pdf()
-#     doc.generate_tex()
