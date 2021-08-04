@@ -1395,7 +1395,7 @@ The pitch at the center of the grating is $d_0=$\SI{.3866}{\micro\meter} \roy{\g
 dispersion of \SI{17.5}{\kilo\meter\per\second} \roy{\dispersionDoppler} at the center of the \OV\ \FOV.
 The groove profile is optimized for the $m=1$ order, so that each grating serves only a single \CCD.
 The modeled grating groove efficiency in this order is \SI{36}{\percent} \roy{We said \SI{39}{\percent} above, need to 
-find out which it is} at \SI{63}{\nano\meter} \roy{\OV}. 
+find out which it is, I get \gratingGrooveEfficiency} at \SI{63}{\nano\meter} \roy{\OV}. 
 
 Figure specification and groove profile are not well controlled near the edges of the gratings.
 Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
