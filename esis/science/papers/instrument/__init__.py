@@ -1579,15 +1579,15 @@ We then computed the maximum change in RMS spot size over all spot positions bet
 The computed positional tolerances for each element in the ESIS optical system are listed in Table~\ref{table:tol}.
 
 The imaging error budget is displayed in Table~\ref{table:tol}.
-For the primary mirror and grating surface figure contributions, we choose the MTF figures of merit from the surface 
+For the primary mirror and grating surface figure contributions, we choose the \MTF\ figures of merit from the surface 
 roughness specifications described earlier.
 To quantify the remaining entries, we assume that each term can be represented by a gaussian function of width 
 $\sigma^2$ that ``blurs'' the final image.
 The value of $\sigma$ then corresponds to the maximum change in RMS spot size for each term as it is perturbed in the 
 tolerance analysis described above.
-The value of the modulation transfer function (MTF) in the right-most column of Table~\ref{table:tol} is computed from 
+The value of the \MTF\ in the right-most column of Table~\ref{table:tol} is computed from 
 each of the gaussian blur terms at the Nyquist frequency (\SI{0.5}{cycles\per arcsecond}).
-From Table~\ref{table:tol}, we estimate the total MTF of ESIS to be $0.109$ at the Nyquist frequency.
+From Table~\ref{table:tol}, we estimate the total \MTF\ of ESIS to be $0.109$ at the Nyquist frequency.
 Compared to, for example, the Rayleigh criterion of \SI{0.09}{cycles\per arcsecond}~\citep{Rayleigh_1879} we estimate 
 the resolution of ESIS to be essentially pixel limited.
 Since ESIS pixels span \SI{0.76}{\arcsecond}, the resolution target in Table~\ref{table:scireq} is obtained by this 
