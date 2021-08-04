@@ -1243,8 +1243,8 @@ Starting from the notional instrument described in Sec.~\ref{sec:TheESISConcept}
 of the science requirements set forth in Table~\ref{table:scireq} are met.
 The final design parameters are summarized in Table~\ref{table:prescription}.
 
-A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{fig:schematic} [A], while the mechanical features 
-of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B] and [C], respectively."""
+A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{fig:schematic}a, while the mechanical features 
+of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b and \ref{fig:schematic}c, respectively."""
         ))
 
         with doc.create(pylatex.Table()) as table:
@@ -1315,9 +1315,9 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic} [B]
 
         with doc.create(pylatex.Subsection('Optics')):
             doc.append(pylatex.NoEscape(
-                r"""Figure~\ref{fig:schematic} [A] shows the relative layout of the optics and detectors for a single 
+                r"""Figure~\ref{fig:schematic}a shows the relative layout of the optics and detectors for a single 
 \ESIS\ channel.
-Here we give specific details of the primary mirror and gratings (Fig.~\ref{fig:schematic} [B] and [C], respectively).
+Here we give specific details of the primary mirror and gratings (Fig.~\ref{fig:schematic}b and \ref{fig:schematic}c, respectively).
 The features of the field stop have been described previously in Sec.~\ref{subsec:ESISFeatures}, while the CCD and 
 cameras are covered in Sec.~\ref{subsec:Cameras}. """
             ))
@@ -1344,7 +1344,7 @@ channel.
                 r"""The primary mirror is octagonal in shape.
 A triangular aperture mask in front of the primary mirror defines the clear aperture of each channel, imaged by a 
 single grating.
-Figure~\ref{fig:schematic} [B] shows one such aperture mask superimposed upon the primary mirror.
+Figure~\ref{fig:schematic}b shows one such aperture mask superimposed upon the primary mirror.
 The octagonal shape of the primary also allows dynamic clearance for filter tubes that are arranged radially around the 
 mirror (\S\,\ref{subsec:CoatingsandFilters}).
 The mirror is attached to a backing plate by three ``bipods'';
@@ -1359,7 +1359,7 @@ The transparency of \ULE, in conjunction with the transparency of the mirror coa
 the heating of the mirror.
 Surface figure specifications for the \ESIS\ optics are described in Sec.~\ref{subsec:OptimizationandTolerancing}.
 
-The spherical gratings (Fig.~\ref{fig:schematic} [C]) re-image light from the field stop to form dispersed images at the 
+The spherical gratings (Fig.~\ref{fig:schematic}c) re-image light from the field stop to form dispersed images at the 
 \CCDs.
 Each grating is individually mounted to a backing plate in a similar fashion as the primary mirror.
 For these much smaller optics, lightweight bipods were wire \EDM\ cut from thin titanium sheet.
@@ -1400,7 +1400,7 @@ find out which it is} at \SI{63}{\nano\meter} \roy{\OV}.
 
 Figure specification and groove profile are not well controlled near the edges of the gratings.
 Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
-Fig.~\ref{fig:schematic} (c).
+Fig.~\ref{fig:schematic}c
 
 The \ESIS\ passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
 The passband includes the He\,\textsc{i} (\SI{58.43}{\nano\meter}) \roy{\HeI} spectral line through Mg\,\textsc{x} 
@@ -1478,7 +1478,7 @@ A second order polynomial describes the ruling pattern,
     d = d_0 + d_1 r + d_2 r^2 \, ,
 \end{equation}
 where $r$ runs radially outward from the optical axis with its origin at the center of the grating \roy{shouldn't we be talking about $x$ here?}
-(Fig.~\ref{fig:schematic} (c)).
+(Fig.~\ref{fig:schematic}c).
 The parameters of Equation~\ref{Eq-d} and $R_g$ were chosen so that the spatial and spectral focal curves intersect at 
 the center of the O\,\textsc{v} \roy{\OV} image on the \CCD.
 
