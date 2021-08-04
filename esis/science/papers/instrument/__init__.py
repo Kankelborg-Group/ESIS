@@ -2035,7 +2035,14 @@ The use of custom designed converters allowed additional ripple filtering for lo
             ))
 
         with doc.create(pylatex.Subsection('Pointing System')):
-            pass
+            doc.append(pylatex.NoEscape(
+                r"""
+The imaging target will be selected prior to launch, the morning of the day of flight.
+During flight, pointing will be maintained by the Solar Pointing Attitude Rocket Control System (SPARCS) 
+\citep{Lockheed69}.
+Images from Camera 1 will be downlinked and displayed in real time on the SPARCS control system console at intervals of 
+$\sim$\SI{16}{\second} to verify pointing is maintained during flight."""
+            ))
 
         with doc.create(pylatex.Subsection('Mechanical')):
             pass
