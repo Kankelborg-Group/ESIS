@@ -1573,7 +1573,7 @@ sufficient to achieve sub-pixel accuracy.
                 r"""The ray trace model was also used to quantify how mirror and positional tolerances affect the 
 instrument's spatial resolution.
 Each element of the model was individually perturbed, then a compensation applied to adjust the image on the \CCD.
-The compensation optimized grating tip/tilt angle and \CCD focus position, so that the image was re-centered and RMS 
+The compensation optimized grating tip/tilt angle and \CCD\ focus position, so that the image was re-centered and RMS 
 spot size minimized at the positions in Fig.~\ref{F-spot} \roy{minimized at the vertices of the field stop and the central field angle}.
 We then computed the maximum change in RMS spot size over all spot positions between the optimized and perturbed models.
 The computed positional tolerances for each element in the ESIS optical system are listed in Table~\ref{table:tol}.
