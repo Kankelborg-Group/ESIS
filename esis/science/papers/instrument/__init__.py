@@ -1318,7 +1318,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                 r"""Figure~\ref{fig:schematic}a shows the relative layout of the optics and detectors for a single 
 \ESIS\ channel.
 Here we give specific details of the primary mirror and gratings (Fig.~\ref{fig:schematic}b and \ref{fig:schematic}c, respectively).
-The features of the field stop have been described previously in Sec.~\ref{subsec:ESISFeatures}, while the CCD and 
+The features of the field stop have been described previously in Sec.~\ref{subsec:ESISFeatures}, while the \CCD\ and 
 cameras are covered in Sec.~\ref{subsec:Cameras}. """
             ))
 
@@ -1333,7 +1333,7 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
                 ]))
 
                 figure.add_caption(pylatex.NoEscape(
-                    r"""(a) Schematic diagram of Channel 1 of the ESIS optical system.
+                    r"""(a) Schematic diagram of Channel 1 of the \ESIS\ optical system.
 (b) Clear aperture of the primary mirror, size of the central obscuration, and the footprint of the beam for each 
 channel.
 (c) Clear aperture of Channel 1's diffraction grating."""
@@ -1382,9 +1382,9 @@ The individual mounts allow each grating to be adjusted in tip and tilt to cente
                 # figure.append('\n')
                 figure.add_image(str(figures.field_stop_projections_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
-                    r"""Areas occupied by strong spectral lines on the ESIS detectors.
-The plot axes are sized exactly to the CCD active area.
-The ESIS passband is defined by a combination of the field stop and grating dispersion."""
+                    r"""Areas occupied by strong spectral lines on the \ESIS\ detectors.
+The plot axes are sized exactly to the \CCD\ active area.
+The \ESIS\ passband is defined by a combination of the field stop and grating dispersion."""
                 ))
                 figure.append(kgpy.latex.Label('fig:projections'))
 
@@ -1414,9 +1414,9 @@ separated from the target O\,\textsc{v} \roy{\OV} line."""
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
             doc.append(pylatex.NoEscape(
                 r"""The science resolution requirement of \angularResolutionRequirement (Table~\ref{table:scireq}) was 
-flowed down to specifications for the ESIS optics.
-To ensure that ESIS meets this requirement, an imaging error budget was developed to track parameters that significantly 
-influence instrument resolution.
+flowed down to specifications for the \ESIS\ optics.
+To ensure that \ESIS\ meets this requirement, an imaging error budget was developed to track parameters that 
+significantly influence instrument resolution.
 The budget is roughly divided into two categories;
 the first includes `variable' parameters that can be directly controlled (\eg, the figure and finish of the optics, 
 grating radius and ruling, placement of the elements in the system, and the accuracy to which the instrument is 
@@ -1437,7 +1437,7 @@ Though the grating is smaller and closer to the focal plane, it was allocated so
 degradation of 0.6 based on manufacturing capabilities.
 The derived requirements are described in table~\ref{table:error}.
 Note that this modeling exercise was undertaken before the baffle designs were finalized.
-The estimated diffraction \MTF\ and aberrations were therefore modeled for a rough estimate of the ESIS single sector 
+The estimated diffraction \MTF\ and aberrations were therefore modeled for a rough estimate of the \ESIS\ single sector 
 aperture."""
             ))
 
@@ -1499,7 +1499,8 @@ The box around each spot represents a single pixel on the detector.
 Each spot was traced using a stratified random grid across the pupil with $\psfPupilSamples \times \psfPupilSamples$ 
 positions per spot.
 }
-(Left:)  Ray traced spot diagrams for ESIS, illustrated at the center and vertices of the O\,\textsc{v} FOV on the CCD.
+(Left:)  Ray traced spot diagrams for \ESIS, illustrated at the center and vertices of the O\,\textsc{v} FOV on the 
+\CCD.
 The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (overplotted on each spot) radius is \SI{2}{\micro\meter}.
 Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
 (Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
@@ -1575,7 +1576,7 @@ Each element of the model was individually perturbed, then a compensation applie
 The compensation optimized grating tip/tilt angle and \CCD\ focus position, so that the image was re-centered and RMS 
 spot size minimized at the positions in Fig.~\ref{F-spot} \roy{minimized at the vertices of the field stop and the central field angle}.
 We then computed the maximum change in RMS spot size over all spot positions between the optimized and perturbed models.
-The computed positional tolerances for each element in the ESIS optical system are listed in Table~\ref{table:tol}.
+The computed positional tolerances for each element in the \ESIS\ optical system are listed in Table~\ref{table:tol}.
 
 The imaging error budget is displayed in Table~\ref{table:tol}.
 For the primary mirror and grating surface figure contributions, we choose the \MTF\ figures of merit from the surface 
@@ -1588,17 +1589,17 @@ The value of the \MTF\ in the right-most column of Table~\ref{table:tol} is comp
 each of the gaussian blur terms at the Nyquist frequency (\SI{0.5}{cycles\per arcsecond}).
 From Table~\ref{table:tol}, we estimate the total \MTF\ of ESIS to be $0.109$ at the Nyquist frequency.
 Compared to, for example, the Rayleigh criterion of \SI{0.09}{cycles\per arcsecond}~\citep{Rayleigh_1879} we estimate 
-the resolution of ESIS to be essentially pixel limited.
-Since ESIS pixels span \SI{0.76}{\arcsecond}, the resolution target in Table~\ref{table:scireq} is obtained by this 
+the resolution of \ESIS\ to be essentially pixel limited.
+Since \ESIS\ pixels span \SI{0.76}{\arcsecond}, the resolution target in Table~\ref{table:scireq} is obtained by this 
 design."""
             ))
 
             doc.append(pylatex.NoEscape(
                 r"""
 \begin{table*}[!htb]
-\caption{Imaging error budget and tolerance analysis results.  MTF is given at \protect\SI{0.5}{cycles\per arcsecond}.}
+\caption{Imaging error budget and tolerance analysis results.  \MTF\ is given at \protect\SI{0.5}{cycles\per arcsecond}.}
 \begin{tabular}{llrcc}
-Element 	&	  		& Tolerance & $\sigma^2$ $[\mu m]$ & MTF \\
+Element 	&	  		& Tolerance & $\sigma^2$ $[\mu m]$ & \MTF \\
 \hline %-----------------------------------------------------------------------------
 Primary M.	& Surface figure & (Ref. Table~\ref{table:surfaces}) & & 0.700 \\
 			& Decenter	& 1 \si{\milli\meter}		& 1.700 	& 0.881 \\
@@ -1618,7 +1619,7 @@ SPARCS drift	& 		&				& 1.920			& 0.998 \\
 Pointing jitter & 		&				& 3.430			& 0.597 \\
 Diff. Limit 	& 		&				&				& 0.833 \\
 \hline %-----------------------------------------------------------------------------
-Total MTF	 	& 		&				&				& 0.109 \\
+Total \MTF\	 	& 		&				&				& 0.109 \\
 \end{tabular}
 \label{table:tol}
 \end{table*}
@@ -1656,7 +1657,7 @@ Note flat response in first order over instrument \FOV\ and suppression of zero 
                     r"""(Top) Measured reflectance for several multilayer coated witness samples 
 \roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
 Note the suppression of second order relative to the first order.
-(Bottom) Comparison of the efficiency of the three main ESIS optical components: primary mirror, grating and filter.
+(Bottom) Comparison of the efficiency of the three main \ESIS\ optical components: primary mirror, grating and filter.
 The primary mirror efficiency is based on measurements of a \Si\ witness sample taken on \primaryMeasurementDate\ at an 
 angle of incidence of \primaryWitnessMeasurementIncidenceAngle. 
 The grating efficiency is from a measurement of the Channel \testGratingChannelIndex\ grating taken on \testGratingDate\
@@ -1682,7 +1683,7 @@ surface on \testGratingDate.}"""
 The diffraction gratings are coated with a multilayer optimized for a center wavelength of \SI{63.0}{\nano\meter} \roy{\OV}, 
 developed by a collaboration between Reflective X-Ray Optics LLC and \LBNL.
 In Fig.~\ref{fig:gratingEfficiencyVsAngle}, characterization of a single, randomly selected multilayer coated grating at \LBNL\ shows 
-that the grating reflectivity is constant over the instrument FOV in the $m=1$ order while the $m=0$ order is almost 
+that the grating reflectivity is constant over the instrument \FOV\ in the $m=1$ order while the $m=0$ order is almost 
 completely suppressed.
 Figure~\ref{fig:gratingMultilayerSchematic} shows a schematic of the coating that achieves peak reflectivity and selectivity in the 
 $m=0$ order using four \roy{\gratingCoatingNumLayersWords} layer pairs of silicon carbide (SiC) \roy{\firstGratingCoatingMaterial} and magnesium (Mg) \roy{\secondGratingCoatingMaterial}.
@@ -1694,10 +1695,11 @@ the upper panel of Figure~\ref{fig:componentEfficiencyVsWavelength}, measured fr
 Combined with the predicted groove efficiency from \S\,\ref{subsec:Optics} and, given the relatively shallow groove profile 
 and near normal incidence angle, the total reflectivity in first order is $\sim$\SI{13}{\percent} \roy{\gratingEfficiency} at 
 \SI{63}{\nano\meter} \roy{\OV}.
-This is confirmed by the first order efficiency measured from a single ESIS grating in the lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}.  
+This is confirmed by the first order efficiency measured from a single \ESIS\ grating in the lower panel of 
+Figure~\ref{fig:componentEfficiencyVsWavelength}.  
 
-Unlike EUV imagers (\eg, \textit{TRACE}~\citep{Handy99}, \textit{AIA}~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
-the ESIS passband is defined by a combination of the field stop and grating (\S\,\ref{subsec:Optics}, 
+Unlike \EUV\ imagers (\eg, \TRACE~\citep{Handy99}, \AIA~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
+the \ESIS\ passband is defined by a combination of the field stop and grating (\S\,\ref{subsec:Optics}, 
 Fig.~\ref{fig:projections}) rather than multi-layer coatings.
 The coating selectivity is therefore not critical in this respect, allowing the multi-layer to be manipulated to 
 suppress out-of-band bright, nearby emission lines.
@@ -1707,18 +1709,18 @@ A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) 
 Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} of that 
 at \SI{63}{\nano\meter} \roy{\OV} (lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}).
 In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} is 
-$\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the CCD.
+$\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the \CCD.
 
 The flight and spare primary mirrors were coated with the same Al/SiC/Mg multilayer.
 Corrosion of this multilayer rendered both mirrors unusable.
 The failed coating was stripped from primary mirror SN001.
 The mirror was then re-coated with a \SI{5}{\nano\meter} \roy{\primaryCoatingBaseThickness} thick layer of chromium (Cr) \roy{\primaryCoatingBaseMaterial} to improve adhesion followed by a 
 \SI{25}{\nano\meter} \roy{\primaryCoatingThickness} thick layer of SiC \roy{\primaryCoatingMaterial}.
-The reflectance of this coating deposited on a silicon (Si) wafer witness sample appears in 
+The reflectance of this coating deposited on a \Si\ wafer witness sample appears in 
 Fig.~\ref{fig:componentEfficiencyVsWavelength}.
 The spare primary mirror (SN002) retains the corroded Al/SiC/Mg multilayer.
 
-The Si \CCDs\ are sensitive to visible light as well as \EUV.
+The \Si\ \CCDs\ are sensitive to visible light as well as \EUV.
 Visible solar radiation is much stronger than \EUV, and visible stray light can survive multiple scatterings while 
 retaining enough intensity to contaminate the \EUV\ images.
 Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be 
