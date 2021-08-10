@@ -253,9 +253,10 @@ def document() -> kgpy.latex.Document:
     )
 
     index_mg10_2 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][1]
+    wavelength_mg10_2 = wavelength[index_mg10_2]
     doc.set_variable_quantity(
         name='MgXdimWavelength',
-        value=wavelength[index_mg10_2],
+        value=wavelength_mg10_2,
         digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
