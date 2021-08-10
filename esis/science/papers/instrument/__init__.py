@@ -1788,6 +1788,76 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
 """
             ))
 
+        intensity_o5 = [334.97, 285.77, 1018.65, 519.534] * u.erg / u.cm ** 2 / u.sr / u.s
+        intensity_mg10 = [51.43, 2.62, 397.64, 239.249] * u.erg / u.cm ** 2 / u.sr / u.s
+
+        energy_o5 = wavelength_o5.to(u.erg, equivalencies=u.spectral()) / u.photon
+        energy_mg10 = wavelength_mg10_2.to(u.erg, equivalencies=u.spectral()) / u.photon
+
+        optics_single_measured = optics.as_measured_single_channel()
+        rays = optics_single_measured.rays_output
+
+        area = rays.intensity.copy()
+        area[~rays.mask] = np.nan
+        area = np.nansum(area, (rays.axis.pupil_x, rays.axis.pupil_y, rays.axis.velocity_los), keepdims=True)
+        area[area == 0] = np.nan
+        area = np.nanmean(area, (rays.axis.field_x, rays.axis.field_y)).squeeze()
+        area_o5 = area[0]
+        area_mg10 = area[2]
+
+        pixel_subtent = (optics_single.plate_scale.x * optics_single.plate_scale.y * u.pix * u.pix).to(u.sr)
+        time_integration = 10 * u.s
+
+        counts_o5 = (intensity_o5 * area_o5 * pixel_subtent * time_integration / energy_o5).to(u.photon)
+        counts_mg10 = (intensity_mg10 * area_mg10 * pixel_subtent * time_integration / energy_mg10).to(u.photon)
+        counts_total = counts_o5 + counts_mg10
+
+        stack_num = 3
+        counts_total_stacked = counts_total * stack_num
+
+        noise_shot = np.sqrt(counts_total.value) * counts_total.unit
+        noise_shot_stacked = np.sqrt(counts_total_stacked.value) * counts_total.unit
+
+        noise_read = optics_single_measured.detector.readout_noise.mean()
+        noise_read = noise_read * optics_single_measured.detector.gain.mean()
+        noise_read_o5 = (noise_read / (energy_o5 / (3.6 * u.eV / u.electron))).to(u.photon)
+        noise_read_o5_stacked = stack_num * noise_read_o5
+
+        noise_total = np.sqrt(np.square(noise_shot) + np.square(noise_read_o5))
+        noise_total_stacked = np.sqrt(np.square(noise_shot_stacked) + np.square(noise_read_o5_stacked))
+
+        snr = counts_total / noise_total
+        snr_stacked = counts_total_stacked / noise_total_stacked
+
+        label = f'1 $\\times$ {kgpy.format.quantity(time_integration, digits_after_decimal=0)} exp.'
+        label_stacked = f'{stack_num} $\\times$ {kgpy.format.quantity(time_integration, digits_after_decimal=0)} exp.'
+
+        with doc.create(pylatex.Table()) as table:
+            # table._star_latex_name = True
+            with table.create(pylatex.Center()) as centering:
+                with centering.create(pylatex.Tabular('llrrrr')) as tabular:
+                    tabular.escape = False
+                    tabular.add_row([r'Source', r'', r'V\&R', r'V\&R', r'V\&R', r'\CDS'])
+                    tabular.add_row(r'Solar context', r'', r'\QS', r'\CH', r'\AR', r'\AR')
+                    tabular.add_hline()
+                    tabular.add_row([label, r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
+                    tabular.add_row([r'', r'\MgXdim',] + [f'{c:0.0f}' for c in counts_mg10.value])
+                    tabular.add_hline()
+                    tabular.add_row([r'', r'Total', ] + [f'{c:0.0f}' for c in counts_total.value])
+                    tabular.add_row([r'', r'Shot noise', ] + [f'{c:0.1f}' for c in noise_shot.value])
+                    tabular.add_row([r'', r'Read noise', ] + 4 * [f'{noise_read_o5.value:0.1f}'])
+                    tabular.add_row([r'', r'\SNR', ] + [f'{c:0.1f}' for c in snr.value])
+                    tabular.add_hline()
+                    tabular.add_hline()
+                    tabular.add_row([label_stacked, 'Total', ] + [f'{c:0.0f}' for c in counts_total_stacked.value])
+                    tabular.add_row([r'', r'\SNR', ] + [f'{c:0.1f}' for c in snr_stacked.value])
+
+            table.add_caption(pylatex.NoEscape(
+                r"""
+Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in \CH, \QS, and \AR."""
+            ))
+            table.append(kgpy.latex.Label('table:counts'))
+
         with doc.create(pylatex.Subsection('Alignment and Focus')):
             doc.append(pylatex.NoEscape(
                 r"""
