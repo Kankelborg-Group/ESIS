@@ -17,7 +17,7 @@ from kgpy.plot import CubeSlicer
 if __name__ == '__main__':
 
     # plt.rcParams['figure.figsize'] = [20, 20]
-
+    start = time.time()
     ov = level_3.Level_3.from_pickle(level_3.ov_final_path)
     ov_data = ov.observation.data
     test_seq = 15
@@ -33,10 +33,11 @@ if __name__ == '__main__':
     # }
 
     angles = (np.arange(4) * 45 - 22.5 + -45) * u.deg
+    print(angles)
 
     l3_event = l3_events.perfectx
 
-    save_path = 'lev4_' + l3_event.name + '_mart_nofilter.pickle'
+    save_path = 'lev4_' + l3_event.name + '_mart.pickle'
     event = l3_event.location
     pad = 50
     event = (slice(event[0].start - pad, event[0].stop + pad, None), slice(event[1].start - pad, event[1].stop + pad))
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 
     pad = np.max(np.sqrt(extent_x ** 2 + extent_y ** 2) - (extent_x, extent_y))
     pad = int(np.ceil(pad * 1.05))
-    print(pad)
+
 
     region = ov_data[:, :, event[0], event[1]]
 
@@ -65,15 +66,15 @@ if __name__ == '__main__':
 
     guess = np.resize(guess, (41, guess.shape[-2], guess.shape[-1]))
     guess = np.moveaxis(guess, 0, -1)
-    print(guess.shape)
+
 
     spectral_order = 1
     mart_obj = mart.MART(
         use_maximize=False,
-        use_filter=False,
+        use_filter=True,
         use_lgof=False,
         max_multiplicative_iteration=20,
-        max_filtering_iterations=1,
+        max_filtering_iterations=25,
         photon_read_noise=2,
         # track_cube_history='filter',
         contrast_exponent=.2,
@@ -88,7 +89,7 @@ if __name__ == '__main__':
 
     seqs = [i for i in range(ov.observation.data.shape[0])]
     # seqs = [13, 14, 15, 16]
-    # seqs = [15]
+    seqs = [15]
 
     channels = [0, 1, 2, 3]
     # channels = [1,2]
@@ -151,8 +152,8 @@ if __name__ == '__main__':
     inverted_results_wcs = [result_wcs for i in range(len(recovered_list))]
 
     lev4 = level_4.Level_4(inverted_results, inverted_results_wcs)
-
-    lev4.to_pickle(path =save_path)
+    print('Inversion Duration = ', start=time.time())
+    # lev4.to_pickle(path =save_path)
 
     test = lev4.plot()
     plt.show()

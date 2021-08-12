@@ -82,6 +82,7 @@ def test_vignetting_correction(capsys):
         lev3.spectral_line_name = 'ov'
         lev3 = lev3.correct_vignetting()
         print(lev3.vignetting_correction_params)
+        # [0.29487136 0.24359919 0.28573844 0.45081646]
 
 
 

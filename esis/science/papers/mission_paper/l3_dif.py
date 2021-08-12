@@ -4,6 +4,9 @@ from esis.science.papers.mission_paper import fig_path #can't figure out relativ
 import matplotlib.patheffects as PathEffects
 import matplotlib.patches as patches
 from esis.flight import l3_events
+from matplotlib.animation import FuncAnimation
+import numpy as np
+
 from kgpy.plot import CubeSlicer
 
 
@@ -16,8 +19,8 @@ if __name__ == '__main__':
 
     l3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
     times = l3.time
-    img1 = l3.observation.data[seq, 1]
-    img2 = l3.observation.data[seq, 2]
+    img1 = l3.observation.data[:, 1]
+    img2 = l3.observation.data[:, 2]
     dif = img1-img2
 
     fig, ax = plt.subplots(figsize=(7.1,7.1),
@@ -27,7 +30,7 @@ if __name__ == '__main__':
     lw=1.1
     scale = 40
 
-    ax.imshow(dif, origin='lower', vmin=-scale, vmax=scale)
+    d = ax.imshow(dif[16], origin='lower', vmin=-scale, vmax=scale)
     ax.set_title('Level-3 Difference (Channel 2 - Channel 3)')
     ax.set_xlabel('Solar X (arcsec)')
     ax.set_ylabel('Solar Y (arcsec)')
@@ -54,4 +57,15 @@ if __name__ == '__main__':
         num.set_path_effects([PathEffects.withStroke(linewidth=lw, foreground='black')])
 
     fig.savefig(fig_path/'l3_dif.pdf')
+
+    def update(frame):
+        d.set_data(dif[frame])
+        t.set_text(times[frame])
+
+
+
+    frames = np.arange(dif.shape[0]-1)
+    ani = FuncAnimation(fig, update, frames)
+
+    ani.save(fig_path / 'l3_dif_movie.mp4', 'ffmpeg', dpi=200)
     plt.show()
