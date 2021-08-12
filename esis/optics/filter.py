@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, transform, optics, format
+from kgpy import Name, transform, optics, format, units
 
 __all__ = ['Filter']
 
@@ -19,6 +19,7 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
     thickness: u.Quantity = 0 * u.mm
     thickness_oxide: u.Quantity = 0 * u.mm
     mesh_ratio: u.Quantity = 100 * u.percent
+    mesh_pitch: u.Quantity = 0 * units.line / u.imperial.inch
     mesh_material: str = ''
 
     @property
@@ -55,6 +56,7 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
         other.thickness = self.thickness.copy()
         other.thickness_oxide = self.thickness_oxide.copy()
         other.mesh_ratio = self.mesh_ratio.copy()
+        other.mesh_pitch = self.mesh_pitch.copy()
         return other
 
     @property
@@ -66,4 +68,5 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
         dataframe['thickness'] = [format.quantity(self.thickness.to(u.nm))]
         dataframe['oxide thickness'] = [format.quantity(self.thickness_oxide.to(u.nm))]
         dataframe['mesh ratio'] = [format.quantity(self.mesh_ratio.to(u.percent))]
+        dataframe['mesh pitch'] = [format.quantity(self.mesh_pitch)]
         return dataframe

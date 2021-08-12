@@ -98,6 +98,7 @@ import dataclasses
 
 import numpy as np
 from astropy import units as u
+import kgpy.units
 from kgpy import Name, vector
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
 
@@ -249,6 +250,7 @@ def final(
     filter.thickness = 100 * u.nm
     filter.thickness_oxide = 4 * u.nm
     filter.mesh_ratio = 82 * u.percent
+    filter.mesh_pitch = 70 * kgpy.units.line / u.imperial.inch
     filter.mesh_material = 'Ni'
     if all_channels:
         filter.plot_kwargs['linestyle'] = dashstyle_channels

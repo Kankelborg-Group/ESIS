@@ -589,6 +589,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    doc.set_variable_quantity(
+        name='filterMeshPitch',
+        value=optics_single.filter.mesh_pitch,
+        digits_after_decimal=0,
+    )
+
     doc.set_variable(
         name='filterMeshMaterial',
         value=pylatex.NoEscape(f'\\{optics_single.filter.mesh_material}'),
@@ -1727,7 +1733,7 @@ Visible solar radiation is much stronger than \EUV, and visible stray light can 
 retaining enough intensity to contaminate the \EUV\ images.
 Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be 
 used to shield each \CCD\ from visible light.
-The Al film is supported by a 70 line per inch (lpi) Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
+The Al film is supported by a 70 line per inch (lpi) \roy{\filterMeshPitch} Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
 The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in 
 Fig.~\ref{fig:componentEfficiencyVsWavelength}.
 We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$.
