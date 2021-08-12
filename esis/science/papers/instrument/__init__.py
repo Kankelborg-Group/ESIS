@@ -1760,7 +1760,7 @@ We also note that the count rates given here are for an unvignetted system which
 While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{subsec:AperturesandBaffles}) to increase throughput.
 Thus, a faster exposure cadence may be obtained by accepting some vignetting in the system.
 
-\begin{table*}[!htb]
+\begin{table}
     \centering
     \begin{tabular}{lcccc}
         Source & V\&R & V\&R & V\&R & CDS \\
@@ -1784,7 +1784,7 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
         Estimated signal statistics per channel (in photon counts) for ESIS lines in coronal hole (CH), quiet Sun (QS), and active region (AR).
     }
     \label{table:count}
-\end{table*}
+\end{table}
 """
             ))
 
