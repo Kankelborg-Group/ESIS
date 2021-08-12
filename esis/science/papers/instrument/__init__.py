@@ -2077,6 +2077,35 @@ Camera & Quad & Gain & Read Noise & Dark Current \\
 \end{table}"""
             ))
 
+            detector = optics_all.detector
+
+            with doc.create(pylatex.Table()) as table:
+                # table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('ccccc')) as tabular:
+                        tabular.escape = False
+                        tabular.add_row([r'Channel', r'Quad.', r'Gain', r'Read noise', r'Dark current',])
+                        tabular.add_row(['', '', f'({detector.gain.unit:latex_inline})', f'({detector.readout_noise.unit:latex_inline})', f'({detector.dark_current.unit:latex_inline})'])
+                        tabular.add_hline()
+                        for i in range(detector.gain.shape[0]):
+                            for j in range(detector.gain.shape[1]):
+                                if j == 0:
+                                    channel_name_i = optics_all.channel_name[i]
+                                    serial_number_i = f'({detector.serial_number[i]})'
+                                else:
+                                    channel_name_i = ''
+                                    serial_number_i = ''
+                                tabular.add_row([
+                                    f'{channel_name_i} {serial_number_i}',
+                                    j + 1,
+                                    detector.gain[i, j].value,
+                                    detector.readout_noise[i, j].value,
+                                    f'{detector.dark_current[i, j].value:0.3f}',
+                                ])
+                            tabular.add_hline()
+                table.add_caption(pylatex.NoEscape(r'\ESIS\ camera properties'))
+                table.append(kgpy.latex.Label('tabel:cameraProperties'))
+
         with doc.create(pylatex.Subsection('Avionics')):
             doc.append(pylatex.NoEscape(
                 r"""
