@@ -87,6 +87,13 @@ def as_measured(
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
     opt.grating.ruling_density = 2585.5 / u.mm
 
+    opt.detector.serial_number = np.array([
+        'SN6',
+        'SN7',
+        'SN9',
+        'SN10'
+    ])
+
     # numbers sourced from ESIS instrument paper as of 09/10/20
     opt.detector.gain = [
         [2.57, 2.50, 2.52, 2.53],

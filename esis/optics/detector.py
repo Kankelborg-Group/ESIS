@@ -22,6 +22,7 @@ SurfaceT = optics.surface.Surface[
 @dataclasses.dataclass
 class Detector(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
+    serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     inclination: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
     twist: u.Quantity = 0 * u.deg
