@@ -3,6 +3,7 @@ import pathlib
 import numpy as np
 import esis.optics
 import astropy.units as u
+import kgpy.optics
 import esis.optics
 
 __all__ = ['as_measured', 'as_flown']
@@ -10,29 +11,88 @@ __all__ = ['as_measured', 'as_flown']
 
 def as_measured(
         pupil_samples: int = 10,
+        pupil_is_stratified_random: bool = False,
         field_samples: int = 10,
+        field_is_stratified_random: bool = False,
+        all_channels: bool = True,
 ) -> esis.optics.Optics:
-    opt = esis.optics.design.final(
+    kwargs = dict(
         pupil_samples=pupil_samples,
+        pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
-        all_channels=True,
+        field_is_stratified_random=field_is_stratified_random,
+    )
+    if all_channels:
+        opt = esis.optics.design.final_active(**kwargs)
+    else:
+        opt = esis.optics.design.final(**kwargs, all_channels=all_channels, )
+
+    primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_recoat_1()
+    primary_serial, primary_angle_input, primary_wavelength, primary_efficiency = primary_witness
+    opt.primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
+        plot_kwargs=opt.primary.material.plot_kwargs,
+        name=primary_serial,
+        thickness=opt.primary.material.thickness,
+        cap=opt.primary.material.cap,
+        main=opt.primary.material.main,
+        base=opt.primary.material.base,
+        efficiency_data=primary_efficiency,
+        wavelength_data=primary_wavelength,
+    )
+
+    opt.grating.serial_number = np.array([
+        '89025',
+        '89024',
+        '89026',
+        '89027',
+    ])
+    opt.grating.manufacturing_number = np.array([
+        'UBO-16-024',
+        'UBO-16-017',
+        'UBO-16-019',
+        'UBO-16-014',
+    ])
+    grating_measurement = esis.optics.grating.efficiency.vs_wavelength()
+    grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
+    opt.grating.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
+        plot_kwargs=opt.grating.material.plot_kwargs,
+        name='UBO-16-017',
+        thickness=opt.grating.material.thickness,
+        cap=opt.grating.material.cap,
+        main=opt.grating.material.main,
+        base=opt.grating.material.base,
+        efficiency_data=grating_efficiency,
+        wavelength_data=grating_wavelength,
+    )
+
+    grating_witness_measurement = esis.optics.grating.efficiency.witness.vs_wavelength_g17()
+    (
+        grating_serial,
+        grating_witness_angle_input,
+        grating_witness_wavelength,
+        grating_witness_efficiency,
+    ) = grating_witness_measurement
+    opt.grating.witness = kgpy.optics.surface.material.MeasuredMultilayerMirror(
+        plot_kwargs=opt.grating.material.plot_kwargs,
+        name=grating_serial,
+        thickness=opt.grating.material.thickness,
+        cap=opt.grating.material.cap,
+        main=opt.grating.material.main,
+        base=opt.grating.material.base,
+        efficiency_data=grating_witness_efficiency,
+        wavelength_data=grating_witness_wavelength,
     )
 
     # opt.grating.tangential_radius = (597.46 * u.mm + 597.08 * u.mm) / 2
     # opt.grating.sagittal_radius = opt.grating.tangential_radius
     opt.grating.ruling_density = 2585.5 / u.mm
 
-    i1 = 1
-    i4 = 4 + 1
-
-    opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[i1:i4]
-    opt.grating.plot_kwargs['linestyle'] = opt.grating.plot_kwargs['linestyle'][i1:i4]
-
-    opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[i1:i4]
-    opt.filter.plot_kwargs['linestyle'] = opt.filter.plot_kwargs['linestyle'][i1:i4]
-
-    opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[i1:i4]
-    opt.detector.plot_kwargs['linestyle'] = opt.detector.plot_kwargs['linestyle'][i1:i4]
+    opt.detector.serial_number = np.array([
+        'SN6',
+        'SN7',
+        'SN9',
+        'SN10'
+    ])
 
     # numbers sourced from ESIS instrument paper as of 09/10/20
     opt.detector.gain = [
@@ -48,6 +108,20 @@ def as_measured(
         [4.1, 4.1, 4.1, 4.3],
         [3.9, 3.9, 4.2, 4.1],
     ] * u.adu
+
+    opt.detector.dark_current = ([
+        [1.37e-4, 9.66e-5, 6.85e-5, 9.80e-5],
+        [6.77e-5, 5.89e-5, 8.98e-5, 1.01e-4],
+        [3.14e-5, 2.68e-5, 3.18e-5, 3.72e-5],
+        [6.39e-4, 5.07e-5, 6.63e-5, 8.24e-5],
+    ] * u.electron / u.ms).to(u.electron / u.s)
+
+    if not all_channels:
+        chan_index = esis.optics.design.default_channel_active
+        opt.grating.serial_number = opt.grating.serial_number[chan_index]
+        opt.grating.manufacturing_number = opt.grating.manufacturing_number[chan_index]
+        opt.detector.gain = opt.detector.gain[chan_index]
+        opt.detector.readout_noise = opt.detector.readout_noise[chan_index]
 
     return opt
 

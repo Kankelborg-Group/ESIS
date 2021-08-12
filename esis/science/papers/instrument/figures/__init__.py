@@ -1,20 +1,50 @@
+import typing as typ
 import pathlib
 import matplotlib.figure
+import matplotlib.colors
+import matplotlib.lines
+import matplotlib.axes
 import matplotlib.pyplot as plt
+import numpy as np
+import scipy.spatial
 import astropy.units as u
+import astropy.visualization
 import kgpy.vector
+import kgpy.format
+import kgpy.plot
+import kgpy.optics
+import kgpy.grid
 import esis.optics
+from .. import optics as optics_factories
 
 __all__ = [
     'layout',
     'layout_pdf'
 ]
 
-fig_width = 7.1
+text_width = 513.11743 / 72
+column_width = 242.26653 / 72
+
+digits_after_decimal = 2
+digits_after_decimal_schematic = 1
+
+
+def save_pdf(fig_factory: typ.Callable[[], matplotlib.figure.Figure]) -> pathlib.Path:
+    path = pathlib.Path(__file__).parent / (fig_factory.__name__ + '.pdf')
+    if not path.exists():
+        fig = fig_factory()
+        fig.savefig(
+            fname=path,
+            # bbox_inches='tight',
+            # pad_inches=0.04,
+            # facecolor='lightblue'
+        )
+        plt.close(fig)
+    return path
 
 
 def layout() -> matplotlib.figure.Figure:
-    fig_layout = plt.figure(figsize=(fig_width, fig_width))
+    fig_layout = plt.figure(figsize=(text_width, text_width))
     ax_layout = fig_layout.add_subplot(111, projection='3d')
     # fig_layout, ax_layout = plt.subplots(figsize=(7.1, 4), constrained_layout=True)
     ax_layout.set_axis_off()
@@ -90,13 +120,935 @@ def layout() -> matplotlib.figure.Figure:
 
 
 def layout_pdf() -> pathlib.Path:
-    fig = layout()
     path = pathlib.Path(__file__).parent / 'layout_mpl.pdf'
-    h = 1.5
-    offset = (fig_width - h) / 2
-    fig.savefig(
-        fname=path,
-        bbox_inches=fig.bbox_inches.from_bounds(0, offset, fig_width, h)
-    )
-    plt.close(fig)
+    if not path.exists():
+        fig = layout()
+        h = 1.5
+        offset = (text_width - h) / 2
+        fig.savefig(
+            fname=path,
+            bbox_inches=fig.bbox_inches.from_bounds(0, offset, text_width, h)
+        )
+        plt.close(fig)
     return path
+
+
+def schematic() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
+    # fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
+    ax.margins(x=.01, y=.01)
+    # ax.autoscale(enable=True, axis='both', tight=True)
+
+    ax.set_aspect('equal')
+    ax.set_axis_off()
+    optics = esis.optics.design.final(all_channels=False)
+    obs = optics.central_obscuration
+    lines, colorbar = optics.system.plot(
+        ax=ax,
+        components=('z', 'x'),
+        plot_rays=False,
+        plot_annotations=False,
+        annotation_text_y=2,
+        plot_kwargs=dict(
+            linewidth=1.5,
+            solid_joinstyle='miter',
+        ),
+        # surface_first=optics.central_obscuration.surface,
+    )
+    optics.plot_distance_annotations_zx(ax=ax, digits_after_decimal=digits_after_decimal_schematic,)
+
+    ax.axhline(linestyle=(0, (20, 10)), linewidth=0.4, color='gray')
+    ax.text(
+        x=-500,
+        y=0,
+        s='axis of symmetry',
+        ha='center',
+        va='bottom',
+    )
+
+    xh = kgpy.vector.x_hat.zx
+    zh = kgpy.vector.z_hat.zx
+    obs_zx = obs.transform.translation_eff.zx - obs.obscured_half_width * xh
+    default_offset_x = -150 * u.mm
+    apkw = dict(
+        arrowstyle='->',
+        linewidth=0.75,
+        relpos=(0.5, 0.5),
+    )
+    kwargs_annotate = dict(
+        ha='center',
+    )
+    ax.annotate(
+        text=str(obs.name),
+        xy=obs_zx.to_tuple(),
+        xytext=(obs_zx.x, default_offset_x),
+        arrowprops=dict(
+            # relpos=(0.5, 0.5),
+            # connectionstyle='arc,angleA=90,angleB=-90,armA=10,armB=10',
+            **apkw,
+        ),
+        # ha='center',
+        **kwargs_annotate
+    )
+    width = optics.grating.inner_half_width + optics.grating.inner_border_width
+    grating_z = -optics.grating.material.thickness / 2 * zh
+    grating_zx = optics.grating.transform.translation_eff.zx - (width * xh) - grating_z
+    ax.annotate(
+        text=str(optics.grating.name),
+        xy=grating_zx.to_tuple(),
+        xytext=(grating_zx.x + 150 * u.mm, default_offset_x),
+        arrowprops=dict(
+            connectionstyle='arc,angleA=90,angleB=-90,armA=15,armB=15',
+            **apkw,
+        ),
+        **kwargs_annotate,
+
+    )
+    fs_zx = optics.field_stop.transform.translation_eff.zx
+    ax.annotate(
+        text=str(optics.field_stop.name),
+        xy=fs_zx.to_tuple(),
+        xytext=(fs_zx.x, default_offset_x),
+        arrowprops=dict(
+            **apkw,
+        ),
+        **kwargs_annotate,
+    )
+    primary_z = optics.primary.material.thickness / 2 * zh
+    primary_zx = optics.primary.transform.translation_eff.zx - optics.primary.mech_half_width * xh + primary_z
+    ax.annotate(
+        text=str(optics.primary.name),
+        xy=primary_zx.to_tuple(),
+        xytext=(primary_zx.x, default_offset_x),
+        arrowprops=dict(
+            **apkw,
+        ),
+        **kwargs_annotate,
+    )
+    filter_zx = optics.filter.transform.translation_eff.zx - optics.filter.clear_radius * xh
+    ax.annotate(
+        text=str(optics.filter.name),
+        xy=filter_zx.to_tuple(),
+        xytext=(filter_zx.x - 100 * u.mm, default_offset_x),
+        arrowprops=dict(
+            connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=30',
+            **apkw,
+        ),
+        **kwargs_annotate,
+    )
+    detector_zx = optics.detector.transform.translation_eff.zx - optics.detector.clear_half_width * xh
+    ax.annotate(
+        text='detector',
+        xy=detector_zx.to_tuple(),
+        xytext=(detector_zx.x + 100 * u.mm, default_offset_x),
+        arrowprops=dict(
+            connectionstyle='arc,angleA=90,angleB=-90,armA=20,armB=35',
+            **apkw,
+        ),
+        **kwargs_annotate,
+    )
+
+    ax.set_ylabel(None)
+    ax.set_yticks([])
+    ax.set_xticks([])
+    ax.set_xlim(right=250)
+    # colorbar.remove()
+
+    return fig
+
+
+def schematic_pdf() -> pathlib.Path:
+    return save_pdf(schematic)
+
+
+def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
+
+    optics = esis.optics.design.final(
+        pupil_samples=21,
+        pupil_is_stratified_random=True,
+        field_samples=7,
+        field_is_stratified_random=True,
+    )
+    optics.roll = -optics.detector.cylindrical_azimuth[1]
+    primary = optics.primary
+    obscuration = optics.central_obscuration
+
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(figsize=(column_width, 3.5), constrained_layout=True)
+        ax.margins(x=.01, y=.01)
+        ax.set_aspect('equal')
+        ax.set_axis_off()
+        kwargs_plot = dict(
+            ax=ax,
+            transform_extra=optics.system.transform_all,
+            plot_annotations=False,
+        )
+        # optics.primary.plot(**kwargs_plot)
+
+        vertices_primary_mech = primary.surface.aperture_mechanical.vertices
+        vertices_primary_mech = optics.system.transform_all(vertices_primary_mech)
+        ax.fill(
+            vertices_primary_mech.x,
+            vertices_primary_mech.y,
+            facecolor='gray',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(primary.mech_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(primary.mech_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.6 * primary.mech_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+
+        vertices_primary = primary.surface.aperture.vertices
+        vertices_primary = optics.system.transform_all(vertices_primary)
+        ax.fill(
+            vertices_primary.x,
+            vertices_primary.y,
+            facecolor='white',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(primary.clear_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(primary.clear_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.4 * primary.mech_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+        ax.text(
+            x=0,
+            y=(obscuration.obscured_half_width + primary.mech_half_width) / 2,
+            s='primary\nclear aperture',
+            ha='center',
+            va='center',
+        )
+
+
+        vertices_obscuration = obscuration.surface.aperture.vertices
+        vertices_obscuration = optics.system.transform_all(vertices_obscuration)
+        ax.fill(
+            vertices_obscuration.x,
+            vertices_obscuration.y,
+            facecolor='darkgray',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D.from_cylindrical(obscuration.obscured_radius, 22.5 * u.deg),
+            point_2=kgpy.vector.Vector2D.from_cylindrical(obscuration.obscured_radius, (180 - 22.5) * u.deg),
+            position_orthogonal=1.2 * primary.mech_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+        ax.text(
+            x=0,
+            y=0,
+            s='central\nobscuration',
+            ha='center',
+            va='center',
+        )
+
+        rays = optics.system.raytrace[optics.system.surfaces_all.flat_local.index(primary.surface)]
+        mask = optics.system.rays_output.mask
+        for i in range(rays.size):
+            index = np.unravel_index(i, rays.shape)
+            points = np.broadcast_to(rays.position, mask.shape, subok=True)
+            points = points[index, mask[index]]
+            hull = scipy.spatial.ConvexHull(points.xy.quantity)
+            vertices = optics.system.transform_all(points[hull.vertices])
+            if optics.grating.plot_kwargs['linestyle'][i] is None:
+                alpha = 1.0
+                inactive = ''
+            else:
+                alpha = 0.5
+                inactive = '\n(inactive)'
+            ax.fill(
+                vertices.x,
+                vertices.y,
+                fill=False,
+                edgecolor='red',
+                alpha=alpha,
+            )
+            position_label_channel = kgpy.vector.Vector2D.from_cylindrical(
+                radius=(obscuration.obscured_half_width + primary.mech_half_width) / 2,
+                azimuth=optics.grating.cylindrical_azimuth[i] + 180 * u.deg,
+            )
+            position_label_channel = optics.system.transform_all(position_label_channel.to_3d()).xy
+            ax.text(
+                x=position_label_channel.x.value,
+                y=position_label_channel.y.value,
+                s='Channel {}{}'.format(i, inactive),
+                ha='center',
+                va='center',
+                color='red',
+                alpha=alpha,
+            )
+
+    return fig
+
+
+def schematic_primary_and_obscuration_pdf() -> pathlib.Path:
+    return save_pdf(schematic_primary_and_obscuration)
+
+
+def schematic_grating() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(all_channels=False)
+    grating = optics.grating
+
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(figsize=(column_width, 3.5), constrained_layout=True)
+        ax.margins(x=.01, y=.01)
+        ax.set_aspect('equal')
+        ax.set_axis_off()
+
+        vertices_grating_mech = optics.grating.surface.aperture_mechanical.vertices
+        # vertices_grating_mech = optics.system.transform_all(vertices_primary_mech)
+        ax.fill(
+            vertices_grating_mech.x,
+            vertices_grating_mech.y,
+            facecolor='gray',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(-grating.inner_half_width - grating.inner_border_width, grating.width_mech_short / 2),
+            point_2=kgpy.vector.Vector2D(grating.outer_half_width + grating.border_width, grating.width_mech_long / 2),
+            # point_2=kgpy.vector.Vector2D(grating.height_mech / 2, grating.width_mech_long / 2),
+            position_orthogonal=1.2 * grating.width_mech_long.value / 2,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+
+        vertices_grating_clear = optics.grating.surface.aperture.vertices
+        # vertices_grating_mech = optics.system.transform_all(vertices_primary_mech)
+        ax.fill(
+            vertices_grating_clear.x,
+            vertices_grating_clear.y,
+            # hatch='/',
+            # fill=False,
+            facecolor='white',
+            edgecolor='black',
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(grating.outer_half_width, -grating.width_long / 2),
+            point_2=kgpy.vector.Vector2D(grating.outer_half_width, grating.width_long / 2),
+            component='y',
+            position_orthogonal=1.3 * (grating.outer_half_width + grating.border_width).value,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(-grating.inner_half_width, -grating.width_short / 2),
+            point_2=kgpy.vector.Vector2D(-grating.inner_half_width, grating.width_short / 2),
+            component='y',
+            position_orthogonal=-0.5 * grating.inner_half_width.value,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+        kgpy.plot.annotate_component(
+            ax=ax,
+            point_1=kgpy.vector.Vector2D(-grating.inner_half_width, grating.width_short / 2),
+            point_2=kgpy.vector.Vector2D(grating.outer_half_width, grating.width_long / 2),
+            position_orthogonal=1 * grating.width_mech_long.value / 2,
+            digits_after_decimal=digits_after_decimal_schematic,
+        )
+
+        ax.text(
+            x=0.3 * grating.outer_half_width.value,
+            y=0,
+            s='grating\nclear aperture',
+            ha='center',
+            va='center',
+        )
+
+    return fig
+
+
+def schematic_grating_pdf() -> pathlib.Path:
+    return save_pdf(schematic_grating)
+
+
+def bunch() -> matplotlib.figure.Figure:
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
+        optics = esis.optics.design.final()
+        optics.bunch.plot(
+            ax=ax,
+            num_emission_lines=optics.num_emission_lines,
+            digits_after_decimal=digits_after_decimal,
+            label_fontsize=6,
+        )
+        ax_twin = ax.twinx()
+        optics_measured = esis.flight.optics.as_measured(**kwargs_optics_default)
+        wavelength_min = optics_measured.wavelength_min
+        wavelength_max = optics_measured.wavelength_max
+        optics_measured.filter.clear_radius = 1000 * u.mm
+        optics_measured.detector.num_pixels = (4096, 2048)
+        sys = optics_measured.system
+        sys.grid_wavelength = kgpy.grid.RegularGrid1D(
+            min=wavelength_min,
+            max=wavelength_max,
+            num_samples=100,
+        )
+        rays = sys.rays_output
+        area = rays.intensity.copy()
+        area[~rays.mask] = np.nan
+        area = np.nansum(area, (rays.axis.pupil_x, rays.axis.pupil_y, rays.axis.velocity_los), keepdims=True)
+        area[area == 0] = np.nan
+        # plt.figure()
+        # plt.imshow(area.squeeze()[..., 0])
+        # plt.show()
+        area = np.nanmean(area, (rays.axis.field_x, rays.axis.field_y)).squeeze()
+        subtent = optics_measured.system.rays_input.input_grid.field.step_size
+        print('bunch subtent', subtent)
+        # area = (area / subtent.x / subtent.y).to(u.cm ** 2)
+
+        wavelength = rays.wavelength.squeeze()
+        sorted_indices = np.argsort(wavelength)
+        area = area[sorted_indices]
+        wavelength = wavelength[sorted_indices]
+        ax_twin.plot(wavelength, area, color='red', zorder=0)
+        bottom, top = ax_twin.get_ylim()
+        margin = 0.05 * (top - bottom)
+        ax_twin.set_ylim(bottom=-margin, top=top + 4 * margin)
+        ax_twin.set_ylabel(f'mean effective area ({ax_twin.get_ylabel()})')
+
+    return fig
+
+
+def bunch_pdf() -> pathlib.Path:
+    return save_pdf(bunch)
+
+
+def field_stop_projections() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(figsize=(column_width, 3), constrained_layout=True)
+    fig.set_constrained_layout_pads(h_pad=.15)
+    # ax.margins(x=.01, y=.01)
+    optics = esis.optics.design.final(all_channels=False)
+    optics.plot_field_stop_projections_local(
+        ax=ax,
+        wavelength_color=[
+            'darkviolet',
+            'indigo',
+            'blue',
+            'dodgerblue',
+            'cyan',
+            'green',
+            'chartreuse',
+            'orange',
+            'orangered',
+            'red',
+        ],
+        digits_after_decimal=digits_after_decimal,
+        use_latex=True,
+    )
+    ax.set_aspect('equal')
+    ax.legend(bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
+    return fig
+
+
+def field_stop_projections_pdf() -> pathlib.Path:
+    return save_pdf(field_stop_projections)
+
+
+psf_pupil_samples = 201
+psf_field_samples = 4
+
+
+def psf() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(
+        pupil_samples=psf_pupil_samples,
+        pupil_is_stratified_random=True,
+        field_samples=psf_field_samples,
+        all_channels=False,
+    )
+    optics.num_emission_lines = 1
+
+    rays = optics.rays_output
+
+    bins = rays.input_grid.pupil.num_samples_normalized.x // 2
+
+    fig, axs = rays.plot_pupil_hist2d_vs_field(
+        wavlen_index=0,
+        norm=matplotlib.colors.PowerNorm(1 / 3),
+        bins=bins,
+        cmap='gray_r',
+        limits=((-0.5, 0.5), (-0.5, 0.5)),
+    )
+    fig.set_figheight(2.6)
+    fig.set_figwidth(column_width)
+    fig.suptitle(None)
+    for i, axs_i in enumerate(axs):
+        for j, axs_ij in enumerate(axs_i):
+            ax = axs_ij
+            if i + 1 == axs.shape[0]:
+                ax.set_xlabel(None)
+            if j == 0:
+                ax.set_ylabel(None)
+            ax.set_xticks([])
+            ax.set_yticks([])
+
+    fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
+    return fig
+
+
+def psf_pdf() -> pathlib.Path:
+    return save_pdf(psf)
+
+
+kwargs_optics_default = dict(
+    pupil_samples=optics_factories.default_pupil_samples,
+    pupil_is_stratified_random=optics_factories.default_pupil_is_stratified_random,
+    field_samples=optics_factories.default_field_samples,
+    field_is_stratified_random=optics_factories.default_field_is_stratified_random,
+    all_channels=False,
+)
+
+num_emission_lines_default = 3
+
+
+def spot_size() -> matplotlib.figure.Figure:
+    optics = optics_factories.as_designed_single_channel()
+    fig, axs = plt.subplots(
+        ncols=num_emission_lines_default,
+        figsize=(text_width, 2.5),
+        sharex=True,
+        sharey=True,
+        constrained_layout=True
+    )
+    optics.rays_output.plot_spot_size_vs_field(
+        axs=axs,
+        digits_after_decimal=digits_after_decimal,
+    )
+    return fig
+
+
+def spot_size_pdf() -> pathlib.Path:
+    return save_pdf(spot_size)
+
+
+def focus_curve() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(
+        pupil_samples=11,
+        pupil_is_stratified_random=True,
+        field_samples=1,
+        # field_is_stratified_random=True,
+        all_channels=False,
+    )
+    optics.num_emission_lines = num_emission_lines_default
+    fig, ax = plt.subplots(
+        figsize=(column_width, 2.5),
+        constrained_layout=True,
+    )
+
+    optics.plot_focus_curve(
+        ax=ax,
+        delta_detector=5 * u.mm,
+        num_samples=51,
+        digits_after_decimal=2,
+        use_latex=True,
+    )
+    ax.legend(bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=2)
+    fig.set_constrained_layout_pads(w_pad=.10, h_pad=0.10)
+
+    return fig
+
+
+def focus_curve_pdf() -> pathlib.Path:
+    return save_pdf(focus_curve)
+
+
+def vignetting() -> matplotlib.figure.Figure:
+    optics = optics_factories.as_measured_single_channel()
+    fig, axs = plt.subplots(
+        figsize=(column_width, 2.9),
+        sharex=True,
+        sharey=True,
+        constrained_layout=True,
+        squeeze=False,
+    )
+    model = optics.rays_output.vignetting(polynomial_degree=optics.vignetting_polynomial_degree)
+    model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.fullname(digits_after_decimal))
+    return fig
+
+
+def vignetting_pdf() -> pathlib.Path:
+    return save_pdf(vignetting)
+
+
+def distortion() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics.num_emission_lines = 1
+    fig, ax = plt.subplots(
+        figsize=(column_width, 3.5),
+        constrained_layout=True,
+    )
+    # fig.set_constrained_layout_pads(h_pad=.15)
+    optics.plot_field_stop_distortion(
+        ax=ax,
+        digits_after_decimal=digits_after_decimal,
+        use_latex=True,
+    )
+    ax.set_aspect('equal')
+    ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center')
+    return fig
+
+
+def distortion_pdf() -> pathlib.Path:
+    return save_pdf(distortion)
+
+
+def distortion_residual() -> matplotlib.figure.Figure:
+    optics = optics_factories.as_designed_single_channel()
+    fig, axs = plt.subplots(
+        nrows=2,
+        ncols=num_emission_lines_default,
+        sharex=True,
+        sharey=True,
+        figsize=(text_width, 4.4),
+        constrained_layout=True,
+    )
+    distortion_linear = optics.rays_output.distortion(polynomial_degree=1)
+    distortion_quadratic = optics.rays_output.distortion(polynomial_degree=2)
+
+    distortion_linear.plot_residual(
+        axs=axs[0],
+        use_xlabels=False,
+        wavelength_name=optics.bunch.fullname(digits_after_decimal),
+    )
+    distortion_quadratic.plot_residual(
+        axs=axs[1],
+        use_titles=False,
+    )
+
+    return fig
+
+
+def distortion_residual_pdf() -> pathlib.Path:
+    return save_pdf(distortion_residual)
+
+
+def grating_multilayer_schematic() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    fig, ax = plt.subplots(
+        figsize=(column_width, 2.2),
+        constrained_layout=True,
+    )
+    optics.grating.surface.material.plot_layers(
+        ax=ax,
+        layer_material_color=dict(
+            Al='lightblue',
+            Mg='pink',
+            SiC='lightgray',
+        ),
+        layer_label_x=dict(
+            Al=1.0,
+            Mg=0.5,
+            SiC=0.5,
+        ),
+        layer_label_x_text=dict(
+            Al=1.2,
+            Mg=0.5,
+            SiC=0.5,
+        )
+    )
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_xlabel(None)
+    ax.set_ylabel(None)
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    fig.set_constrained_layout_pads(w_pad=0.2)
+    return fig
+
+
+def grating_multilayer_schematic_pdf() -> pathlib.Path:
+    return save_pdf(grating_multilayer_schematic)
+
+
+def grating_efficiency_vs_angle() -> matplotlib.figure.Figure:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    fig, ax = plt.subplots(
+        figsize=(column_width, 2),
+        constrained_layout=True,
+    )
+    eff_unit = u.percent
+    output_angle_unit = u.deg
+    for func in [esis.optics.grating.efficiency.vs_angle_at_0aoi, esis.optics.grating.efficiency.vs_angle_at_3aoi]:
+        input_angle, output_angle, wavelength, eff = func()
+        ax.plot(
+            output_angle.to(output_angle_unit),
+            eff.to(eff_unit),
+            label=f'input angle = {kgpy.format.quantity(input_angle, digits_after_decimal=0)}'
+        )
+    angle_m0 = 0 * u.deg
+    angle_m1 = optics.grating.diffraction_angle(optics.wavelength[0]).to(u.deg)
+    ax.axvline(angle_m0.value, linestyle='dashed', color='black')
+    ax.axvline(angle_m1.value, linestyle='dashed', color='black')
+    ax.text(
+        x=angle_m0.value,
+        y=1.01,
+        s='$m=0$',
+        transform=ax.get_xaxis_transform(),
+        ha='center',
+        va='bottom',
+    )
+    ax.text(
+        x=angle_m1.value,
+        y=1.01,
+        s='$m=1$',
+        transform=ax.get_xaxis_transform(),
+        ha='center',
+        va='bottom',
+    )
+    ax.set_xlabel(f'output angle ({output_angle_unit:latex})')
+    ax.set_ylabel(f'efficiency ({eff_unit:latex})')
+    ax.legend()
+
+    return fig
+
+
+def grating_efficiency_vs_angle_pdf() -> pathlib.Path:
+    return save_pdf(grating_efficiency_vs_angle)
+
+
+def _annotate_wavelength(
+        ax: matplotlib.axes.Axes,
+        label_orders: bool = True
+) -> typ.List[matplotlib.lines.Line2D]:
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics.num_emission_lines = 2
+    optics2 = optics.copy()
+    optics2.grating.diffraction_order = 2
+    optics2.num_emission_lines = 2
+
+    optics.plot_wavelength_range(ax=ax)
+    optics2.plot_wavelength_range(ax=ax)
+    if label_orders:
+        ax.text(
+            x=(optics.wavelength_min + optics.wavelength_max) / 2,
+            y=1.01,
+            s='$m=1$',
+            transform=ax.get_xaxis_transform(),
+            ha='center',
+            va='bottom',
+        )
+        ax.text(
+            x=(optics2.wavelength_min + optics2.wavelength_max) / 2,
+            y=1.01,
+            s='$m=2$',
+            transform=ax.get_xaxis_transform(),
+            ha='center',
+            va='bottom',
+        )
+    lines = optics.bunch.plot_wavelength(
+        ax=ax,
+        num_emission_lines=optics.num_emission_lines,
+        digits_after_decimal=digits_after_decimal,
+        colors=['orangered', 'blue'],
+    )
+    lines += optics2.bunch.plot_wavelength(
+        ax=ax,
+        num_emission_lines=optics2.num_emission_lines,
+        digits_after_decimal=digits_after_decimal,
+        colors=['gray', 'black'],
+    )
+    return lines
+
+
+def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    fig, axs = plt.subplots(
+        nrows=2,
+        sharex=True,
+        figsize=(column_width, 5),
+        constrained_layout=True,
+    )
+    eff_unit = u.percent
+    wavl_unit = u.Angstrom
+    witness = esis.optics.grating.efficiency.witness
+    with astropy.visualization.quantity_support():
+        optics = esis.flight.optics.as_measured()
+        for func in [witness.vs_wavelength_g24, witness.vs_wavelength_g17, witness.vs_wavelength_g19, ]:
+            serial, angle_input, wavelength, efficiency = func()
+            chan_i = np.nonzero(optics.grating.manufacturing_number == serial)
+            axs[0].plot(
+                wavelength.to(wavl_unit),
+                efficiency.to(eff_unit),
+                label=f'Channel {optics.channel_name[chan_i].squeeze()}',
+            )
+        axs[0].legend()
+
+        axs[0].set_xlabel(None)
+        axs[0].set_ylabel(f'efficiency ({eff_unit:latex})')
+        _annotate_wavelength(ax=axs[0])
+
+        wavelength = esis.optics.grating.efficiency.witness.vs_wavelength_g17()[2].to(wavl_unit)
+        rays = kgpy.optics.rays.Rays(
+            wavelength=wavelength,
+        )
+
+        axs[1].plot(
+            wavelength,
+            optics.primary.material.transmissivity(rays).to(eff_unit),
+            label=f'primary',
+            color='tab:red'
+        )
+
+        axs[1].plot(
+            wavelength,
+            optics.grating.material.transmissivity(rays).to(eff_unit),
+            label=f'grating',
+            color='tab:purple'
+        )
+
+        axs[1].plot(
+            wavelength,
+            optics.filter.surface.material.transmissivity(rays).to(u.percent),
+            label=r'filter',
+            color='tab:cyan',
+        )
+
+        axs[1].add_artist(axs[1].legend())
+        lines = _annotate_wavelength(ax=axs[1], label_orders=False)
+        axs[1].set_xlabel(f'wavelength ({wavl_unit:latex})')
+        axs[1].set_ylabel(f'efficiency ({eff_unit:latex})')
+        axs[1].legend(handles=lines, bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
+
+    return fig
+
+
+def component_efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(component_efficiency_vs_wavelength)
+
+
+def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
+    with astropy.visualization.quantity_support():
+        fig, axs = plt.subplots(
+            ncols=2,
+            sharey=True,
+            figsize=(text_width, 2.5),
+            constrained_layout=True,
+        )
+
+        position_x, position_y, wavelength, efficiency = esis.optics.grating.efficiency.vs_position_x()
+        axs[0].plot(
+            position_x,
+            efficiency.to(u.percent),
+            label='grating 017',
+        )
+        axs[0].set_xlabel(f'$x$ position ({axs[0].get_xlabel()})')
+        axs[0].set_ylabel(f'efficiency ({axs[0].get_ylabel()})')
+
+        position_x, position_y, wavelength, efficiency = esis.optics.grating.efficiency.vs_position_y()
+        axs[1].plot(
+            position_y,
+            efficiency,
+            label='grating 017'
+        )
+        axs[1].set_xlabel(f'$y$ position ({axs[1].get_xlabel()})')
+        axs[1].set_ylabel(None)
+
+        return fig
+
+
+def grating_efficiency_vs_position_pdf() -> pathlib.Path:
+    return save_pdf(grating_efficiency_vs_position)
+
+
+def primary_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    fig, ax = plt.subplots(
+        figsize=(column_width, 2.75),
+        constrained_layout=True,
+    )
+    eff_unit = u.percent
+    wavl_unit = u.Angstrom
+    witness = esis.optics.primary.efficiency.witness
+    with astropy.visualization.quantity_support():
+        for func in [witness.vs_wavelength_p1, witness.vs_wavelength_p2, witness.vs_wavelength_recoat_1]:
+            serial, angle_input, wavelength, efficiency = func()
+            ax.plot(
+                wavelength.to(wavl_unit),
+                efficiency.to(eff_unit),
+                label=serial,
+            )
+        ax.legend()
+        ax.add_artist(ax.legend())
+        lines = _annotate_wavelength(ax=ax)
+        ax.set_xlabel(f'wavelength ({wavl_unit:latex})')
+        ax.set_ylabel(f'reflectivity ({eff_unit:latex})')
+        ax.legend(handles=lines, bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
+
+    return fig
+
+
+def primary_efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(primary_efficiency_vs_wavelength)
+
+
+def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(
+            figsize=(column_width, 2.75),
+            constrained_layout=True,
+        )
+        optics = esis.optics.design.final(**kwargs_optics_default)
+        wavelength = esis.optics.grating.efficiency.witness.vs_wavelength_g17()[2].to(u.AA)
+        rays = kgpy.optics.rays.Rays(
+            wavelength=wavelength,
+        )
+        ax.plot(
+            wavelength,
+            optics.filter.surface.material.transmissivity(rays).to(u.percent),
+            label=r'$\mathrm{Al}_2\mathrm{O}_3 / \mathrm{Al} / \mathrm{Al}_2\mathrm{O}_3$',
+        )
+        ax.add_artist(ax.legend())
+        lines = _annotate_wavelength(ax=ax)
+        ax.set_xlabel(f'wavelength ({ax.get_xlabel()})')
+        ax.set_ylabel(f'transmission ({ax.get_ylabel()})')
+        # ax.legend()
+        ax.legend(handles=lines, bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=2)
+
+        fig.set_constrained_layout_pads(h_pad=0.1)
+        return fig
+
+
+def filter_efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(filter_efficiency_vs_wavelength)
+
+
+def ccd_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
+    with astropy.visualization.quantity_support():
+        fig, ax = plt.subplots(
+            figsize=(column_width, 2.75),
+            constrained_layout=True,
+        )
+        wavelength = esis.optics.grating.efficiency.witness.vs_wavelength_g17()[2].to(u.AA)
+        rays = kgpy.optics.rays.Rays(
+            wavelength=wavelength,
+        )
+        ax.plot(
+            wavelength,
+            # wavelength,
+            kgpy.optics.surface.material.CCDStern1994().transmissivity(rays).to(u.percent),
+            label=r'Stern 1994',
+        )
+        ax.plot(
+            wavelength,
+            # wavelength,
+            kgpy.optics.surface.material.CCDStern2004().transmissivity(rays),
+            label=r'Stern 2004',
+        )
+        ax.add_artist(ax.legend())
+        lines = _annotate_wavelength(ax=ax)
+        ax.set_xlabel(f'wavelength ({ax.get_xlabel()})')
+        ax.set_ylabel(f'quantum efficiency ({ax.get_ylabel()})')
+        # ax.legend()
+        ax.legend(handles=lines, bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=2)
+
+        fig.set_constrained_layout_pads(h_pad=0.1)
+        return fig
+
+
+def ccd_efficiency_vs_wavelength_pdf() -> pathlib.Path:
+    return save_pdf(ccd_efficiency_vs_wavelength)

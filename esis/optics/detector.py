@@ -22,6 +22,7 @@ SurfaceT = optics.surface.Surface[
 @dataclasses.dataclass
 class Detector(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
+    serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     inclination: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
     twist: u.Quantity = 0 * u.deg
@@ -36,6 +37,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     npix_blank: int = 0
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
+    dark_current: u.Quantity = 0 * u.electron / u.s
     exposure_length_min: u.Quantity = 0 * u.s
 
     @property
@@ -114,6 +116,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
             width_y_neg=-(self.clear_half_height + self.border_width_bottom),
             width_y_pos=self.clear_half_height + self.border_width_top,
         )
+        surface.material = optics.surface.material.CCDStern2004()
         return surface
 
     def copy(self) -> 'Detector':
@@ -128,6 +131,11 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.border_width_top = self.border_width_top.copy()
         other.border_width_bottom = self.border_width_bottom.copy()
         other.dynamic_clearance = self.dynamic_clearance.copy()
+        other.npix_overscan = self.npix_overscan
+        other.npix_blank = self.npix_blank
+        other.gain = self.gain.copy()
+        other.readout_noise = self.readout_noise.copy()
+        other.exposure_length_min = self.exposure_length_min.copy()
         return other
 
     @property
@@ -141,6 +149,11 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['top border width'] = [format.quantity(self.border_width_top.to(u.mm))]
         dataframe['bottom border width'] = [format.quantity(self.border_width_bottom.to(u.mm))]
         dataframe['dynamic clearance'] = [format.quantity(self.dynamic_clearance.to(u.mm))]
+        dataframe['overscan pixels'] = [self.npix_overscan]
+        dataframe['blank pixels'] = [self.npix_blank]
+        dataframe['gain'] = [format.quantity(self.gain)]
+        dataframe['readout noise'] = [format.quantity(self.readout_noise)]
+        dataframe['minimum exposure length'] = [format.quantity(self.exposure_length_min)]
         return dataframe
 
     def apply_poletto_prescription(

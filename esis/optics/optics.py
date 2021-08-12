@@ -11,9 +11,11 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.visualization
 import astropy.time
+import astropy.constants
 import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
 import kgpy.chianti
+import kgpy.format
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 
 __all__ = ['Optics']
@@ -28,6 +30,7 @@ class Optics(
     Add test docstring to see if this is the problem.
     """
     name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
+    channel_name: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     source: Source = dataclasses.field(default_factory=Source)
     front_aperture: FrontAperture = dataclasses.field(default_factory=FrontAperture)
     central_obscuration: typ.Optional[CentralObscuration] = dataclasses.field(default_factory=CentralObscuration)
@@ -49,6 +52,8 @@ class Optics(
     pointing: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.angular)
     roll: u.Quantity = 0 * u.deg
     stray_light: u.Quantity = 0 * u.adu
+    distortion_polynomial_degree: int = 2
+    vignetting_polynomial_degree: int = 1
     vignetting_correction: polynomial.Polynomial3D = dataclasses.field(
         default_factory=lambda: polynomial.Polynomial3D(
             degree=1,
@@ -65,7 +70,7 @@ class Optics(
 
     @property
     def num_channels(self) -> int:
-        return self.system.shape[0]
+        return self.grating.cylindrical_azimuth.shape[~0]
 
     @property
     def system(self) -> optics.System:
@@ -83,11 +88,15 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                wavelength=self.bunch.wavelength[:self.num_emission_lines],
                 field_samples=self.field_samples,
                 field_is_stratified_random=self.field_is_stratified_random,
+                field_margin=1.5 * u.arcsec,
                 pupil_samples=self.pupil_samples,
                 pupil_is_stratified_random=self.pupil_is_stratified_random,
+                grid_wavelength=grid.IrregularGrid1D(
+                    points=self.wavelength,
+                    name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
+                ),
                 grid_velocity_los=self.grid_velocity_los,
                 pointing=self.pointing,
                 roll=self.roll,
@@ -97,7 +106,7 @@ class Optics(
     @property
     def rays_output(self) -> optics.rays.Rays:
         rays = self.system.rays_output.copy()
-        rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
+        rays.position = (rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)).to(u.pix)
         rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
         rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
         return rays
@@ -107,15 +116,29 @@ class Optics(
         return -self.detector.piston
 
     @property
-    def magnification(self) -> u.Quantity:
-        grating = self.grating
-        detector = self.detector
-        source_pos = vector.from_components(self.primary.focal_length)
-        grating_pos = vector.from_components(grating.piston, grating.cylindrical_radius)
-        detector_pos = vector.from_components(detector.piston, detector.cylindrical_radius)
-        entrance_arm = grating_pos - source_pos
-        exit_arm = detector_pos - grating_pos
-        return vector.length(exit_arm, keepdims=False) / vector.length(entrance_arm, keepdims=False)
+    def magnification(self):
+        rays_detector = self.system.rays_output
+        rays_fs = self.system.raytrace[self.system.surfaces_all.flat_local.index(self.field_stop.surface)]
+        scale_detector = rays_detector.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        scale_fs = rays_fs.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        return scale_fs / scale_detector
+
+    @property
+    def magnification_anamorphic(self) -> u.Quantity:
+        return np.cos(self.angle_alpha.mean()) / np.cos(self.angle_beta.mean())
+
+    @property
+    def arm_ratio(self) -> u.Quantity:
+        arm_entrance = (self.field_stop.transform.inverse + self.grating.transform).translation_eff
+        transform_ov = kgpy.transform.rigid.TransformList([
+            kgpy.transform.rigid.Translate(x=self.detector.clear_half_width / 2)
+        ])
+        arm_exit = (self.grating.transform.inverse + self.detector.transform + transform_ov).translation_eff
+        return arm_exit.length / arm_entrance.length
+
+    @property
+    def radius_ratio(self) -> u.Quantity:
+        return self.primary.radius / self.grating.tangential_radius
 
     @property
     def effective_focal_length(self) -> u.Quantity:
@@ -127,12 +150,21 @@ class Optics(
 
     @property
     def plate_scale(self) -> vector.Vector2D:
-        return self.system.rays_output.distortion().plate_scale[0].max() * (self.detector.pixel_width.to(u.mm) / u.pix)
+        return self.rays_output.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+
+    @property
+    def resolution_spatial(self) -> vector.Vector2D:
+        return 2 * u.pix * self.plate_scale
 
     @property
     def dispersion(self) -> u.Quantity:
-        val = self.system.rays_output.distortion().dispersion.max() * (self.detector.pixel_width.to(u.mm) / u.pix)
+        val = self.rays_output.distortion(self.distortion_polynomial_degree).dispersion[..., 0, 0, 0]
         return val.to(u.Angstrom / u.pix)
+
+    @property
+    def dispersion_doppler(self) -> u.Quantity:
+        val = self.dispersion / self.wavelength[..., 0] * astropy.constants.c
+        return val.to(u.km / u.s / u.pix)
     
     @property
     def field_of_view(self) -> kgpy.vector.Vector2D:
@@ -183,8 +215,17 @@ class Optics(
             self._bunch.wavelength_max = self.wavelength_max.max()
         return self._bunch
 
+    @property
+    def wavelength(self) -> u.Quantity:
+        return self.bunch.wavelength[:self.num_emission_lines]
+
+    @property
+    def wavelength_sorted(self) -> u.Quantity:
+        return np.sort(self.wavelength)
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
+        other.channel_name = self.channel_name.copy()
         other.num_emission_lines = self.num_emission_lines
         other.pupil_samples = self.pupil_samples
         other.field_samples = self.field_samples
@@ -205,6 +246,8 @@ class Optics(
         other.pointing = self.pointing.copy()
         other.roll = self.roll.copy()
         other.stray_light = self.stray_light.copy()
+        other.distortion_polynomial_degree = self.distortion_polynomial_degree
+        other.vignetting_polynomial_degree = self.vignetting_polynomial_degree
         other.vignetting_correction = self.vignetting_correction.copy()
         return other
 
@@ -1571,6 +1614,7 @@ class Optics(
             self,
             ax: matplotlib.axes.Axes,
             transform_extra: typ.Optional[kgpy.transform.rigid.TransformList] = None,
+            digits_after_decimal: int = 3,
     ):
         with astropy.visualization.quantity_support():
             if transform_extra is None:
@@ -1614,102 +1658,156 @@ class Optics(
             font_size = matplotlib.rcParams['font.size']
 
             blended_transform_x = matplotlib.transforms.blended_transform_factory(ax.transData, ax.figure.dpi_scale_trans)
-
+            # print(self.primary.mech_half_width * kgpy.vector.z_hat)
+            xh = kgpy.vector.x_hat.zx
             annotation_primary_to_fs_x = plot.annotate_component(
                 ax=ax,
-                point_1=position_primary.zx,
+                point_1=position_primary.zx + self.primary.mech_half_width * xh,
                 point_2=position_fs.zx,
                 component='x',
-                position_orthogonal=-0.2,
+                position_orthogonal=1.3,
                 transform=ax.get_xaxis_transform(),
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_fs_to_grating_x = plot.annotate_component(
                 ax=ax,
                 point_1=position_fs.zx,
-                point_2=position_grating.zx,
+                point_2=position_grating.zx + (self.grating.outer_half_width + self.grating.border_width) * xh,
                 component='x',
-                position_orthogonal=-0.2,
+                position_orthogonal=1.1,
                 transform=ax.get_xaxis_transform(),
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_fs_to_obscuration_x = plot.annotate_component(
                 ax=ax,
                 point_1=position_fs.zx,
-                point_2=position_obscuration.zx,
+                point_2=position_obscuration.zx + self.central_obscuration.obscured_half_width * xh,
                 component='x',
-                position_orthogonal=-0.3,
+                position_orthogonal=1.3,
                 # position_parallel=1,
                 # horizontal_alignment='right',
                 transform=ax.get_xaxis_transform(),
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_grating_y = plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx,
                 point_2=position_grating.zx,
                 component='y',
-                position_orthogonal=-1550,
-                position_parallel=0,
-                vertical_alignment='top',
+                position_orthogonal=-1300,
+                position_parallel=0.25,
+                horizontal_alignment='left',
+                vertical_alignment='baseline',
+                transparent=True,
+                plot_bar_1=False,
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_filter_x = plot.annotate_component(
                 ax=ax,
-                point_1=position_primary.zx,
-                point_2=position_filter.zx,
+                point_1=position_primary.zx + (self.primary.clear_half_width + self.primary.border_width) * xh,
+                point_2=position_filter.zx + self.filter.clear_radius * xh,
                 component='x',
-                position_orthogonal=-0.3,
+                position_orthogonal=1.1,
                 position_parallel=1,
                 horizontal_alignment='right',
+                vertical_alignment='center',
                 transform=ax.get_xaxis_transform(),
+                transparent=True,
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_filter_y = plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx,
                 point_2=position_filter.zx,
                 component='y',
-                position_orthogonal=-650,
-                position_parallel=0.3,
+                position_orthogonal=-200,
+                # position_parallel=0.3,
+                plot_bar_1=False,
+                digits_after_decimal=digits_after_decimal,
             )
 
             annotation_primary_to_detector_x = plot.annotate_component(
                 ax=ax,
-                point_1=position_primary.zx,
-                point_2=position_detector.zx,
+                point_1=position_primary.zx + (self.primary.clear_half_width + self.primary.border_width) * xh,
+                point_2=position_detector.zx + self.detector.clear_half_width * xh,
                 component='x',
-                position_orthogonal=-0.2,
-                position_parallel=1,
-                horizontal_alignment='left',
+                position_orthogonal=1.3,
+                position_parallel=0.5,
+                horizontal_alignment='center',
+                vertical_alignment='bottom',
                 transform=ax.get_xaxis_transform(),
+                transparent=True,
+                digits_after_decimal=digits_after_decimal,
             )
             annotation_primary_to_detector_y = plot.annotate_component(
                 ax=ax,
-                point_1=position_primary.zx,
+                point_1=position_primary.zx + self.primary.material.thickness * kgpy.vector.z_hat.zx,
                 point_2=position_detector.zx,
                 component='y',
-                position_orthogonal=-400,
-                position_parallel=0.4,
+                position_orthogonal=225,
+                # position_parallel=0.4,
+                plot_bar_1=False,
+                digits_after_decimal=digits_after_decimal,
             )
 
+            diff = (self.grating.transform)
+            default_radius = 100 * u.mm
             annotation_grating_tip = plot.annotate_angle(
                 ax=ax,
                 point_center=position_grating.zx,
-                radius=10 * self.grating.surface.aperture_mechanical.max.y,
+                # radius=15 * self.grating.surface.aperture_mechanical.max.y,
+                radius=default_radius,
                 angle_1=90 * u.deg,
                 angle_2=90 * u.deg + self.grating.inclination,
-                angle_label=90 * u.deg + self.grating.inclination / 2,
+                # angle_2=90 * u.deg - 90 * u.deg,
+                angle_label=90 * u.deg + self.grating.inclination - 2 * u.deg,
+                horizontal_alignment='left',
+                radius_inner=self.grating.outer_half_width + self.grating.border_width,
+                digits_after_decimal=digits_after_decimal,
             )
 
-    def plot_field_stop_projections(
-            self,
-            ax: matplotlib.axes.Axes,
-            wavelength_color: typ.Optional[typ.List[str]] = None
-    ):
+            annotation_filter_tip = plot.annotate_angle(
+                ax=ax,
+                point_center=position_filter.zx,
+                # radius=5 * self.filter.surface.aperture_mechanical.max.y,
+                radius=default_radius,
+                angle_1=90 * u.deg,
+                angle_2=90 * u.deg - self.filter.inclination,
+                # angle_2=90 * u.deg - 90 * u.deg,
+                angle_label=92 * u.deg - self.filter.inclination,
+                horizontal_alignment='right',
+                radius_inner=self.filter.clear_radius,
+                digits_after_decimal=digits_after_decimal,
+            )
 
-        subsystem = optics.System(
-            object_surface=self.field_stop.surface,
+            annotation_detector_tip = plot.annotate_angle(
+                ax=ax,
+                point_center=position_detector.zx,
+                # radius=10 * self.detector.surface.aperture_mechanical.max.y,
+                radius=default_radius,
+                angle_1=90 * u.deg,
+                angle_2=90 * u.deg + self.detector.inclination,
+                # angle_2=90 * u.deg - 90 * u.deg,
+                angle_label=86 * u.deg + self.detector.inclination,
+                horizontal_alignment='left',
+                radius_inner=self.detector.clear_half_width,
+                digits_after_decimal=digits_after_decimal,
+            )
+
+    @property
+    def subsystem_spectrograph(self) -> optics.System:
+        fs = self.field_stop.surface
+        fs.transform.append(kgpy.transform.rigid.TiltZ(self.roll))
+        return optics.System(
+            object_surface=fs,
             surfaces=optics.surface.SurfaceList([
                 self.grating.surface,
                 self.detector.surface,
             ]),
-            wavelength=self.wavelength,
+            grid_wavelength=kgpy.grid.IrregularGrid1D(
+                points=self.wavelength,
+                name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
+            ),
             field_samples=self.field_samples,
             field_margin=1 * u.nm,
             field_is_stratified_random=self.field_is_stratified_random,
@@ -1719,6 +1817,13 @@ class Optics(
             pointing=self.pointing,
             roll=self.roll,
         )
+
+    def plot_field_stop_projections(
+            self,
+            ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None
+    ):
+        subsystem = self.subsystem_spectrograph
 
         transform_detectors = kgpy.transform.rigid.TransformList([
             kgpy.transform.rigid.TiltZ(self.detector.cylindrical_azimuth),
@@ -1828,5 +1933,206 @@ class Optics(
                         color=wavelength_color[w],
                     )
 
+    def plot_field_stop_projections_local(
+            self,
+            ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None,
+            digits_after_decimal: int = 3,
+            use_latex: bool = False,
+    ):
+        with astropy.visualization.quantity_support():
+
+            wire = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
+            wavelength = self.wavelength_sorted
+            wire.z = wavelength
+
+            if wavelength_color is None:
+                colormap = plt.cm.rainbow_r
+                colornorm = plt.Normalize(vmin=wavelength.min().value, vmax=wavelength.max().value)
+                wavelength_color = [colormap(colornorm(wavelength[..., w].value)) for w in range(wavelength.shape[~0])]
+
+            subsystem = self.subsystem_spectrograph
+            rays = subsystem.rays_output
+            rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
+            rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
+            rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
+            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
+            wire = subsystem_model(wire)
+            wire = wire.to_3d()
+
+            if wire.ndim == 3:
+                wire = wire[np.newaxis]
+            transition = self.bunch.fullname(
+                digits_after_decimal=digits_after_decimal, use_latex=use_latex)[np.argsort(self.wavelength)]
+            intensity = self.bunch.intensity[np.argsort(self.wavelength)]
+            intensity = np.log2(intensity.value)
+            intensity = intensity / intensity.max()
+
+            for i in range(wire.shape[0]):
+                for w in range(wire.shape[~0]):
+                    if i == 0:
+                        label_kwarg = dict(label=transition[w])
+                    else:
+                        label_kwarg = dict()
+                    wire_iw = wire[i, ..., w]
+                    ax.plot(
+                        wire_iw.x,
+                        wire_iw.y,
+                        color=wavelength_color[w],
+                        alpha=intensity[w],
+                        **label_kwarg,
+                    )
+
+        ax.set_xlim(left=0, right=self.detector.num_pixels[0])
+        ax.set_ylim(bottom=0, top=self.detector.num_pixels[1])
+
+    def plot_field_stop_distortion(
+            self,
+            ax: matplotlib.axes.Axes,
+            wavelength_color: typ.Optional[typ.List[str]] = None,
+            digits_after_decimal: int = 3,
+            use_latex: bool = False,
+    ):
+        with astropy.visualization.quantity_support():
+
+            wire_fs = self.field_stop.surface.aperture.wire[..., np.newaxis, np.newaxis]
+            wavelength = self.wavelength_sorted
+            wire_fs.z = wavelength
+
+            vertices = self.field_stop.surface.aperture.vertices
+            num_grid_points = 100
+            mesh_fs = np.stack(
+                arrays=[
+                    np.linspace(vertices[1], vertices[4], num_grid_points),
+                    np.linspace(vertices[0], vertices[~2], num_grid_points),
+                    np.linspace(vertices[2], vertices[~0], num_grid_points),
+                    np.linspace(vertices[3], vertices[~1], num_grid_points),
+                ],
+                axis=~0,
+            )[..., np.newaxis]
+            mesh_fs.z = wavelength
+
+            if wavelength_color is None:
+                colormap = plt.cm.rainbow_r
+                colornorm = plt.Normalize(vmin=wavelength.min().value, vmax=wavelength.max().value)
+                wavelength_color = [colormap(colornorm(wavelength[..., w].value)) for w in range(wavelength.shape[~0])]
+
+            subsystem = self.subsystem_spectrograph
+            rays = subsystem.rays_output
+            rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
+            rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
+            rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
+            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
+            wire = subsystem_model(wire_fs)
+            mesh = subsystem_model(mesh_fs)
+            wire = wire.to_3d()
+            mesh = mesh.to_3d()
+
+            shift_x = wire.x.mean(0)
+            shift_y = wire.y.mean(0)
+            wire.x = wire.x - shift_x
+            wire.y = wire.y - shift_y
+            mesh.x = mesh.x - shift_x
+            mesh.y = mesh.y - shift_y
+
+            wire_fs.z = 0 * u.mm
+            mesh_fs.z = 0 * u.mm
+            wire_fs = subsystem.transform_roll(wire_fs)
+            mesh_fs = subsystem.transform_roll(mesh_fs)
+
+            # mag = wire.length.mean() / wire_fs.length.mean()
+            mag = self.arm_ratio * u.pix / self.detector.pixel_width.to(u.mm)
+            wire_fs.x = wire_fs.x * mag
+            wire_fs.y = wire_fs.y * mag
+            mesh_fs.x = mesh_fs.x * mag
+            mesh_fs.y = mesh_fs.y * mag
+
+            if wire.ndim == 3:
+                wire = wire[np.newaxis]
+                mesh = mesh[np.newaxis]
+            transition = self.bunch.fullname(
+                digits_after_decimal=digits_after_decimal, use_latex=use_latex)[np.argsort(self.wavelength)]
+            intensity = self.bunch.intensity[np.argsort(self.wavelength)]
+            intensity = np.log2(intensity.value)
+            intensity = intensity / intensity.max()
+
+            ax.plot(
+                wire_fs.x[..., 0, 0],
+                wire_fs.y[..., 0, 0],
+                color='black',
+                label='magnified field stop',
+                zorder=10,
+            )
+
+            ax.plot(
+                mesh_fs.x[..., 0],
+                mesh_fs.y[..., 0],
+                color='black',
+                zorder=10,
+            )
+
+            for i in range(wire.shape[0]):
+                for w in range(wire.shape[~0]):
+                    if i == 0:
+                        label_kwarg = dict(label=transition[w])
+                    else:
+                        label_kwarg = dict()
+                    wire_iw = wire[i, ..., w]
+                    mesh_iw = mesh[i, ..., w]
+                    ax.plot(
+                        wire_iw.x,
+                        wire_iw.y,
+                        color=wavelength_color[w],
+                        alpha=intensity[w],
+                        **label_kwarg,
+                    )
+                    ax.plot(
+                        mesh_iw.x,
+                        mesh_iw.y,
+                        color=wavelength_color[w],
+                        alpha=intensity[w],
+                    )
+
+    def plot_focus_curve(
+            self,
+            ax: matplotlib.axes.Axes,
+            delta_detector: u.Quantity,
+            num_samples: int,
+            digits_after_decimal: int = 3,
+            use_latex: bool = False
+    ):
+
+        delta = np.linspace(-delta_detector, delta_detector, num_samples)
+
+        spot_sizes = []
+
+        for d in delta:
+            other = self.copy()
+            other.detector.piston = other.detector.piston - d
+            s = other.rays_output.spot_size_rms
+            spot_sizes.append(s)
+
+        spot_sizes = u.Quantity(spot_sizes)
+
+        spot_sizes = np.nanmean(spot_sizes, axis=(~3, ~2, ~0))
+
+        with astropy.visualization.quantity_support():
+            for i, spot_size in enumerate(spot_sizes.T):
+                ax.plot(
+                    delta,
+                    spot_size,
+                    label=self.bunch.fullname(digits_after_decimal=digits_after_decimal, use_latex=use_latex)[i]
+                )
+
+            ax.set_xlabel(f'detector position ({ax.get_xlabel()})')
+            ax.set_ylabel(f'RMS spot radius ({ax.get_ylabel()})')
+
+    def plot_wavelength_range(
+            self,
+            ax: matplotlib.axes.Axes,
+    ):
+        ax.set_facecolor('lightgray')
+
+        ax.axvspan(xmin=self.wavelength_min, xmax=self.wavelength_max, facecolor='white', edgecolor='none')
 
 
