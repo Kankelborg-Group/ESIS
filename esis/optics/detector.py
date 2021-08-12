@@ -36,6 +36,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     npix_blank: int = 0
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
+    dark_current: u.Quantity = 0 * u.electron / u.s
     exposure_length_min: u.Quantity = 0 * u.s
 
     @property

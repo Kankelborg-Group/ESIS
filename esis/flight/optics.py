@@ -102,6 +102,13 @@ def as_measured(
         [3.9, 3.9, 4.2, 4.1],
     ] * u.adu
 
+    opt.detector.dark_current = [
+        [1.37e-4, 9.66e-5, 6.85e-5, 9.80e-5],
+        [6.77e-5, 5.89e-5, 8.98e-5, 1.01e-4],
+        [3.14e-5, 2.68e-5, 3.18e-5, 3.72e-5],
+        [6.39e-4, 5.07e-5, 6.63e-5, 8.24e-5],
+    ] * u.electron / u.ms
+
     if not all_channels:
         chan_index = esis.optics.design.default_channel_active
         opt.grating.serial_number = opt.grating.serial_number[chan_index]
