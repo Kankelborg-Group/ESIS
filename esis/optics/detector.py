@@ -37,7 +37,6 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
     exposure_length_min: u.Quantity = 0 * u.s
-    quantum_efficiency: u.Quantity = 100 * u.percent
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
@@ -135,7 +134,6 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.gain = self.gain.copy()
         other.readout_noise = self.readout_noise.copy()
         other.exposure_length_min = self.exposure_length_min.copy()
-        other.quantum_efficiency = self.quantum_efficiency.copy()
         return other
 
     @property
@@ -154,7 +152,6 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['gain'] = [format.quantity(self.gain)]
         dataframe['readout noise'] = [format.quantity(self.readout_noise)]
         dataframe['minimum exposure length'] = [format.quantity(self.exposure_length_min)]
-        dataframe['quantum efficiency'] = [format.quantity(self.quantum_efficiency)]
         return dataframe
 
     def apply_poletto_prescription(
