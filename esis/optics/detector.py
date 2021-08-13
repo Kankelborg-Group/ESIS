@@ -22,6 +22,7 @@ SurfaceT = optics.surface.Surface[
 @dataclasses.dataclass
 class Detector(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
+    manufacturer: str = ''
     serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     inclination: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
@@ -121,6 +122,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
 
     def copy(self) -> 'Detector':
         other = super().copy()  # type: Detector
+        other.manufacturer = self.manufacturer
         other.inclination = self.inclination.copy()
         other.roll = self.roll.copy()
         other.twist = self.twist.copy()
@@ -141,6 +143,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe
+        dataframe['manufacturer'] = [self.manufacturer]
         dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
         dataframe['pixel width'] = [format.quantity(self.pixel_width.to(u.um))]
         dataframe['pixel array shape'] = [self.num_pixels]
