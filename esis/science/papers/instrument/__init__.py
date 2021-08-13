@@ -125,6 +125,9 @@ def document() -> kgpy.latex.Document:
 
     optics_single = optics.as_designed_single_channel()
 
+    optics_single_m2 = esis.optics.design.final(all_channels=False)
+    optics_single_m2.grating.diffraction_order = 2
+
     optics_all = esis.flight.optics.as_measured()
 
     doc.set_variable_quantity(
@@ -266,6 +269,23 @@ def document() -> kgpy.latex.Document:
     doc.set_variable(
         name='MgXdim',
         value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
+    )
+
+    wavelength_m2 = optics_single_m2.bunch.wavelength
+    ion_m2 = kgpy.chianti.to_spectroscopic(optics_single_m2.bunch.ion)
+    index_he2 = np.nonzero(optics_single_m2.bunch.ion == 'he_2')[0][0]
+    doc.set_variable_quantity(
+        name='HeIIwavelength',
+        value=wavelength_m2[index_he2],
+        digits_after_decimal=wavl_digits,
+    )
+    doc.set_variable(
+        name='HeIIion',
+        value=pylatex.NoEscape(ion_m2[index_he2])
+    )
+    doc.set_variable(
+        name='HeII',
+        value=pylatex.NoEscape(r'\HeIIion\ \HeIIwavelength')
     )
 
     doc.set_variable(
