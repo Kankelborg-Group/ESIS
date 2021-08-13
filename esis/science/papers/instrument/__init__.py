@@ -686,6 +686,11 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable(
+        name='detectorAnalogToDigitalBits',
+        value=str(optics_single.detector.bits_analog_to_digital)
+    )
+
+    doc.set_variable(
         name='defaultPupilSamples',
         value=figures.kwargs_optics_default['pupil_samples'],
     )
