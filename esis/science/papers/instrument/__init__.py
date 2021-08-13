@@ -1070,7 +1070,7 @@ The combined \ESIS/\MOSES\ mission will address the following two overarching sc
 \item observe magnetic reconnection in the \TR\label{item-goal1}, and \item map the transfer of energy through the \TR\ 
 with emphasis on \MHD\ waves\label{item-goal2}. \end{inparaenum}
 These objectives have significant overlap with the missions of \IRIS~\citep{IRIS14}, the \EIS~\citep{Culhane07}
-aboard Hinode, the \EUNIS~\citep{Brosius07,Brosius14}, and a long history of FUV and EUV slit spectrographs.
+aboard Hinode, the \EUNIS~\citep{Brosius07,Brosius14}, and a long history of FUV and \EUV\ slit spectrographs.
 The \ESIS\ instrument, however, can obtain both spatial and spectral information co-temporally.
 This will allow us to resolve complicated morphologies of compact \TR\ reconnection events (as was done with 
 \MOSES~\citep{Fox11,Rust17,Courrier18}) and observe signatures of \MHD\ waves over a large portion of the solar disk.
@@ -1913,7 +1913,7 @@ Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in \
 In the conceptual phase of \ESIS, the decision was made to perform focus and alignment in visible light with a HeNe 
 source.
 Certain difficulties are introduced by this choice, however, the benefits outweigh the operational complexity and 
-equipment that would be required for focus in EUV.
+equipment that would be required for focus in \EUV.
 Moreover, a sounding rocket instrument requires robust, adjustment-free mounts to survive the launch environment.
 Such a design is not amenable to iterative adjustment in vacuum.  The choice of alignment wavelength is arbitrary for 
 most components;
@@ -1921,7 +1921,7 @@ most components;
 The exceptions are the thin film filters (which will not be installed until just before launch and have no affect on 
 telescope alignment and focus) and the diffraction gratings.
 Visible light gratings have been manufactured specifically for alignment and focus.
-These gratings are identical to the EUV flight version, but with a ruling pattern scaled to a 
+These gratings are identical to the \EUV\ flight version, but with a ruling pattern scaled to a 
 \SI{632.8}{\nano\meter} wavelength.
 """
             ))
@@ -1940,19 +1940,19 @@ Trapezoidal grating, bipods, and mounting plate are installed on the tuffet in f
             doc.append(pylatex.NoEscape(
                 r"""
 After alignment and focus has been obtained with the HeNe source, the instrument will be prepared for flight by 
-replacing the visible gratings by the EUV flight versions.
-Each grating (EUV and alignment) is individually mounted to a backing plate using a bipod system similar to that of the 
+replacing the visible gratings by the \EUV\ flight versions.
+Each grating (\EUV\ and alignment) is individually mounted to a backing plate using a bipod system similar to that of the 
 primary mirror.
 The array of gratings on their backing plates are in turn mounted to a single part which we call the `tuffet.'
 The backing plate is attached to the tuffet by bolts through spherical washers.
 With this mounting scheme, the gratings can be individually aligned in tip/tilt.
 The tuffet is attached to the secondary mirror mount structure (Fig.~\ref{F-alt}).
 This enables the entire grating array to be replaced simply by removing/installing the tuffet, such as when switching 
-between alignment and EUV gratings.
+between alignment and \EUV\ gratings.
 
 Properly positioning the gratings will be the most difficult aspect of final telescope assembly.
 Table~\ref{table:tol} shows that the telescope is very sensitive to defocus.
-The depth of field is an order of magnitude smaller in EUV than in visible light.
+The depth of field is an order of magnitude smaller in \EUV\ than in visible light.
 Moreover, the sensitivity to defocus at the gratings is $M^2+1=17$ times greater than at the detectors.
 Another sensitive aspect of the telescope is grating tip/tilt.
 A tolerance of $\sim\pm$\SI{0.5}{\milli\radian} will be needed to insure that the entire image lands on the active area 
@@ -1960,13 +1960,13 @@ of the \CCD.
 
 Once the visible gratings are aligned and focused, the challenge is to transfer this alignment to the UV gratings.
 \citet{Johnson18} describes a procedure and the apparatus constructed to accurately transfer the position of an 
-alignment grating radius to an EUV flight grating.
+alignment grating radius to an \EUV\ flight grating.
 This device, displayed in Fig.~\ref{F-alt}, consists of an array of three miniature confocal microscopes that record the 
 position of the alignment grating radius.
-The alignment grating is replaced by an EUV grating, which is then measured into position by the same apparatus.
+The alignment grating is replaced by an \EUV\ grating, which is then measured into position by the same apparatus.
 This device (and procedure) is capable of obtaining position measurements of the diffraction gratings to a repeatability 
 of $\approx$\SI{14}{\micro\meter} in the three confocal channels.
-This alignment transfer apparatus will ensure that the EUV flight gratings are positioned to within the tolerances 
+This alignment transfer apparatus will ensure that the \EUV\ flight gratings are positioned to within the tolerances 
 described in Table~\ref{table:tol}."""
             ))
 
@@ -2231,11 +2231,11 @@ A companion paper will describe \ESIS\ first results~\citep{Parker_inprep}.
 Two significant changes, one to the \ESIS\ instrument and one to our alignment procedures, were made prior to launch and 
 are summarized below.
 
-The transfer from visible to EUV grating alignment was completed by an alternative means.
+The transfer from visible to \EUV\ grating alignment was completed by an alternative means.
 The apparatus described by~\citet{Johnson18} was not able to maintain sufficient repeatability during test runs on 
 diffraction grating surfaces.
 To maintain the launch schedule, a phase shifting interferometer was used to transfer the alignment of the visible 
-gratings to the EUV flight gratings. 
+gratings to the \EUV\ flight gratings. 
 
 A trade study was conducted, and it was decided to remove the primary aperture stop. The advantage was an increase in 
 sensitivity.
@@ -2273,7 +2273,7 @@ a future orbital instrument.
 For the first flight, four of the six available \ESIS\ channels will be populated with optics optimized around the 
 O\,\textsc{v} emission line.
 The large (\SI{11.3}{\arcminute}), high resolution FOV (\SI{1.52}{\arcsecond}, \SI{74}{\milli\angstrom}) can 
-simultaneously observe the evolution of small scale EUV flows and large scale MHD waves in high temporal cadence. 
+simultaneously observe the evolution of small scale \EUV\ flows and large scale MHD waves in high temporal cadence. 
 \ESIS\ also enables the study of transport of mass and energy in the transition region and corona during the $\sim 5$ 
 minute data collection portion of rocket flight.
 
