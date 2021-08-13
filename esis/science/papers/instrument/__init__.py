@@ -720,7 +720,8 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('SOHO', 'Solar and Heliospheric Observatory'))
     doc.preamble.append(kgpy.latex.Acronym('CDS', 'Coronal Diagnostic Spectrometer', short=True))
     doc.preamble.append(kgpy.latex.Acronym('MDI', r'Michelson Doppler Imager'))
-    doc.preamble.append(kgpy.latex.Acronym('CLASP', r'Chromospheric Lyman-alpha Spectro-polarimeter '))
+    doc.preamble.append(kgpy.latex.Acronym('CLASP', r'Chromospheric Lyman-alpha Spectro-polarimeter'))
+    doc.preamble.append(kgpy.latex.Acronym('HiC', r'High-Resolution Coronal Imager', 'Hi-C'))
     doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('EUV', 'extreme ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
@@ -1753,7 +1754,7 @@ and near normal incidence angle, the total reflectivity in first order is $\sim$
 This is confirmed by the first order efficiency measured from a single \ESIS\ grating in the lower panel of 
 Figure~\ref{fig:componentEfficiencyVsWavelength}.  
 
-Unlike \EUV\ imagers (\eg, \TRACE~\citep{Handy99}, \AIA~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
+Unlike \EUV\ imagers (\eg, \TRACE~\citep{Handy99}, \AIA~\citep{Lemen12}, and the \HiC~\citep{Kobayashi2014}) 
 the \ESIS\ passband is defined by a combination of the field stop and grating (\S\,\ref{subsec:Optics}, 
 Fig.~\ref{fig:projections}) rather than multi-layer \roy{multilayer} coatings.
 The coating selectivity is therefore not critical in this respect, allowing the multi-layer \roy{multilayer} to be manipulated to 
@@ -2047,7 +2048,7 @@ Thin film filters and filter tubes are not installed in this image."""
                 r"""
 The \ESIS\ \CCD\ cameras were designed and constructed by \MSFC\ and are the latest in a 
 series of camera systems developed specifically for use on solar space flight instruments.
-The \ESIS\ camera heritage includes those flown on both the \CLASP~\citep{Kano12,Kobayashi12} and the High-Resolution Coronal Imager (Hi-C)\citep{Kobayashi2014}.
+The \ESIS\ camera heritage includes those flown on both the \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
 
 The \ESIS\ detectors are CCD230-42 astro-process \CCDs\ from E2V.
 For each camera, the \CCD\ is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
@@ -2161,7 +2162,7 @@ Camera & Quad & Gain & Read Noise & Dark Current \\
         with doc.create(pylatex.Subsection('Avionics')):
             doc.append(pylatex.NoEscape(
                 r"""
-The \ESIS\ DACS are based on the designs used for both \CLASP~\citep{Kano12,Kobayashi12} and Hi-C~\citep{Kobayashi2014}.
+The \ESIS\ DACS are based on the designs used for both \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
 The electronics are a combination of Military Off-The-Shelf (MOTS) hardware and custom designed components.
 The DACS is a 6-slot, 3U, open VPX PCIe architecture conduction cooled system using an AiTech C873 single board
 computer.
