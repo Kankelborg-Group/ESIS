@@ -717,6 +717,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('IRIS', r'Interface Region Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('EIS', 'EUV Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('EUNIS', 'EUV Normal-incidence Spectrometer'))
+    doc.preamble.append(kgpy.latex.Acronym('SOHO', 'Solar and Heliospheric Observatory'))
     doc.preamble.append(kgpy.latex.Acronym('CDS', 'Coronal Diagnostic Spectrometer', short=True))
     doc.preamble.append(kgpy.latex.Acronym('MDI', r'Michelson Doppler Imager'))
     doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
@@ -1798,7 +1799,7 @@ stored in a nitrogen purged environment until after payload vibration testing.""
             doc.append(pylatex.NoEscape(
                 r"""
 Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the \CCD\ \QE\ listed in Table~\ref{table:prescription}.
-Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the SOHO/\CDS\ \citep{Harrison95} data.
+Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data.
 The \SI{100}{\percent} duty cycle of \ESIS\ (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
 So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant SNR penalty.
 Table~\ref{table:count} shows that \ESIS\ is effectively shot noise limited with a \SI{10}{\second} exposure.
