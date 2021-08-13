@@ -862,7 +862,7 @@ The similarities end there, however, as the optical layout of \ESIS\ differs sig
 In this section, we detail some difficulties and limitations encountered with \MOSES, then describe how the new design 
 of \ESIS\ addresses these issues."""
         ))
-        with doc.create(pylatex.Subsection('Limitations of the MOSES Design')):
+        with doc.create(pylatex.Subsection(pylatex.NoEscape('Limitations of the \MOSES\ Design'))):
             doc.append(pylatex.NoEscape(
                 r"""The \MOSES\ design features a single concave diffraction grating forming images on three \CCD\ 
 detectors~\citep{Fox10} (Fig.~\ref{fig:mosesSchematic}). 
@@ -882,7 +882,7 @@ orthogonal planes."""
             with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
                 moses_schematic.add_image('figures/old/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
                 moses_schematic.add_caption(pylatex.NoEscape(
-                    r"""Schematic diagram of the MOSES instrument.
+                    r"""Schematic diagram of the \MOSES\ instrument.
 Incident light on the right forms an undispersed image on the central $m=0$ \CCD.
 Dispersed images are formed on the outboard $m=\pm1$ \CCDs."""
                 ))
@@ -920,7 +920,7 @@ The single diffraction grating also leads to a compromise in the optical perform
 Since the \MOSES\ grating forms images in three orders simultaneously, aberration cannot be simultaneously optimized for 
 all three of those spectral orders.
 A result of this design is that the orientations (\ie\,the central axis) of the \PSFs\ vary order to order~\citep{Rust17}.
-During the first mission, MOSES was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
+During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
 inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
 The combination of these two effects results in spurious spectral features that require additional 
 consideration~\citep{Atwood18} and further increase the complexity of the inversion process~\citep{Rust17,Courrier18}.
@@ -991,7 +991,7 @@ Sect.~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
 
 Replacing the secondary mirror with an array of concave diffraction gratings confers several advantages to \ESIS\ over 
 \MOSES.
-First, the magnification of the \ESIS\ gratings results in a shorter axial length than MOSES, without sacrificing 
+First, the magnification of the \ESIS\ gratings results in a shorter axial length than \MOSES, without sacrificing 
 spatial or spectral resolution.
 Second, the magnification and tilt of an individual grating controls the position of the dispersed image with respect 
 to the optical axis, so that the spectral resolution is not as constrained by the payload dimensions.
@@ -1211,7 +1211,7 @@ reconnection in explosive events, and the transport of mass and energy through t
 The latter may take many forms, from \MHD\ waves of various modes to \EUV\ jets or macro-spicules.
 To fulfill these goals, \ESIS\ will obtain simultaneous intensity, Doppler shift and line width images of the \OV\ line 
 in the solar transition region at rapid cadence.
-This is a lower \TR\ line (\SI{.25}{\mega\kelvin}) that complements the MOSES Ne\,\textsc{vii}.
+This is a lower \TR\ line (\SI{.25}{\mega\kelvin}) that complements the \MOSES\ Ne\,\textsc{vii}.
 The bright, optically thin \OVion\ emission line is well isolated except for the two coronal \MgXion\ lines.
 These coronal lines can be viewed as contamination or as a bonus;
 we expect that with the \numChannelsWords\ \ESIS\ projections it will be possible to separate the \OVion\ emission from 
@@ -2191,7 +2191,7 @@ $\sim$\SI{16}{\second} to verify pointing is maintained during flight."""
         with doc.create(pylatex.Subsection('Mechanical')):
             doc.append(pylatex.NoEscape(
                 r"""
-\ESIS\ and MOSES are mounted on opposite sides of a composite optical table structure originally developed for the Solar 
+\ESIS\ and \MOSES\ are mounted on opposite sides of a composite optical table structure originally developed for the Solar 
 Plasma Diagnostics Experiment rocket mission (SPDE,~\citet{Bruner95lock}).
 The layered carbon fiber structure features a convenient, precisely coplanar array of threaded inserts with precision 
 counterbores.
@@ -2225,7 +2225,7 @@ helicopter after the payload is located on the ground."""
                 r"""
 Since the time of writing \ESIS\ launched and was recovered successfully from White Sands Missile Range on 
 September 30, 2019.
-Unfortunately, due to failure of the mechanical shutter, no MOSES data was obtained during this flight.
+Unfortunately, due to failure of the mechanical shutter, no \MOSES\ data was obtained during this flight.
 A  paper is forthcoming that will document the \ESIS\ instrument in its as-flown configuration~\citep{Courrier_inprep}.
 A companion paper will describe \ESIS\ first results~\citep{Parker_inprep}.
 Two significant changes, one to the \ESIS\ instrument and one to our alignment procedures, were made prior to launch and 
@@ -2260,7 +2260,7 @@ transition region and corona.
 In this report, we present details of the scientific objectives, instrument, image and spectral resolution, data 
 acquisition, and flight profile.
 
-\ESIS\ follows on the proven MOSES design, incorporating several design changes to improve the utility of the instrument.
+\ESIS\ follows on the proven \MOSES\ design, incorporating several design changes to improve the utility of the instrument.
 The symmetrical arrangement of CCDs and diffraction gratings results in a compact instrument while increasing the number 
 of dispersed images and dispersion planes.
 This aids the inversion process, while also allowing access to higher order spectral line profile moments.
