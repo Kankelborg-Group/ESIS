@@ -1070,7 +1070,7 @@ The combined \ESIS/\MOSES\ mission will address the following two overarching sc
 \item observe magnetic reconnection in the \TR\label{item-goal1}, and \item map the transfer of energy through the \TR\ 
 with emphasis on \MHD\ waves\label{item-goal2}. \end{inparaenum}
 These objectives have significant overlap with the missions of \IRIS~\citep{IRIS14}, the \EIS~\citep{Culhane07}
-aboard Hinode, the \EUNIS~\citep{Brosius07,Brosius14}, and a long history of FUV and \EUV\ slit spectrographs.
+aboard Hinode, the \EUNIS~\citep{Brosius07,Brosius14}, and a long history of \FUV\ and \EUV\ slit spectrographs.
 The \ESIS\ instrument, however, can obtain both spatial and spectral information co-temporally.
 This will allow us to resolve complicated morphologies of compact \TR\ reconnection events (as was done with 
 \MOSES~\citep{Fox11,Rust17,Courrier18}) and observe signatures of \MHD\ waves over a large portion of the solar disk.
