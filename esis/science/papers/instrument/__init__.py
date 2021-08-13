@@ -739,6 +739,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
     doc.preamble.append(kgpy.latex.Acronym('MTF', 'modulation transfer function'))
     doc.preamble.append(kgpy.latex.Acronym('LBNL', 'Lawrence Berkley National Laboratory'))
+    doc.preamble.append(kgpy.latex.Acronym('VR', pylatex.NoEscape('\citet{Vernazza78}'), pylatex.NoEscape('V\&R')))
 
     doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
@@ -1781,7 +1782,7 @@ The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93
 Fig.~\ref{fig:componentEfficiencyVsWavelength}.
 We conservatively estimate filter oxidation at the time of launch as a 4nm \roy{\filterOxideThickness} thick layer of Al$_2$O$_3$.
 
-An Al \roy{\Al} filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight box with a 
+An Al \roy{\Al} filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight \roy{light-tight} box with a 
 labyrinthine evacuation vent (e.g., Fig.~\ref{F-cameras}).
 The placement of the filter relative to the \CCD\ is optimized so that the filter mesh shadow is not visible.
 By modeling the filter mesh shadow, we find that a position far from the \CCD\ ($>$\SI{200}{\milli\meter} \roy{\filterToDetectorDistance}) and mesh grid
@@ -1797,7 +1798,7 @@ stored in a nitrogen purged environment until after payload vibration testing.""
             doc.append(pylatex.NoEscape(
                 r"""
 Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the \CCD\ \QE\ listed in Table~\ref{table:prescription}.
-Line intensities are derived from \citet{Vernazza78} (V\&R) and the SOHO/\CDS\ \citep{Harrison95} data.
+Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the SOHO/\CDS\ \citep{Harrison95} data.
 The \SI{100}{\percent} duty cycle of \ESIS\ (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
 So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant SNR penalty.
 Table~\ref{table:count} shows that \ESIS\ is effectively shot noise limited with a \SI{10}{\second} exposure.
@@ -1886,7 +1887,7 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
             with table.create(pylatex.Center()) as centering:
                 with centering.create(pylatex.Tabular('llrrrr')) as tabular:
                     tabular.escape = False
-                    tabular.add_row([r'Source', r'', r'V\&R', r'V\&R', r'V\&R', r'\CDS'])
+                    tabular.add_row([r'Source', r'', r'\VR', r'\VR', r'\VR', r'\CDS'])
                     tabular.add_row(r'Solar context', r'', r'\QS', r'\CH', r'\AR', r'\AR')
                     tabular.add_hline()
                     tabular.add_row([label, r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
