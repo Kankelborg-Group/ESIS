@@ -740,6 +740,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
     doc.preamble.append(kgpy.latex.Acronym('MTF', 'modulation transfer function'))
     doc.preamble.append(kgpy.latex.Acronym('LBNL', 'Lawrence Berkley National Laboratory'))
+    doc.preamble.append(kgpy.latex.Acronym('MSFC', 'Marshall Space Flight Center', short=True))
     doc.preamble.append(kgpy.latex.Acronym('VR', pylatex.NoEscape('\citet{Vernazza78}'), pylatex.NoEscape('V\&R')))
 
     doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
@@ -2036,14 +2037,14 @@ A model of the six baffles, showing cutouts and position on the optical bench, i
                 figure.add_image('figures/old/ESIS_Cameras_1gr_text', width=kgpy.latex.columnwidth)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-\ESIS\ camera assembly as built by MSFC.  
+\ESIS\ camera assembly as built by \MSFCShort.  
 Thin film filters and filter tubes are not installed in this image."""
                 ))
                 figure.append(kgpy.latex.Label('F-cameras'))
 
             doc.append(pylatex.NoEscape(
                 r"""
-The \ESIS\ \CCD\ cameras were designed and constructed by Marshall Space Flight Center (MSFC), and are the latest in a 
+The \ESIS\ \CCD\ cameras were designed and constructed by \MSFC\ and are the latest in a 
 series of camera systems developed specifically for use on solar space flight instruments.
 The \ESIS\ camera heritage includes those flown on both the Chromospheric Lyman-Alpha Spectro-Polarimeter 
 (CLASP)~\citep{Kano12,Kobayashi12} and the High-Resolution Coronal Imager (Hi-C)\citep{Kobayashi2014}.
@@ -2071,7 +2072,7 @@ The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second}.
 Shutterless operation allows \ESIS\ to observe with a \SI{100}{\percent} duty cycle.
 The cadence is limited only by the 1.1\,s readout time. 
 
-MSFC custom designed the camera board, enclosure, and mounting structure for \ESIS\ to fit the unique packaging 
+\MSFC\ custom designed the camera board, enclosure, and mounting structure for \ESIS\ to fit the unique packaging 
 requirements of this experiment (Fig~\ref{F-cameras}).
 The front part of the camera is a metal block which equalizes the temperature across the \CCD\ while fastening it in 
 place.
@@ -2084,7 +2085,7 @@ The LN2 flow will be controlled automatically by a Ground Support Equipment (GSE
 maintained above survival temperature but below the target temperature of \SI{-55}{\celsius} to insure a negligible dark 
 current level.
 
-The gain, read noise, and dark current of the four cameras were measured at MSFC using an ${}^{55}$Fe radioactive 
+The gain, read noise, and dark current of the four cameras were measured at \MSFC\ using an ${}^{55}$Fe radioactive 
 source.
 Cameras are labeled 1, 2, 3, and 4 with associated serial numbers SN6, SN7, SN9, and SN10 respectively in 
 Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
@@ -2164,7 +2165,7 @@ The \ESIS\ DACS are based on the designs used for both CLASP~\citep{Kano12,Kobay
 The electronics are a combination of Military Off-The-Shelf (MOTS) hardware and custom designed components.
 The DACS is a 6-slot, 3U, open VPX PCIe architecture conduction cooled system using an AiTech C873 single board
 computer.
-The data system also include a MOTS PCIe switch card, MSFC parallel interface card, and two MOTS Spacewire cards.
+The data system also include a MOTS PCIe switch card, \MSFC\ parallel interface card, and two MOTS Spacewire cards.
 A slot for an additional Spacewire card is included to accommodate two more cameras for the next \ESIS\ flight.
 The C873 has a \SI{2.4}{\giga\hertz} Intel i7 processor with \SI{16}{\giga b} of memory.
 The operating temperature range for the data system is -40 to +85 C.
