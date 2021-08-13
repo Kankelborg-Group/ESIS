@@ -274,9 +274,10 @@ def document() -> kgpy.latex.Document:
     wavelength_m2 = optics_single_m2.bunch.wavelength
     ion_m2 = kgpy.chianti.to_spectroscopic(optics_single_m2.bunch.ion)
     index_he2 = np.nonzero(optics_single_m2.bunch.ion == 'he_2')[0][0]
+    wavelength_he2 = wavelength_m2[index_he2]
     doc.set_variable_quantity(
         name='HeIIwavelength',
-        value=wavelength_m2[index_he2],
+        value=wavelength_he2,
         digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
@@ -542,6 +543,15 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='gratingWitnessEfficiency',
         value=grating_witness_efficiency,
+        digits_after_decimal=0,
+    )
+
+    rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
+    grating_witness_efficiency_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
+    grating_rejection_ratio_he2 = (grating_witness_efficiency_he2 / grating_witness_efficiency).to(u.percent)
+    doc.set_variable_quantity(
+        name='gratingHeIIRejectionRatio',
+        value=grating_rejection_ratio_he2,
         digits_after_decimal=0,
     )
 
