@@ -641,6 +641,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    doc.set_variable_quantity(
+        name='filterToDetectorDistance',
+        value=optics_single.filter.piston - optics_single.detector.piston,
+        digits_after_decimal=0,
+    )
+
     doc.set_variable(
         name='detectorName',
         value=str(optics_single.detector.name),
