@@ -246,6 +246,7 @@ def final(
     filter.cylindrical_radius = 95.9 * u.mm
     filter.cylindrical_azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
+    filter.clocking = 45 * u.deg
     filter.clear_radius = 15 * u.mm
     filter.thickness = 100 * u.nm
     filter.thickness_oxide = 4 * u.nm
