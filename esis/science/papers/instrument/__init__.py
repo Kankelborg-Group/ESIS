@@ -222,7 +222,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='OV',
-        value=pylatex.NoEscape(r'\OVion\ \OVwavelength')
+        value=pylatex.NoEscape(r'\OVion~\OVwavelength')
     )
 
     index_he1 = np.nonzero(optics_single.bunch.ion == 'he_1')[0][0]
@@ -237,7 +237,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='HeI',
-        value=pylatex.NoEscape(r'\HeIion\ \HeIwavelength')
+        value=pylatex.NoEscape(r'\HeIion~\HeIwavelength')
     )
 
     index_mg10 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][0]
@@ -252,7 +252,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='MgX',
-        value=pylatex.NoEscape(r'\MgXion\ \MgXwavelength')
+        value=pylatex.NoEscape(r'\MgXion~\MgXwavelength')
     )
 
     index_mg10_2 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][1]
@@ -268,7 +268,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='MgXdim',
-        value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
+        value=pylatex.NoEscape(r'\MgXdimIon~\MgXdimWavelength')
     )
 
     wavelength_m2 = optics_single_m2.bunch.wavelength
@@ -285,7 +285,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='HeII',
-        value=pylatex.NoEscape(r'\HeIIion\ \HeIIwavelength')
+        value=pylatex.NoEscape(r'\HeIIion~\HeIIwavelength')
     )
 
     doc.set_variable(
