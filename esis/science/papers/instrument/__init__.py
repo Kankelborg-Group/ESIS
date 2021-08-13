@@ -1784,7 +1784,7 @@ We conservatively estimate filter oxidation at the time of launch as a 4nm \roy{
 An Al \roy{\Al} filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight box with a 
 labyrinthine evacuation vent (e.g., Fig.~\ref{F-cameras}).
 The placement of the filter relative to the \CCD\ is optimized so that the filter mesh shadow is not visible.
-By modeling the filter mesh shadow, we find that a position far from the CCD ($>$\SI{200}{\milli\meter} \roy{\filterToDetectorDistance}) and mesh grid
+By modeling the filter mesh shadow, we find that a position far from the \CCD\ ($>$\SI{200}{\milli\meter} \roy{\filterToDetectorDistance}) and mesh grid
 clocking of \SI{45}{\degree} \roy{\filterClocking} to the detector array reduces the shadow amplitude well below photon statistics.
 The \MOSES\ instrument utilizes a similar design;
 no detectable signature of the filter mesh is found in data and inversion residuals from the 2006 \MOSES\ flight.
@@ -1917,7 +1917,7 @@ equipment that would be required for focus in EUV.
 Moreover, a sounding rocket instrument requires robust, adjustment-free mounts to survive the launch environment.
 Such a design is not amenable to iterative adjustment in vacuum.  The choice of alignment wavelength is arbitrary for 
 most components;
-CCD response and multilayer coating reflectively is sufficient across a wide band a visible wavelengths.
+\CCD\ response and multilayer coating reflectively is sufficient across a wide band a visible wavelengths.
 The exceptions are the thin film filters (which will not be installed until just before launch and have no affect on 
 telescope alignment and focus) and the diffraction gratings.
 Visible light gratings have been manufactured specifically for alignment and focus.
@@ -1956,7 +1956,7 @@ The depth of field is an order of magnitude smaller in EUV than in visible light
 Moreover, the sensitivity to defocus at the gratings is $M^2+1=17$ times greater than at the detectors.
 Another sensitive aspect of the telescope is grating tip/tilt.
 A tolerance of $\sim\pm$\SI{0.5}{\milli\radian} will be needed to insure that the entire image lands on the active area 
-of the CCD.
+of the \CCD.
 
 Once the visible gratings are aligned and focused, the challenge is to transfer this alignment to the UV gratings.
 \citet{Johnson18} describes a procedure and the apparatus constructed to accurately transfer the position of an 
@@ -1985,7 +1985,7 @@ described in Table~\ref{table:tol}."""
 Each channel of \ESIS\ has two apertures: one at the surface of the grating and another in front of the primary mirror.
 The purpose of the aperture at the grating is to mask the out-of-figure margins at the edges of these optics.
 This provides a well defined edge to the clear aperture of each grating while also keeping unwanted rays from being 
-reflected from the grating margins and back onto the CCDs.
+reflected from the grating margins and back onto the \CCDs.
 The dimensions of the grating aperture match those of the grating clear aperture shown in Figure~\ref{fig:schematic}c. 
 
 The aperture placed at the primary mirror is the stop for each individual channel.
@@ -2011,7 +2011,7 @@ From Figure~\ref{fig:schematic}c it is apparent that considerable surface area o
 non-vignetting stop design.
 The primary apertures could be enlarged considerably if the vignetting constraint were to be relaxed.
 
-The \ESIS\ baffles are designed to block direct light paths between the front aperture plate and the CCDs for any ray 
+The \ESIS\ baffles are designed to block direct light paths between the front aperture plate and the \CCDs\ for any ray 
 $<$\SI{1.4}{\degree} from the optical axis.
 This angle is purposefully larger than the angular diameter of the sun ($\sim$\SI{0.5}{\degree}) so that any direct 
 paths are excluded from bright sources in the solar corona.
@@ -2022,7 +2022,7 @@ The light path from the primary mirror to the field stop is defined as the volum
 primary mirror aperture mask (e.g., Fig.~\ref{fig:schematic}) to every vertex of the octagonal field stop.
 This is a conservative definition that ensures no rays within the FOV are excluded, and therefore unintentionally 
 vignetted by the baffles.  Light paths from the field stop to the grating, and from the grating to the image formed on 
-the CCD, are defined in a similar manner.
+the \CCD, are defined in a similar manner.
 The cutouts in the baffles are sized using the projection of these light paths onto the baffle surface.
 A conservative \SI{1}{\milli\meter} margin is added to each cutout to prevent unintentional vignetting.
 A model of the six baffles, showing cutouts and position on the optical bench, is displayed in Fig.~\ref{F-Baff1}."""
@@ -2041,13 +2041,13 @@ Thin film filters and filter tubes are not installed in this image."""
 
             doc.append(pylatex.NoEscape(
                 r"""
-The \ESIS\ CCD cameras were designed and constructed by Marshall Space Flight Center (MSFC), and are the latest in a 
+The \ESIS\ \CCD\ cameras were designed and constructed by Marshall Space Flight Center (MSFC), and are the latest in a 
 series of camera systems developed specifically for use on solar space flight instruments.
 The \ESIS\ camera heritage includes those flown on both the Chromospheric Lyman-Alpha Spectro-Polarimeter 
 (CLASP)~\citep{Kano12,Kobayashi12} and the High-Resolution Coronal Imager (Hi-C)\citep{Kobayashi2014}.
 
-The \ESIS\ detectors are CCD230-42 astro-process CCDs from E2V.
-For each camera, the CCD is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
+The \ESIS\ detectors are CCD230-42 astro-process \CCDs\ from E2V.
+For each camera, the \CCD\ is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
 converter.
 The central $2048 \times 1024$ pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
 used for storage.
@@ -2071,7 +2071,7 @@ The cadence is limited only by the 1.1\,s readout time.
 
 MSFC custom designed the camera board, enclosure, and mounting structure for \ESIS\ to fit the unique packaging 
 requirements of this experiment (Fig~\ref{F-cameras}).
-The front part of the camera is a metal block which equalizes the temperature across the CCD while fastening it in 
+The front part of the camera is a metal block which equalizes the temperature across the \CCD\ while fastening it in 
 place.
 The carriers of all cameras are connected to a central two-piece copper (\SI{3}{\kilo\gram}) and aluminum 
 (\SI{1}{\kilo\gram}) thermal reservoir (cold block) by flexible copper cold straps.
@@ -2088,10 +2088,10 @@ Cameras are labeled 1, 2, 3, and 4 with associated serial numbers SN6, SN7, SN9,
 Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
-The \QE\ of the \ESIS\ CCDs will not be measured before flight.
-Similar astro-process CCDs with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
+The \QE\ of the \ESIS\ \CCDs\ will not be measured before flight.
+Similar astro-process \CCDs\ with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
 Orbiting Environmental Satellites (GOES) N and O.
-A \QE\ range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the \ESIS\ CCDs, based on \QE\ measurements by 
+A \QE\ range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
 \citet{Stern04} for GOES SXI instruments.
 
 \begin{table}[!htb]
@@ -2261,7 +2261,7 @@ In this report, we present details of the scientific objectives, instrument, ima
 acquisition, and flight profile.
 
 \ESIS\ follows on the proven \MOSES\ design, incorporating several design changes to improve the utility of the instrument.
-The symmetrical arrangement of CCDs and diffraction gratings results in a compact instrument while increasing the number 
+The symmetrical arrangement of \CCDs\ and diffraction gratings results in a compact instrument while increasing the number 
 of dispersed images and dispersion planes.
 This aids the inversion process, while also allowing access to higher order spectral line profile moments.
 Individual gratings improve resolution by controlling aberration in each channel.
