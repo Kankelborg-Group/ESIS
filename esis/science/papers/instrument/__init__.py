@@ -733,6 +733,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('AR', 'active region'))
     doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole'))
     doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
+    doc.preamble.append(kgpy.latex.Acronym('QE', 'quantum efficiency', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
     doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
     doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
@@ -2087,10 +2088,10 @@ Cameras are labeled 1, 2, 3, and 4 with associated serial numbers SN6, SN7, SN9,
 Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
-The Quantum Efficiency (QE) of the ESIS CCDs will not be measured before flight.
+The \QE\ of the ESIS CCDs will not be measured before flight.
 Similar astro-process CCDs with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
 Orbiting Environmental Satellites (GOES) N and O.
-A QE range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the ESIS CCDs, based on QE measurements by 
+A \QE\ range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the ESIS CCDs, based on \QE\ measurements by 
 \citet{Stern04} for GOES SXI instruments.
 
 \begin{table}[!htb]
