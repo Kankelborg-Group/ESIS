@@ -272,6 +272,7 @@ def final(
     detector.time_frame_transfer = 60 * u.ms
     detector.time_readout = 1.1 * u.s
     detector.exposure_length_min = 2 * u.s
+    detector.exposure_length_max = 600 * u.s
     detector.bits_analog_to_digital = 16
     if all_channels:
         detector.plot_kwargs['linestyle'] = dashstyle_channels
