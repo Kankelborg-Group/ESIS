@@ -369,12 +369,6 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
-        name='minCadence',
-        value=optics_single.detector.exposure_length_min,
-        digits_after_decimal=1,
-    )
-
-    doc.set_variable_quantity(
         name='primaryDiameter',
         value=2 * optics_single.primary.clear_half_width,
         digits_after_decimal=0,
@@ -712,6 +706,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=1,
     )
 
+    doc.set_variable_quantity(
+        name='detectorMinExposureLength',
+        value=optics_single.detector.exposure_length_min,
+        digits_after_decimal=1,
+    )
+
     doc.set_variable(
         name='detectorAnalogToDigitalBits',
         value=str(optics_single.detector.bits_analog_to_digital)
@@ -805,9 +805,9 @@ This field stop is re-imaged  using an array of \numChannelsWords\ spherical dif
 ispersion angles relative to ...? [ I want to say relative to solar north or field stop north or something], with each 
 diffraction grating projecting the spectrum onto a unique detector.}
 The slitless multi-projection design will obtain co-temporal spatial (\plateScale) and spectral (\dispersion) images 
-at high cadence ($>=$\minCadence). 
+at high cadence ($>=$\detectorMinExposureLength). 
 \amy{The instrument is designed to be capable of obtaining co-temporal spatial (\plateScale) and spectral 
-(\dispersion) images at high cadence ($>=$\minCadence).}
+(\dispersion) images at high cadence ($>=$\detectorMinExposureLength).}
 \amy{Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
 at high spatial and spectral resolution over a large (\fov) \FOV. 
 The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. }
@@ -1393,7 +1393,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'Active area', r'\detectorPixelsX\ $\times$ \detectorPixelsY'])
                     tabular.add_row([r'', r'Pixel size', r'\detectorPixelSize'])
                     tabular.add_row([r'', r'Quantum efficiency \roy{(\OV)}', r'33\% \roy{\detectorQuantumEfficiency}'])
-                    tabular.add_row([r'', r'Minumum cadence', r'\minCadence'])
+                    tabular.add_row([r'', r'Minumum cadence', r'\detectorMinExposureLength'])
 
                     tabular.add_hline()
                     tabular.add_row([r'System', r'Magnification', r'\magnification'])
