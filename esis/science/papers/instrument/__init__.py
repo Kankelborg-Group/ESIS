@@ -679,6 +679,21 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    doc.set_variable(
+        name='detectorNumOverscanColumns',
+        value=str(optics_single.detector.npix_overscan),
+    )
+
+    doc.set_variable(
+        name='detectorNumOverscanColumnWords',
+        value=num2words.num2words(optics_single.detector.npix_overscan),
+    )
+
+    doc.set_variable(
+        name='DetectorNumOverscanColumnWords',
+        value=num2words.num2words(optics_single.detector.npix_overscan).title(),
+    )
+
     doc.set_variable_quantity(
         name='detectorQuantumEfficiency',
         value=optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent),
@@ -2066,7 +2081,7 @@ For each camera, the \CCD\ is operated in a split frame transfer mode with each 
 converter.
 The central $2048 \times 1024$ pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
 used for storage.
-Two overscan columns on either side of the imaging area and eight extra rows in each storage region will monitor read 
+Two \roy{\DetectorNumOverscanColumnWords} overscan columns on either side of the imaging area and eight extra rows in each storage region will monitor read 
 noise and dark current.
 When the camera receives the trigger signal, it transfers the image from the imaging region to the storage regions and 
 starts image readout.
