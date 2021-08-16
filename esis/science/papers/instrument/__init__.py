@@ -706,6 +706,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0
     )
 
+    doc.set_variable_quantity(
+        name='detectorReadoutTime',
+        value=optics_single.detector.time_readout,
+        digits_after_decimal=1,
+    )
+
     doc.set_variable(
         name='detectorAnalogToDigitalBits',
         value=str(optics_single.detector.bits_analog_to_digital)
@@ -2094,7 +2100,7 @@ When the camera receives the trigger signal, it transfers the image from the ima
 starts image readout.
 The digitized data are sent to the \DACS\ through a SpaceWire interface immediately, 
 one line at a time.
-The frame transfer takes $<$\SI{60}{\milli\second} \roy{\detectorFrameTransferTime}, and readout takes \SI{1.1}{\second}.
+The frame transfer takes $<$\SI{60}{\milli\second} \roy{\detectorFrameTransferTime}, and readout takes \SI{1.1}{\second} \roy{\detectorReadoutTime}.
 The cadence is adjustable from 2-\SI{600}{\second} in increments of \SI{100}{\milli\second}, to satisfy the requirement 
 listed in Table~\ref{table:scireq}.
 Because the imaging region is continuously illuminated, the action of frame transfer (transferring the image from the 
@@ -2104,7 +2110,7 @@ Camera 1 (Fig.~\ref{F-cameras}) generates the sync trigger, which is fed back in
 independently buffered triggers to the remaining three cameras.
 The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second}.
 Shutterless operation allows \ESIS\ to observe with a \SI{100}{\percent} duty cycle.
-The cadence is limited only by the 1.1\,s readout time. 
+The cadence is limited only by the 1.1\,s \roy{\detectorReadoutTime} readout time. 
 
 \MSFC\ custom designed the camera board, enclosure, and mounting structure for \ESIS\ to fit the unique packaging 
 requirements of this experiment (Fig~\ref{F-cameras}).
