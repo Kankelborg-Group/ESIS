@@ -700,6 +700,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0
     )
 
+    doc.set_variable_quantity(
+        name='detectorFrameTransferTime',
+        value=optics_single.detector.time_frame_transfer,
+        digits_after_decimal=0
+    )
+
     doc.set_variable(
         name='detectorAnalogToDigitalBits',
         value=str(optics_single.detector.bits_analog_to_digital)
@@ -2088,7 +2094,7 @@ When the camera receives the trigger signal, it transfers the image from the ima
 starts image readout.
 The digitized data are sent to the \DACS\ through a SpaceWire interface immediately, 
 one line at a time.
-The frame transfer takes $<$\SI{60}{\milli\second}, and readout takes \SI{1.1}{\second}.
+The frame transfer takes $<$\SI{60}{\milli\second} \roy{\detectorFrameTransferTime}, and readout takes \SI{1.1}{\second}.
 The cadence is adjustable from 2-\SI{600}{\second} in increments of \SI{100}{\milli\second}, to satisfy the requirement 
 listed in Table~\ref{table:scireq}.
 Because the imaging region is continuously illuminated, the action of frame transfer (transferring the image from the 

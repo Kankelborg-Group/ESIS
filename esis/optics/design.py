@@ -269,6 +269,7 @@ def final(
     detector.npix_blank = 50
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
+    detector.time_frame_transfer = 60 * u.ms
     detector.exposure_length_min = 1.2 * u.s
     detector.bits_analog_to_digital = 16
     if all_channels:
