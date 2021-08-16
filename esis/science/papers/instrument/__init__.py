@@ -104,8 +104,9 @@ def document() -> kgpy.latex.Document:
         '425 Riverside Dr., #16G, New York, NY 10025, USA'
     )
 
-    doc.append(kgpy.latex.aas.Author('Hans T. Courrier', affil_msu))
     doc.append(kgpy.latex.aas.Author('Roy T. Smart', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Hans T. Courrier', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Jacob D. Parker', affil_msu))
     doc.append(kgpy.latex.aas.Author('Charles C. Kankelborg', affil_msu))
     doc.append(kgpy.latex.aas.Author('Amy R. Winebarger', affil_msfc))
     doc.append(kgpy.latex.aas.Author('Ken Kobayashi', affil_msfc))
@@ -116,7 +117,6 @@ def document() -> kgpy.latex.Document:
     doc.append(kgpy.latex.aas.Author('James A. Duffy', affil_msfc))
     doc.append(kgpy.latex.aas.Author('Eric Gullikson', affil_lbnl))
     doc.append(kgpy.latex.aas.Author('Micah Johnson', affil_msu))
-    doc.append(kgpy.latex.aas.Author('Jacob D. Parker', affil_msu))
     doc.append(kgpy.latex.aas.Author('Laurel Rachmeler', affil_msfc))
     doc.append(kgpy.latex.aas.Author('Larry Springer', affil_msu))
     doc.append(kgpy.latex.aas.Author('David L. Windt', affil_rxo))
