@@ -713,6 +713,22 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable(
+        name='detectorMinExposureLengthValue',
+        value=f'{optics_single.detector.exposure_length_min.value:0.0f}',
+    )
+
+    doc.set_variable_quantity(
+        name='detectorMaxExposureLength',
+        value=optics_single.detector.exposure_length_max,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='detectorExposureLengthRange',
+        value=pylatex.NoEscape(r'\detectorMinExposureLengthValue-\detectorMaxExposureLength'),
+    )
+
+    doc.set_variable(
         name='detectorAnalogToDigitalBits',
         value=str(optics_single.detector.bits_analog_to_digital)
     )
@@ -2101,7 +2117,7 @@ starts image readout.
 The digitized data are sent to the \DACS\ through a SpaceWire interface immediately, 
 one line at a time.
 The frame transfer takes $<$\SI{60}{\milli\second} \roy{\detectorFrameTransferTime}, and readout takes \SI{1.1}{\second} \roy{\detectorReadoutTime}.
-The cadence is adjustable from 2-\SI{600}{\second} in increments of \SI{100}{\milli\second}, to satisfy the requirement 
+The cadence is adjustable from 2-\SI{600}{\second} \roy{\detectorExposureLengthRange} in increments of \SI{100}{\milli\second}, to satisfy the requirement 
 listed in Table~\ref{table:scireq}.
 Because the imaging region is continuously illuminated, the action of frame transfer (transferring the image from the 
 imaging region to the storage regions) also starts the next exposure without delay.
