@@ -1991,10 +1991,10 @@ Once the visible gratings were aligned and focused, the challenge is to transfer
 gratings.
 We preformed this transfer using a 4D Phasecam 6000 interferometer.
 We aligned the interferometer to each visible grating such that the tip, tilt, and defocus aberrations were zero.
-Then, placing the corresponding flight grating in the alignment grating's place, we shimmed the mounting screws of the 
+Then, placing the corresponding flight grating in the visible grating's place, we shimmed the mounting screws of the 
 flight grating to match the tip, tilt, and defocus of the alignment grating.
 Since the mounting interface for the tuffet is extremely repeatable by design we were able to swap tuffets and compare 
-there alignment and focus to ensure everything was transferred correctly.
+their alignment and focus to ensure everything was transferred correctly.
 
 When transferring the focus and alignment two key details were considered.
 First, there is nothing about the tuffet that constrains the grating roll.
@@ -2003,8 +2003,8 @@ This was accomplished by using a HeNe laser diverged a cylindrical optic that il
 perpendicular to the grating blaze direction.
 The line of light was reflected back onto a ruled target that could be compared between gratings.
 Since our alignment gratings were ruled to image light of approximately an order of magnitude longer wavelength the
-laser and cylindrical optic were placed at the position of Littrow for the 1st order image in the visible grating,
-and the 10th order for the \EUV\ gratings.
+laser and cylindrical optic were placed at the position of Littrow for the 10th order image in the visible grating,
+and the 1st order for the \EUV\ gratings.
 Second, during testing we measured slight differences in radius of curvature between each grating. 
 Therefore each flight grating was prescribed a specific amount of defocus to account for the differnce in radius of
 curvature between each optic when transferring alignment and focus.
