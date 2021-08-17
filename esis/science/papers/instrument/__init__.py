@@ -1391,8 +1391,8 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'Output angle (\OV)', r'\gratingOutputAngle'])
                     tabular.add_row([r'', r'Manufacturing process', r'Individual master gratings'])
                     tabular.add_row([r'', r'Coating', r'Mg/Al/SiC \roy{\gratingCoatingMaterialShort} multilayer, optimized for \OVwavelength'])
+                    tabular.add_row([r'', r'Groove efficiency \roy{(\OV)}', r'\SI{39}{\percent} \roy{\gratingGrooveEfficiency}'])
                     tabular.add_row([r'', r'Efficiency \roy{(\OV)}', r'\SI{14}{\percent} \roy{\gratingEfficiency}'])
-                    tabular.add_row([r'', r'Uncoated efficiency \roy{(\OV)}', r'\SI{39}{\percent} \roy{\gratingGrooveEfficiency}'])
 
                     tabular.add_hline()
                     tabular.add_row([r'Filters (\numChannels)', r'Aperture shape', r'Circular'])
