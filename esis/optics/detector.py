@@ -43,6 +43,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     time_readout: u.Quantity = 0 * u.s
     exposure_length_min: u.Quantity = 0 * u.s
     exposure_length_max: u.Quantity = 0 * u.s
+    exposure_length_increment: u.Quantity = 0 * u.s
     bits_analog_to_digital: int = 0
 
     @property
@@ -145,6 +146,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.time_readout = self.time_readout.copy()
         other.exposure_length_min = self.exposure_length_min.copy()
         other.exposure_length_max = self.exposure_length_max.copy()
+        other.exposure_length_increment = self.exposure_length_increment.copy()
         other.bits_analog_to_digital = self.bits_analog_to_digital
         return other
 
@@ -168,6 +170,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['readout time'] = [format.quantity(self.time_readout)]
         dataframe['minimum exposure length'] = [format.quantity(self.exposure_length_min)]
         dataframe['maximum exposure length'] = [format.quantity(self.exposure_length_max)]
+        dataframe['exposure length increment'] = [format.quantity(self.exposure_length_increment)]
         dataframe['analog-to-digital bits'] = [self.bits_analog_to_digital]
         return dataframe
 
