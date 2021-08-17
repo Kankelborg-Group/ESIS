@@ -1946,6 +1946,8 @@ These gratings are identical to the \EUV\ flight version, but with a ruling patt
                 figure.add_image('figures/old/Alignment_transfer_1gr_text', width=kgpy.latex.columnwidth)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
+\jake{Will update this figure.  Will include a rendering of the secondary mount pointing to the tuffet, grating
+backplate, bipod, etc. Capturing the same as before but without TEA.}
 \ESIS\ alignment transfer device, consisting of three miniature confocal microscopes that translate along the optical 
 axis.  
 Trapezoidal grating, bipods, and mounting plate are installed on the tuffet in front of the apparatus 
@@ -1971,19 +1973,42 @@ Table~\ref{table:tol} shows that the telescope is very sensitive to defocus.
 The depth of field is an order of magnitude smaller in \EUV\ than in visible light.
 Moreover, the sensitivity to defocus at the gratings is $M^2+1=17$ times greater than at the detectors.
 Another sensitive aspect of the telescope is grating tip/tilt.
-A tolerance of $\sim\pm$\SI{0.5}{\milli\radian} will be needed to insure that the entire image lands on the active area 
+A tolerance of $\sim\pm$\SI{0.5}{\milli\radian} will be needed to ensure that the entire image lands on the active area 
 of the \CCD.
 
-Once the visible gratings are aligned and focused, the challenge is to transfer this alignment to the UV gratings.
-\citet{Johnson18} describes a procedure and the apparatus constructed to accurately transfer the position of an 
-alignment grating radius to an \EUV\ flight grating.
-This device, displayed in Fig.~\ref{F-alt}, consists of an array of three miniature confocal microscopes that record the 
-position of the alignment grating radius.
-The alignment grating is replaced by an \EUV\ grating, which is then measured into position by the same apparatus.
-This device (and procedure) is capable of obtaining position measurements of the diffraction gratings to a repeatability 
-of $\approx$\SI{14}{\micro\meter} in the three confocal channels.
-This alignment transfer apparatus will ensure that the \EUV\ flight gratings are positioned to within the tolerances 
-described in Table~\ref{table:tol}."""
+%Once the visible gratings are aligned and focused, the challenge is to transfer this alignment to the UV gratings.
+%\citet{Johnson18} describes a procedure and the apparatus constructed to accurately transfer the position of an 
+%alignment grating radius to an \EUV\ flight grating.
+%This device, displayed in Fig.~\ref{F-alt}, consists of an array of three miniature confocal microscopes that record the 
+%position of the alignment grating radius.
+%The alignment grating is replaced by an \EUV\ grating, which is then measured into position by the same apparatus.
+%This device (and procedure) is capable of obtaining position measurements of the diffraction gratings to a repeatability 
+%of $\approx$\SI{14}{\micro\meter} in the three confocal channels.
+%This alignment transfer apparatus will ensure that the \EUV\ flight gratings are positioned to within the tolerances 
+%described in Table~\ref{table:tol}.
+
+Once the visible gratings were aligned and focused, the challenge is to transfer this alignment to the \EUV\ flight 
+gratings.
+We preformed this transfer using a 4D Phasecam 6000 interferometer.
+We aligned the interferometer to each visible grating such that the tip, tilt, and defocus aberrations were zero.
+Then, placing the corresponding flight grating in the alignment grating's place, we shimmed the mounting screws of the 
+flight grating to match the tip, tilt, and defocus of the alignment grating.
+Since the mounting interface for the tuffet is extremely repeatable by design we were able to swap tuffets and compare 
+there alignment and focus to ensure everything was transferred correctly.
+
+When transferring the focus and alignment two key details were considered.
+First, there is nothing about the tuffet that constrains the grating roll.
+Therefore, we ensured the same roll existed on each flight gratings as was used to align \ESIS\ in visible light.
+This was accomplished by using a HeNe laser diverged a cylindrical optic that illuminated each grating with a line
+perpendicular to the grating blaze direction.
+The line of light was reflected back onto a ruled target that could be compared between gratings.
+Since our alignment gratings were ruled to image light of approximately an order of magnitude longer wavelength the
+laser and cylindrical optic were placed at the position of Littrow for the 1st order image in the visible grating,
+and the 10th order for the \EUV\ gratings.
+Second, during testing we measured slight differences in radius of curvature between each grating. 
+Therefore each flight grating was prescribed a specific amount of defocus to account for the differnce in radius of
+curvature between each optic when transferring alignment and focus.
+"""
             ))
 
         with doc.create(pylatex.Subsection('Apertures and Baffles')):
