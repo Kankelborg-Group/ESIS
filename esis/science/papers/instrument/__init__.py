@@ -1710,7 +1710,7 @@ design."""
 \begin{table*}[!htb]
 \caption{Imaging error budget and tolerance analysis results.  \MTF\ is given at \protect\SI{0.5}{cycles\per arcsecond}.}
 \begin{tabular}{llrcc}
-Element 	&	  		& Tolerance & $\sigma^2$ $[\mu m]$ & \MTF \\
+Element 	&	  		& Tolerance & $\sigma$ $[\mu m]$ & \MTF \\
 \hline %-----------------------------------------------------------------------------
 Primary M.	& Surface figure & (Ref. Table~\ref{table:surfaces}) & & 0.700 \\
 			& Decenter	& 1 \si{\milli\meter}		& 1.700 	& 0.881 \\
