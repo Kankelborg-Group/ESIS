@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, transform, optics, format
+from kgpy import Name, transform, optics, format, units
 
 __all__ = ['Filter']
 
@@ -14,11 +14,13 @@ SurfT = optics.surface.Surface[None, None, optics.surface.aperture.Circular, opt
 class Filter(optics.component.CylindricalComponent[SurfT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('filter'))
     inclination: u.Quantity = 0 * u.deg
+    clocking: u.Quantity = 0 * u.deg
     clear_radius: u.Quantity = 0 * u.mm
     border_width: u.Quantity = 0 * u.mm
     thickness: u.Quantity = 0 * u.mm
     thickness_oxide: u.Quantity = 0 * u.mm
     mesh_ratio: u.Quantity = 100 * u.percent
+    mesh_pitch: u.Quantity = 0 * units.line / u.imperial.inch
     mesh_material: str = ''
 
     @property
@@ -50,20 +52,24 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
     def copy(self) -> 'Filter':
         other = super().copy()      # type: Filter
         other.inclination = self.inclination.copy()
+        other.clocking = self.clocking.copy()
         other.clear_radius = self.clear_radius.copy()
         other.border_width = self.border_width.copy()
         other.thickness = self.thickness.copy()
         other.thickness_oxide = self.thickness_oxide.copy()
         other.mesh_ratio = self.mesh_ratio.copy()
+        other.mesh_pitch = self.mesh_pitch.copy()
         return other
 
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe
         dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
+        dataframe['clocking'] = [format.quantity(self.clocking.to(u.deg))]
         dataframe['clear radius'] = [format.quantity(self.clear_radius.to(u.mm))]
         dataframe['border width'] = [format.quantity(self.border_width.to(u.mm))]
         dataframe['thickness'] = [format.quantity(self.thickness.to(u.nm))]
         dataframe['oxide thickness'] = [format.quantity(self.thickness_oxide.to(u.nm))]
         dataframe['mesh ratio'] = [format.quantity(self.mesh_ratio.to(u.percent))]
+        dataframe['mesh pitch'] = [format.quantity(self.mesh_pitch)]
         return dataframe

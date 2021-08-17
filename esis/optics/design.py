@@ -98,6 +98,7 @@ import dataclasses
 
 import numpy as np
 from astropy import units as u
+import kgpy.units
 from kgpy import Name, vector
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
 
@@ -245,16 +246,19 @@ def final(
     filter.cylindrical_radius = 95.9 * u.mm
     filter.cylindrical_azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
+    filter.clocking = 45 * u.deg
     filter.clear_radius = 15 * u.mm
     filter.thickness = 100 * u.nm
     filter.thickness_oxide = 4 * u.nm
     filter.mesh_ratio = 82 * u.percent
+    filter.mesh_pitch = 70 * kgpy.units.line / u.imperial.inch
     filter.mesh_material = 'Ni'
     if all_channels:
         filter.plot_kwargs['linestyle'] = dashstyle_channels
 
     detector = Detector()
-    detector.name = Name('E2V CCD230-42')
+    detector.name = Name('CCD230-42')
+    detector.manufacturer = 'E2V'
     detector.piston = filter.piston - 200 * u.mm
     detector.cylindrical_radius = 108 * u.mm
     detector.cylindrical_azimuth = channel_angle.copy()
@@ -266,6 +270,7 @@ def final(
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
     detector.exposure_length_min = 1.2 * u.s
+    detector.bits_analog_to_digital = 16
     if all_channels:
         detector.plot_kwargs['linestyle'] = dashstyle_channels
 

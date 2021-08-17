@@ -125,6 +125,9 @@ def document() -> kgpy.latex.Document:
 
     optics_single = optics.as_designed_single_channel()
 
+    optics_single_m2 = esis.optics.design.final(all_channels=False)
+    optics_single_m2.grating.diffraction_order = 2
+
     optics_all = esis.flight.optics.as_measured()
 
     doc.set_variable_quantity(
@@ -219,7 +222,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='OV',
-        value=pylatex.NoEscape(r'\OVion\ \OVwavelength')
+        value=pylatex.NoEscape(r'\OVion~\OVwavelength')
     )
 
     index_he1 = np.nonzero(optics_single.bunch.ion == 'he_1')[0][0]
@@ -234,7 +237,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='HeI',
-        value=pylatex.NoEscape(r'\HeIion\ \HeIwavelength')
+        value=pylatex.NoEscape(r'\HeIion~\HeIwavelength')
     )
 
     index_mg10 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][0]
@@ -249,7 +252,7 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='MgX',
-        value=pylatex.NoEscape(r'\MgXion\ \MgXwavelength')
+        value=pylatex.NoEscape(r'\MgXion~\MgXwavelength')
     )
 
     index_mg10_2 = np.nonzero(optics_single.bunch.ion == 'mg_10')[0][1]
@@ -265,7 +268,25 @@ def document() -> kgpy.latex.Document:
     )
     doc.set_variable(
         name='MgXdim',
-        value=pylatex.NoEscape(r'\MgXdimIon\ \MgXdimWavelength')
+        value=pylatex.NoEscape(r'\MgXdimIon~\MgXdimWavelength')
+    )
+
+    wavelength_m2 = optics_single_m2.bunch.wavelength
+    ion_m2 = kgpy.chianti.to_spectroscopic(optics_single_m2.bunch.ion)
+    index_he2 = np.nonzero(optics_single_m2.bunch.ion == 'he_2')[0][0]
+    wavelength_he2 = wavelength_m2[index_he2]
+    doc.set_variable_quantity(
+        name='HeIIwavelength',
+        value=wavelength_he2,
+        digits_after_decimal=wavl_digits,
+    )
+    doc.set_variable(
+        name='HeIIion',
+        value=pylatex.NoEscape(ion_m2[index_he2])
+    )
+    doc.set_variable(
+        name='HeII',
+        value=pylatex.NoEscape(r'\HeIIion~\HeIIwavelength')
     )
 
     doc.set_variable(
@@ -525,6 +546,15 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
+    grating_witness_efficiency_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
+    grating_rejection_ratio_he2 = (grating_witness_efficiency_he2 / grating_witness_efficiency).to(u.percent)
+    doc.set_variable_quantity(
+        name='gratingHeIIRejectionRatio',
+        value=grating_rejection_ratio_he2,
+        digits_after_decimal=0,
+    )
+
     doc.set_variable_quantity(
         name='gratingGrooveEfficiency',
         value=(grating_efficiency / grating_witness_efficiency).to(u.percent),
@@ -561,6 +591,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='filterClocking',
+        value=optics_single.filter.clocking,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
         name='filterDiameter',
         value=optics_single.filter.clear_diameter,
         digits_after_decimal=1,
@@ -589,6 +625,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    doc.set_variable_quantity(
+        name='filterMeshPitch',
+        value=optics_single.filter.mesh_pitch,
+        digits_after_decimal=0,
+    )
+
     doc.set_variable(
         name='filterMeshMaterial',
         value=pylatex.NoEscape(f'\\{optics_single.filter.mesh_material}'),
@@ -605,9 +647,20 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    doc.set_variable_quantity(
+        name='filterToDetectorDistance',
+        value=optics_single.filter.piston - optics_single.detector.piston,
+        digits_after_decimal=0,
+    )
+
     doc.set_variable(
         name='detectorName',
         value=str(optics_single.detector.name),
+    )
+
+    doc.set_variable(
+        name='detectorManufacturer',
+        value=optics_single.detector.manufacturer,
     )
 
     doc.set_variable(
@@ -630,6 +683,11 @@ def document() -> kgpy.latex.Document:
         name='detectorQuantumEfficiency',
         value=optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent),
         digits_after_decimal=0
+    )
+
+    doc.set_variable(
+        name='detectorAnalogToDigitalBits',
+        value=str(optics_single.detector.bits_analog_to_digital)
     )
 
     doc.set_variable(
@@ -669,8 +727,11 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('IRIS', r'Interface Region Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('EIS', 'EUV Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('EUNIS', 'EUV Normal-incidence Spectrometer'))
+    doc.preamble.append(kgpy.latex.Acronym('SOHO', 'Solar and Heliospheric Observatory'))
     doc.preamble.append(kgpy.latex.Acronym('CDS', 'Coronal Diagnostic Spectrometer', short=True))
     doc.preamble.append(kgpy.latex.Acronym('MDI', r'Michelson Doppler Imager'))
+    doc.preamble.append(kgpy.latex.Acronym('CLASP', r'Chromospheric Lyman-alpha Spectro-polarimeter'))
+    doc.preamble.append(kgpy.latex.Acronym('HiC', r'High-Resolution Coronal Imager', 'Hi-C'))
     doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('EUV', 'extreme ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
@@ -685,11 +746,14 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('AR', 'active region'))
     doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole'))
     doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
+    doc.preamble.append(kgpy.latex.Acronym('QE', 'quantum efficiency', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
     doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
     doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
     doc.preamble.append(kgpy.latex.Acronym('MTF', 'modulation transfer function'))
     doc.preamble.append(kgpy.latex.Acronym('LBNL', 'Lawrence Berkley National Laboratory'))
+    doc.preamble.append(kgpy.latex.Acronym('MSFC', 'Marshall Space Flight Center', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('VR', pylatex.NoEscape('\citet{Vernazza78}'), pylatex.NoEscape('V\&R')))
 
     doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
@@ -800,7 +864,7 @@ brief description of the expected mission profile in Section~\ref{sec:MissionPro
 The current status and progress toward launch is summarized in Section~\ref{sec:ConclusionsandOutlook}."""
         ))
 
-    with doc.create(pylatex.Section('The ESIS Concept')):
+    with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Concept'))):
         doc.append(pylatex.NoEscape(
             r"""A primary goal of the \ESIS\ instrument is to improve the implementation of \EUV\ snapshot imaging 
 spectroscopy demonstrated by \MOSES.  
@@ -813,7 +877,7 @@ The similarities end there, however, as the optical layout of \ESIS\ differs sig
 In this section, we detail some difficulties and limitations encountered with \MOSES, then describe how the new design 
 of \ESIS\ addresses these issues."""
         ))
-        with doc.create(pylatex.Subsection('Limitations of the MOSES Design')):
+        with doc.create(pylatex.Subsection(pylatex.NoEscape('Limitations of the \MOSES\ Design'))):
             doc.append(pylatex.NoEscape(
                 r"""The \MOSES\ design features a single concave diffraction grating forming images on three \CCD\ 
 detectors~\citep{Fox10} (Fig.~\ref{fig:mosesSchematic}). 
@@ -833,7 +897,7 @@ orthogonal planes."""
             with doc.create(pylatex.Figure(position='!ht')) as moses_schematic:
                 moses_schematic.add_image('figures/old/MOSES_Schematic', width=pylatex.NoEscape(r'\columnwidth'))
                 moses_schematic.add_caption(pylatex.NoEscape(
-                    r"""Schematic diagram of the MOSES instrument.
+                    r"""Schematic diagram of the \MOSES\ instrument.
 Incident light on the right forms an undispersed image on the central $m=0$ \CCD.
 Dispersed images are formed on the outboard $m=\pm1$ \CCDs."""
                 ))
@@ -871,7 +935,7 @@ The single diffraction grating also leads to a compromise in the optical perform
 Since the \MOSES\ grating forms images in three orders simultaneously, aberration cannot be simultaneously optimized for 
 all three of those spectral orders.
 A result of this design is that the orientations (\ie\,the central axis) of the \PSFs\ vary order to order~\citep{Rust17}.
-During the first mission, MOSES was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
+During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
 inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
 The combination of these two effects results in spurious spectral features that require additional 
 consideration~\citep{Atwood18} and further increase the complexity of the inversion process~\citep{Rust17,Courrier18}.
@@ -913,7 +977,7 @@ In designing \ESIS, we have sought to improve upon each of these points.
 """
             ))
 
-        with doc.create(pylatex.Subsection('ESIS Features')):
+        with doc.create(pylatex.Subsection(pylatex.NoEscape('\ESIS\ Features'))):
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
                 figure.add_image('figures/old/layout', width=pylatex.NoEscape(r'\textwidth'))
 
@@ -942,7 +1006,7 @@ Sect.~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
 
 Replacing the secondary mirror with an array of concave diffraction gratings confers several advantages to \ESIS\ over 
 \MOSES.
-First, the magnification of the \ESIS\ gratings results in a shorter axial length than MOSES, without sacrificing 
+First, the magnification of the \ESIS\ gratings results in a shorter axial length than \MOSES, without sacrificing 
 spatial or spectral resolution.
 Second, the magnification and tilt of an individual grating controls the position of the dispersed image with respect 
 to the optical axis, so that the spectral resolution is not as constrained by the payload dimensions.
@@ -984,7 +1048,7 @@ observed in \MOSES\ data (\S\,\ref{subsec:LimitationsoftheMOSESDesign} limitatio
 Second, each spectral image observed by \ESIS\ will be bordered by the outline of the field stop 
 (\eg\,\S\,\ref{subsec:Optics}).
 This aids the inversion process since outside of this sharp edge the intensity is zero for any look angle through an 
-ESIS data cube.
+\ESIS\ data cube.
 Additionally, the symmetry of the field stop gives multiple checkpoints where the edge inversion is duplicated in the 
 dispersed images produced by adjacent orders.
 The size and octagonal shape of the field stop are defined by the requirement that all \CCDs\ must see the entire \FOV\ 
@@ -1021,7 +1085,7 @@ The combined \ESIS/\MOSES\ mission will address the following two overarching sc
 \item observe magnetic reconnection in the \TR\label{item-goal1}, and \item map the transfer of energy through the \TR\ 
 with emphasis on \MHD\ waves\label{item-goal2}. \end{inparaenum}
 These objectives have significant overlap with the missions of \IRIS~\citep{IRIS14}, the \EIS~\citep{Culhane07}
-aboard Hinode, the \EUNIS~\citep{Brosius07,Brosius14}, and a long history of FUV and EUV slit spectrographs.
+aboard Hinode, the \EUNIS~\citep{Brosius07,Brosius14}, and a long history of \FUV\ and \EUV\ slit spectrographs.
 The \ESIS\ instrument, however, can obtain both spatial and spectral information co-temporally.
 This will allow us to resolve complicated morphologies of compact \TR\ reconnection events (as was done with 
 \MOSES~\citep{Fox11,Rust17,Courrier18}) and observe signatures of \MHD\ waves over a large portion of the solar disk.
@@ -1162,7 +1226,7 @@ reconnection in explosive events, and the transport of mass and energy through t
 The latter may take many forms, from \MHD\ waves of various modes to \EUV\ jets or macro-spicules.
 To fulfill these goals, \ESIS\ will obtain simultaneous intensity, Doppler shift and line width images of the \OV\ line 
 in the solar transition region at rapid cadence.
-This is a lower \TR\ line (\SI{.25}{\mega\kelvin}) that complements the MOSES Ne\,\textsc{vii}.
+This is a lower \TR\ line (\SI{.25}{\mega\kelvin}) that complements the \MOSES\ Ne\,\textsc{vii}.
 The bright, optically thin \OVion\ emission line is well isolated except for the two coronal \MgXion\ lines.
 These coronal lines can be viewed as contamination or as a bonus;
 we expect that with the \numChannelsWords\ \ESIS\ projections it will be possible to separate the \OVion\ emission from 
@@ -1232,12 +1296,12 @@ $n_e T = $\,\chiantiPressure.}"""
                                 r'\fov, Table~\ref{table:prescription}',
                             ])
                         table.add_caption(pylatex.NoEscape(
-                            r"""ESIS instrument requirements.  
+                            r"""\ESIS\ instrument requirements.  
 AR is active region, QS quiet sun, and CH coronal hole."""
                         ))
                         table.append(kgpy.latex.Label('table:scireq'))
 
-    with doc.create(pylatex.Section('The ESIS Instrument')):
+    with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Instrument'))):
         doc.append(pylatex.NoEscape(
             r"""\ESIS\ is a multiple projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
 widths in a single snapshot over a 2D \FOV.
@@ -1296,7 +1360,8 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'\roy{Efficiency (\OV)}', r'\roy{\filterEfficiency}'])
 
                     tabular.add_hline()
-                    tabular.add_row([r'Detectors (\numChannels)', r'Model', r'\detectorName'])
+                    tabular.add_row([r'Detectors (\numChannels)', r'Manufacturer', r'\detectorManufacturer'])
+                    tabular.add_row([r'', r'Model', r'\detectorName'])
                     tabular.add_row([r'', r'Active area', r'\detectorPixelsX\ $\times$ \detectorPixelsY'])
                     tabular.add_row([r'', r'Pixel size', r'\detectorPixelSize'])
                     tabular.add_row([r'', r'Quantum efficiency \roy{(\OV)}', r'33\% \roy{\detectorQuantumEfficiency}'])
@@ -1589,7 +1654,7 @@ The value of $\sigma$ then corresponds to the maximum change in RMS spot size fo
 tolerance analysis described above.
 The value of the \MTF\ in the right-most column of Table~\ref{table:tol} is computed from 
 each of the gaussian blur terms at the Nyquist frequency (\SI{0.5}{cycles\per arcsecond}).
-From Table~\ref{table:tol}, we estimate the total \MTF\ of ESIS to be $0.109$ at the Nyquist frequency.
+From Table~\ref{table:tol}, we estimate the total \MTF\ of \ESIS\ to be $0.109$ at the Nyquist frequency.
 Compared to, for example, the Rayleigh criterion of \SI{0.09}{cycles\per arcsecond}~\citep{Rayleigh_1879} we estimate 
 the resolution of \ESIS\ to be essentially pixel limited.
 Since \ESIS\ pixels span \SI{0.76}{\arcsecond}, the resolution target in Table~\ref{table:scireq} is obtained by this 
@@ -1700,45 +1765,45 @@ and near normal incidence angle, the total reflectivity in first order is $\sim$
 This is confirmed by the first order efficiency measured from a single \ESIS\ grating in the lower panel of 
 Figure~\ref{fig:componentEfficiencyVsWavelength}.  
 
-Unlike \EUV\ imagers (\eg, \TRACE~\citep{Handy99}, \AIA~\citep{Lemen12}, and Hi-C~\citep{Kobayashi2014}) 
+Unlike \EUV\ imagers (\eg, \TRACE~\citep{Handy99}, \AIA~\citep{Lemen12}, and the \HiC~\citep{Kobayashi2014}) 
 the \ESIS\ passband is defined by a combination of the field stop and grating (\S\,\ref{subsec:Optics}, 
-Fig.~\ref{fig:projections}) rather than multi-layer coatings.
-The coating selectivity is therefore not critical in this respect, allowing the multi-layer to be manipulated to 
+Fig.~\ref{fig:projections}) rather than multi-layer \roy{multilayer} coatings.
+The coating selectivity is therefore not critical in this respect, allowing the multi-layer \roy{multilayer} to be manipulated to 
 suppress out-of-band bright, nearby emission lines.
 The lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength} shows the peak reflectance of the grating multilayer is shifted slightly towards longer 
-wavelengths to attenuate the He\,\textsc{i} emission line, reducing the likelihood of detector saturation.
-A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) line.
-Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} of that 
+wavelengths to attenuate the He\,\textsc{i} \roy{\HeI} emission line, reducing the likelihood of detector saturation.
+A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) \roy{\HeII} line.
+Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} \roy{\gratingHeIIRejectionRatio} of that 
 at \SI{63}{\nano\meter} \roy{\OV} (lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}).
-In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} is 
-$\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} emission will be completely attenuated at the \CCD.
+In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} \roy{\HeIIwavelength} is 
+$\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} \roy{\HeII} emission will be completely attenuated at the \CCD.
 
-The flight and spare primary mirrors were coated with the same Al/SiC/Mg multilayer.
+The flight and spare primary mirrors were coated with the same Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer.
 Corrosion of this multilayer rendered both mirrors unusable.
 The failed coating was stripped from primary mirror SN001.
 The mirror was then re-coated with a \SI{5}{\nano\meter} \roy{\primaryCoatingBaseThickness} thick layer of chromium (Cr) \roy{\primaryCoatingBaseMaterial} to improve adhesion followed by a 
 \SI{25}{\nano\meter} \roy{\primaryCoatingThickness} thick layer of SiC \roy{\primaryCoatingMaterial}.
 The reflectance of this coating deposited on a \Si\ wafer witness sample appears in 
 Fig.~\ref{fig:componentEfficiencyVsWavelength}.
-The spare primary mirror (SN002) retains the corroded Al/SiC/Mg multilayer.
+The spare primary mirror (SN002) retains the corroded Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer.
 
 The \Si\ \CCDs\ are sensitive to visible light as well as \EUV.
 Visible solar radiation is much stronger than \EUV, and visible stray light can survive multiple scatterings while 
 retaining enough intensity to contaminate the \EUV\ images.
 Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be 
 used to shield each \CCD\ from visible light.
-The Al film is supported by a 70 line per inch (lpi) Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
+The Al film is supported by a 70 line per inch (lpi) \roy{\filterMeshPitch} Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
 The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in 
 Fig.~\ref{fig:componentEfficiencyVsWavelength}.
-We conservatively estimate filter oxidation at the time of launch as a 4nm thick layer of Al$_2$O$_3$.
+We conservatively estimate filter oxidation at the time of launch as a 4nm \roy{\filterOxideThickness} thick layer of Al$_2$O$_3$.
 
-An Al filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight box with a 
+An Al \roy{\Al} filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight \roy{light-tight} box with a 
 labyrinthine evacuation vent (e.g., Fig.~\ref{F-cameras}).
 The placement of the filter relative to the \CCD\ is optimized so that the filter mesh shadow is not visible.
-By modeling the filter mesh shadow, we find that a position far from the CCD ($>$\SI{200}{\milli\meter}) and mesh grid
-clocking of \SI{45}{\degree} to the detector array reduces the shadow amplitude well below photon statistics.
-The \MOSES\ instrument utilizes a similar design; no detectable signature of the filter mesh is found in data and 
-inversion residuals from the 2006 \MOSES\ flight.
+By modeling the filter mesh shadow, we find that a position far from the \CCD\ ($>$\SI{200}{\milli\meter} \roy{\filterToDetectorDistance}) and mesh grid
+clocking of \SI{45}{\degree} \roy{\filterClocking} to the detector array reduces the shadow amplitude well below photon statistics.
+The \MOSES\ instrument utilizes a similar design;
+no detectable signature of the filter mesh is found in data and inversion residuals from the 2006 \MOSES\ flight.
 
 To prevent oxidation, and to minimize the risk of tears, pinholes, and breakage from handling, the filters will be 
 stored in a nitrogen purged environment until after payload vibration testing."""
@@ -1747,15 +1812,15 @@ stored in a nitrogen purged environment until after payload vibration testing.""
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
             doc.append(pylatex.NoEscape(
                 r"""
-Count rates for ESIS are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the CCD quantum efficiency (QE) listed in Table~\ref{table:prescription}.
-Line intensities are derived from \citet{Vernazza78} (V\&R) and the SOHO/\CDS\ \citep{Harrison95} data.
-The \SI{100}{\percent} duty cycle of ESIS (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
-So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant SNR penalty.
-Table~\ref{table:count} shows that ESIS is effectively shot noise limited with a \SI{10}{\second} exposure.
+Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the \CCD\ \QE\ listed in Table~\ref{table:prescription}.
+Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data.
+The \SI{100}{\percent} duty cycle of \ESIS\ (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
+So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant \SNR\ penalty.
+Table~\ref{table:count} shows that \ESIS\ is effectively shot noise limited with a \SI{10}{\second} exposure.
 The signal requirement in Table~\ref{table:scireq} is met by stacking exposures.
 Good quality images ($\sim300$ counts) in active regions can be obtained by stacking \SI{30}{\second} worth of exposures.
 This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en waves described in \S\,\ref{sec:ScienceObjectives}.
-However, by stacking multiple \SI{10}{\second} exposures, sufficient SNR \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained.
+However, by stacking multiple \SI{10}{\second} exposures, sufficient \SNR\ \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained.
 We also note that the count rates given here are for an unvignetted system which is limited by the baffling of this design.
 While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{subsec:AperturesandBaffles}) to increase throughput.
 Thus, a faster exposure cadence may be obtained by accepting some vignetting in the system.
@@ -1781,7 +1846,7 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
         \hline
     \end{tabular}
     \caption{
-        Estimated signal statistics per channel (in photon counts) for ESIS lines in coronal hole (CH), quiet Sun (QS), and active region (AR).
+        Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in coronal hole (CH), quiet Sun (QS), and active region (AR).
     }
     \label{table:count}
 \end{table}
@@ -1837,7 +1902,7 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
             with table.create(pylatex.Center()) as centering:
                 with centering.create(pylatex.Tabular('llrrrr')) as tabular:
                     tabular.escape = False
-                    tabular.add_row([r'Source', r'', r'V\&R', r'V\&R', r'V\&R', r'\CDS'])
+                    tabular.add_row([r'Source', r'', r'\VR', r'\VR', r'\VR', r'\CDS'])
                     tabular.add_row(r'Solar context', r'', r'\QS', r'\CH', r'\AR', r'\AR')
                     tabular.add_hline()
                     tabular.add_row([label, r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
@@ -1861,18 +1926,18 @@ Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in \
         with doc.create(pylatex.Subsection('Alignment and Focus')):
             doc.append(pylatex.NoEscape(
                 r"""
-In the conceptual phase of ESIS, the decision was made to perform focus and alignment in visible light with a HeNe 
+In the conceptual phase of \ESIS, the decision was made to perform focus and alignment in visible light with a HeNe 
 source.
 Certain difficulties are introduced by this choice, however, the benefits outweigh the operational complexity and 
-equipment that would be required for focus in EUV.
+equipment that would be required for focus in \EUV.
 Moreover, a sounding rocket instrument requires robust, adjustment-free mounts to survive the launch environment.
 Such a design is not amenable to iterative adjustment in vacuum.  The choice of alignment wavelength is arbitrary for 
 most components;
-CCD response and multilayer coating reflectively is sufficient across a wide band a visible wavelengths.
+\CCD\ response and multilayer coating reflectively is sufficient across a wide band a visible wavelengths.
 The exceptions are the thin film filters (which will not be installed until just before launch and have no affect on 
 telescope alignment and focus) and the diffraction gratings.
 Visible light gratings have been manufactured specifically for alignment and focus.
-These gratings are identical to the EUV flight version, but with a ruling pattern scaled to a 
+These gratings are identical to the \EUV\ flight version, but with a ruling pattern scaled to a 
 \SI{632.8}{\nano\meter} wavelength.
 """
             ))
@@ -1881,7 +1946,7 @@ These gratings are identical to the EUV flight version, but with a ruling patter
                 figure.add_image('figures/old/Alignment_transfer_1gr_text', width=kgpy.latex.columnwidth)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-ESIS alignment transfer device, consisting of three miniature confocal microscopes that translate along the optical 
+\ESIS\ alignment transfer device, consisting of three miniature confocal microscopes that translate along the optical 
 axis.  
 Trapezoidal grating, bipods, and mounting plate are installed on the tuffet in front of the apparatus 
 (left of center)"""
@@ -1891,33 +1956,33 @@ Trapezoidal grating, bipods, and mounting plate are installed on the tuffet in f
             doc.append(pylatex.NoEscape(
                 r"""
 After alignment and focus has been obtained with the HeNe source, the instrument will be prepared for flight by 
-replacing the visible gratings by the EUV flight versions.
-Each grating (EUV and alignment) is individually mounted to a backing plate using a bipod system similar to that of the 
+replacing the visible gratings by the \EUV\ flight versions.
+Each grating (\EUV\ and alignment) is individually mounted to a backing plate using a bipod system similar to that of the 
 primary mirror.
 The array of gratings on their backing plates are in turn mounted to a single part which we call the `tuffet.'
 The backing plate is attached to the tuffet by bolts through spherical washers.
 With this mounting scheme, the gratings can be individually aligned in tip/tilt.
 The tuffet is attached to the secondary mirror mount structure (Fig.~\ref{F-alt}).
 This enables the entire grating array to be replaced simply by removing/installing the tuffet, such as when switching 
-between alignment and EUV gratings.
+between alignment and \EUV\ gratings.
 
 Properly positioning the gratings will be the most difficult aspect of final telescope assembly.
 Table~\ref{table:tol} shows that the telescope is very sensitive to defocus.
-The depth of field is an order of magnitude smaller in EUV than in visible light.
+The depth of field is an order of magnitude smaller in \EUV\ than in visible light.
 Moreover, the sensitivity to defocus at the gratings is $M^2+1=17$ times greater than at the detectors.
 Another sensitive aspect of the telescope is grating tip/tilt.
 A tolerance of $\sim\pm$\SI{0.5}{\milli\radian} will be needed to insure that the entire image lands on the active area 
-of the CCD.
+of the \CCD.
 
 Once the visible gratings are aligned and focused, the challenge is to transfer this alignment to the UV gratings.
 \citet{Johnson18} describes a procedure and the apparatus constructed to accurately transfer the position of an 
-alignment grating radius to an EUV flight grating.
+alignment grating radius to an \EUV\ flight grating.
 This device, displayed in Fig.~\ref{F-alt}, consists of an array of three miniature confocal microscopes that record the 
 position of the alignment grating radius.
-The alignment grating is replaced by an EUV grating, which is then measured into position by the same apparatus.
+The alignment grating is replaced by an \EUV\ grating, which is then measured into position by the same apparatus.
 This device (and procedure) is capable of obtaining position measurements of the diffraction gratings to a repeatability 
 of $\approx$\SI{14}{\micro\meter} in the three confocal channels.
-This alignment transfer apparatus will ensure that the EUV flight gratings are positioned to within the tolerances 
+This alignment transfer apparatus will ensure that the \EUV\ flight gratings are positioned to within the tolerances 
 described in Table~\ref{table:tol}."""
             ))
 
@@ -1927,16 +1992,16 @@ described in Table~\ref{table:tol}."""
                 figure._star_latex_name = True
                 figure.add_image('figures/old/Baffles_1clr', width=kgpy.latex.textwidth)
                 figure.add_caption(pylatex.NoEscape(
-                    r"""Model view of ESIS baffle placement and cutouts."""
+                    r"""Model view of \ESIS\ baffle placement and cutouts."""
                 ))
                 figure.append(kgpy.latex.Label('F-Baff1'))
 
             doc.append(pylatex.NoEscape(
                 r"""
-Each channel of ESIS has two apertures: one at the surface of the grating and another in front of the primary mirror.
+Each channel of \ESIS\ has two apertures: one at the surface of the grating and another in front of the primary mirror.
 The purpose of the aperture at the grating is to mask the out-of-figure margins at the edges of these optics.
 This provides a well defined edge to the clear aperture of each grating while also keeping unwanted rays from being 
-reflected from the grating margins and back onto the CCDs.
+reflected from the grating margins and back onto the \CCDs.
 The dimensions of the grating aperture match those of the grating clear aperture shown in Figure~\ref{fig:schematic}c. 
 
 The aperture placed at the primary mirror is the stop for each individual channel.
@@ -1962,7 +2027,7 @@ From Figure~\ref{fig:schematic}c it is apparent that considerable surface area o
 non-vignetting stop design.
 The primary apertures could be enlarged considerably if the vignetting constraint were to be relaxed.
 
-The ESIS baffles are designed to block direct light paths between the front aperture plate and the CCDs for any ray 
+The \ESIS\ baffles are designed to block direct light paths between the front aperture plate and the \CCDs\ for any ray 
 $<$\SI{1.4}{\degree} from the optical axis.
 This angle is purposefully larger than the angular diameter of the sun ($\sim$\SI{0.5}{\degree}) so that any direct 
 paths are excluded from bright sources in the solar corona.
@@ -1973,7 +2038,7 @@ The light path from the primary mirror to the field stop is defined as the volum
 primary mirror aperture mask (e.g., Fig.~\ref{fig:schematic}) to every vertex of the octagonal field stop.
 This is a conservative definition that ensures no rays within the FOV are excluded, and therefore unintentionally 
 vignetted by the baffles.  Light paths from the field stop to the grating, and from the grating to the image formed on 
-the CCD, are defined in a similar manner.
+the \CCD, are defined in a similar manner.
 The cutouts in the baffles are sized using the projection of these light paths onto the baffle surface.
 A conservative \SI{1}{\milli\meter} margin is added to each cutout to prevent unintentional vignetting.
 A model of the six baffles, showing cutouts and position on the optical bench, is displayed in Fig.~\ref{F-Baff1}."""
@@ -1985,20 +2050,19 @@ A model of the six baffles, showing cutouts and position on the optical bench, i
                 figure.add_image('figures/old/ESIS_Cameras_1gr_text', width=kgpy.latex.columnwidth)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
-ESIS camera assembly as built by MSFC.  
+\ESIS\ camera assembly as built by \MSFCShort.  
 Thin film filters and filter tubes are not installed in this image."""
                 ))
                 figure.append(kgpy.latex.Label('F-cameras'))
 
             doc.append(pylatex.NoEscape(
                 r"""
-The ESIS CCD cameras were designed and constructed by Marshall Space Flight Center (MSFC), and are the latest in a 
+The \ESIS\ \CCD\ cameras were designed and constructed by \MSFC\ and are the latest in a 
 series of camera systems developed specifically for use on solar space flight instruments.
-The ESIS camera heritage includes those flown on both the Chromospheric Lyman-Alpha Spectro-Polarimeter 
-(CLASP)~\citep{Kano12,Kobayashi12} and the High-Resolution Coronal Imager (Hi-C)\citep{Kobayashi2014}.
+The \ESIS\ camera heritage includes those flown on both the \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
 
-The ESIS detectors are CCD230-42 astro-process CCDs from E2V.
-For each camera, the CCD is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
+The \ESIS\ detectors are CCD230-42 astro-process \CCDs\ from E2V.
+For each camera, the \CCD\ is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
 converter.
 The central $2048 \times 1024$ pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
 used for storage.
@@ -2017,12 +2081,12 @@ Thus the exposure time is controlled by the time period between triggers.
 Camera 1 (Fig.~\ref{F-cameras}) generates the sync trigger, which is fed back into Camera 1's trigger input and provides 
 independently buffered triggers to the remaining three cameras.
 The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second}.
-Shutterless operation allows ESIS to observe with a \SI{100}{\percent} duty cycle.
+Shutterless operation allows \ESIS\ to observe with a \SI{100}{\percent} duty cycle.
 The cadence is limited only by the 1.1\,s readout time. 
 
-MSFC custom designed the camera board, enclosure, and mounting structure for ESIS to fit the unique packaging 
+\MSFC\ custom designed the camera board, enclosure, and mounting structure for \ESIS\ to fit the unique packaging 
 requirements of this experiment (Fig~\ref{F-cameras}).
-The front part of the camera is a metal block which equalizes the temperature across the CCD while fastening it in 
+The front part of the camera is a metal block which equalizes the temperature across the \CCD\ while fastening it in 
 place.
 The carriers of all cameras are connected to a central two-piece copper (\SI{3}{\kilo\gram}) and aluminum 
 (\SI{1}{\kilo\gram}) thermal reservoir (cold block) by flexible copper cold straps.
@@ -2033,20 +2097,20 @@ The LN2 flow will be controlled automatically by a Ground Support Equipment (GSE
 maintained above survival temperature but below the target temperature of \SI{-55}{\celsius} to insure a negligible dark 
 current level.
 
-The gain, read noise, and dark current of the four cameras were measured at MSFC using an ${}^{55}$Fe radioactive 
+The gain, read noise, and dark current of the four cameras were measured at \MSFC\ using an ${}^{55}$Fe radioactive 
 source.
 Cameras are labeled 1, 2, 3, and 4 with associated serial numbers SN6, SN7, SN9, and SN10 respectively in 
 Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
-The Quantum Efficiency (QE) of the ESIS CCDs will not be measured before flight.
-Similar astro-process CCDs with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
+The \QE\ of the \ESIS\ \CCDs\ will not be measured before flight.
+Similar astro-process \CCDs\ with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
 Orbiting Environmental Satellites (GOES) N and O.
-A QE range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the ESIS CCDs, based on QE measurements by 
+A \QE\ range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
 \citet{Stern04} for GOES SXI instruments.
 
 \begin{table}[!htb]
-\caption{ESIS Camera properties.}
+\caption{\ESIS\ Camera properties.}
 %\tableformat
 \begin{tabular}{ccccc}
 Camera & Quad & Gain & Read Noise & Dark Current \\
@@ -2109,18 +2173,18 @@ Camera & Quad & Gain & Read Noise & Dark Current \\
         with doc.create(pylatex.Subsection('Avionics')):
             doc.append(pylatex.NoEscape(
                 r"""
-The ESIS DACS are based on the designs used for both CLASP~\citep{Kano12,Kobayashi12} and Hi-C~\citep{Kobayashi2014}.
+The \ESIS\ DACS are based on the designs used for both \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
 The electronics are a combination of Military Off-The-Shelf (MOTS) hardware and custom designed components.
 The DACS is a 6-slot, 3U, open VPX PCIe architecture conduction cooled system using an AiTech C873 single board
 computer.
-The data system also include a MOTS PCIe switch card, MSFC parallel interface card, and two MOTS Spacewire cards.
-A slot for an additional Spacewire card is included to accommodate two more cameras for the next ESIS flight.
+The data system also include a MOTS PCIe switch card, \MSFC\ parallel interface card, and two MOTS Spacewire cards.
+A slot for an additional Spacewire card is included to accommodate two more cameras for the next \ESIS\ flight.
 The C873 has a \SI{2.4}{\giga\hertz} Intel i7 processor with \SI{16}{\giga b} of memory.
 The operating temperature range for the data system is -40 to +85 C.
 The operating system for the flight data system is Linux Fedora 23.
 
 The DACS is responsible for several functions;
-it controls the ESIS experiment, responds to timers and uplinks, acquires and stores image data from the cameras, 
+it controls the \ESIS\ experiment, responds to timers and uplinks, acquires and stores image data from the cameras, 
 downlinks a subset of images through telemetry, and provides experiment health and status.
 The DACS is housed with the rest of the avionics (power supply, analog signal conditioning system) in a 
 0.56-\SI{0.43}{\meter} transition section outside of the experiment section.
@@ -2142,7 +2206,7 @@ $\sim$\SI{16}{\second} to verify pointing is maintained during flight."""
         with doc.create(pylatex.Subsection('Mechanical')):
             doc.append(pylatex.NoEscape(
                 r"""
-ESIS and MOSES are mounted on opposite sides of a composite optical table structure originally developed for the Solar 
+\ESIS\ and \MOSES\ are mounted on opposite sides of a composite optical table structure originally developed for the Solar 
 Plasma Diagnostics Experiment rocket mission (SPDE,~\citet{Bruner95lock}).
 The layered carbon fiber structure features a convenient, precisely coplanar array of threaded inserts with precision 
 counterbores.
@@ -2157,11 +2221,11 @@ The kinematic mounting system isolates the optical table from bending or twistin
 
         doc.append(pylatex.NoEscape(
             r"""
-ESIS will be launched aboard a sub-orbital Terrier Black Brant sounding rocket from White Sands Missile Range.
+\ESIS\ will be launched aboard a sub-orbital Terrier Black Brant sounding rocket from White Sands Missile Range.
 The experiment is currently scheduled for launch in August, 2019.
 Trajectory will follow a roughly parabolic path, with $>$\SI{270}{\second} solar observing time above 
 \SI{160}{\kilo\meter}.
-ESIS will begin continuously taking exposures at a fixed cadence immediately after launch, terminating just before the 
+\ESIS\ will begin continuously taking exposures at a fixed cadence immediately after launch, terminating just before the 
 payload impacts the upper atmosphere.
 Exposure length will be determined by the target selected for launch day.
 Exposures taken while the payload shutter door is closed ($<$ \SI{160}{\kilo\meter}) will be used for dark calibration.
@@ -2171,22 +2235,22 @@ A parachute will slow the descent of the payload after it enters the atmosphere,
 helicopter after the payload is located on the ground."""
         ))
 
-        with doc.create(pylatex.Subsection('ESIS Mission Update')):
+        with doc.create(pylatex.Subsection(pylatex.NoEscape('\ESIS\ Mission Update'))):
             doc.append(pylatex.NoEscape(
                 r"""
-Since the time of writing ESIS launched and was recovered successfully from White Sands Missile Range on 
+Since the time of writing \ESIS\ launched and was recovered successfully from White Sands Missile Range on 
 September 30, 2019.
-Unfortunately, due to failure of the mechanical shutter, no MOSES data was obtained during this flight.
-A  paper is forthcoming that will document the ESIS instrument in its as-flown configuration~\citep{Courrier_inprep}.
-A companion paper will describe ESIS first results~\citep{Parker_inprep}.
-Two significant changes, one to the ESIS instrument and one to our alignment procedures, were made prior to launch and 
+Unfortunately, due to failure of the mechanical shutter, no \MOSES\ data was obtained during this flight.
+A  paper is forthcoming that will document the \ESIS\ instrument in its as-flown configuration~\citep{Courrier_inprep}.
+A companion paper will describe \ESIS\ first results~\citep{Parker_inprep}.
+Two significant changes, one to the \ESIS\ instrument and one to our alignment procedures, were made prior to launch and 
 are summarized below.
 
-The transfer from visible to EUV grating alignment was completed by an alternative means.
+The transfer from visible to \EUV\ grating alignment was completed by an alternative means.
 The apparatus described by~\citet{Johnson18} was not able to maintain sufficient repeatability during test runs on 
 diffraction grating surfaces.
 To maintain the launch schedule, a phase shifting interferometer was used to transfer the alignment of the visible 
-gratings to the EUV flight gratings. 
+gratings to the \EUV\ flight gratings. 
 
 A trade study was conducted, and it was decided to remove the primary aperture stop. The advantage was an increase in 
 sensitivity.
@@ -2199,41 +2263,41 @@ This gradient is due almost entirely to vignetting by the central obscuration, a
 The principal challenge is that the images cannot be corrected directly;
 rather, since the gradient is repeated for each of the overlapping spectral line images, the vignetting can only be 
 accounted for by forward modeling.
-Since forward modeling is required for all of the inversion procedures under consideration for ESIS data analysis, the 
+Since forward modeling is required for all of the inversion procedures under consideration for \ESIS\ data analysis, the 
 vignetting was deemed low risk to the mission science."""
             ))
 
     with doc.create(pylatex.Section('Conclusions and Outlook')):
         doc.append(pylatex.NoEscape(
             r"""
-ESIS is a next generation slitless spectrograph, designed to obtain co-temporal spectral and spatial images of the solar 
+\ESIS\ is a next generation slitless spectrograph, designed to obtain co-temporal spectral and spatial images of the solar 
 transition region and corona.
 In this report, we present details of the scientific objectives, instrument, image and spectral resolution, data 
 acquisition, and flight profile.
 
-ESIS follows on the proven MOSES design, incorporating several design changes to improve the utility of the instrument.
-The symmetrical arrangement of CCDs and diffraction gratings results in a compact instrument while increasing the number 
+\ESIS\ follows on the proven \MOSES\ design, incorporating several design changes to improve the utility of the instrument.
+The symmetrical arrangement of \CCDs\ and diffraction gratings results in a compact instrument while increasing the number 
 of dispersed images and dispersion planes.
 This aids the inversion process, while also allowing access to higher order spectral line profile moments.
 Individual gratings improve resolution by controlling aberration in each channel.
 The addition of a field stop eliminates spectral contamination and provides an easily recognizable edge for data 
 inversion.
-The ESIS design also demonstrates that all this can be accomplished in a volume small enough to serve as a prototype for 
+The \ESIS\ design also demonstrates that all this can be accomplished in a volume small enough to serve as a prototype for 
 a future orbital instrument.
 
-For the first flight, four of the six available ESIS channels will be populated with optics optimized around the 
+For the first flight, four of the six available \ESIS\ channels will be populated with optics optimized around the 
 O\,\textsc{v} emission line.
 The large (\SI{11.3}{\arcminute}), high resolution FOV (\SI{1.52}{\arcsecond}, \SI{74}{\milli\angstrom}) can 
-simultaneously observe the evolution of small scale EUV flows and large scale MHD waves in high temporal cadence. 
-ESIS also enables the study of transport of mass and energy in the transition region and corona during the $\sim 5$ 
+simultaneously observe the evolution of small scale \EUV\ flows and large scale MHD waves in high temporal cadence. 
+\ESIS\ also enables the study of transport of mass and energy in the transition region and corona during the $\sim 5$ 
 minute data collection portion of rocket flight.
 
-ESIS was recovered after a successful first launch on September 30, 2019, with analysis of collected data currently 
+\ESIS\ was recovered after a successful first launch on September 30, 2019, with analysis of collected data currently 
 in-process.
 Subsequent flights will be proposed and the instrument refined with an eye toward orbital opportunities.
 Suborbital flights will allow us to expand the instrument to its full complement of six channels and refine our data 
 analysis methods, but do not provide access to major flares and eruptive events that drive space weather.
-The long term prospect is that an ESIS-like instrument on an orbital platform could provide high cadence maps of 
+The long term prospect is that an \ESIS-like instrument on an orbital platform could provide high cadence maps of 
 spectral line profiles in solar flares, allowing unique and comprehensive observations of the dynamics in solar eruptive 
 events, flare ribbons, and the flare reconnection region."""
         ))

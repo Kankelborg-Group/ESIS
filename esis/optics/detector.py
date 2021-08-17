@@ -22,6 +22,7 @@ SurfaceT = optics.surface.Surface[
 @dataclasses.dataclass
 class Detector(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
+    manufacturer: str = ''
     serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     inclination: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
@@ -39,6 +40,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     readout_noise: u.Quantity = 0 * u.adu
     dark_current: u.Quantity = 0 * u.electron / u.s
     exposure_length_min: u.Quantity = 0 * u.s
+    bits_analog_to_digital: int = 0
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
@@ -121,6 +123,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
 
     def copy(self) -> 'Detector':
         other = super().copy()  # type: Detector
+        other.manufacturer = self.manufacturer
         other.inclination = self.inclination.copy()
         other.roll = self.roll.copy()
         other.twist = self.twist.copy()
@@ -136,11 +139,13 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.gain = self.gain.copy()
         other.readout_noise = self.readout_noise.copy()
         other.exposure_length_min = self.exposure_length_min.copy()
+        other.bits_analog_to_digital = self.bits_analog_to_digital
         return other
 
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe
+        dataframe['manufacturer'] = [self.manufacturer]
         dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
         dataframe['pixel width'] = [format.quantity(self.pixel_width.to(u.um))]
         dataframe['pixel array shape'] = [self.num_pixels]
@@ -154,6 +159,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['gain'] = [format.quantity(self.gain)]
         dataframe['readout noise'] = [format.quantity(self.readout_noise)]
         dataframe['minimum exposure length'] = [format.quantity(self.exposure_length_min)]
+        dataframe['analog-to-digital bits'] = [self.bits_analog_to_digital]
         return dataframe
 
     def apply_poletto_prescription(
