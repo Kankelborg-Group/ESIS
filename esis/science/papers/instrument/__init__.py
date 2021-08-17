@@ -1537,7 +1537,7 @@ from the entrance aperture).
 In this sub-section we describe the optimization of the first category to balance the contributions of the second. 
 
 Figure and surface roughness specifications for the primary mirror and gratings were developed first by a rule of thumb 
-and then validated through a Fourier optics based model \roy{Fourier-optics-based model} and MonteCarlo \roy{MonteCarlo} simulations.
+and then validated through a Fourier optics based model \roy{Fourier-optics-based model} and Monte Carlo simulations.
 Surface figure errors were randomly generated, using a power law distribution in frequency.
 The model explored a range of power spectral distributions for the surface figure errors, with power laws ranging from 
 0.1 to 4.0.
