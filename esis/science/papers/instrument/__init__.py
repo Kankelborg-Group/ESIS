@@ -875,6 +875,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('VR', pylatex.NoEscape('\citet{Vernazza78}'), pylatex.NoEscape('V\&R')))
     doc.preamble.append(kgpy.latex.Acronym('DACS', 'data acquisition and control system'))
     doc.preamble.append(kgpy.latex.Acronym('GSE', 'ground support equipment'))
+    doc.preamble.append(kgpy.latex.Acronym('MOTS', 'military off-the-shelf'))
 
     doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
@@ -2297,10 +2298,10 @@ Camera & Quad & Gain & Read Noise & Dark Current \\
             doc.append(pylatex.NoEscape(
                 r"""
 The \ESIS\ \DACS\ are based on the designs used for both \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
-The electronics are a combination of Military Off-The-Shelf (MOTS) hardware and custom designed components.
+The electronics are a combination of \MOTS\ hardware and custom designed components.
 The \DACS\ is a 6-slot, 3U, open VPX PCIe architecture conduction cooled system using an AiTech C873 single board
 computer.
-The data system also include a MOTS PCIe switch card, \MSFC\ parallel interface card, and two MOTS Spacewire cards.
+The data system also include a \MOTS\ PCIe switch card, \MSFC\ parallel interface card, and two \MOTS\ Spacewire cards.
 A slot for an additional Spacewire card is included to accommodate two more cameras for the next \ESIS\ flight.
 The C873 has a \SI{2.4}{\giga\hertz} Intel i7 processor with \SI{16}{\giga b} of memory.
 The operating temperature range for the data system is -40 to +85 C.
