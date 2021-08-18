@@ -1839,7 +1839,8 @@ Note flat response in first order over instrument \FOV\ and suppression of zero 
                 figure.add_caption(pylatex.NoEscape(
                     r"""(Top) Measured reflectance for several multilayer coated witness samples 
 \roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
-Note the suppression of second order relative to the first order.
+Note the suppression of second order relative to the first order and the consistency of the coatings between each 
+channel. 
 (Bottom) Comparison of the efficiency of the three main \ESIS\ optical components: primary mirror, grating and filter.
 The primary mirror efficiency is based on measurements of a \Si\ witness sample taken on \primaryMeasurementDate\ at an 
 angle of incidence of \primaryWitnessMeasurementIncidenceAngle. 
