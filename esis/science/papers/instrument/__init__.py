@@ -382,6 +382,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='spectralResolution',
+        value=(2 * u.pix) * optics_single.dispersion.to(kgpy.units.mAA / u.pix),
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
         name='dispersionDoppler',
         value=optics_single.dispersion_doppler.to(u.km / u.s / u.pix),
         digits_after_decimal=1,
@@ -2418,7 +2424,7 @@ a future orbital instrument.
 
 For the first flight, four of the six available \ESIS\ channels will be populated with optics optimized around the 
 O\,\textsc{v} emission line.
-The large (\SI{11.3}{\arcminute}), high resolution \FOV\ (\SI{1.52}{\arcsecond} \roy{\spatialResolutionMax}, \SI{74}{\milli\angstrom}) can 
+The large (\SI{11.3}{\arcminute}), high resolution \FOV\ (\SI{1.52}{\arcsecond} \roy{\spatialResolutionMax}, \SI{74}{\milli\angstrom} \roy{\spectralResolution}) can 
 simultaneously observe the evolution of small scale \EUV\ flows and large scale MHD waves in high temporal cadence. 
 \ESIS\ also enables the study of transport of mass and energy in the transition region and corona during the $\sim 5$ 
 minute data collection portion of rocket flight.
