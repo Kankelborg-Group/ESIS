@@ -227,9 +227,10 @@ def document() -> kgpy.latex.Document:
     )
 
     index_he1 = np.nonzero(optics_single.bunch.ion == 'he_1')[0][0]
+    wavelength_he1 = wavelength[index_he1]
     doc.set_variable_quantity(
         name='HeIwavelength',
-        value=wavelength[index_he1],
+        value=wavelength_he1,
         digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
@@ -734,6 +735,13 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='detectorQuantumEfficiency',
         value=optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent),
+        digits_after_decimal=0
+    )
+
+    rays_he1 = kgpy.optics.rays.Rays(wavelength=wavelength_he1)
+    doc.set_variable_quantity(
+        name='detectorQuantumEfficiencyHeI',
+        value=optics_single.detector.surface.material.transmissivity(rays_he1).to(u.percent),
         digits_after_decimal=0
     )
 
@@ -2213,7 +2221,7 @@ Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for e
 
 The \QE\ of the \ESIS\ \CCDs\ will not be measured before flight.
 Similar astro-process \CCDs\ with no AR \roy{antireflection (because AR is already used for active region)} coating are used in the \SXI\ aboard the \GOES\ N and O.
-A \QE\ range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
+A \QE\ range of 43\% at 583\AA\ \roy{\detectorQuantumEfficiencyHeI\ at \HeI} to 33\% at 630\AA\ is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
 \citet{Stern04} for \GOES\ \SXI\ instruments.
 
 \begin{table}[!htb]
