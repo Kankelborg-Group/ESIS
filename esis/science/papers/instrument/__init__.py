@@ -37,6 +37,7 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.packages.append(pylatex.Package('paralist'))
+    doc.packages.append(pylatex.Package('amsmath'))
     doc.packages.append(pylatex.Package('acronym'))
     doc.packages.append(pylatex.Package('savesym'))
     doc.preamble.append(pylatex.NoEscape(
@@ -705,6 +706,14 @@ def document() -> kgpy.latex.Document:
         name='detectorTemperatureTarget',
         value=optics_single.detector.temperature,
         digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='detectorGainRange',
+        value=pylatex.NoEscape(
+            f'{optics_all.detector.gain.value.min():0.1f}\\nobreakdash-{optics_all.detector.gain.value.max():0.1f}\\,'
+            f'{optics_all.detector.gain.unit:latex_inline}'
+        ),
     )
 
     doc.set_variable(
@@ -2197,7 +2206,7 @@ current level.
 The gain, read noise, and dark current of the four cameras were measured at \MSFC\ using an ${}^{55}$Fe radioactive 
 source.
 Cameras are labeled 1, 2, 3, and 4 \roy{\channelNames} with associated serial numbers SN6, SN7, SN9, and SN10 \roy{\detectorSerialNumbers} respectively in 
-Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
+Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} \roy{\detectorGainRange} in each quadrant of all four cameras.
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
 The \QE\ of the \ESIS\ \CCDs\ will not be measured before flight.
