@@ -2210,7 +2210,7 @@ Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} \roy{\detector
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
 The \QE\ of the \ESIS\ \CCDs\ will not be measured before flight.
-Similar astro-process \CCDs\ with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
+Similar astro-process \CCDs\ with no AR \roy{antireflection (because AR is already used for active region)} coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
 Orbiting Environmental Satellites (GOES) N and O.
 A \QE\ range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
 \citet{Stern04} for GOES SXI instruments.
