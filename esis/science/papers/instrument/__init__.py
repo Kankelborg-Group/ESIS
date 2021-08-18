@@ -2058,7 +2058,7 @@ Moreover, a sounding rocket instrument requires robust, adjustment-free mounts t
 Such a design is not amenable to iterative adjustment in vacuum.  The choice of alignment wavelength is arbitrary for 
 most components;
 \CCD\ response and multilayer coating reflectively is sufficient across a wide band a visible wavelengths.
-The exceptions are the thin film filters (which will not be installed until just before launch and have no affect on 
+The exceptions are the thin film filters (which will not be installed until just before launch and have no affect \roy{effect} on 
 telescope alignment and focus) and the diffraction gratings.
 Visible light gratings have been manufactured specifically for alignment and focus.
 These gratings are identical to the \EUV\ flight version, but with a ruling pattern scaled to a 
