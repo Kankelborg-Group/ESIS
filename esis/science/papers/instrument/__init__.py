@@ -668,6 +668,17 @@ def document() -> kgpy.latex.Document:
         value=optics_single.detector.manufacturer,
     )
 
+    detector_serial_numbers = ''
+    for i, cname in enumerate(optics_all.detector.serial_number):
+        if i + 1 == optics_all.detector.serial_number.shape[~0]:
+            detector_serial_numbers += f'and {cname}'
+        else:
+            detector_serial_numbers += f'{cname}, '
+    doc.set_variable(
+        name='detectorSerialNumbers',
+        value=detector_serial_numbers,
+    )
+
     doc.set_variable_quantity(
         name='detectorFocusAdjustmentRange',
         value=optics_single.detector.range_focus_adjustment,
@@ -2185,7 +2196,7 @@ current level.
 
 The gain, read noise, and dark current of the four cameras were measured at \MSFC\ using an ${}^{55}$Fe radioactive 
 source.
-Cameras are labeled 1, 2, 3, and 4 \roy{\channelNames} with associated serial numbers SN6, SN7, SN9, and SN10 respectively in 
+Cameras are labeled 1, 2, 3, and 4 \roy{\channelNames} with associated serial numbers SN6, SN7, SN9, and SN10 \roy{\detectorSerialNumbers} respectively in 
 Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
