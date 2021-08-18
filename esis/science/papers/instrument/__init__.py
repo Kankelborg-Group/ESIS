@@ -2155,7 +2155,7 @@ The \ESIS\ baffles are designed to block direct light paths between the front ap
 $<$\SI{1.4}{\degree} from the optical axis.
 This angle is purposefully larger than the angular diameter of the sun ($\sim$\SI{0.5}{\degree}) so that any direct 
 paths are excluded from bright sources in the solar corona.
-All baffles are bead-blasted, anodized Al sheet metal oriented perpendicular to the optical axis.
+All baffles are bead-blasted, anodized \Al\ sheet metal oriented perpendicular to the optical axis.
 The size and shape of the cutouts were determined using a combination of the ray trace from 
 Section~\ref{subsec:OptimizationandTolerancing} and 3D modeling.
 The light path from the primary mirror to the field stop is defined as the volume that connects each vertex of the 
