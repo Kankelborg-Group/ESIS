@@ -2185,10 +2185,10 @@ The \ESIS\ \CCD\ cameras were designed and constructed by \MSFC\ and are the lat
 series of camera systems developed specifically for use on solar space flight instruments.
 The \ESIS\ camera heritage includes those flown on both the \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
 
-The \ESIS\ detectors are CCD230-42 astro-process \CCDs\ from E2V.
-For each camera, the \CCD\ is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
+The \ESIS\ detectors are CCD230-42 \roy{\detectorName} astro-process \CCDs\ from E2V \roy{\detectorManufacturer}.
+For each camera, the \CCD\ is operated in a split frame transfer mode with each of the four ports read out by a 16-bit \roy{\detectorAnalogToDigitalBits-bit} A/D 
 converter.
-The central $2048 \times 1024$ pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
+The central $2048 \times 1024$ \roy{$\detectorPixelsX \times \detectorPixelsY$} pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
 used for storage.
 Two \roy{\DetectorNumOverscanColumnWords} overscan columns on either side of the imaging area and eight extra rows in each storage region will monitor read 
 noise and dark current.
@@ -2229,7 +2229,7 @@ Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for e
 
 The \QE\ of the \ESIS\ \CCDs\ will not be measured before flight.
 Similar astro-process \CCDs\ with no AR \roy{antireflection (because AR is already used for active region)} coating are used in the \SXI\ aboard the \GOES\ N and O.
-A \QE\ range of 43\% at 583\AA\ \roy{\detectorQuantumEfficiencyHeI\ at \HeI} to 33\% at 630\AA\ is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
+A \QE\ range of 43\% at 583\AA\ \roy{\detectorQuantumEfficiencyHeI\ at \HeI} to 33\% at 630\AA\ \roy{\detectorQuantumEfficiency\ at \OV} is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
 \citet{Stern04} for \GOES\ \SXI\ instruments.
 
 \begin{table}[!htb]
