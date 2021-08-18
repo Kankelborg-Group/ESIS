@@ -851,6 +851,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('HiC', r'High-Resolution Coronal Imager', 'Hi-C'))
     doc.preamble.append(kgpy.latex.Acronym('SXI', r'Solar X-ray Imager'))
     doc.preamble.append(kgpy.latex.Acronym('GOES', r'Geostationary Operational Environmental Satellite'))
+    doc.preamble.append(kgpy.latex.Acronym('SPDE', r'Solar Plasma Diagnostics Experiment'))
     doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('EUV', 'extreme ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
@@ -2330,8 +2331,8 @@ $\sim$\SI{16}{\second} to verify pointing is maintained during flight."""
         with doc.create(pylatex.Subsection('Mechanical')):
             doc.append(pylatex.NoEscape(
                 r"""
-\ESIS\ and \MOSES\ are mounted on opposite sides of a composite optical table structure originally developed for the Solar 
-Plasma Diagnostics Experiment rocket mission (SPDE,~\citet{Bruner95lock}).
+\ESIS\ and \MOSES\ are mounted on opposite sides of a composite optical table structure originally developed for the 
+\SPDE~\citep{Bruner95lock}.
 The layered carbon fiber structure features a convenient, precisely coplanar array of threaded inserts with precision 
 counterbores.
 The carbon fiber layup is designed to minimize the longitudinal coefficient of thermal expansion.
