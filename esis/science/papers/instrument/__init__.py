@@ -876,6 +876,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('DACS', 'data acquisition and control system'))
     doc.preamble.append(kgpy.latex.Acronym('GSE', 'ground support equipment'))
     doc.preamble.append(kgpy.latex.Acronym('MOTS', 'military off-the-shelf'))
+    doc.preamble.append(kgpy.latex.Acronym('SPARCS', 'Solar Pointing Attitude Rocket Control System', short=True))
 
     doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
@@ -1805,7 +1806,7 @@ CCD			& Decenter	& 1 \si{\milli\meter}		& 0.310		& 0.996 \\
 \multicolumn{2}{l}{Max RMS spot radius (modeled)} 	&				& 1.720			& 0.878 \\
 \multicolumn{2}{l}{CCD charge diffusion (est.)} &				& 2.000			& 0.839 \\
 Thermal drift	& 		&				& 0.192			& 0.998 \\
-SPARCS drift	& 		&				& 1.920			& 0.998 \\
+\SPARCSShort\ drift	& 		&				& 1.920			& 0.998 \\
 Pointing jitter & 		&				& 3.430			& 0.597 \\
 Diff. Limit 	& 		&				&				& 0.833 \\
 \hline %-----------------------------------------------------------------------------
@@ -2321,9 +2322,8 @@ The use of custom designed converters allowed additional ripple filtering for lo
             doc.append(pylatex.NoEscape(
                 r"""
 The imaging target will be selected prior to launch, the morning of the day of flight.
-During flight, pointing will be maintained by the Solar Pointing Attitude Rocket Control System (SPARCS) 
-\citep{Lockheed69}.
-Images from Camera 1 will be downlinked and displayed in real time on the SPARCS control system console at intervals of 
+During flight, pointing will be maintained by the \SPARCS\ \citep{Lockheed69}.
+Images from Camera 1 will be downlinked and displayed in real time on the \SPARCS\ control system console at intervals of 
 $\sim$\SI{16}{\second} to verify pointing is maintained during flight."""
             ))
 
