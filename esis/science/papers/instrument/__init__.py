@@ -657,6 +657,12 @@ def document() -> kgpy.latex.Document:
         value=optics_single.detector.manufacturer,
     )
 
+    doc.set_variable_quantity(
+        name='detectorFocusAdjustmentRange',
+        value=optics_single.detector.range_focus_adjustment,
+        digits_after_decimal=0,
+    )
+
     doc.set_variable(
         name='detectorPixelsX',
         value=str(optics_single.detector.num_pixels[0]),
@@ -2152,7 +2158,7 @@ place.
 The carriers of all cameras are connected to a central two-piece copper (\SI{3}{\kilo\gram}) and aluminum 
 (\SI{1}{\kilo\gram}) thermal reservoir (cold block) by flexible copper cold straps.
 The flexible cold straps allow individual cameras to be translated parallel to the optical axis (by means of shims) up 
-to $\sim$\SI{13}{\milli\meter} to adjust focus in each channel prior to launch.
+to $\sim$\SI{13}{\milli\meter} \roy{$\sim$\detectorFocusAdjustmentRange} to adjust focus in each channel prior to launch.
 The centrally located cold block will be cooled by LN2 flow from outside the payload until just before launch.
 The LN2 flow will be controlled automatically by a Ground Support Equipment (GSE) computer so that all cameras are 
 maintained above survival temperature but below the target temperature of \SI{-55}{\celsius} to insure a negligible dark 

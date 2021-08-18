@@ -262,6 +262,7 @@ def final(
     detector.piston = filter.piston - 200 * u.mm
     detector.cylindrical_radius = 108 * u.mm
     detector.cylindrical_azimuth = channel_angle.copy()
+    detector.range_focus_adjustment = 13 * u.mm
     detector.inclination = -12.252 * u.deg
     detector.pixel_width = 15 * u.um
     detector.num_pixels = (2048, 1040)
