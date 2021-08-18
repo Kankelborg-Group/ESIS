@@ -45,6 +45,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     exposure_length_max: u.Quantity = 0 * u.s
     exposure_length_increment: u.Quantity = 0 * u.s
     bits_analog_to_digital: int = 0
+    index_trigger: int = 0
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
@@ -148,6 +149,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.exposure_length_max = self.exposure_length_max.copy()
         other.exposure_length_increment = self.exposure_length_increment.copy()
         other.bits_analog_to_digital = self.bits_analog_to_digital
+        other.index_trigger = self.index_trigger
         return other
 
     @property
@@ -172,6 +174,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['maximum exposure length'] = [format.quantity(self.exposure_length_max)]
         dataframe['exposure length increment'] = [format.quantity(self.exposure_length_increment)]
         dataframe['analog-to-digital bits'] = [self.bits_analog_to_digital]
+        dataframe['trigger index'] = [self.index_trigger]
         return dataframe
 
     def apply_poletto_prescription(

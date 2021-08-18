@@ -276,6 +276,7 @@ def final(
     detector.exposure_length_increment = 100 * u.ms
     detector.bits_analog_to_digital = 16
     if all_channels:
+        detector.index_trigger = 1
         detector.plot_kwargs['linestyle'] = dashstyle_channels
 
     field_limit = (0.09561 * u.deg).to(u.arcmin)
@@ -336,6 +337,7 @@ def final_active(
 
     opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[slice_channels_active]
     opt.detector.plot_kwargs['linestyle'] = None
+    opt.detector.index_trigger = opt.detector.index_trigger - slice_channels_active.start
 
     return opt
 
