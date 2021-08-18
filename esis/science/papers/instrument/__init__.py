@@ -553,6 +553,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    unmeasured = esis.optics.grating.efficiency.witness.manufacturing_number_unmeasured
+    doc.set_variable(
+        name='gratingWitnessMissingChannel',
+        value=optics_all.channel_name[np.nonzero(optics_all.grating.manufacturing_number == unmeasured)][0]
+    )
+
     rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
     grating_witness_efficiency_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
     grating_rejection_ratio_he2 = (grating_witness_efficiency_he2 / grating_witness_efficiency).to(u.percent)
@@ -1840,7 +1846,8 @@ Note flat response in first order over instrument \FOV\ and suppression of zero 
                     r"""(Top) Measured reflectance for several multilayer coated witness samples 
 \roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
 Note the suppression of second order relative to the first order and the consistency of the coatings between each 
-channel. 
+channel.
+The Channel \gratingWitnessMissingChannel\ grating measurement is missing due to issues in the measurement apparatus.
 (Bottom) Comparison of the efficiency of the three main \ESIS\ optical components: primary mirror, grating and filter.
 The primary mirror efficiency is based on measurements of a \Si\ witness sample taken on \primaryMeasurementDate\ at an 
 angle of incidence of \primaryWitnessMeasurementIncidenceAngle. 
