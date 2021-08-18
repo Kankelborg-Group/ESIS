@@ -370,6 +370,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='spatialResolutionMax',
+        value=optics_single.resolution_spatial.quantity.max(),
+        digits_after_decimal=2,
+    )
+
+    doc.set_variable_quantity(
         name='dispersion',
         value=optics_single.dispersion.to(kgpy.units.mAA / u.pix),
         digits_after_decimal=1,
@@ -1393,7 +1399,7 @@ $n_e T = $\,\chiantiPressure.}"""
                                 r'Spatial resolution',
                                 r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter}) \roy{\angularResolutionRequirement (\spatialResolutionRequirement)}',
                                 r'Explosive events',
-                                r'\spatialResolution, Table~\ref{table:prescription}',
+                                r'\spatialResolutionMax, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
                                 r'Desired \SNR',
@@ -2412,7 +2418,7 @@ a future orbital instrument.
 
 For the first flight, four of the six available \ESIS\ channels will be populated with optics optimized around the 
 O\,\textsc{v} emission line.
-The large (\SI{11.3}{\arcminute}), high resolution \FOV\ (\SI{1.52}{\arcsecond}, \SI{74}{\milli\angstrom}) can 
+The large (\SI{11.3}{\arcminute}), high resolution \FOV\ (\SI{1.52}{\arcsecond} \roy{\spatialResolutionMax}, \SI{74}{\milli\angstrom}) can 
 simultaneously observe the evolution of small scale \EUV\ flows and large scale MHD waves in high temporal cadence. 
 \ESIS\ also enables the study of transport of mass and energy in the transition region and corona during the $\sim 5$ 
 minute data collection portion of rocket flight.
