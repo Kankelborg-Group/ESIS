@@ -2023,6 +2023,7 @@ curvature between each optic when transferring alignment and focus.
 
             doc.append(pylatex.NoEscape(
                 r"""
+                
 Each channel of \ESIS\ has two apertures: one at the surface of the grating and another in front of the primary mirror.
 The purpose of the aperture at the grating is to mask the out-of-figure margins at the edges of these optics.
 This provides a well defined edge to the clear aperture of each grating while also keeping unwanted rays from being 
