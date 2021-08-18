@@ -46,6 +46,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     exposure_length_increment: u.Quantity = 0 * u.s
     bits_analog_to_digital: int = 0
     index_trigger: int = 0
+    error_synchronization: u.Quantity = 0 * u.s
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
@@ -150,6 +151,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.exposure_length_increment = self.exposure_length_increment.copy()
         other.bits_analog_to_digital = self.bits_analog_to_digital
         other.index_trigger = self.index_trigger
+        other.error_synchronization = self.error_synchronization.copy()
         return other
 
     @property
@@ -175,6 +177,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['exposure length increment'] = [format.quantity(self.exposure_length_increment)]
         dataframe['analog-to-digital bits'] = [self.bits_analog_to_digital]
         dataframe['trigger index'] = [self.index_trigger]
+        dataframe['synchronization error'] = [format.quantity(self.error_synchronization)]
         return dataframe
 
     def apply_poletto_prescription(

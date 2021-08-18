@@ -739,6 +739,12 @@ def document() -> kgpy.latex.Document:
         value=str(optics_all.channel_name[optics_all.detector.index_trigger]),
     )
 
+    doc.set_variable_quantity(
+        name='detectorSynchronizationError',
+        value=optics_single.detector.error_synchronization,
+        digits_after_decimal=0,
+    )
+
     doc.set_variable(
         name='detectorAnalogToDigitalBits',
         value=str(optics_single.detector.bits_analog_to_digital)
@@ -2135,7 +2141,7 @@ imaging region to the storage regions) also starts the next exposure without del
 Thus the exposure time is controlled by the time period between triggers.
 Camera 1 \roy{\detectorTriggerIndex} (Fig.~\ref{F-cameras}) generates the sync trigger, which is fed back into Camera 1's \roy{\detectorTriggerIndex's} trigger input and provides 
 independently buffered triggers to the remaining three cameras.
-The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second}.
+The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second} \roy{$\pm$\detectorSynchronizationError}.
 Shutterless operation allows \ESIS\ to observe with a \SI{100}{\percent} duty cycle.
 The cadence is limited only by the 1.1\,s \roy{\detectorReadoutTime} readout time. 
 
