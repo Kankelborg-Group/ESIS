@@ -1095,7 +1095,7 @@ In summary, our experience leads us to conclude that the \MOSES\ design has the 
     \item too few dispersed images (orders) \label{item-orders}
     \item single plane dispersion \label{item-dispersion}
     \item lack of aberration control \label{item-PSF}
-    \item insufficiently defined FOV \label{item-FOV}
+    \item insufficiently defined \FOV\ \label{item-FOV}
     \item sub-optimal exposure cadence \label{item-CAD}
 \end{enumerate}
 In designing \ESIS, we have sought to improve upon each of these points.
@@ -1691,11 +1691,11 @@ The box around each spot represents a single pixel on the detector.
 Each spot was traced using a stratified random grid across the pupil with $\psfPupilSamples \times \psfPupilSamples$ 
 positions per spot.
 }
-(Left:)  Ray traced spot diagrams for \ESIS, illustrated at the center and vertices of the O\,\textsc{v} FOV on the 
+(Left:)  Ray traced spot diagrams for \ESIS, illustrated at the center and vertices of the O\,\textsc{v} \FOV\ on the 
 \CCD.
 The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (overplotted on each spot) radius is \SI{2}{\micro\meter}.
 Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
-(Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
+(Right:) RMS spot radius through focus for the three centered spots; top of \FOV\ (purple curve), center (maroon), and bottom (red)."""
                 ))
                 figure.append(kgpy.latex.Label('fig:psf'))
 
@@ -2145,7 +2145,7 @@ The resulting optimized and non-vignetting stop geometry is shown in Figure~\ref
 
 After final optimization, the stop geometry was analyzed to check for vignetting at the grating with the optical model.
 A footprint diagram was generated at the grating from of multiple grids of rays.
-The incidence angle of each grid of rays corresponded to the extremes of FOV defined by the positions of the eight 
+The incidence angle of each grid of rays corresponded to the extremes of \FOV\ defined by the positions of the eight 
 points of the octagonal field stop.
 The footprint diagram showed that, with the stop completely filled, no ray landed outside of the grating clear aperture
 in Figure~\ref{fig:schematic}c, and no ray was intercepted by the central obscuration.
@@ -2163,7 +2163,7 @@ The size and shape of the cutouts were determined using a combination of the ray
 Section~\ref{subsec:OptimizationandTolerancing} and 3D modeling.
 The light path from the primary mirror to the field stop is defined as the volume that connects each vertex of the 
 primary mirror aperture mask (e.g., Fig.~\ref{fig:schematic}) to every vertex of the octagonal field stop.
-This is a conservative definition that ensures no rays within the FOV are excluded, and therefore unintentionally 
+This is a conservative definition that ensures no rays within the \FOV\ are excluded, and therefore unintentionally 
 vignetted by the baffles.  Light paths from the field stop to the grating, and from the grating to the image formed on 
 the \CCD, are defined in a similar manner.
 The cutouts in the baffles are sized using the projection of these light paths onto the baffle surface.
@@ -2380,11 +2380,11 @@ gratings to the \EUV\ flight gratings.
 A trade study was conducted, and it was decided to remove the primary aperture stop. The advantage was an increase in 
 sensitivity.
 The disadvantage was to sacrifice the unvignetted design described in Section \ref{subsec:AperturesandBaffles}.
-The effective aperture is increased by a factor of 1.7 to 2.7 as a function of FOV in the radial dimension.
+The effective aperture is increased by a factor of 1.7 to 2.7 as a function of \FOV\ in the radial dimension.
 The corresponding signal gradient is oriented along the dispersion direction of each channel;
 vignetting increases (and signal decreases) when moving towards blue wavelengths 
 (\ie\,moving to the left in Figure~\ref{fig:projections}).
-This gradient is due almost entirely to vignetting by the central obscuration, and is linear across the entire FOV.
+This gradient is due almost entirely to vignetting by the central obscuration, and is linear across the entire \FOV.
 The principal challenge is that the images cannot be corrected directly;
 rather, since the gradient is repeated for each of the overlapping spectral line images, the vignetting can only be 
 accounted for by forward modeling.
@@ -2412,7 +2412,7 @@ a future orbital instrument.
 
 For the first flight, four of the six available \ESIS\ channels will be populated with optics optimized around the 
 O\,\textsc{v} emission line.
-The large (\SI{11.3}{\arcminute}), high resolution FOV (\SI{1.52}{\arcsecond}, \SI{74}{\milli\angstrom}) can 
+The large (\SI{11.3}{\arcminute}), high resolution \FOV\ (\SI{1.52}{\arcsecond}, \SI{74}{\milli\angstrom}) can 
 simultaneously observe the evolution of small scale \EUV\ flows and large scale MHD waves in high temporal cadence. 
 \ESIS\ also enables the study of transport of mass and energy in the transition region and corona during the $\sim 5$ 
 minute data collection portion of rocket flight.
