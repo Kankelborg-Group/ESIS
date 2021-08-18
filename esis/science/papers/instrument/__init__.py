@@ -304,6 +304,17 @@ def document() -> kgpy.latex.Document:
         value=num2words.num2words(optics_all.num_channels).capitalize()
     )
 
+    channel_names_str = ''
+    for i, cname in enumerate(optics_all.channel_name):
+        if i + 1 == optics_all.channel_name.shape[~0]:
+            channel_names_str += f'and {cname}'
+        else:
+            channel_names_str += f'{cname}, '
+    doc.set_variable(
+        name='channelNames',
+        value=channel_names_str,
+    )
+
     doc.set_variable_quantity(
         name='magnification',
         value=optics_single.magnification.quantity,
@@ -2174,7 +2185,7 @@ current level.
 
 The gain, read noise, and dark current of the four cameras were measured at \MSFC\ using an ${}^{55}$Fe radioactive 
 source.
-Cameras are labeled 1, 2, 3, and 4 with associated serial numbers SN6, SN7, SN9, and SN10 respectively in 
+Cameras are labeled 1, 2, 3, and 4 \roy{\channelNames} with associated serial numbers SN6, SN7, SN9, and SN10 respectively in 
 Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
