@@ -1998,15 +1998,15 @@ their alignment and focus to ensure everything was transferred correctly.
 
 When transferring the focus and alignment two key details were considered.
 First, there is nothing about the tuffet that constrains the grating roll.
-Therefore, we ensured the same roll existed on each flight gratings as was used to align \ESIS\ in visible light.
-This was accomplished by using a HeNe laser diverged a cylindrical optic that illuminated each grating with a line
-perpendicular to the grating blaze direction.
+Therefore, we needed to ensure each flight grating had the same roll as each visible grating.
+This was accomplished by using a HeNe laser diverged through a cylindrical optic that illuminated each grating with a 
+line perpendicular to the grating blaze direction.
 The line of light was reflected back onto a ruled target that could be compared between gratings.
 Since our alignment gratings were ruled to image light of approximately an order of magnitude longer wavelength the
 laser and cylindrical optic were placed at the position of Littrow for the 10th order image in the visible grating,
 and the 1st order for the \EUV\ gratings.
 Second, during testing we measured slight differences in radius of curvature between each grating. 
-Therefore each flight grating was prescribed a specific amount of defocus to account for the differnce in radius of
+Therefore each flight grating was prescribed a specific amount of defocus to account for the difference in radius of
 curvature between each optic when transferring alignment and focus.
 """
             ))
