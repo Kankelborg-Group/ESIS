@@ -268,6 +268,7 @@ def final(
     detector.num_pixels = (2048, 1040)
     detector.npix_overscan = 2
     detector.npix_blank = 50
+    detector.temperature = -55 * u.deg_C
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
     detector.time_frame_transfer = 60 * u.ms

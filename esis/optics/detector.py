@@ -37,6 +37,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     dynamic_clearance: u.Quantity = 0 * u.mm
     npix_overscan: int = 0
     npix_blank: int = 0
+    temperature: u.Quantity = 0 * u.K
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
     dark_current: u.Quantity = 0 * u.electron / u.s
@@ -144,6 +145,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.dynamic_clearance = self.dynamic_clearance.copy()
         other.npix_overscan = self.npix_overscan
         other.npix_blank = self.npix_blank
+        other.temperature = self.temperature.copy()
         other.gain = self.gain.copy()
         other.readout_noise = self.readout_noise.copy()
         other.time_frame_transfer = self.time_frame_transfer.copy()
@@ -171,6 +173,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['dynamic clearance'] = [format.quantity(self.dynamic_clearance.to(u.mm))]
         dataframe['overscan pixels'] = [self.npix_overscan]
         dataframe['blank pixels'] = [self.npix_blank]
+        dataframe['temperature'] = [format.quantity(self.temperature)]
         dataframe['gain'] = [format.quantity(self.gain)]
         dataframe['readout noise'] = [format.quantity(self.readout_noise)]
         dataframe['frame transfer time'] = [format.quantity(self.time_frame_transfer)]
