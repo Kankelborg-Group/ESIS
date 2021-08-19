@@ -53,6 +53,17 @@ def as_measured(
         'UBO-16-019',
         'UBO-16-014',
     ])
+    radius_014 = [597.170, 597.210, 597.195] * u.mm
+    radius_017 = [597.065, 597.045, 597.050] * u.mm
+    radius_019 = [597.055, 597.045, 597.030] * u.mm
+    radius_024 = [596.890, 596.870, 596.880] * u.mm
+    opt.grating.tangential_radius = u.Quantity([
+        radius_024.mean(),
+        radius_017.mean(),
+        radius_019.mean(),
+        radius_014.mean(),
+    ])
+    opt.grating.sagittal_radius = opt.grating.tangential_radius
     grating_measurement = esis.optics.grating.efficiency.vs_wavelength()
     grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
     opt.grating.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(

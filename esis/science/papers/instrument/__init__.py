@@ -502,6 +502,18 @@ def document() -> kgpy.latex.Document:
         value=optics_single.grating.tangential_radius,
     )
 
+    grating_radius_min = optics_all.grating.tangential_radius.min()
+    grating_radius_max = optics_all.grating.tangential_radius.max()
+    grating_radius_mean = (grating_radius_max + grating_radius_min) / 2
+    grating_radius_range = (grating_radius_max - grating_radius_min) / 2
+    doc.set_variable(
+        name='gratingRadiusMeasured',
+        value=pylatex.NoEscape(
+            f'${grating_radius_mean.value:0.3f}\\pm{grating_radius_range.value:0.3f}$\\,'
+            f'{grating_radius_mean.unit:latex_inline}'
+        )
+    )
+
     doc.set_variable_quantity(
         name='gratingInputAngle',
         value=optics_single.grating.nominal_input_angle,
@@ -1478,7 +1490,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
                     tabular.add_hline()
                     tabular.add_row([r'Gratings (\numChannels)', r'Surface shape', r'Spherical'])
-                    tabular.add_row([r'', r'Surface radius', r'\gratingRadius'])
+                    tabular.add_row([r'', r'Surface radius', r'\gratingRadius\ \roy{(\gratingRadiusMeasured)}'])
                     tabular.add_row([r'', r'Aperture shape', r'Trapezoidal'])
                     tabular.add_row([r'', r'Aperture height', r'\gratingHeight'])
                     tabular.add_row([r'', r'Aperture long base', r'\gratingLongWidth'])
