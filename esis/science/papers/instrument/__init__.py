@@ -440,7 +440,7 @@ def document() -> kgpy.latex.Document:
 
     rays_o5 = kgpy.optics.rays.Rays(wavelength=wavelength_o5)
     doc.set_variable_quantity(
-        name='primaryEfficiency',
+        name='primaryEfficiencyMeasured',
         value=optics_all.primary.material.transmissivity(rays_o5).to(u.percent),
         digits_after_decimal=0,
     )
@@ -1469,7 +1469,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'Aperture shape', r'Octagonal'])
                     tabular.add_row([r'', r'Aperture diameter', r'\primaryDiameter'])
                     tabular.add_row([r'', r'Coating', r'SiC \roy{\primaryCoatingMaterialShort} single layer, optimized for \OVwavelength'])
-                    tabular.add_row([r'', r'\roy{Efficiency (\OV)}', r'\roy{\primaryEfficiency}'])
+                    tabular.add_row([r'', r'\roy{Efficiency (\OV)}', r'\roy{(\primaryEfficiencyMeasured)}'])
 
                     tabular.add_hline()
                     tabular.add_row([r'Field stop', r'Sky plane diameter', r'\fov'])
