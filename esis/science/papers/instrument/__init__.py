@@ -405,6 +405,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=1,
     )
 
+    doc.set_variable_quantity(
+        name='primaryFocalLengthMeasured',
+        value=optics_all.primary.focal_length,
+        digits_after_decimal=1,
+    )
+
     doc.set_variable(
         name='primaryCoatingMaterial',
         value=pylatex.NoEscape('\\' + optics_single.primary.material.main.material[0]),
@@ -1458,7 +1464,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.escape = False
                     tabular.add_hline()
                     tabular.add_row([r'Primary', r'Surface shape', r'Parabolic'])
-                    tabular.add_row([r'', r'Focal length ', r'\primaryFocalLength'])
+                    tabular.add_row([r'', r'Focal length ', r'\primaryFocalLength\ (\primaryFocalLengthMeasured)'])
                     tabular.add_row([r'', r'Aperture shape', r'Octagonal'])
                     tabular.add_row([r'', r'Aperture diameter', r'\primaryDiameter'])
                     tabular.add_row([r'', r'Coating', r'SiC \roy{\primaryCoatingMaterialShort} single layer, optimized for \OVwavelength'])
