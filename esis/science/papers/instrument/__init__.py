@@ -439,9 +439,10 @@ def document() -> kgpy.latex.Document:
     )
 
     rays_o5 = kgpy.optics.rays.Rays(wavelength=wavelength_o5)
+    efficiency_measured_primary = optics_all.primary.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='primaryEfficiencyMeasured',
-        value=optics_all.primary.material.transmissivity(rays_o5).to(u.percent),
+        value=efficiency_measured_primary,
         digits_after_decimal=0,
     )
 
@@ -574,17 +575,17 @@ def document() -> kgpy.latex.Document:
         value=num2words.num2words(grating_nlayers),
     )
 
-    grating_efficiency = optics_all.grating.material.transmissivity(rays_o5).to(u.percent)
+    efficency_grating = optics_all.grating.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='gratingEfficiency',
-        value=grating_efficiency,
+        value=efficency_grating,
         digits_after_decimal=0,
     )
 
-    grating_witness_efficiency = optics_all.grating.witness.transmissivity(rays_o5).to(u.percent)
+    efficiency_grating_witness = optics_all.grating.witness.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='gratingWitnessEfficiency',
-        value=grating_witness_efficiency,
+        value=efficiency_grating_witness,
         digits_after_decimal=0,
     )
 
@@ -595,8 +596,8 @@ def document() -> kgpy.latex.Document:
     )
 
     rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
-    grating_witness_efficiency_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
-    grating_rejection_ratio_he2 = (grating_witness_efficiency_he2 / grating_witness_efficiency).to(u.percent)
+    efficiency_grating_witness_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
+    grating_rejection_ratio_he2 = (efficiency_grating_witness_he2 / efficiency_grating_witness).to(u.percent)
     doc.set_variable_quantity(
         name='gratingHeIIRejectionRatio',
         value=grating_rejection_ratio_he2,
@@ -605,7 +606,7 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable_quantity(
         name='gratingGrooveEfficiency',
-        value=(grating_efficiency / grating_witness_efficiency).to(u.percent),
+        value=(efficency_grating / efficiency_grating_witness).to(u.percent),
         digits_after_decimal=0,
     )
 
@@ -689,9 +690,10 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(f'\\{optics_single.filter.mesh_material}Short'),
     )
 
+    efficiency_filter = optics_single.filter.surface.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='filterEfficiency',
-        value=optics_single.filter.surface.material.transmissivity(rays_o5).to(u.percent),
+        value=efficiency_filter,
         digits_after_decimal=0,
     )
 
@@ -773,9 +775,10 @@ def document() -> kgpy.latex.Document:
         value=num2words.num2words(optics_single.detector.npix_overscan).title(),
     )
 
+    efficiency_detector = optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='detectorQuantumEfficiency',
-        value=optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent),
+        value=efficiency_detector,
         digits_after_decimal=0
     )
 
