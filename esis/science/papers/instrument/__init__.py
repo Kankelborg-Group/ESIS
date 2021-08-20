@@ -486,6 +486,11 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='gratingRulingSpacingMeasured',
+        value=optics_single.grating.surface.rulings.ruling_spacing.to(u.um),
+    )
+
+    doc.set_variable_quantity(
         name='gratingLinearRulingSpacingCoefficient',
         value=optics_single.grating.ruling_spacing_coeff_linear,
         scientific_notation=True,
@@ -1496,7 +1501,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'Aperture long base', r'\gratingLongWidth'])
                     tabular.add_row([r'', r'Aperture short base', r'\gratingShortWidth'])
                     tabular.add_row([r'', r'Ruling type', r'Varied line spacing'])
-                    tabular.add_row([r'', r'Constant ruling spacing coefficient', r'\gratingRulingSpacing'])
+                    tabular.add_row([r'', r'Constant ruling spacing coefficient', r'\gratingRulingSpacing\ \roy{(\gratingRulingSpacingMeasured)}'])
                     tabular.add_row([r'', r'Linear ruling spacing coefficient', r'\gratingLinearRulingSpacingCoefficient'])
                     tabular.add_row([r'', r'Quadratic ruling spacing coefficient', r'\gratingQuadraticRulingSpacingCoefficient'])
                     tabular.add_row([r'', r'Input angle', r'\gratingInputAngle'])
