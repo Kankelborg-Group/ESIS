@@ -371,7 +371,8 @@ class Level_3(Pickleable):
         print('Finding Vignetting Correction')
         # fit = scipy.optimize.minimize(vignetting_correction_quality, guess, args=(self,), bounds=bounds,
         #                               options={'ftol': 1e-5})
-        fit = scipy.optimize.differential_evolution(vignetting_correction_quality, bounds, args=(self,), polish=True, workers=4)
+        # fit = scipy.optimize.differential_evolution(vignetting_correction_quality, bounds, args=(self,), polish=True, workers=4)
+        fit = scipy.optimize.differential_evolution(vignetting_correction_quality, bounds, args=(self,), polish=True, workers=-1)
         print('Fit Duration = ', time.time() - start)
         print('Fit Params = ', fit.x)
         return fit.x
@@ -416,9 +417,8 @@ class Level_3(Pickleable):
         '''
         aia_obj = copy.deepcopy(self)
         times = self.time
-        aia_304 = aia.AIA.from_time_range(times[0] - 20 * u.s, times[-1] + 20 * u.s, channels=[304 * u.AA],
+        aia_304 = aia.AIA.from_time_range(times[0] - 20 * u.s, times[-1] + 20 * u.s, channels=[aia_channel],
                                           user_email='jacobdparker@gmail.com')
-        print(aia_304.time.shape)
 
         transforms = img_align.TransformCube.from_pickle(self.transformation_objects)
         aia_times = []

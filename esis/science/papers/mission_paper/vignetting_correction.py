@@ -20,6 +20,7 @@ if __name__ == '__main__':
     l3_vig = l3_vig.normalize_intensites()
 
     l3_fin = level_3.Level_3.from_pickle(level_3.ov_final_path)
+    print(l3_fin.vignetting_correction_params)
 
     masked_imgs_vig = l3_vig.observation.data
     combined_mask = l3_fin.observation.mask[sequence, 1] * l3_fin.observation.mask[sequence, 2]

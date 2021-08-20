@@ -79,8 +79,8 @@ def gauss_fit(domain, data):
 
 def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
     l4 = level_4.Level_4.from_pickle(event.mart_inverted_pickle_path)
-    plot = l4.plot()
-    plt.show()
+    # plot = l4.plot()
+    # plt.show()
     l4_int = l4.integrated_intensity
     brightest_pix = np.unravel_index(l4_int.argmax(), l4_int.shape)
 
@@ -102,8 +102,9 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
 
     wr = [1, 1, 1, 1, .05]
     hr = [1, 1]
-    fig1 = plt.figure(figsize=[7.1, 3.1])
+
     # fig1 = plt.figure(figsize=[7.1, 3.3])
+    fig1 = plt.figure(figsize=[7.1, 3.5])
     spec1 = gridspec.GridSpec(nrows=2, ncols=len(seqs) + 1, width_ratios=wr, height_ratios=hr, top=.99)
     axs_top = []
     axs_bottom = []
@@ -200,7 +201,7 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
             vel2 = '%.0f' % fit_params[5]
             flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (60, lp_max - 2.5 * (j+1)), color=colors[j],
                                  fontsize=7)
-            # flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (70, lp_max - 2 * (j+1)), color=colors[j],
+            # flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (110, lp_max - 2 * (j+1)), color=colors[j],
             #                      fontsize=7)
 
             if i == 1 or i == 2 or i == 4 or i == 5 or i == 7 or i == 8:
@@ -281,7 +282,7 @@ def ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_t
     ax_dif.coords[0].set_ticklabel(exclude_overlapping=True)
     ax_dif.coords[0].set_axislabel('Solar X (arcsec)')
     ax_dif.coords[1].set_axislabel('Solar Y (arcsec)')
-    ax_dif.set_title('Camera 2 - 3')
+    ax_dif.set_title('Channel 2 - 3')
     cb = plt.colorbar(dif_im, ax=ax_dif, label='Photons')
 
 
@@ -398,14 +399,14 @@ if __name__ == '__main__':
 
 
     #
-    # event = l3_events.perfectx
-    # seqs = [6, 11, 15, 19] #for static figure
-    # time_trim = slice(0, -4)
+    event = l3_events.perfectx
+    seqs = [6, 11, 15, 19] #for static figure
+    time_trim = slice(0, -4)
 
 
-    event = l3_events.otherx
-    seqs = [4, 8, 13, 18]
-    time_trim=None
+    # event = l3_events.otherx
+    # seqs = [6, 10, 15, 18]
+    # time_trim=None
 
     ### Doesn't work when the thing you care about isn't the brightest in the frame
     # event = l3_events.big_blue
@@ -423,8 +424,11 @@ if __name__ == '__main__':
     filepath2 = event.name + '_invertb.pdf'
     fig1.savefig(fig_path / filepath1)
     fig2.savefig(fig_path / filepath2)
+    # plt.show()
+
 
     seqs = None
     movie = ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh,time_trim=time_trim)
-    movie_path = event.name + '_movie.avi'
+    movie_path = event.name + '_movie.mp4'
     movie.save(fig_path / movie_path, 'ffmpeg', dpi=200)
+

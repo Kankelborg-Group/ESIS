@@ -32,7 +32,7 @@ class Level_4(Pickleable):
 
         # NOTE, this currently doesn't require looping because the list contains repeated wcs objects in memory.
         # Might need to fix this later.
-        wcs = self.wcs_list[0]
+        wcs = self.wcs_list[0].copy()
         wcs.wcs.ctype[1] = 'Solar X'
         wcs.wcs.ctype[2] = 'Solar Y'
         wcs.wcs.cunit[1] = u.arcsec

@@ -29,6 +29,7 @@ if __name__ == '__main__':
     print(list_cc.mean())
 
     updated_lev_3 = level_3.Level_3.from_pickle(level_3.ov_Level3_updated)
+
     normalized_imgs = updated_lev_3.observation.data
     normalized_imgs = (normalized_imgs - normalized_imgs.mean(axis=(-2, -1), keepdims=True)) / normalized_imgs.std(
         axis=(-2, -1), keepdims=True)
@@ -49,7 +50,7 @@ if __name__ == '__main__':
 
     fig, ax = plt.subplots(figsize=[7.1,3.7])
     ax.set_ylabel('Cross-Correlation Ratio')
-    ax.set_xlabel('Level-3 Image Sequence')
+    ax.set_xlabel('Level-3 Exposure')
     for lev3_seq, lev1_seq in enumerate(updated_lev_3.lev1_sequences):
         for i, combo in enumerate(channel_index):
             ax.plot(lev3_seq, cc_ratio[i, lev3_seq], marker=marker[i], ls='', color=colors[i], label=cam_ids[i])
