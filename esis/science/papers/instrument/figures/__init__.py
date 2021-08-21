@@ -869,6 +869,7 @@ def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     wavl_unit = u.Angstrom
     witness = esis.optics.grating.efficiency.witness
     with astropy.visualization.quantity_support():
+        optics_design = esis.optics.design.final()
         optics = esis.flight.optics.as_measured()
         for func in [witness.vs_wavelength_g24, witness.vs_wavelength_g17, witness.vs_wavelength_g19, ]:
             serial, angle_input, wavelength, efficiency = func()
@@ -894,6 +895,14 @@ def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
             optics.primary.material.transmissivity(rays).to(eff_unit),
             label=f'primary',
             color='tab:red'
+        )
+
+        axs[1].plot(
+            wavelength,
+            optics_design.primary.material.transmissivity(rays).to(eff_unit),
+            label=f'primary model',
+            color='tab:red',
+            alpha=0.5,
         )
 
         axs[1].plot(
