@@ -845,6 +845,12 @@ def document() -> kgpy.latex.Document:
         value=str(optics_single.detector.bits_analog_to_digital)
     )
 
+    doc.set_variable_quantity(
+        name='totalEfficiency',
+        value=(efficiency_measured_primary * efficency_grating * efficiency_filter * efficiency_detector).to(u.percent),
+        digits_after_decimal=2,
+    )
+
     doc.set_variable(
         name='defaultPupilSamples',
         value=figures.kwargs_optics_default['pupil_samples'],
@@ -1537,6 +1543,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'Nyquist resolution', r'\spatialResolution'])
                     tabular.add_row([r'', r'Dispersion', r'\dispersion\ (\dispersionDoppler)'])
                     tabular.add_row([r'', r'Passband', r'\minWavelength\ to \maxWavelength'])
+                    tabular.add_row([r'', r'\roy{Efficiency}', r'\roy{\totalEfficiency}'])
                     # tabular.add_row([r'Back focal length', r'\SI{127}{\milli\meter}'])
 
                     tabular.add_hline()
