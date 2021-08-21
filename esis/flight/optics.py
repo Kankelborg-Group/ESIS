@@ -132,6 +132,8 @@ def as_measured(
         chan_index = esis.optics.design.default_channel_active
         opt.grating.serial_number = opt.grating.serial_number[chan_index]
         opt.grating.manufacturing_number = opt.grating.manufacturing_number[chan_index]
+        opt.grating.tangential_radius = opt.grating.tangential_radius[chan_index]
+        opt.grating.sagittal_radius = opt.grating.sagittal_radius[chan_index]
         opt.detector.gain = opt.detector.gain[chan_index]
         opt.detector.readout_noise = opt.detector.readout_noise[chan_index]
 
