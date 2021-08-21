@@ -1894,6 +1894,8 @@ Note flat response in first order over instrument \FOV\ and suppression of zero 
                 figure.add_caption(pylatex.NoEscape(
                     r"""(Top) Measured reflectance for several multilayer coated witness samples 
 \roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
+The white regions indicate wavelengths that intercept the detector and the gray regions indicate wavelengths that
+miss the detector.
 Note the suppression of second order relative to the first order and the consistency of the coatings between each 
 channel.
 The Channel \gratingWitnessMissingChannel\ grating measurement is missing due to issues in the measurement apparatus.
