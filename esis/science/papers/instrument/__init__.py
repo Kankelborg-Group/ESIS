@@ -364,6 +364,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='plateScaleMean',
+        value=optics_single.plate_scale.quantity.mean(),
+        digits_after_decimal=2,
+    )
+
+    doc.set_variable_quantity(
         name='spatialResolution',
         value=optics_single.resolution_spatial.quantity,
         digits_after_decimal=2,
@@ -1830,7 +1836,7 @@ each of the gaussian blur terms at the Nyquist frequency (\SI{0.5}{cycles\per ar
 From Table~\ref{table:tol}, we estimate the total \MTF\ of \ESIS\ to be $0.109$ at the Nyquist frequency.
 Compared to, for example, the Rayleigh criterion of \SI{0.09}{cycles\per arcsecond}~\citep{Rayleigh_1879} we estimate 
 the resolution of \ESIS\ to be essentially pixel limited.
-Since \ESIS\ pixels span \SI{0.76}{\arcsecond}, the resolution target in Table~\ref{table:scireq} is obtained by this 
+Since \ESIS\ pixels span \SI{0.76}{\arcsecond} \roy{\plateScaleMean}, the resolution target in Table~\ref{table:scireq} is obtained by this 
 design."""
             ))
 
