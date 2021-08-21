@@ -100,7 +100,9 @@ import numpy as np
 from astropy import units as u
 import kgpy.units
 from kgpy import Name, vector
+import kgpy.optics
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
+from . import primary as module_primary
 
 __all__ = [
     'Requirements',
@@ -181,11 +183,15 @@ def final(
     primary.num_sides = num_sides
     primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
     primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
+    primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror()
     primary.material.thickness = 30 * u.mm
     primary.material.base.material = np.array(['Cr'])
     primary.material.base.thickness = [5] * u.nm
     primary.material.main.material = np.array(['SiC'])
     primary.material.main.thickness = [25] * u.nm
+    primary_angle_input, primary_wavelength, primary_efficiency = module_primary.efficiency.model.vs_wavelength()
+    primary.material.efficiency_data = primary_efficiency
+    primary.material.wavelength_data = primary_wavelength
 
     front_aperture = FrontAperture()
     front_aperture.piston = primary.focal_length + 500 * u.mm
