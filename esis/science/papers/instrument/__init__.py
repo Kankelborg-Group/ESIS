@@ -484,11 +484,13 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='gratingRulingSpacing',
         value=optics_single.grating.surface.rulings.ruling_spacing.to(u.um),
+        digits_after_decimal=5,
     )
 
     doc.set_variable_quantity(
         name='gratingRulingSpacingMeasured',
-        value=optics_single.grating.surface.rulings.ruling_spacing.to(u.um),
+        value=optics_all.grating.surface.rulings.ruling_spacing.to(u.um),
+        digits_after_decimal=5,
     )
 
     doc.set_variable_quantity(
