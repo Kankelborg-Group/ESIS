@@ -452,6 +452,10 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
+    efficiency_primary_he2 = optics_single.primary.material.transmissivity(rays_he2).to(u.percent)
+    rejection_primary_he2 = efficiency_primary_he2 / efficiency_primary
+
     efficiency_measured_primary = optics_all.primary.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='primaryEfficiencyMeasured',
@@ -610,12 +614,11 @@ def document() -> kgpy.latex.Document:
         value=optics_all.channel_name[np.nonzero(optics_all.grating.manufacturing_number == unmeasured)][0]
     )
 
-    rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
     efficiency_grating_witness_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
-    grating_rejection_ratio_he2 = (efficiency_grating_witness_he2 / efficiency_grating_witness).to(u.percent)
+    rejection_grating_he2 = (efficiency_grating_witness_he2 / efficiency_grating_witness)
     doc.set_variable_quantity(
         name='gratingHeIIRejectionRatio',
-        value=grating_rejection_ratio_he2,
+        value=rejection_grating_he2.to(u.percent),
         digits_after_decimal=0,
     )
 
@@ -712,6 +715,9 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    efficiency_filter_he2 = optics_single.filter.surface.material.transmissivity(rays_he2).to(u.percent)
+    rejection_filter_he2 = efficiency_filter_he2 / efficiency_filter
+
     doc.set_variable_quantity(
         name='filterToDetectorDistance',
         value=optics_single.filter.piston - optics_single.detector.piston,
@@ -797,6 +803,9 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0
     )
 
+    efficiency_detector_he2 = optics_single.detector.surface.material.transmissivity(rays_he2).to(u.percent)
+    rejection_detector_he2 = efficiency_detector_he2 / efficiency_detector
+
     rays_he1 = kgpy.optics.rays.Rays(wavelength=wavelength_he1)
     doc.set_variable_quantity(
         name='detectorQuantumEfficiencyHeI',
@@ -864,6 +873,13 @@ def document() -> kgpy.latex.Document:
         name='totalEfficiency',
         value=(efficiency_measured_primary * efficency_grating * efficiency_filter * efficiency_detector).to(u.percent),
         digits_after_decimal=2,
+    )
+
+    rejection_he2 = rejection_primary_he2 * rejection_grating_he2 * rejection_filter_he2 * rejection_detector_he2
+    doc.set_variable_quantity(
+        name='totalHeIIRejection',
+        value=10 * np.log10(rejection_he2) * u.dB,
+        digits_after_decimal=0,
     )
 
     doc.set_variable(
@@ -1966,7 +1982,7 @@ A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) 
 Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} \roy{\gratingHeIIRejectionRatio} of that 
 at \SI{63}{\nano\meter} \roy{\OV} (lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}).
 In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} \roy{\HeIIwavelength} is 
-$\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} \roy{\HeII} emission will be completely attenuated at the \CCD.
+$\sim$\SI{32}{\decibel} \roy{\totalHeIIRejection}.  Thus, He\,\textsc{ii} \roy{\HeII} emission will be completely attenuated at the \CCD.
 
 The flight and spare primary mirrors were coated with the same Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer.
 Corrosion of this multilayer rendered both mirrors unusable.
