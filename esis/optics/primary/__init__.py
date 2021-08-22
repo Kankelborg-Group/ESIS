@@ -22,6 +22,9 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('primary'))
     radius: u.Quantity = np.inf * u.mm
     conic: u.Quantity = -1 * u.dimensionless_unscaled
+    slope_error: optics.surface.sag.SlopeErrorRMS = dataclasses.field(default_factory=optics.surface.sag.SlopeErrorRMS)
+    ripple: optics.surface.sag.RippleRMS = dataclasses.field(default_factory=optics.surface.sag.RippleRMS)
+    roughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
     num_sides: int = 0
     clear_half_width: u.Quantity = 0 * u.mm
     border_width: u.Quantity = 0 * u.mm
@@ -68,6 +71,9 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
         other = super().copy()      # type: Primary
         other.radius = self.radius.copy()
         other.conic = self.conic.copy()
+        other.slope_error = self.slope_error.copy()
+        other.ripple = self.ripple.copy()
+        other.roughness = self.roughness.copy()
         other.num_sides = self.num_sides
         other.clear_half_width = self.clear_half_width.copy()
         other.border_width = self.border_width.copy()
@@ -79,6 +85,9 @@ class Primary(optics.component.PistonComponent[SurfaceT]):
         dataframe = super().dataframe
         dataframe['radius'] = [format.quantity(self.radius.to(u.mm))]
         dataframe['conic constant'] = [format.quantity(self.conic)]
+        dataframe['slope error'] = [format.quantity(self.slope_error.value)]
+        dataframe['ripple'] = [format.quantity(self.ripple.value)]
+        dataframe['roughness'] = [format.quantity(self.roughness.value)]
         dataframe['number of sides'] = [self.num_sides]
         dataframe['clear half-width'] = [format.quantity(self.clear_half_width.to(u.mm))]
         dataframe['border width'] = [format.quantity(self.border_width.to(u.mm))]

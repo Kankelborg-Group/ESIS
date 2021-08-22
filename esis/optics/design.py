@@ -180,6 +180,15 @@ def final(
 
     primary = Primary()
     primary.radius = 2000 * u.mm
+    primary.slope_error.value = 1.0 * u.urad
+    primary.slope_error.length_integration = 4 * u.mm
+    primary.slope_error.length_sample = 2 * u.mm
+    primary.ripple.value = 2.5 * u.nm
+    primary.ripple.periods_min = 0.06 * u.mm
+    primary.ripple.periods_max = 6 * u.mm
+    primary.roughness.value = 1 * u.nm
+    primary.roughness.periods_min = 1.6 * u.um
+    primary.roughness.periods_max = 70 * u.um
     primary.num_sides = num_sides
     primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
     primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
@@ -218,6 +227,15 @@ def final(
     grating.cylindrical_azimuth = channel_angle.copy()
     grating.sagittal_radius = 597.830 * u.mm
     grating.tangential_radius = grating.sagittal_radius
+    grating.slope_error.value = 3 * u.urad
+    grating.slope_error.length_integration = 2 * u.mm
+    grating.slope_error.length_sample = 1 * u.mm
+    grating.ripple.value = 4 * u.nm
+    grating.ripple.periods_min = 0.024 * u.mm
+    grating.ripple.periods_max = 2.4 * u.mm
+    grating.roughness.value = 1 * u.nm
+    grating.roughness.periods_min = 0.02 * u.um
+    grating.roughness.periods_max = 2 * u.um
     grating.nominal_input_angle = 1.301 * u.deg
     grating.nominal_output_angle = 8.057 * u.deg
     grating.ruling_density = (2.586608603456000 / u.um).to(1 / u.mm)

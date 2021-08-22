@@ -29,6 +29,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     twist: u.Quantity = 0 * u.deg
     tangential_radius: u.Quantity = np.inf * u.mm
     sagittal_radius: u.Quantity = np.inf * u.mm
+    slope_error: optics.surface.sag.SlopeErrorRMS = dataclasses.field(default_factory=optics.surface.sag.SlopeErrorRMS)
+    ripple: optics.surface.sag.RippleRMS = dataclasses.field(default_factory=optics.surface.sag.RippleRMS)
+    roughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
     nominal_input_angle: u.Quantity = 0 * u.deg
     nominal_output_angle: u.Quantity = 0 * u.deg
     diffraction_order: u.Quantity = 0 << u.dimensionless_unscaled
@@ -53,6 +56,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
         dataframe['tangential radius'] = [format.quantity(self.tangential_radius.to(u.mm))]
         dataframe['sagittal radius'] = [format.quantity(self.sagittal_radius.to(u.mm))]
+        dataframe['slope error'] = [format.quantity(self.slope_error.value)]
+        dataframe['ripple'] = [format.quantity(self.ripple.value)]
+        dataframe['roughness'] = [format.quantity(self.roughness.value)]
         dataframe['nominal alpha'] = [format.quantity(self.nominal_input_angle.to(u.deg))]
         dataframe['nominal beta'] = [format.quantity(self.nominal_output_angle.to(u.deg))]
         dataframe['diffraction order'] = [format.quantity(self.diffraction_order)]
@@ -170,6 +176,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.twist = self.twist.copy()
         other.tangential_radius = self.tangential_radius.copy()
         other.sagittal_radius = self.sagittal_radius.copy()
+        other.slope_error = self.slope_error.copy()
+        other.ripple = self.ripple.copy()
+        other.roughness = self.roughness.copy()
         other.nominal_input_angle = self.nominal_input_angle.copy()
         other.nominal_output_angle = self.nominal_output_angle.copy()
         other.diffraction_order = self.diffraction_order.copy()

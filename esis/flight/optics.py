@@ -28,6 +28,9 @@ def as_measured(
         opt = esis.optics.design.final(**kwargs, all_channels=all_channels, )
 
     opt.primary.radius = 2000 * u.mm
+    opt.primary.slope_error.value = 0.436 * u.urad
+    opt.primary.ripple.value = 0.938 * u.nm
+    opt.primary.roughness.value = ([5.38, 5.68] * u.AA).mean().to(u.nm)
     primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_recoat_1()
     primary_serial, primary_angle_input, primary_wavelength, primary_efficiency = primary_witness
     opt.primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
@@ -64,6 +67,9 @@ def as_measured(
         radius_014.mean(),
     ])
     opt.grating.sagittal_radius = opt.grating.tangential_radius
+    opt.grating.slope_error.value = [2.05, 2.0, 2.05, 2.0] * u.urad
+    opt.grating.ripple.value = [1.75, 1.75, 1.75, 1.5] * u.nm
+    opt.grating.roughness.value = [0.5, 0.45, 0.6, 0.65] * u.nm
     grating_measurement = esis.optics.grating.efficiency.vs_wavelength()
     grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
     opt.grating.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
