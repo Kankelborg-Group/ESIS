@@ -18,7 +18,7 @@ SurfaceT = optics.surface.Surface[
 
 
 @dataclasses.dataclass
-class Primary(optics.component.PistonComponent[SurfaceT]):
+class Primary(optics.component.TranslationComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('primary'))
     radius: u.Quantity = np.inf * u.mm
     conic: u.Quantity = -1 * u.dimensionless_unscaled
