@@ -2339,7 +2339,6 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             psf_size=to_pix(opt.detector.charge_diffusion),
                         )
                         tabular.add_hline()
-                        print('pointing jitter', opt.sparcs.pointing_jitter)
                         add_row_basic(
                             tabular=tabular,
                             optics=opt,
