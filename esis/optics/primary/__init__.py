@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, optics, format
+from kgpy import Name, optics, format, mixin
 from . import efficiency
 
 __all__ = ['Primary']
@@ -15,6 +15,14 @@ SurfaceT = optics.surface.Surface[
     optics.surface.aperture.RegularPolygon,
     None,
 ]
+
+
+class PrimaryAxes(mixin.AutoAxis):
+    def __init__(self):
+        super().__init__()
+        self.primary_translation_x = self.auto_axis_index(from_right=False)
+        self.primary_translation_y = self.auto_axis_index(from_right=False)
+        self.primary_translation_z = self.auto_axis_index(from_right=False)
 
 
 @dataclasses.dataclass

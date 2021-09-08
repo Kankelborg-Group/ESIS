@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, vector, transform, optics, format
+from kgpy import Name, vector, transform, optics, format, mixin
 from . import Grating
 from astropy import constants as const
 
@@ -17,6 +17,14 @@ SurfaceT = optics.surface.Surface[
     optics.surface.aperture.AsymmetricRectangular,
     None,
 ]
+
+
+class DetectorAxes(mixin.AutoAxis):
+    def __init__(self):
+        super().__init__()
+        self.detector_translation_x = self.auto_axis_index(from_right=False)
+        self.detector_translation_y = self.auto_axis_index(from_right=False)
+        self.detector_translation_z = self.auto_axis_index(from_right=False)
 
 
 @dataclasses.dataclass

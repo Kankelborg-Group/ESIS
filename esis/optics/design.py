@@ -101,8 +101,10 @@ from astropy import units as u
 import kgpy.units
 from kgpy import Name, vector
 import kgpy.optics
-from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
+import kgpy.nsroc
+from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 from . import primary as module_primary
+from . import optics as module_optics
 
 __all__ = [
     'Requirements',
@@ -148,13 +150,16 @@ def final(
         field_samples: int = 10,
         field_is_stratified_random: bool = False,
         all_channels: bool = True,
-) -> Optics:
+        use_uncertainty: bool = False,
+) -> module_optics.Optics:
     """
     Final ESIS optical design prepared by Charles Kankelborg and Hans Courrier.
     :param pupil_samples: Number of rays per axis across the pupil.
     :param field_samples: Number of rays per axis across the field.
     :return: An instance of the as-designed ESIS optics model.
     """
+    axes = module_optics.OpticsAxes()
+
     num_sides = 8
     num_channels = 6
 
@@ -202,6 +207,10 @@ def final(
     primary.material.efficiency_data = primary_efficiency
     primary.material.wavelength_data = primary_wavelength
 
+    if use_uncertainty:
+        primary.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.primary_translation_x))
+        primary.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.primary_translation_y))
+
     front_aperture = FrontAperture()
     front_aperture.piston = primary.focal_length + 500 * u.mm
     front_aperture.clear_radius = 100 * u.mm
@@ -222,7 +231,7 @@ def final(
     field_stop.num_sides = num_sides
 
     grating = Grating()
-    grating.piston = primary.focal_length + 374.7 * u.mm
+    grating.translation.z = -(primary.focal_length + 374.7 * u.mm)
     grating.cylindrical_radius = 2.074999998438000e1 * u.mm
     grating.cylindrical_azimuth = channel_angle.copy()
     grating.sagittal_radius = 597.830 * u.mm
@@ -265,8 +274,31 @@ def final(
     if all_channels:
         grating.plot_kwargs['linestyle'] = dashstyle_channels
 
+    if use_uncertainty:
+        grating.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.grating_translation_x))
+        grating.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.grating_translation_y))
+
+        error_alignment_transfer_single_point = 2.5e-5 * u.m
+        error_alignment_transfer_systematic = 5e-6 * u.m
+        error_alignment_transfer = np.sqrt(
+            error_alignment_transfer_single_point ** 2 / 3 + error_alignment_transfer_systematic ** 2).to(u.mm)
+        grating.translation_error.z = np.expand_dims(
+            error_alignment_transfer * [-1, 0, 1],
+            axes.perp_axes(axes.grating_translation_z),
+        )
+
+        roll_error = 1.3e-2 * u.rad
+        grating.roll_error = np.expand_dims(roll_error * [-1, 0, 1], axes.perp_axes(axes.grating_roll)).to(u.deg)
+
+        radius_error = (0.4 * u.percent).to(u.dimensionless_unscaled)
+        tangential_radius_error = grating.tangential_radius * radius_error
+        sagittal_radius_error = grating.sagittal_radius * radius_error
+        grating.tangential_radius_error = np.expand_dims([-1, 0, 1] * tangential_radius_error, axes.perp_axes(axes.grating_tangential_radius))
+        grating.sagittal_radius_error = np.expand_dims([-1, 0, 1] * sagittal_radius_error, axes.perp_axes(axes.grating_sagittal_radius))
+
+
     filter = Filter()
-    filter.piston = grating.piston - 1.301661998854058 * u.m
+    filter.translation.z = grating.translation.z + 1.301661998854058 * u.m
     filter.cylindrical_radius = 95.9 * u.mm
     filter.cylindrical_azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
@@ -283,7 +315,7 @@ def final(
     detector = Detector()
     detector.name = Name('CCD230-42')
     detector.manufacturer = 'E2V'
-    detector.piston = filter.piston - 200 * u.mm
+    detector.translation.z = filter.translation.z + 200 * u.mm
     detector.cylindrical_radius = 108 * u.mm
     detector.cylindrical_azimuth = channel_angle.copy()
     detector.range_focus_adjustment = 13 * u.mm
@@ -308,6 +340,18 @@ def final(
         detector.index_trigger = 1
         detector.plot_kwargs['linestyle'] = dashstyle_channels
 
+    if use_uncertainty:
+        detector.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.detector_translation_x))
+        detector.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.detector_translation_y))
+
+        uncertainty_focus = 5e-4 * u.m
+        shim_length = 5e-5 * u.m
+        edge_defocus = 1e-4 * u.m
+        detector_defocus = np.sqrt(np.square(uncertainty_focus) + np.square(shim_length) + np.square(edge_defocus))
+        detector_defocus = detector_defocus.to(u.mm)
+        detector.translation_error.z = np.expand_dims(detector_defocus * [-1, 0, 1], axes.perp_axes(axes.detector_translation_z))
+
+
     field_limit = (0.09561 * u.deg).to(u.arcmin)
     if all_channels:
         field_limit = np.arctan2(field_stop.clear_radius, primary.focal_length).to(u.arcmin)
@@ -318,7 +362,7 @@ def final(
     source.half_width_x = field_limit
     source.half_width_y = field_limit
 
-    return Optics(
+    return module_optics.Optics(
         name=Name('ESIS'),
         channel_name=channel_name,
         source=source,
@@ -334,6 +378,7 @@ def final(
         pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
         field_is_stratified_random=field_is_stratified_random,
+        sparcs=kgpy.nsroc.sparcs.specification(),
         roll=roll,
     )
 
@@ -348,7 +393,7 @@ def final_active(
         pupil_is_stratified_random: bool = False,
         field_samples: int = 10,
         field_is_stratified_random: bool = False,
-) -> Optics:
+) -> module_optics.Optics:
     opt = final(
         pupil_samples=pupil_samples,
         pupil_is_stratified_random=pupil_is_stratified_random,
@@ -377,7 +422,7 @@ def final_from_poletto(
         use_toroidal_grating: bool = False,
         use_vls_grating: bool = False,
         use_one_wavelength_detector_tilt: bool = False,
-) -> Optics:
+) -> module_optics.Optics:
     """
     Try to reproduce the final ESIS design using infrastructure developed from Thomas and Poletto (2004)
     :param pupil_samples: Number of rays across the pupil in each axis.

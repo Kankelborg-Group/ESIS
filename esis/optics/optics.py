@@ -16,9 +16,26 @@ import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
 import kgpy.chianti
 import kgpy.format
-from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
+import kgpy.nsroc
+from . import Source, FrontAperture, CentralObscuration, FieldStop, Filter, Detector
+from . import primary as module_primary
+from . import grating as module_grating
+from . import detector as module_detector
 
-__all__ = ['Optics']
+__all__ = [
+    'OpticsAxes',
+    'Optics',
+]
+
+
+class OpticsAxes(
+    module_detector.DetectorAxes,
+    module_grating.GratingAxes,
+    module_primary.PrimaryAxes,
+):
+    def __init__(self):
+        super().__init__()
+        self.channel = self.auto_axis_index()
 
 
 @dataclasses.dataclass
@@ -29,14 +46,16 @@ class Optics(
     """
     Add test docstring to see if this is the problem.
     """
+    axis: typ.ClassVar[OpticsAxes] = OpticsAxes()
+
     name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
     channel_name: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     source: Source = dataclasses.field(default_factory=Source)
     front_aperture: FrontAperture = dataclasses.field(default_factory=FrontAperture)
     central_obscuration: typ.Optional[CentralObscuration] = dataclasses.field(default_factory=CentralObscuration)
-    primary: Primary = dataclasses.field(default_factory=Primary)
+    primary: module_primary.Primary = dataclasses.field(default_factory=module_primary.Primary)
     field_stop: FieldStop = dataclasses.field(default_factory=FieldStop)
-    grating: Grating = dataclasses.field(default_factory=Grating)
+    grating: module_grating.Grating = dataclasses.field(default_factory=module_grating.Grating)
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
     num_emission_lines: int = 3
@@ -49,6 +68,7 @@ class Optics(
         max=0 * u.km / u.s,
         num_samples=1,
     ))
+    sparcs: kgpy.nsroc.sparcs.SPARCS = dataclasses.field(default_factory=kgpy.nsroc.sparcs.SPARCS)
     pointing: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.angular)
     roll: u.Quantity = 0 * u.deg
     stray_light: u.Quantity = 0 * u.adu
@@ -113,7 +133,7 @@ class Optics(
 
     @property
     def back_focal_length(self) -> u.Quantity:
-        return -self.detector.piston
+        return self.detector.translation.z
 
     @property
     def magnification(self):
@@ -243,6 +263,7 @@ class Optics(
         else:
             other.filter = self.filter
         other.detector = self.detector.copy()
+        other.sparcs = self.sparcs.copy()
         other.pointing = self.pointing.copy()
         other.roll = self.roll.copy()
         other.stray_light = self.stray_light.copy()
@@ -2108,7 +2129,7 @@ class Optics(
 
         for d in delta:
             other = self.copy()
-            other.detector.piston = other.detector.piston - d
+            other.detector.translation.z = other.detector.translation.z - d
             s = other.rays_output.spot_size_rms
             spot_sizes.append(s)
 
