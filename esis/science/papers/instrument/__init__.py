@@ -1,3 +1,4 @@
+import typing as typ
 import pathlib
 import matplotlib.pyplot as plt
 import astropy.units as u
@@ -329,7 +330,7 @@ def document() -> kgpy.latex.Document:
     )
 
     dr = optics_single.detector.cylindrical_radius - optics_single.grating.cylindrical_radius
-    dz = optics_single.detector.piston - optics_single.grating.piston
+    dz = optics_single.detector.translation.z - optics_single.grating.translation.z
     doc.set_variable_quantity(
         name='tiltMagnification',
         value=1 / np.cos(optics_single.detector.inclination + np.arctan(dr / dz))
@@ -720,7 +721,7 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable_quantity(
         name='filterToDetectorDistance',
-        value=optics_single.filter.piston - optics_single.detector.piston,
+        value=optics_single.filter.translation.z - optics_single.detector.translation.z,
         digits_after_decimal=0,
     )
 
@@ -1769,7 +1770,7 @@ defined per ISO 10110."""
                             f'{optics_all.grating.slope_error.value.to(unit_slope_error).value.mean():0.1f}',
                         ])
                 table.add_caption(pylatex.NoEscape(
-                            r"""RMS slope error requirements compared to metrology for the \ESIS\ optics.
+                    r"""RMS slope error requirements compared to metrology for the \ESIS\ optics.
 Slope error (both the numerical estimates and the measurements) is worked out with integration length and sample length 
 defined per ISO 10110."""
                 ))
@@ -2004,10 +2005,374 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
 \end{table*}
 """
             ))
-            # with doc.create(pylatex.Table()) as table:
-            #     # table._star_latex_name = True
-            #     with table.create(pylatex.Center()) as centering:
-            #         with centering.create(pylatex.Tabular('llrcc')) as tabular:
+
+            units_psf = u.pix
+            plate_scale = optics_single.plate_scale
+            focal_length_effective = optics_single.magnification.x * optics_single.primary.focal_length
+
+            opt = optics.error_optimized()
+            system_psf = np.nanmean(opt.rays_output.spot_size_rms[..., 0, :])
+
+            frequency_mtf = 0.5 / u.arcsec * plate_scale.x
+            def to_mtf(psf_size: u.Quantity):
+                psf_size = psf_size / np.sqrt(2)
+                alpha = 1 / (2 * psf_size ** 2)
+                return np.exp(-(np.pi * frequency_mtf) ** 2 / alpha)
+                # return np.exp(-(2 * np.pi * frequency_mtf * psf_size) ** 2)
+
+            def to_pix(value: u.Quantity):
+                return value / (optics_single.detector.pixel_width / u.pix)
+
+            def from_pix(value: u.Quantity):
+                return value * (optics_single.detector.pixel_width / u.pix)
+
+            primary_slope_error = optics_single.primary.slope_error.value
+            primary_slope_error_psf = focal_length_effective * np.tan(2 * primary_slope_error)
+            primary_slope_error_psf /= optics_single.detector.pixel_width / u.pix
+
+            opt_primary_decenter_x_max = optics.error_primary_decenter_x_max()
+            opt_primary_decenter_x_min = optics.error_primary_decenter_x_min()
+            opt_primary_decenter_y_max = optics.error_primary_decenter_y_max()
+            opt_primary_decenter_y_min = optics.error_primary_decenter_y_min()
+
+            distance_grating_to_detector = (optics_single.detector.transform.translation_eff - optics_single.grating.transform.translation_eff).length
+            grating_slope_error = optics_single.grating.slope_error.value
+            grating_slope_error_psf = distance_grating_to_detector * np.tan(2 * grating_slope_error)
+            grating_slope_error_psf /= optics_single.detector.pixel_width / u.pix
+
+            opt_grating_translation_x_min = optics.error_grating_translation_x_min()
+            opt_grating_translation_x_max = optics.error_grating_translation_x_max()
+            opt_grating_translation_y_min = optics.error_grating_translation_y_min()
+            opt_grating_translation_y_max = optics.error_grating_translation_y_max()
+            opt_grating_translation_z_min = optics.error_grating_translation_z_min()
+            opt_grating_translation_z_max = optics.error_grating_translation_z_max()
+            opt_grating_roll_min = optics.error_grating_roll_min()
+            opt_grating_roll_max = optics.error_grating_roll_max()
+            opt_grating_radius_min = optics.error_grating_radius_min()
+            opt_grating_radius_max = optics.error_grating_radius_max()
+
+            opt_detector_translation_x_min = optics.error_detector_translation_x_min()
+            opt_detector_translation_x_max = optics.error_detector_translation_x_max()
+            opt_detector_translation_y_min = optics.error_detector_translation_y_min()
+            opt_detector_translation_y_max = optics.error_detector_translation_y_max()
+            opt_detector_translation_z_min = optics.error_detector_translation_z_min()
+            opt_detector_translation_z_max = optics.error_detector_translation_z_max()
+
+            rays = opt.system.rays_input.copy()
+            rays.position[~opt.rays_output.mask] = np.nan
+            rays_min = np.nanmin(rays.position, axis=(rays.axis.pupil_x, rays.axis.pupil_y))
+            rays_max = np.nanmax(rays.position, axis=(rays.axis.pupil_x, rays.axis.pupil_y))
+            rays_range = np.nanmean(rays_max - rays_min)
+            diffraction_limit = np.sqrt(2) * 0.42 * np.arctan2(opt.wavelength[0], rays_range.x).to(u.arcsec) / opt.plate_scale.x / 2
+
+            accumulator = dict(
+                psf_size_squared=0 * u.pix ** 2,
+                mtf=1 * u.dimensionless_unscaled,
+            )
+
+            def add_row_basic(
+                tabular: pylatex.Tabular,
+                optics: typ.Union[esis.optics.Optics, typ.Tuple[esis.optics.Optics, esis.optics.Optics]],
+                name_major: str = '',
+                name_minor: str = '',
+                value_str: str = '',
+                psf_size: u.Quantity = 0 * u.um,
+            ):
+
+                accumulator['psf_size_squared'] += np.square(psf_size)
+
+                mtf = to_mtf(psf_size)
+                accumulator['mtf'] *= mtf
+
+                tabular.add_row([
+                    name_major,
+                    name_minor,
+                    value_str,
+                    f'{optics.grating.translation_error.z.value:0.3f}',
+                    f'{optics.grating.inclination_error.value:0.3f}',
+                    f'{optics.grating.twist_error.value:0.3f}',
+                    f'{from_pix(psf_size).to(u.um).value:0.2f}',
+                    f'{psf_size.to(u.pix).value:0.2f}',
+                    f'{(psf_size * optics.plate_scale.x).to(u.arcsec).value:0.2f}',
+                    f'{mtf.value:0.3f}',
+                ])
+
+            def add_row(
+                    tabular: pylatex.Tabular,
+                    optics: typ.Union[esis.optics.Optics, typ.Tuple[esis.optics.Optics, esis.optics.Optics]],
+                    name_major: str = '',
+                    name_minor: str = '',
+                    value: typ.Optional[typ.Union[u.Quantity, typ.Tuple[u.Quantity, u.Quantity]]] = None,
+                    digits_after_decimal: int = 3,
+                    remove_nominal_psf: bool = True
+            ):
+                if not isinstance(optics, esis.optics.Optics):
+                    optics_min, optics_max = optics
+
+                    psf_size_min = np.nanmean(optics_min.rays_output.spot_size_rms[..., 0, :])
+                    psf_size_max = np.nanmean(optics_max.rays_output.spot_size_rms[..., 0, :])
+
+                    if psf_size_max > psf_size_min:
+                        optics = optics_max
+                    else:
+                        optics = optics_min
+
+                    if value is not None:
+                        value_min, value_max = value
+                        if value_max == -value_min:
+                            value_str = f'$\\pm${kgpy.format.quantity(value_max, digits_after_decimal=digits_after_decimal)}'
+                        else:
+                            raise NotImplementedError
+                    else:
+                        value_str = ''
+
+                else:
+                    if value is not None:
+                        value_str = f'{kgpy.format.quantity(value, digits_after_decimal=digits_after_decimal)}'
+                    else:
+                        value_str = ''
+
+                psf_size = np.nanmean(optics.rays_output.spot_size_rms[..., 0, :])
+                if remove_nominal_psf:
+                    psf_size = np.sqrt(np.square(psf_size) - np.square(system_psf))
+
+                add_row_basic(
+                    tabular=tabular,
+                    optics=optics,
+                    name_major=name_major,
+                    name_minor=name_minor,
+                    value_str=value_str,
+                    psf_size=psf_size,
+                )
+
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('ll|rrrrrrrr')) as tabular:
+                        tabular.escape = False
+                        tabular.add_row([
+                            r'Element',
+                            r'',
+                            r'Tolerance',
+                            f'Piston ({opt.detector.translation_error.x.unit:latex_inline})',
+                            f'Inclination ({opt.grating.inclination_error.unit:latex_inline})',
+                            f'Twist ({opt.grating.twist_error.unit:latex_inline})',
+                            f'$\\sigma$ ({u.um:latex_inline})',
+                            f'$\\sigma$ ({units_psf:latex_inline})',
+                            f'$\\sigma$ ({u.arcsec:latex_inline})',
+                            r'\MTF\ '
+                        ])
+                        tabular.add_hline()
+                        add_row(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='System',
+                            name_minor='Aberration',
+                            remove_nominal_psf=False,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Diffraction',
+                            psf_size=diffraction_limit,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Thermal drift',
+                            psf_size=opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length / np.sqrt(8),
+                        )
+                        tabular.add_hline()
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='Primary',
+                            name_minor='Slope error',
+                            value_str=f'{kgpy.format.quantity(primary_slope_error, digits_after_decimal=1)}',
+                            psf_size=primary_slope_error_psf,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_primary_decenter_x_min,
+                                opt_primary_decenter_x_max,
+                            ),
+                            name_minor='Decenter $x$',
+                            value=(
+                                -opt_primary_decenter_x_min.primary.translation_error.value.xy.length,
+                                opt_primary_decenter_x_max.primary.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_primary_decenter_y_min,
+                                opt_primary_decenter_y_max,
+                            ),
+                            name_minor='Decenter $y$',
+                            value=(
+                                -opt_primary_decenter_y_min.primary.translation_error.value.xy.length,
+                                opt_primary_decenter_y_max.primary.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        tabular.add_hline()
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='Grating',
+                            name_minor='Slope error',
+                            value_str=f'{kgpy.format.quantity(grating_slope_error, digits_after_decimal=1)}',
+                            psf_size=grating_slope_error_psf,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_translation_x_min,
+                                opt_grating_translation_x_max,
+                            ),
+                            name_minor='Decenter $x$',
+                            value=(
+                                -opt_grating_translation_x_min.grating.translation_error.value.xy.length,
+                                opt_grating_translation_x_max.grating.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_translation_y_min,
+                                opt_grating_translation_y_max,
+                            ),
+                            name_minor='Decenter $y$',
+                            value=(
+                                -opt_grating_translation_y_min.grating.translation_error.value.xy.length,
+                                opt_grating_translation_y_max.grating.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_translation_z_min,
+                                opt_grating_translation_z_max,
+                            ),
+                            name_minor='Defocus',
+                            value=(
+                                opt_grating_translation_z_min.grating.translation_error.z,
+                                opt_grating_translation_z_max.grating.translation_error.z,
+                            ),
+                            digits_after_decimal=3,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_roll_min,
+                                opt_grating_roll_max,
+                            ),
+                            name_minor='Roll',
+                            value=(
+                                opt_grating_roll_min.grating.roll_error,
+                                opt_grating_roll_max.grating.roll_error,
+                            ),
+                            digits_after_decimal=3,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_radius_min,
+                                opt_grating_radius_max,
+                            ),
+                            name_minor='Radius',
+                            value=(
+                                opt_grating_radius_min.grating.tangential_radius_error,
+                                opt_grating_radius_max.grating.tangential_radius_error,
+                            ),
+                            digits_after_decimal=1,
+                        )
+                        tabular.add_hline()
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_detector_translation_x_min,
+                                opt_detector_translation_x_max,
+                            ),
+                            name_major='Detector',
+                            name_minor='Decenter $x$',
+                            value=(
+                                -opt_detector_translation_x_min.detector.translation_error.value.xy.length,
+                                opt_detector_translation_x_max.detector.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_detector_translation_y_min,
+                                opt_detector_translation_y_max,
+                            ),
+                            name_minor='Decenter $y$',
+                            value=(
+                                -opt_detector_translation_y_min.detector.translation_error.value.xy.length,
+                                opt_detector_translation_y_max.detector.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_detector_translation_z_min,
+                                opt_detector_translation_z_max,
+                            ),
+                            name_minor='Defocus',
+                            value=(
+                                opt_detector_translation_z_min.detector.translation_error.z,
+                                opt_detector_translation_z_max.detector.translation_error.z,
+                            ),
+                            digits_after_decimal=2,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Charge diffusion',
+                            psf_size=to_pix(opt.detector.charge_diffusion),
+                        )
+                        tabular.add_hline()
+                        print('pointing jitter', opt.sparcs.pointing_jitter)
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major=r'\SPARCSShort',
+                            name_minor='Pointing jitter',
+                            psf_size=opt.sparcs.pointing_jitter / opt.plate_scale.x,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Pointing drift',
+                            psf_size=opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length / np.sqrt(8),
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='RLG jitter',
+                            psf_size=opt.sparcs.rlg_jitter / opt.plate_scale.x,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='RLG drift',
+                            psf_size=opt.sparcs.rlg_drift / opt.plate_scale.x * opt.detector.exposure_length / np.sqrt(8),
+                        )
+                        tabular.add_hline()
+                        tabular.add_hline()
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='Total',
+                            psf_size=np.sqrt(accumulator['psf_size_squared']),
+                        )
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
@@ -2220,6 +2585,7 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
                     tabular.escape = False
                     tabular.add_row([r'Source', r'', r'\VR', r'\VR', r'\VR', r'\CDS'])
                     tabular.add_row(r'Solar context', r'', r'\QS', r'\CH', r'\AR', r'\AR')
+                    tabular.add_hline()
                     tabular.add_hline()
                     tabular.add_row([label, r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
                     tabular.add_row([r'', r'\MgXdim',] + [f'{c:0.0f}' for c in counts_mg10.value])
