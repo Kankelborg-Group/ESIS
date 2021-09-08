@@ -22,9 +22,9 @@ def _cache(factory: typ.Callable[[], esis.optics.Optics]):
     return func
 
 
-default_pupil_samples = 21
+default_pupil_samples = 15
 default_pupil_is_stratified_random = True
-default_field_samples = 21
+default_field_samples = 15
 default_field_is_stratified_random = False
 
 
