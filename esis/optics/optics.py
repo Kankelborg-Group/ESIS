@@ -243,6 +243,81 @@ class Optics(
     def wavelength_sorted(self) -> u.Quantity:
         return np.sort(self.wavelength)
 
+    def _focus_and_align_factory(
+            self,
+            values: np.ndarray,
+            units: typ.List[u.Unit],
+            focus_grating: bool,
+            focus_detector: bool,
+    ) -> typ.NoReturn:
+        values_iter = iter(values)
+        units_iter = iter(units)
+
+        self.grating.inclination_error = next(values_iter) * next(units_iter)
+        self.grating.twist_error = next(values_iter) * next(units_iter)
+
+        if focus_grating:
+            self.grating.translation_error.z = next(values_iter) * next(units_iter)
+
+        if focus_detector:
+            self.detector.translation_error.z = next(values_iter) * next(units_iter)
+
+        self.num_emission_lines = 1
+        self._system = None
+
+    def _focus_and_align_func(
+            self,
+            values: np.ndarray,
+            units: typ.List[u.Unit],
+            other: 'Optics',
+            focus_grating: bool,
+            focus_detector: bool,
+    ) -> float:
+        other._focus_and_align_factory(values, units, focus_grating, focus_detector)
+        result_size = np.nanmean(other.system.rays_output.spot_size_rms[..., 0, :])
+        result_position = np.nanmean(other.system.rays_output.position[..., 0, :])
+        target_position = kgpy.vector.Vector3D(x=7.2090754246099999 * u.mm)
+        result_position = result_position - target_position
+        result = np.sqrt(np.square(result_size) + np.square(result_position.length))
+        return result.value
+
+    def focus_and_align(
+            self,
+            focus_grating: bool = True,
+            focus_detector: bool = False,
+    ) -> 'Optics':
+        other = self.copy()
+        units = [
+            self.grating.inclination_error.unit,
+            self.grating.twist_error.unit,
+        ]
+        if focus_grating:
+            units += [self.grating.translation_error.z.unit]
+        if focus_detector:
+            units += [self.detector.translation_error.z.unit]
+
+        ranges = [
+            ([-0.1, 0.1] * u.deg).to(self.grating.inclination_error.unit).value,
+            ([-0.1, 0.1] * u.deg).to(self.grating.twist_error.unit).value,
+        ]
+        if focus_grating:
+            ranges += [([-3, 3] * u.mm).to(self.grating.translation_error.z.unit).value]
+        if focus_detector:
+            ranges += [([-10, 10] * u.mm).to(self.detector.translation_error.z.unit).value]
+
+        result = scipy.optimize.shgo(
+            func=self._focus_and_align_func,
+            args=(
+                units,
+                other,
+                focus_grating,
+                focus_detector,
+            ),
+            bounds=ranges,
+        )
+        other._focus_and_align_factory(result.x, units, focus_grating, focus_detector)
+        return other
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
         other.channel_name = self.channel_name.copy()
