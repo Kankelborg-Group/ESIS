@@ -43,6 +43,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     dark_current: u.Quantity = 0 * u.electron / u.s
     time_frame_transfer: u.Quantity = 0 * u.s
     time_readout: u.Quantity = 0 * u.s
+    exposure_length: u.Quantity = 0 * u.s
     exposure_length_min: u.Quantity = 0 * u.s
     exposure_length_max: u.Quantity = 0 * u.s
     exposure_length_increment: u.Quantity = 0 * u.s
@@ -150,6 +151,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.readout_noise = self.readout_noise.copy()
         other.time_frame_transfer = self.time_frame_transfer.copy()
         other.time_readout = self.time_readout.copy()
+        other.exposure_length = self.exposure_length.copy()
         other.exposure_length_min = self.exposure_length_min.copy()
         other.exposure_length_max = self.exposure_length_max.copy()
         other.exposure_length_increment = self.exposure_length_increment.copy()
@@ -178,6 +180,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['readout noise'] = [format.quantity(self.readout_noise)]
         dataframe['frame transfer time'] = [format.quantity(self.time_frame_transfer)]
         dataframe['readout time'] = [format.quantity(self.time_readout)]
+        dataframe['exposure length'] = [format.quantity(self.exposure_length)]
         dataframe['minimum exposure length'] = [format.quantity(self.exposure_length_min)]
         dataframe['maximum exposure length'] = [format.quantity(self.exposure_length_max)]
         dataframe['exposure length increment'] = [format.quantity(self.exposure_length_increment)]

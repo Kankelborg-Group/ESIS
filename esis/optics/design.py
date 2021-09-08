@@ -297,6 +297,7 @@ def final(
     detector.readout_noise = 4 * u.adu
     detector.time_frame_transfer = 60 * u.ms
     detector.time_readout = 1.1 * u.s
+    detector.exposure_length = 10 * u.s
     detector.exposure_length_min = 2 * u.s
     detector.exposure_length_max = 600 * u.s
     detector.exposure_length_increment = 100 * u.ms
