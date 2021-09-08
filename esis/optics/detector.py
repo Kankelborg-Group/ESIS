@@ -149,6 +149,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.temperature = self.temperature.copy()
         other.gain = self.gain.copy()
         other.readout_noise = self.readout_noise.copy()
+        other.dark_current = self.dark_current.copy()
         other.time_frame_transfer = self.time_frame_transfer.copy()
         other.time_readout = self.time_readout.copy()
         other.exposure_length = self.exposure_length.copy()
@@ -178,6 +179,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['temperature'] = [format.quantity(self.temperature)]
         dataframe['gain'] = [format.quantity(self.gain)]
         dataframe['readout noise'] = [format.quantity(self.readout_noise)]
+        dataframe['dark current'] = [format.quantity(self.dark_current)]
         dataframe['frame transfer time'] = [format.quantity(self.time_frame_transfer)]
         dataframe['readout time'] = [format.quantity(self.time_readout)]
         dataframe['exposure length'] = [format.quantity(self.exposure_length)]
