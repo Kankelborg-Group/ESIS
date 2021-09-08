@@ -41,6 +41,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
     dark_current: u.Quantity = 0 * u.electron / u.s
+    charge_diffusion: u.Quantity = 0 * u.mm
     time_frame_transfer: u.Quantity = 0 * u.s
     time_readout: u.Quantity = 0 * u.s
     exposure_length: u.Quantity = 0 * u.s
@@ -150,6 +151,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.gain = self.gain.copy()
         other.readout_noise = self.readout_noise.copy()
         other.dark_current = self.dark_current.copy()
+        other.charge_diffusion = self.charge_diffusion.copy()
         other.time_frame_transfer = self.time_frame_transfer.copy()
         other.time_readout = self.time_readout.copy()
         other.exposure_length = self.exposure_length.copy()
@@ -180,6 +182,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['gain'] = [format.quantity(self.gain)]
         dataframe['readout noise'] = [format.quantity(self.readout_noise)]
         dataframe['dark current'] = [format.quantity(self.dark_current)]
+        dataframe['charge diffusion'] = [format.quantity(self.charge_diffusion)]
         dataframe['frame transfer time'] = [format.quantity(self.time_frame_transfer)]
         dataframe['readout time'] = [format.quantity(self.time_readout)]
         dataframe['exposure length'] = [format.quantity(self.exposure_length)]

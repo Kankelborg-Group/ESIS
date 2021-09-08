@@ -295,6 +295,7 @@ def final(
     detector.temperature = -55 * u.deg_C
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
+    detector.charge_diffusion = 2 * u.um
     detector.time_frame_transfer = 60 * u.ms
     detector.time_readout = 1.1 * u.s
     detector.exposure_length = 10 * u.s
