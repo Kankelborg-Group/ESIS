@@ -233,6 +233,54 @@ def error_grating_radius_max() -> esis.optics.Optics:
 
 
 @_cache
+def error_grating_ruling_density_min() -> esis.optics.Optics:
+    opt = esis.optics.design.final(**error_kwargs)
+    opt_uncertainty = esis.optics.design.final(**error_kwargs, use_uncertainty=True)
+    opt.grating.ruling_density_error = opt_uncertainty.grating.ruling_density_error.min()
+    return opt.focus_and_align()
+
+
+@_cache
+def error_grating_ruling_density_max() -> esis.optics.Optics:
+    opt = esis.optics.design.final(**error_kwargs)
+    opt_uncertainty = esis.optics.design.final(**error_kwargs, use_uncertainty=True)
+    opt.grating.ruling_density_error = opt_uncertainty.grating.ruling_density_error.max()
+    return opt.focus_and_align()
+
+
+@_cache
+def error_grating_ruling_spacing_linear_min() -> esis.optics.Optics:
+    opt = esis.optics.design.final(**error_kwargs)
+    opt_uncertainty = esis.optics.design.final(**error_kwargs, use_uncertainty=True)
+    opt.grating.ruling_spacing_coeff_linear_error = opt_uncertainty.grating.ruling_spacing_coeff_linear_error.min()
+    return opt.focus_and_align()
+
+
+@_cache
+def error_grating_ruling_spacing_linear_max() -> esis.optics.Optics:
+    opt = esis.optics.design.final(**error_kwargs)
+    opt_uncertainty = esis.optics.design.final(**error_kwargs, use_uncertainty=True)
+    opt.grating.ruling_spacing_coeff_linear_error = opt_uncertainty.grating.ruling_spacing_coeff_linear_error.max()
+    return opt.focus_and_align()
+
+
+@_cache
+def error_grating_ruling_spacing_quadratic_min() -> esis.optics.Optics:
+    opt = esis.optics.design.final(**error_kwargs)
+    opt_uncertainty = esis.optics.design.final(**error_kwargs, use_uncertainty=True)
+    opt.grating.ruling_spacing_coeff_quadratic_error = opt_uncertainty.grating.ruling_spacing_coeff_quadratic_error.min()
+    return opt.focus_and_align()
+
+
+@_cache
+def error_grating_ruling_spacing_quadratic_max() -> esis.optics.Optics:
+    opt = esis.optics.design.final(**error_kwargs)
+    opt_uncertainty = esis.optics.design.final(**error_kwargs, use_uncertainty=True)
+    opt.grating.ruling_spacing_coeff_quadratic_error = opt_uncertainty.grating.ruling_spacing_coeff_quadratic_error.max()
+    return opt.focus_and_align()
+
+
+@_cache
 def error_detector_translation_x_min() -> esis.optics.Optics:
     opt = esis.optics.design.final(**error_kwargs)
     opt_uncertainty = esis.optics.design.final(**error_kwargs, use_uncertainty=True)

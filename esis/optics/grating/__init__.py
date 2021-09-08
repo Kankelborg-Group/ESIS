@@ -33,6 +33,10 @@ class GratingAxes(mixin.AutoAxis):
         self.grating_twist = self.auto_axis_index(from_right=True)
         self.grating_tangential_radius = self.auto_axis_index(from_right=True)
         self.grating_sagittal_radius = self.auto_axis_index(from_right=True)
+        self.grating_ruling_density = self.auto_axis_index(from_right=True)
+        self.grating_ruling_spacing_coeff_linear = self.auto_axis_index(from_right=True)
+        self.grating_ruling_spacing_coeff_quadratic = self.auto_axis_index(from_right=True)
+        self.grating_ruling_spacing_coeff_cubic = self.auto_axis_index(from_right=True)
 
 
 @dataclasses.dataclass
@@ -57,9 +61,13 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     nominal_output_angle: u.Quantity = 0 * u.deg
     diffraction_order: u.Quantity = 0 << u.dimensionless_unscaled
     ruling_density: u.Quantity = 0 / u.mm
+    ruling_density_error: u.Quantity = 0 / u.mm
     ruling_spacing_coeff_linear: u.Quantity = 0 * u.dimensionless_unscaled
+    ruling_spacing_coeff_linear_error: u.Quantity = 0 * u.dimensionless_unscaled
     ruling_spacing_coeff_quadratic: u.Quantity = 0 / u.mm
+    ruling_spacing_coeff_quadratic_error: u.Quantity = 0 / u.mm
     ruling_spacing_coeff_cubic: u.Quantity = 0 / u.mm ** 2
+    ruling_spacing_coeff_cubic_error: u.Quantity = 0 / u.mm ** 2
     aper_wedge_angle: u.Quantity = 0 * u.deg
     inner_half_width: u.Quantity = 0 * u.mm
     outer_half_width: u.Quantity = 0 * u.mm
@@ -169,10 +177,10 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         )
         surface.rulings = optics.surface.rulings.CubicPolySpacing(
             diffraction_order=self.diffraction_order,
-            ruling_density=self.ruling_density,
-            ruling_spacing_linear=self.ruling_spacing_coeff_linear,
-            ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic,
-            ruling_spacing_cubic=self.ruling_spacing_coeff_cubic,
+            ruling_density=self.ruling_density + self.ruling_density_error,
+            ruling_spacing_linear=self.ruling_spacing_coeff_linear + self.ruling_spacing_coeff_linear_error,
+            ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic + self.ruling_spacing_coeff_quadratic_error,
+            ruling_spacing_cubic=self.ruling_spacing_coeff_cubic + self.ruling_spacing_coeff_cubic_error,
         )
         surface.material = self.material
         side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
@@ -209,9 +217,13 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.nominal_output_angle = self.nominal_output_angle.copy()
         other.diffraction_order = self.diffraction_order.copy()
         other.ruling_density = self.ruling_density.copy()
+        other.ruling_density_error = self.ruling_density_error.copy()
         other.ruling_spacing_coeff_linear = self.ruling_spacing_coeff_linear.copy()
+        other.ruling_spacing_coeff_linear_error = self.ruling_spacing_coeff_linear_error.copy()
         other.ruling_spacing_coeff_quadratic = self.ruling_spacing_coeff_quadratic.copy()
+        other.ruling_spacing_coeff_quadratic_error = self.ruling_spacing_coeff_quadratic_error.copy()
         other.ruling_spacing_coeff_cubic = self.ruling_spacing_coeff_cubic.copy()
+        other.ruling_spacing_coeff_cubic_error = self.ruling_spacing_coeff_cubic_error.copy()
         other.aper_wedge_angle = self.aper_wedge_angle.copy()
         other.inner_half_width = self.inner_half_width.copy()
         other.outer_half_width = self.outer_half_width.copy()

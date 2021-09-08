@@ -296,6 +296,10 @@ def final(
         grating.tangential_radius_error = np.expand_dims([-1, 0, 1] * tangential_radius_error, axes.perp_axes(axes.grating_tangential_radius))
         grating.sagittal_radius_error = np.expand_dims([-1, 0, 1] * sagittal_radius_error, axes.perp_axes(axes.grating_sagittal_radius))
 
+        grating.ruling_density_error = np.expand_dims([-1, 0, 1] / u.mm, axes.perp_axes(axes.grating_ruling_density))
+        grating.ruling_spacing_coeff_linear_error = np.expand_dims(0.0512e-5 * ([-1, 0, 1] * u.um / u.mm), axes.perp_axes(axes.grating_ruling_spacing_coeff_linear))
+        grating.ruling_spacing_coeff_quadratic_error = np.expand_dims(0.08558e-7 * ([-1, 0, 1] * u.um / u.mm ** 2), axes.perp_axes(axes.grating_ruling_spacing_coeff_linear))
+
 
     filter = Filter()
     filter.translation.z = grating.translation.z + 1.301661998854058 * u.m

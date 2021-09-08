@@ -2050,6 +2050,12 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
             opt_grating_roll_max = optics.error_grating_roll_max()
             opt_grating_radius_min = optics.error_grating_radius_min()
             opt_grating_radius_max = optics.error_grating_radius_max()
+            opt_grating_ruling_density_min = optics.error_grating_ruling_density_min()
+            opt_grating_ruling_density_max = optics.error_grating_ruling_density_max()
+            opt_grating_ruling_spacing_linear_min = optics.error_grating_ruling_spacing_linear_min()
+            opt_grating_ruling_spacing_linear_max = optics.error_grating_ruling_spacing_linear_max()
+            opt_grating_ruling_spacing_quadratic_min = optics.error_grating_ruling_spacing_quadratic_min()
+            opt_grating_ruling_spacing_quadratic_max = optics.error_grating_ruling_spacing_quadratic_max()
 
             opt_detector_translation_x_min = optics.error_detector_translation_x_min()
             opt_detector_translation_x_max = optics.error_detector_translation_x_max()
@@ -2104,8 +2110,14 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                     name_minor: str = '',
                     value: typ.Optional[typ.Union[u.Quantity, typ.Tuple[u.Quantity, u.Quantity]]] = None,
                     digits_after_decimal: int = 3,
+                    scientific_notation: bool = False,
                     remove_nominal_psf: bool = True
             ):
+                format_kwargs = dict(
+                    digits_after_decimal=digits_after_decimal,
+                    scientific_notation=scientific_notation,
+                )
+
                 if not isinstance(optics, esis.optics.Optics):
                     optics_min, optics_max = optics
 
@@ -2120,7 +2132,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                     if value is not None:
                         value_min, value_max = value
                         if value_max == -value_min:
-                            value_str = f'$\\pm${kgpy.format.quantity(value_max, digits_after_decimal=digits_after_decimal)}'
+                            value_str = f'$\\pm${kgpy.format.quantity(value_max, **format_kwargs)}'
                         else:
                             raise NotImplementedError
                     else:
@@ -2128,7 +2140,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
 
                 else:
                     if value is not None:
-                        value_str = f'{kgpy.format.quantity(value, digits_after_decimal=digits_after_decimal)}'
+                        value_str = f'{kgpy.format.quantity(value, **format_kwargs)}'
                     else:
                         value_str = ''
 
@@ -2290,6 +2302,47 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_grating_radius_max.grating.tangential_radius_error,
                             ),
                             digits_after_decimal=1,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_ruling_density_min,
+                                opt_grating_ruling_density_max,
+                            ),
+                            name_minor='Ruling density',
+                            value=(
+                                opt_grating_ruling_density_min.grating.ruling_density_error,
+                                opt_grating_ruling_density_max.grating.ruling_density_error,
+                            ),
+                            digits_after_decimal=1,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_ruling_spacing_linear_min,
+                                opt_grating_ruling_spacing_linear_max,
+                            ),
+                            name_minor='Linear coeff.',
+                            value=(
+                                opt_grating_ruling_spacing_linear_min.grating.ruling_spacing_coeff_linear_error,
+                                opt_grating_ruling_spacing_linear_max.grating.ruling_spacing_coeff_linear_error,
+                            ),
+                            digits_after_decimal=3,
+                            scientific_notation=True,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_ruling_spacing_quadratic_min,
+                                opt_grating_ruling_spacing_quadratic_max,
+                            ),
+                            name_minor='Quadratic coeff.',
+                            value=(
+                                opt_grating_ruling_spacing_quadratic_min.grating.ruling_spacing_coeff_quadratic_error,
+                                opt_grating_ruling_spacing_quadratic_max.grating.ruling_spacing_coeff_quadratic_error,
+                            ),
+                            digits_after_decimal=3,
+                            scientific_notation=True,
                         )
                         tabular.add_hline()
                         add_row(
