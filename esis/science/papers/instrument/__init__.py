@@ -2157,6 +2157,9 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                     psf_size=psf_size,
                 )
 
+            def ptp_to_rms(value: u.Quantity) -> u.Quantity:
+                return value / np.sqrt(8)
+
             with doc.create(pylatex.Table()) as table:
                 table._star_latex_name = True
                 with table.create(pylatex.Center()) as centering:
@@ -2192,7 +2195,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             tabular=tabular,
                             optics=opt,
                             name_minor='Thermal drift',
-                            psf_size=opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length / np.sqrt(8),
+                            psf_size=ptp_to_rms(opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length),
                         )
                         tabular.add_hline()
                         add_row_basic(
@@ -2327,7 +2330,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_grating_ruling_spacing_linear_min.grating.ruling_spacing_coeff_linear_error,
                                 opt_grating_ruling_spacing_linear_max.grating.ruling_spacing_coeff_linear_error,
                             ),
-                            digits_after_decimal=3,
+                            digits_after_decimal=1,
                             scientific_notation=True,
                         )
                         add_row(
@@ -2341,7 +2344,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_grating_ruling_spacing_quadratic_min.grating.ruling_spacing_coeff_quadratic_error,
                                 opt_grating_ruling_spacing_quadratic_max.grating.ruling_spacing_coeff_quadratic_error,
                             ),
-                            digits_after_decimal=3,
+                            digits_after_decimal=1,
                             scientific_notation=True,
                         )
                         tabular.add_hline()
@@ -2397,25 +2400,29 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             optics=opt,
                             name_major=r'\SPARCSShort',
                             name_minor='Pointing jitter',
-                            psf_size=opt.sparcs.pointing_jitter / opt.plate_scale.x,
+                            value_str=f'$\\pm${kgpy.format.quantity(opt.sparcs.pointing_jitter / 2)}',
+                            psf_size=ptp_to_rms(opt.sparcs.pointing_jitter / opt.plate_scale.x),
                         )
                         add_row_basic(
                             tabular=tabular,
                             optics=opt,
                             name_minor='Pointing drift',
-                            psf_size=opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length / np.sqrt(8),
+                            value_str=f'{kgpy.format.quantity(opt.sparcs.pointing_drift)}',
+                            psf_size=ptp_to_rms(opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length),
                         )
                         add_row_basic(
                             tabular=tabular,
                             optics=opt,
-                            name_minor='RLG jitter',
-                            psf_size=opt.sparcs.rlg_jitter / opt.plate_scale.x,
+                            name_minor='Roll jitter',
+                            value_str=f'$\\pm${kgpy.format.quantity(opt.sparcs.rlg_jitter / 2, digits_after_decimal=0)}',
+                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_jitter / 2) * opt.field_of_view.x / 4 / opt.plate_scale.x),
                         )
                         add_row_basic(
                             tabular=tabular,
                             optics=opt,
-                            name_minor='RLG drift',
-                            psf_size=opt.sparcs.rlg_drift / opt.plate_scale.x * opt.detector.exposure_length / np.sqrt(8),
+                            name_minor='Roll drift',
+                            value_str=f'{kgpy.format.quantity(opt.sparcs.rlg_drift)}',
+                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_drift * opt.detector.exposure_length / 2) * opt.field_of_view.x / 4 / opt.plate_scale.x),
                         )
                         tabular.add_hline()
                         tabular.add_hline()
