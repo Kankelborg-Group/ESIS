@@ -2014,7 +2014,8 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
             opt = esis.optics.design.final(**optics.error_kwargs)
             system_psf = np.nanmean(opt.rays_output.spot_size_rms[..., 0, :])
 
-            frequency_mtf = 0.5 / u.arcsec * plate_scale.x
+            frequency_mtf_arcsec = 0.5 * u.cycle / u.arcsec
+            frequency_mtf = frequency_mtf_arcsec * plate_scale.x / u.cycle
             def to_mtf(psf_size: u.Quantity):
                 psf_size = psf_size / np.sqrt(2)
                 alpha = 1 / (2 * psf_size ** 2)
@@ -2434,6 +2435,12 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             name_major='Total',
                             psf_size=np.sqrt(accumulator['psf_size_squared']),
                         )
+                table.add_caption(pylatex.NoEscape(
+                    f"""
+Imaging error budget and tolerance analysis results. \\MTF\\ is given at 
+{kgpy.format.quantity(frequency_mtf_arcsec, digits_after_decimal=1)}."""
+                ))
+                table.append(kgpy.latex.Label('table:errorBudget'))
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
