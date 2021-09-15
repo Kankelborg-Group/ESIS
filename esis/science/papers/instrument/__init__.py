@@ -2213,7 +2213,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_primary_decenter_x_min,
                                 opt_primary_decenter_x_max,
                             ),
-                            name_minor='Decenter $x$',
+                            name_minor='Translation $x$',
                             value=(
                                 -opt_primary_decenter_x_min.primary.translation_error.value.xy.length,
                                 opt_primary_decenter_x_max.primary.translation_error.value.xy.length,
@@ -2226,7 +2226,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_primary_decenter_y_min,
                                 opt_primary_decenter_y_max,
                             ),
-                            name_minor='Decenter $y$',
+                            name_minor='Translation $y$',
                             value=(
                                 -opt_primary_decenter_y_min.primary.translation_error.value.xy.length,
                                 opt_primary_decenter_y_max.primary.translation_error.value.xy.length,
@@ -2248,7 +2248,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_grating_translation_x_min,
                                 opt_grating_translation_x_max,
                             ),
-                            name_minor='Decenter $x$',
+                            name_minor='Translation $x$',
                             value=(
                                 -opt_grating_translation_x_min.grating.translation_error.value.xy.length,
                                 opt_grating_translation_x_max.grating.translation_error.value.xy.length,
@@ -2261,7 +2261,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_grating_translation_y_min,
                                 opt_grating_translation_y_max,
                             ),
-                            name_minor='Decenter $y$',
+                            name_minor='Translation $y$',
                             value=(
                                 -opt_grating_translation_y_min.grating.translation_error.value.xy.length,
                                 opt_grating_translation_y_max.grating.translation_error.value.xy.length,
@@ -2274,7 +2274,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_grating_translation_z_min,
                                 opt_grating_translation_z_max,
                             ),
-                            name_minor='Defocus',
+                            name_minor='Translation $z$',
                             value=(
                                 opt_grating_translation_z_min.grating.translation_error.z,
                                 opt_grating_translation_z_max.grating.translation_error.z,
@@ -2356,7 +2356,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_detector_translation_x_max,
                             ),
                             name_major='Detector',
-                            name_minor='Decenter $x$',
+                            name_minor='Translation $x$',
                             value=(
                                 -opt_detector_translation_x_min.detector.translation_error.value.xy.length,
                                 opt_detector_translation_x_max.detector.translation_error.value.xy.length,
@@ -2369,7 +2369,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_detector_translation_y_min,
                                 opt_detector_translation_y_max,
                             ),
-                            name_minor='Decenter $y$',
+                            name_minor='Translation $y$',
                             value=(
                                 -opt_detector_translation_y_min.detector.translation_error.value.xy.length,
                                 opt_detector_translation_y_max.detector.translation_error.value.xy.length,
@@ -2382,7 +2382,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                                 opt_detector_translation_z_min,
                                 opt_detector_translation_z_max,
                             ),
-                            name_minor='Defocus',
+                            name_minor='Translation $z$',
                             value=(
                                 opt_detector_translation_z_min.detector.translation_error.z,
                                 opt_detector_translation_z_max.detector.translation_error.z,
