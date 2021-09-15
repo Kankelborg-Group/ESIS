@@ -1832,10 +1832,10 @@ defined per ISO 10110."""
                         tabular.add_hline()
                         tabular.add_row([
                             r'Primary',
-                            f'{optics_single.primary.roughness.periods_min.to(unit_period_min).value:0.2f}',
-                            f'{optics_single.primary.roughness.periods_max.to(unit_period_max).value:0.1f}',
-                            f'{optics_single.primary.roughness.value.to(unit_roughness).value:0.1f}',
-                            f'{optics_all.primary.roughness.value.to(unit_roughness).value:0.1f}',
+                            f'{optics_single.primary.microroughness.periods_min.to(unit_period_min).value:0.2f}',
+                            f'{optics_single.primary.microroughness.periods_max.to(unit_period_max).value:0.1f}',
+                            f'{optics_single.primary.microroughness.value.to(unit_roughness).value:0.1f}',
+                            f'{optics_all.primary.microroughness.value.to(unit_roughness).value:0.1f}',
                         ])
                         tabular.add_row([
                             r'Grating',

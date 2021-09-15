@@ -191,9 +191,9 @@ def final(
     primary.ripple.value = 2.5 * u.nm
     primary.ripple.periods_min = 0.06 * u.mm
     primary.ripple.periods_max = 6 * u.mm
-    primary.roughness.value = 1 * u.nm
-    primary.roughness.periods_min = 1.6 * u.um
-    primary.roughness.periods_max = 70 * u.um
+    primary.microroughness.value = 1 * u.nm
+    primary.microroughness.periods_min = 1.6 * u.um
+    primary.microroughness.periods_max = 70 * u.um
     primary.num_sides = num_sides
     primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
     primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
