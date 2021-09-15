@@ -2,6 +2,7 @@ import typing as typ
 import pathlib
 import matplotlib.pyplot as plt
 import astropy.units as u
+import astropy.modeling
 import numpy as np
 import pylatex
 import num2words
@@ -2065,11 +2066,19 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
             opt_detector_translation_z_max = optics.error_detector_translation_z_max()
 
             rays = opt.system.rays_input.copy()
+            rays.position = np.broadcast_to(rays.position, opt.rays_output.position.shape, subok=True).copy()
             rays.position[~opt.rays_output.mask] = np.nan
             rays_min = np.nanmin(rays.position, axis=(rays.axis.pupil_x, rays.axis.pupil_y))
             rays_max = np.nanmax(rays.position, axis=(rays.axis.pupil_x, rays.axis.pupil_y))
             rays_range = np.nanmean(rays_max - rays_min)
-            diffraction_limit = np.sqrt(2) * 0.42 * np.arctan2(opt.wavelength[0], rays_range.x).to(u.arcsec) / opt.plate_scale.x / 2
+            detector_x = np.linspace(-1, 1, 100) / 2 * u.pix
+            diffraction_intensity = np.sinc(rays_range.x / wavelength_o5 * u.rad * np.sin(detector_x * opt.plate_scale.x)) ** 2
+            model = astropy.modeling.fitting.LevMarLSQFitter()(
+                model=astropy.modeling.models.Gaussian1D(),
+                x=detector_x,
+                y=diffraction_intensity,
+            )
+            diffraction_limit = np.sqrt(2) * model.stddev.quantity
 
             accumulator = dict(
                 psf_size_squared=0 * u.pix ** 2,
