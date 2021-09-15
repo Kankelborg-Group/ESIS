@@ -95,9 +95,9 @@ Distortion
 
 """
 import dataclasses
-
 import numpy as np
 from astropy import units as u
+import astropy.modeling
 import kgpy.units
 from kgpy import Name, vector
 import kgpy.optics
@@ -331,7 +331,28 @@ def final(
     detector.temperature = -55 * u.deg_C
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
-    detector.charge_diffusion = 2 * u.um
+
+    moses_pixel_width = 13 * u.um
+    kernel = [
+                 [.034, .077, .034],
+                 [.076, .558, .076],
+                 [.034, .077, .034],
+             ] * u.dimensionless_unscaled
+    fitter = astropy.modeling.fitting.LevMarLSQFitter()
+    charge_diffusion_model = fitter(
+        astropy.modeling.models.Gaussian2D(x_stddev=3 * u.um, y_stddev=3 * u.um),
+        *np.broadcast_arrays(
+            np.linspace(-1, 1, 3)[:, np.newaxis] * moses_pixel_width,
+            np.linspace(-1, 1, 3)[np.newaxis, :] * moses_pixel_width,
+            kernel,
+            subok=True,
+        )
+    )
+    detector.charge_diffusion = kgpy.vector.Vector2D(
+        x=charge_diffusion_model.x_stddev.quantity,
+        y=charge_diffusion_model.y_stddev.quantity,
+    ).length
+
     detector.time_frame_transfer = 60 * u.ms
     detector.time_readout = 1.1 * u.s
     detector.exposure_length = 10 * u.s
