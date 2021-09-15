@@ -2010,7 +2010,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
             plate_scale = optics_single.plate_scale
             focal_length_effective = optics_single.magnification.x * optics_single.primary.focal_length
 
-            opt = optics.error_optimized()
+            opt = esis.optics.design.final(**optics.error_kwargs)
             system_psf = np.nanmean(opt.rays_output.spot_size_rms[..., 0, :])
 
             frequency_mtf = 0.5 / u.arcsec * plate_scale.x
