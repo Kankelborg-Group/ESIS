@@ -1839,10 +1839,10 @@ defined per ISO 10110."""
                         ])
                         tabular.add_row([
                             r'Grating',
-                            f'{optics_single.grating.roughness.periods_min.to(unit_period_min).value:0.2f}',
-                            f'{optics_single.grating.roughness.periods_max.to(unit_period_max).value:0.1f}',
-                            f'{optics_single.grating.roughness.value.to(unit_roughness).value:0.1f}',
-                            f'{optics_all.grating.roughness.value.to(unit_roughness).value.mean():0.1f}',
+                            f'{optics_single.grating.microroughness.periods_min.to(unit_period_min).value:0.2f}',
+                            f'{optics_single.grating.microroughness.periods_max.to(unit_period_max).value:0.1f}',
+                            f'{optics_single.grating.microroughness.value.to(unit_roughness).value:0.1f}',
+                            f'{optics_all.grating.microroughness.value.to(unit_roughness).value.mean():0.1f}',
                         ])
 
                 table.add_caption(pylatex.NoEscape(

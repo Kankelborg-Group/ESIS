@@ -242,9 +242,9 @@ def final(
     grating.ripple.value = 4 * u.nm
     grating.ripple.periods_min = 0.024 * u.mm
     grating.ripple.periods_max = 2.4 * u.mm
-    grating.roughness.value = 1 * u.nm
-    grating.roughness.periods_min = 0.02 * u.um
-    grating.roughness.periods_max = 2 * u.um
+    grating.microroughness.value = 1 * u.nm
+    grating.microroughness.periods_min = 0.02 * u.um
+    grating.microroughness.periods_max = 2 * u.um
     grating.nominal_input_angle = 1.301 * u.deg
     grating.nominal_output_angle = 8.057 * u.deg
     grating.ruling_density = (2.586608603456000 / u.um).to(1 / u.mm)

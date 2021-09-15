@@ -56,7 +56,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     sagittal_radius_error: u.Quantity = 0 * u.mm
     slope_error: optics.surface.sag.SlopeErrorRMS = dataclasses.field(default_factory=optics.surface.sag.SlopeErrorRMS)
     ripple: optics.surface.sag.RippleRMS = dataclasses.field(default_factory=optics.surface.sag.RippleRMS)
-    roughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
+    microroughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
     nominal_input_angle: u.Quantity = 0 * u.deg
     nominal_output_angle: u.Quantity = 0 * u.deg
     diffraction_order: u.Quantity = 0 << u.dimensionless_unscaled
@@ -87,7 +87,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['sagittal radius'] = [format.quantity(self.sagittal_radius.to(u.mm))]
         dataframe['slope error'] = [format.quantity(self.slope_error.value)]
         dataframe['ripple'] = [format.quantity(self.ripple.value)]
-        dataframe['roughness'] = [format.quantity(self.roughness.value)]
+        dataframe['microroughness'] = [format.quantity(self.microroughness.value)]
         dataframe['nominal alpha'] = [format.quantity(self.nominal_input_angle.to(u.deg))]
         dataframe['nominal beta'] = [format.quantity(self.nominal_output_angle.to(u.deg))]
         dataframe['diffraction order'] = [format.quantity(self.diffraction_order)]
@@ -212,7 +212,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.sagittal_radius_error = self.sagittal_radius_error.copy()
         other.slope_error = self.slope_error.copy()
         other.ripple = self.ripple.copy()
-        other.roughness = self.roughness.copy()
+        other.microroughness = self.microroughness.copy()
         other.nominal_input_angle = self.nominal_input_angle.copy()
         other.nominal_output_angle = self.nominal_output_angle.copy()
         other.diffraction_order = self.diffraction_order.copy()
