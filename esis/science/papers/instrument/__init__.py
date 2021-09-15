@@ -2103,10 +2103,6 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                     name_major,
                     name_minor,
                     value_str,
-                    f'{optics.grating.translation_error.z.value:0.3f}',
-                    f'{optics.grating.inclination_error.value:0.3f}',
-                    f'{optics.grating.twist_error.value:0.3f}',
-                    f'{from_pix(psf_size).to(u.um).value:0.2f}',
                     f'{psf_size.to(u.pix).value:0.2f}',
                     f'{(psf_size * optics.plate_scale.x).to(u.arcsec).value:0.2f}',
                     f'{mtf.value:0.3f}',
@@ -2172,16 +2168,12 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
             with doc.create(pylatex.Table()) as table:
                 table._star_latex_name = True
                 with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular('ll|rrrrrrrr')) as tabular:
+                    with centering.create(pylatex.Tabular('ll|rrrr')) as tabular:
                         tabular.escape = False
                         tabular.add_row([
                             r'Element',
                             r'',
                             r'Tolerance',
-                            f'Piston ({opt.detector.translation_error.x.unit:latex_inline})',
-                            f'Inclination ({opt.grating.inclination_error.unit:latex_inline})',
-                            f'Twist ({opt.grating.twist_error.unit:latex_inline})',
-                            f'$\\sigma$ ({u.um:latex_inline})',
                             f'$\\sigma$ ({units_psf:latex_inline})',
                             f'$\\sigma$ ({u.arcsec:latex_inline})',
                             r'\MTF\ '
