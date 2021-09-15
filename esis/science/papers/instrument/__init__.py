@@ -2620,7 +2620,7 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
         area_mg10 = area[2]
 
         pixel_subtent = (optics_single.plate_scale.x * optics_single.plate_scale.y * u.pix * u.pix).to(u.sr)
-        time_integration = 10 * u.s
+        time_integration = optics_single.detector.exposure_length
 
         counts_o5 = (intensity_o5 * area_o5 * pixel_subtent * time_integration / energy_o5).to(u.photon)
         counts_mg10 = (intensity_mg10 * area_mg10 * pixel_subtent * time_integration / energy_mg10).to(u.photon)
