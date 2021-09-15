@@ -2151,7 +2151,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
 
                 psf_size = np.nanmean(optics.rays_output.spot_size_rms[..., 0, :])
                 if remove_nominal_psf:
-                    psf_size = np.sqrt(np.square(psf_size) - np.square(system_psf))
+                    psf_size = np.nan_to_num(np.sqrt(np.square(psf_size) - np.square(system_psf)))
 
                 add_row_basic(
                     tabular=tabular,
