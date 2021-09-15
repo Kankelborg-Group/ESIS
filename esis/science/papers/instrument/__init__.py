@@ -2411,19 +2411,20 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             value_str=f'{kgpy.format.quantity(opt.sparcs.pointing_drift)}',
                             psf_size=ptp_to_rms(opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length),
                         )
+                        pointing = 10 * u.arcmin
                         add_row_basic(
                             tabular=tabular,
                             optics=opt,
                             name_minor='Roll jitter',
                             value_str=f'$\\pm${kgpy.format.quantity(opt.sparcs.rlg_jitter / 2, digits_after_decimal=0)}',
-                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_jitter / 2) * opt.field_of_view.x / 4 / opt.plate_scale.x),
+                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_jitter / 2) * pointing / opt.plate_scale.x),
                         )
                         add_row_basic(
                             tabular=tabular,
                             optics=opt,
                             name_minor='Roll drift',
                             value_str=f'{kgpy.format.quantity(opt.sparcs.rlg_drift)}',
-                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_drift * opt.detector.exposure_length / 2) * opt.field_of_view.x / 4 / opt.plate_scale.x),
+                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_drift * opt.detector.exposure_length / 2) * pointing / opt.plate_scale.x),
                         )
                         tabular.add_hline()
                         tabular.add_hline()
