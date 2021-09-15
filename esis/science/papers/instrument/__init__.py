@@ -2401,7 +2401,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             optics=opt,
                             name_major=r'\SPARCSShort',
                             name_minor='Pointing jitter',
-                            value_str=f'$\\pm${kgpy.format.quantity(opt.sparcs.pointing_jitter / 2)}',
+                            value_str=f'$\\pm${kgpy.format.quantity(opt.sparcs.pointing_jitter / 2, digits_after_decimal=2)}',
                             psf_size=ptp_to_rms(opt.sparcs.pointing_jitter / opt.plate_scale.x),
                         )
                         add_row_basic(
