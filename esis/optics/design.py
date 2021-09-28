@@ -332,7 +332,7 @@ def final(
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
 
-    moses_pixel_width = 13 * u.um
+    moses_pixel_width = 13.5 * u.um
     kernel = [
                  [.034, .077, .034],
                  [.076, .558, .076],
