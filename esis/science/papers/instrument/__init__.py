@@ -963,6 +963,7 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('Cr', 'chromium', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Ni', 'nickel', short=True))
     doc.preamble.append(kgpy.latex.Acronym('LN', 'liquid nitrogen',  pylatex.NoEscape('LN$_2$')))
+    doc.preamble.append(kgpy.latex.Acronym('HeNe', 'helium-neon', 'He-Ne'))
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
@@ -2676,7 +2677,7 @@ Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in \
         with doc.create(pylatex.Subsection('Alignment and Focus')):
             doc.append(pylatex.NoEscape(
                 r"""
-In the conceptual phase of \ESIS, the decision was made to perform focus and alignment in visible light with a HeNe 
+In the conceptual phase of \ESIS, the decision was made to perform focus and alignment in visible light with a \HeNe\ 
 source.
 Certain difficulties are introduced by this choice, however, the benefits outweigh the operational complexity and 
 equipment that would be required for focus in \EUV.
@@ -2707,7 +2708,7 @@ Trapezoidal grating, bipods, and mounting plate are installed on the tuffet in f
 
             doc.append(pylatex.NoEscape(
                 r"""
-After alignment and focus has been obtained with the HeNe source, the instrument will be prepared for flight by 
+After alignment and focus has been obtained with the \HeNe\ source, the instrument will be prepared for flight by 
 replacing the visible gratings by the \EUV\ flight versions.
 Each grating (\EUV\ and alignment) is individually mounted to a backing plate using a bipod system similar to that of the 
 primary mirror.
@@ -2749,7 +2750,7 @@ their alignment and focus to ensure everything was transferred correctly.
 When transferring the focus and alignment two key details were considered.
 First, there is nothing about the tuffet that constrains the grating roll.
 Therefore, we needed to ensure each flight grating had the same roll as each visible grating.
-This was accomplished by using a HeNe laser diverged through a cylindrical optic that illuminated each grating with a 
+This was accomplished by using a \HeNe\ laser diverged through a cylindrical optic that illuminated each grating with a 
 line perpendicular to the grating blaze direction.
 The line of light was reflected back onto a ruled target that could be compared between gratings.
 Since our alignment gratings were ruled to image light of approximately an order of magnitude longer wavelength the
