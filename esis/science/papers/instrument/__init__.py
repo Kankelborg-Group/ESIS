@@ -1512,8 +1512,7 @@ $n_e T = $\,\chiantiPressure.}"""
                                 r'\fov, Table~\ref{table:prescription}',
                             ])
                         table.add_caption(pylatex.NoEscape(
-                            r"""\ESIS\ instrument requirements.  
-AR is active region, QS quiet sun, and CH coronal hole."""
+                            r"""\ESIS\ instrument requirements."""
                         ))
                         table.append(kgpy.latex.Label('table:scireq'))
 
