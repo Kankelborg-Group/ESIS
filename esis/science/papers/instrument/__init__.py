@@ -395,9 +395,16 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=0,
     )
 
+    km_per_s_per_pix = u.def_unit(
+        'km_per_s_per_pix',
+        represents=u.km / u.s / u.pix,
+        format=dict(
+            latex=r'\mathrm{km\,s^{-1}\,pix^{-1}}'
+        )
+    )
     doc.set_variable_quantity(
         name='dispersionDoppler',
-        value=optics_single.dispersion_doppler.to(u.km / u.s / u.pix),
+        value=optics_single.dispersion_doppler.to(km_per_s_per_pix),
         digits_after_decimal=1,
     )
 
