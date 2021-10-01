@@ -2664,23 +2664,27 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
         with doc.create(pylatex.Table()) as table:
             # table._star_latex_name = True
             with table.create(pylatex.Center()) as centering:
-                with centering.create(pylatex.Tabular('llrrrr')) as tabular:
+                with centering.create(pylatex.Tabular('lrrrr')) as tabular:
                     tabular.escape = False
-                    tabular.add_row([r'Source', r'', r'\VR', r'\VR', r'\VR', r'\CDS'])
-                    tabular.add_row(r'Solar context', r'', r'\QS', r'\CH', r'\AR', r'\AR')
+                    tabular.add_row([r'Source', r'\VR', r'\VR', r'\VR', r'\CDS'])
+                    tabular.add_row(r'Solar context', r'\QSShort', r'\CHShort', r'\ARShort', r'\ARShort')
                     tabular.add_hline()
                     tabular.add_hline()
-                    tabular.add_row([label, r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
-                    tabular.add_row([r'', r'\MgXdim',] + [f'{c:0.0f}' for c in counts_mg10.value])
+                    tabular.append(f'\\multicolumn{{5}}{{c}}{{{label}}}\\\\')
+                    tabular.add_row([r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
+                    tabular.add_row([r'\MgXdim',] + [f'{c:0.0f}' for c in counts_mg10.value])
                     tabular.add_hline()
-                    tabular.add_row([r'', r'Total', ] + [f'{c:0.0f}' for c in counts_total.value])
-                    tabular.add_row([r'', r'Shot noise', ] + [f'{c:0.1f}' for c in noise_shot.value])
-                    tabular.add_row([r'', r'Read noise', ] + 4 * [f'{noise_read_o5.value:0.1f}'])
-                    tabular.add_row([r'', r'\SNR', ] + [f'{c:0.1f}' for c in snr.value])
+                    tabular.add_row([r'Total', ] + [f'{c:0.0f}' for c in counts_total.value])
+                    tabular.add_row([r'Shot noise', ] + [f'{c:0.1f}' for c in noise_shot.value])
+                    tabular.add_row([r'Read noise', ] + 4 * [f'{noise_read_o5.value:0.1f}'])
+                    tabular.add_row([r'\SNR', ] + [f'{c:0.1f}' for c in snr.value])
                     tabular.add_hline()
                     tabular.add_hline()
-                    tabular.add_row([label_stacked, 'Total', ] + [f'{c:0.0f}' for c in counts_total_stacked.value])
-                    tabular.add_row([r'', r'\SNR', ] + [f'{c:0.1f}' for c in snr_stacked.value])
+                    tabular.append(f'\\multicolumn{{5}}{{c}}{{{label_stacked}}}\\\\')
+                    tabular.add_row(['Total', ] + [f'{c:0.0f}' for c in counts_total_stacked.value])
+                    tabular.add_row([r'\SNR', ] + [f'{c:0.1f}' for c in snr_stacked.value])
+                    tabular.add_hline()
+                    tabular.add_hline()
 
             table.add_caption(pylatex.NoEscape(
                 r"""
