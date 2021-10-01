@@ -1470,44 +1470,44 @@ $n_e T = $\,\chiantiPressure.}"""
                             tabular.add_hline()
                             tabular.add_row([
                                 r'Spectral line',
-                                r'\OVion\ \roy{\OV}',
-                                r'Explosive events',
-                                r'\OVion, \MgXion, \HeIion, Table~\ref{table:prescription}',
+                                r'\OV',
+                                r'\EEs',
+                                r'\OVion, \MgXion, \HeIion, Table~\ref{table:prescription} \roy{Figure~\ref{fig:projections}}',
                             ])
                             tabular.add_row([
                                 r'Spectral resolution',
-                                r'\SI{18}{\kilo\meter\per\second} broadening \roy{\spectralResolutionRequirement}',
+                                r'\spectralResolutionRequirement\ broadening',
                                 r'\MHD\ waves',
                                 r'\dispersionDoppler, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
                                 r'Spatial resolution',
-                                r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter}) \roy{\angularResolutionRequirement (\spatialResolutionRequirement)}',
-                                r'Explosive events',
+                                r'\angularResolutionRequirement (\spatialResolutionRequirement)',
+                                r'\EEs',
                                 r'\spatialResolutionTotal, Table~\ref{table:errorBudget}',
                             ])
                             tabular.add_row([
-                                r'Desired \SNR',
-                                r'\SI{17.3}{} \roy{\snrRequirement} in \CHShort',
+                                r'\SNRShort',
+                                r'\snrRequirement\ (\CHShort)',
                                 r'\MHD\ waves in \CHShort',
-                                r'$>$\SI{17.7}{} \roy{\StackedCoronalHoleSNR} w/$20 \roy{\NumExpInStack} \times$\SI{10}{\second} \roy{\detectorExposureLength} exp., '
-                                r'\S~\ref{subsec:SensitivityandCadence}',
+                                r'\StackedCoronalHoleSNR\ ($\NumExpInStack \times \text{\detectorExposureLength}$ exp.), '
+                                r'Table~\ref{table:counts}',
                             ])
                             tabular.add_row([
                                 r'Cadence',
-                                r'\SI{15}{\second} \roy{\cadenceRequirement}',
+                                r'\cadenceRequirement',
                                 r'Torsional waves',
-                                r'\SI{10}{\second} \roy{\detectorExposureLength} eff., \S~\ref{subsec:SensitivityandCadence}',
+                                r'\detectorExposureLength\ eff., Section~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
                                 r'Observing time',
-                                r'$>$\SI{150}{\second} \roy{\observingTimeRequirement}',
-                                r'Explosive events',
-                                r'\SI{270}{\second}, \S~\ref{sec:MissionProfile}',
+                                r'\observingTimeRequirement',
+                                r'\EEs',
+                                r'\SI{270}{\second}, Section~\ref{sec:MissionProfile}',
                             ])
                             tabular.add_row([
-                                r'\FOV',
-                                r'\SI{10}{\arcminute} \roy{\fovRequirement} diameter ',
+                                r'\FOV\ diameter',
+                                r'\fovRequirement',
                                 r'Span \QSShort, \ARShort, and limb',
                                 r'\fov, Table~\ref{table:prescription}',
                             ])
