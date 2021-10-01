@@ -835,6 +835,12 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='detectorExposureLength',
+        value=optics_single.detector.exposure_length,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
         name='detectorMinExposureLength',
         value=optics_single.detector.exposure_length_min,
         digits_after_decimal=1,
@@ -1478,20 +1484,20 @@ $n_e T = $\,\chiantiPressure.}"""
                                 r'Spatial resolution',
                                 r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter}) \roy{\angularResolutionRequirement (\spatialResolutionRequirement)}',
                                 r'Explosive events',
-                                r'\spatialResolutionMax, Table~\ref{table:prescription}',
+                                r'\spatialResolutionTotal, Table~\ref{table:errorBudget}',
                             ])
                             tabular.add_row([
                                 r'Desired \SNR',
                                 r'\SI{17.3}{} \roy{\snrRequirement} in \CH',
                                 r'\MHD\ waves in \CH',
-                                r'$>$\SI{17.7}{} w/$20\times$\SI{10}{\second} exp., '
+                                r'$>$\SI{17.7}{} \roy{\StackedCoronalHoleSNR} w/$20 \roy{\NumExpInStack} \times$\SI{10}{\second} \roy{\detectorExposureLength} exp., '
                                 r'\S~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
                                 r'Cadence',
                                 r'\SI{15}{\second} \roy{\cadenceRequirement}',
                                 r'Torsional waves',
-                                r'\SI{10}{\second} eff., \S~\ref{subsec:SensitivityandCadence}',
+                                r'\SI{10}{\second} \roy{\detectorExposureLength} eff., \S~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
                                 r'Observing time',
@@ -2421,11 +2427,17 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                         )
                         tabular.add_hline()
                         tabular.add_hline()
+                        psf_size_total = np.sqrt(accumulator['psf_size_squared'])
+                        doc.set_variable_quantity(
+                            name='spatialResolutionTotal',
+                            value=2 * psf_size_total * opt.plate_scale.x,
+                            digits_after_decimal=2,
+                        )
                         add_row_basic(
                             tabular=tabular,
                             optics=opt,
                             name_major='Total',
-                            psf_size=np.sqrt(accumulator['psf_size_squared']),
+                            psf_size=psf_size_total,
                         )
                 table.add_caption(pylatex.NoEscape(
                     f"""
@@ -2618,7 +2630,7 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
         counts_mg10 = (intensity_mg10 * area_mg10 * pixel_subtent * time_integration / energy_mg10).to(u.photon)
         counts_total = counts_o5 + counts_mg10
 
-        stack_num = 3
+        stack_num = 12
         counts_total_stacked = counts_total * stack_num
 
         noise_shot = np.sqrt(counts_total.value) * counts_total.unit
@@ -2637,6 +2649,17 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
 
         label = f'1 $\\times$ {kgpy.format.quantity(time_integration, digits_after_decimal=0)} exp.'
         label_stacked = f'{stack_num} $\\times$ {kgpy.format.quantity(time_integration, digits_after_decimal=0)} exp.'
+
+        doc.set_variable(
+            name='NumExpInStack',
+            value=str(stack_num),
+        )
+
+        doc.set_variable_quantity(
+            name='StackedCoronalHoleSNR',
+            value=snr_stacked[np.argmin(intensity_o5)],
+            digits_after_decimal=1,
+        )
 
         with doc.create(pylatex.Table()) as table:
             # table._star_latex_name = True
