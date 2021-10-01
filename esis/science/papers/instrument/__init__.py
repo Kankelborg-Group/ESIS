@@ -952,9 +952,9 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
     doc.preamble.append(kgpy.latex.Acronym('MHD', 'magnetohydrodynamic'))
     doc.preamble.append(kgpy.latex.Acronym('EE', 'explosive event', plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('QS', 'quiet sun'))
-    doc.preamble.append(kgpy.latex.Acronym('AR', 'active region'))
-    doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole'))
+    doc.preamble.append(kgpy.latex.Acronym('QS', 'quiet sun', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('AR', 'active region', short=True, plural=True))
+    doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole', short=True, plural=True))
     doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('QE', 'quantum efficiency', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
@@ -1488,8 +1488,8 @@ $n_e T = $\,\chiantiPressure.}"""
                             ])
                             tabular.add_row([
                                 r'Desired \SNR',
-                                r'\SI{17.3}{} \roy{\snrRequirement} in \CH',
-                                r'\MHD\ waves in \CH',
+                                r'\SI{17.3}{} \roy{\snrRequirement} in \CHShort',
+                                r'\MHD\ waves in \CHShort',
                                 r'$>$\SI{17.7}{} \roy{\StackedCoronalHoleSNR} w/$20 \roy{\NumExpInStack} \times$\SI{10}{\second} \roy{\detectorExposureLength} exp., '
                                 r'\S~\ref{subsec:SensitivityandCadence}',
                             ])
@@ -1508,7 +1508,7 @@ $n_e T = $\,\chiantiPressure.}"""
                             tabular.add_row([
                                 r'\FOV',
                                 r'\SI{10}{\arcminute} \roy{\fovRequirement} diameter ',
-                                r'Span \QS, \AR, and limb',
+                                r'Span \QSShort, \ARShort, and limb',
                                 r'\fov, Table~\ref{table:prescription}',
                             ])
                         table.add_caption(pylatex.NoEscape(
@@ -2566,7 +2566,8 @@ stored in a nitrogen purged environment until after payload vibration testing.""
             doc.append(pylatex.NoEscape(
                 r"""
 Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the \CCD\ \QE\ listed in Table~\ref{table:prescription}.
-Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data.
+Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data, and
+are given in a variety of solar contexts: \QS, \CHs, and \ARs.
 The \SI{100}{\percent} duty cycle of \ESIS\ (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
 So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant \SNR\ penalty.
 Table~\ref{table:count} shows that \ESIS\ is effectively shot noise limited with a \SI{10}{\second} exposure.
