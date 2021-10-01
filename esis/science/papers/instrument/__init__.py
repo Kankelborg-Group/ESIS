@@ -1450,7 +1450,7 @@ meet our science goals."""
                     figure.add_image(str(figures.bunch_pdf()), width=None)
                     figure.add_caption(pylatex.NoEscape(
                         r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
-Calculated using ChiantiPy, with the \chiantiAbundances\ abundances file, the \chiantiDEM\ \DEM\ file, and
+Calculated using ChiantiPy, with the \cite{Schmelz2012} abundances, the \chiantiDEM\ \DEM\ file, and
 $n_e T = $\,\chiantiPressure.}"""
                     ))
                     figure.append(kgpy.latex.Label('fig:bunch'))
@@ -1513,7 +1513,7 @@ AR is active region, QS quiet sun, and CH coronal hole."""
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Instrument'))):
         doc.append(pylatex.NoEscape(
-            r"""\ESIS\ is a multiple projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
+            r"""\ESIS\ is a multi-projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
 widths in a single snapshot over a 2D \FOV.
 Starting from the notional instrument described in Sec.~\ref{sec:TheESISConcept}, \ESIS\ has been designed to ensure all 
 of the science requirements set forth in Table~\ref{table:scireq} are met.
@@ -1620,21 +1620,17 @@ channel.
                 figure.append(kgpy.latex.Label('fig:schematic'))
 
             doc.append(pylatex.NoEscape(
-                r"""The primary mirror is octagonal in shape.
-A triangular aperture mask in front of the primary mirror defines the clear aperture of each channel, imaged by a 
-single grating.
-Figure~\ref{fig:schematic}b shows one such aperture mask superimposed upon the primary mirror.
-The octagonal shape of the primary also allows dynamic clearance for filter tubes that are arranged radially around the 
+                r"""
+The primary mirror is octagonal in shape.
+The octagonal shape of the primary allows dynamic clearance for filter tubes that are arranged radially around the 
 mirror (\S\,\ref{subsec:CoatingsandFilters}).
-The mirror is attached to a backing plate by three ``bipods'';
-thin titanium structures that are flexible in the radial dimension, perpendicular to the mirror edge, but rigid in the 
-other two dimensions.
+The mirror is attached to a backing plate by three \textit{bipods}: thin titanium structures that are flexible in the radial 
+dimension, perpendicular to the mirror edge, but rigid in the other two dimensions.
 The bipods form a kinematic mount, isolating the primary mirror figure from mounting stress. 
 
-The mirror will have to maintain its figure under direct solar illumination, so low expansion (Corning \ULE) substrates 
-were used.
-The transparency of \ULE, in conjunction with the transparency of the mirror coating in visible and near IR 
-\roy{near-IR} wavelengths (\eg, Table~\ref{table:prescription} and \S\,\ref{subsec:CoatingsandFilters}), helps minimize 
+The mirror will have to maintain its figure under direct solar illumination, so a Corning \ULE\ substrate was used.
+The transparency of \ULE, in conjunction with the transparency of the mirror coating in visible and near-IR  wavelengths 
+(\eg, Table~\ref{table:prescription} and \S\,\ref{subsec:CoatingsandFilters}), helps minimize 
 the heating of the mirror.
 Surface figure specifications for the \ESIS\ optics are described in Sec.~\ref{subsec:OptimizationandTolerancing}.
 
@@ -1645,16 +1641,6 @@ For these much smaller optics, lightweight bipods were wire \EDM\ cut from thin 
 The bipods are bonded to both the grating and backing plate along the three long edges of each grating.
 The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
             ))
-
-            with doc.create(pylatex.Table()) as table:
-                with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular('rr')) as tabular:
-                        tabular.escape = False
-                        tabular.add_row(['Channel', 'Serial number'])
-                        tabular.add_hline()
-                        for i in range(optics_all.channel_name.size):
-                            index = np.unravel_index(i, optics_all.channel_name.shape)
-                            tabular.add_row([optics_all.channel_name[index], optics_all.grating.serial_number[index]])
 
             with doc.create(pylatex.Figure()) as figure:
                 # figure.add_image('figures/old/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
@@ -1668,9 +1654,9 @@ The \ESIS\ passband is defined by a combination of the field stop and grating di
                 figure.append(kgpy.latex.Label('fig:projections'))
 
             doc.append(pylatex.NoEscape(
-                r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, pixel 
-limited \roy{pixel-limited} imaging from the field stop to the \CCDs.
-The pitch at the center of the grating is $d_0=$\SI{.3866}{\micro\meter} \roy{\gratingRulingSpacing} resulting in a 
+                r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, 
+pixel-limited imaging from the field stop to the \CCDs.
+The pitch at the center of the grating is $d_0=\text{\gratingRulingSpacing}$ resulting in a 
 dispersion of \SI{17.5}{\kilo\meter\per\second} \roy{\dispersionDoppler} at the center of the \OV\ \FOV.
 The groove profile is optimized for the $m=1$ order, so that each grating serves only a single \CCD.
 The modeled grating groove efficiency in this order is \SI{36}{\percent} \roy{We said \SI{39}{\percent} above, need to 
@@ -1681,9 +1667,7 @@ Therefore, a baffle is placed at each grating to restrict illumination to the cl
 Fig.~\ref{fig:schematic}c
 
 The \ESIS\ passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
-The passband includes the He\,\textsc{i} (\SI{58.43}{\nano\meter}) \roy{\HeI} spectral line through Mg\,\textsc{x} 
-(60.98 and \SI{62.49}{\nano\meter}) \roy{\MgXion\ (\MgXwavelength\ and \MgXdimWavelength)} to O\,\textsc{v} 
-(\SI{62.97}{\nano\meter}) \roy{\OV}.
+The passband includes the \HeI\ spectral line through \MgXion\ (\MgXwavelength\ and \MgXdimWavelength) to \OV.
 Figure~\ref{fig:projections} shows where images of each of the strong spectral lines will fall on the \CCD.
 The instrument dispersion satisfies the spectral resolution requirement in Table~\ref{table:scireq} and ensures that the 
 spectral images are well separated; Figure~\ref{fig:projections} shows that He\,\textsc{i} \roy{\HeI} will be completely 
