@@ -1007,39 +1007,39 @@ The instrument is currently in the build up phase prior to spacecraft integratio
 
     with doc.create(pylatex.Section('Introduction')):
         doc.append(pylatex.NoEscape(
-            r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft 
-X-ray), is a three-dimensional scene evolving in time: $I[x,y,\lambda,t]$.
-Here the solar sky plane spatial coordinates, $x$ and $y$, and the wavelength axis, $\lambda$, comprise the three 
-dimensions of the scene, while $t$ represents the temporal axis.
-An ideal instrument would capture a spatial/spectral data cube ($I[x,y,\lambda]$) at a rapid temporal cadence ($t$), 
-however, practical limitations lead us to accept various compromises of these four observables.
+            r"""The solar atmosphere, as viewed from \sout{space} \roy{earth} in its characteristic short wavelengths (\FUV, \EUV, and soft 
+X-ray), is a three-dimensional scene evolving in time: \sout{$I[x,y,\lambda,t]$} \roy{$I(x, y, \lambda, t)$}.
+Here the \sout{solar sky plane spatial coordinates} \roy{helioprojective longitude and latitude}, $x$ and $y$, and the 
+wavelength axis, $\lambda$, comprise the three dimensions of the scene, while $t$ represents the temporal axis.
+An ideal instrument would capture a spatial/spectral data cube \sout{$I[x,y,\lambda]$}\roy{, $I(x, y, \lambda)$} at a rapid temporal cadence \sout{($t$)}, 
+however, practical limitations lead us to accept various compromises of \sout{these four observables} \roy{the sampling rate along each of these four dimensions}.
 Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
 Fabry--P{\'e}rot Interferometer, \citep{Puschmann12}), but the materials do not exist to extend this technology to 
 \EUV\ wavelengths shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
-Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect high cadence 2D \EUV\ spatial scenes, but 
-they collect spectrally integrated intensity over a fixed passband that is not narrow enough to isolate a single 
+Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect \sout{high cadence} \roy{high-cadence} 2D \EUV\ spatial scenes, but 
+they collect \sout{spectrally integrated} \roy{spectrally-integrated} intensity over a fixed passband that is not narrow enough to isolate a single 
 emission line.  
-In principle, filter ratios that make use of spectrally adjacent multilayer \EUV\ passbands could detect Doppler 
+In principle, filter ratios that make use of \sout{spectrally adjacent} \roy{spectrally-adjacent} multilayer \EUV\ passbands could detect Doppler 
 shifts~\citep{Sakao99}.
 However, the passbands of the multilayer coatings are still wide enough that the presence of weaker contaminant lines 
 limits resolution of Doppler shifts to $\sim$\SI{1000}{\kilo\meter\per\second}~\citep{Kobayashi00}.
 Slit spectrographs (\eg\ the \IRIS~\citep{IRIS14}) obtain fast, high-resolution spatial and spectral observations, but are 
 limited by the narrow \FOV\ of the spectrograph slit.
-The $I[x,y,\lambda]$ data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
+The \sout{$I[x,y,\lambda]$} \roy{$I(x, y, \lambda)$} data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
 raster axis.
-Moreover, extended and dynamic scenes can change significantly in the time required to raster over their extant.  
+Moreover, extended and dynamic scenes can change significantly in the time required to raster over their \sout{extant} \roy{extent}.  
 
 A different approach is to forego the entrance slit employed by traditional spectrographs entirely.
-The \Acposs{NRL} SO82A~\citep{Tousey73,Tousey77} was one of the first instruments to pioneer this method.
+The \Acposs{NRL} SO82A \roy{spectroheliograph}~\citep{Tousey73,Tousey77}  was one of the first instruments to pioneer this method.
 The `overlappograms' obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
 recently been used to determine line ratios in solar flares~\citep{Keenan06}.
-Unfortunately, for closely spaced \EUV\ lines, the dispersed images from the single diffraction order suffer from 
-considerable overlap confusion.
+Unfortunately, for \sout{closely spaced} \roy{closely-spaced} \EUV\ lines, the dispersed images from the single diffraction order suffer from 
+considerable \sout{overlap confusion} \roy{ambiguity from overlapping images}.
 Image overlap is all but unavoidable with this configuration, however, overlappograms can be disentangled, or inverted, 
 under the right circumstances.  
 
 In analogy to a tomographic imaging problem~\citep{Kak88}, inversion of an overlapping spatial/spectral scene can be 
-facilitated by increasing the number of independent spectral projections, or `look angles,' through the 3D 
+facilitated by increasing the number of independent spectral projections, or \sout{`look angles,'} \roy{viewing angles,} through the 3D 
 $(x,y,\lambda)$ scene~\citep{DeForest04}.
 For example, \citet{DeForest04} demonstrated recovery of Doppler shifts in magnetograms from two dispersed orders of a 
 grating at the output of the \MDI~\citep{Scherrer95}.
@@ -1048,14 +1048,14 @@ projections~\citep{Kak88,Descour97}, generally at the cost of computational comp
 \Acp{CTIS}~\citep{okamoto1991,Bulygin91,Descour95} leverage this concept by obtaining multiple, simultaneous dispersed 
 images of an object or scene; 
 upwards of 25 grating diffraction orders may be projected onto a single detector plane~\citep{Descour97}.
-Through post processing of these images, \CTIS\ can recover a 3D data cube from a (spectrally) smooth and continuous 
+Through \sout{post processing} \roy{post-processing} of these images, \CTISs\ can recover a 3D data cube from a (spectrally) smooth and continuous 
 scene over a large bandpass (\eg\ \citet{Hagen08}).
 
 The \MOSES~\citep{Fox10,Fox11} is our first effort aimed at developing the unique capability of simultaneous 
 imaging and spectroscopy for solar \EUV\ scenes.
 \MOSES\ is a three-order slitless spectrograph that seeks to combine the simplicity of the SO82A concept with the 
 advantages of a \CTIS\ instrument.
-A single diffraction grating (in conjunction with a fold mirror) projects the $m=\pm1$ and the un-dispersed $m=0$ order 
+A single diffraction grating (in conjunction with a fold mirror) projects the $m=\pm1$ and the \sout{un-dispersed} \roy{undispersed}  $m=0$ order 
 onto three different detectors.
 Through a combination of dispersion and multi-layer coatings, the passband of the $m=\pm1$ orders encompasses only a few
 solar \EUV\ emission lines.
@@ -1077,7 +1077,7 @@ Section~\ref{sec:ScienceObjectives} describes the narrow scientific objectives a
 instrument.
 Section~\ref{sec:TheESISInstrument} describes the technical approach to meet our scientific objectives, followed by a 
 brief description of the expected mission profile in Section~\ref{sec:MissionProfile}.
-The current status and progress toward launch is summarized in Section~\ref{sec:ConclusionsandOutlook}."""
+\sout{The current status and progress toward launch is summarized in Section~\ref{sec:ConclusionsandOutlook}.}"""
         ))
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Concept'))):
@@ -1736,6 +1736,14 @@ Slope error (both the numerical estimates and the measurements) is worked out wi
 defined per ISO 10110."""
                 ))
                 table.append(kgpy.latex.Label('table:error'))
+
+            # with doc.create(pylatex.Table()) as table:
+            #     table._star_latex_name = True
+            #     with table.create(pylatex.Center()) as centering:
+            #         with centering.create(pylatex.Tabular('l|rrrr')) as tabular:
+            #             tabular.escape = False
+            #             tabular.append(['Element', 'Parameter', 'Requirement', 'Measured'])
+            #             tabular.append([])
 
             unit_length_integration = u.mm
             unit_length_sample = u.mm
@@ -2574,6 +2582,7 @@ The signal requirement in Table~\ref{table:scireq} is met by stacking exposures.
 Good quality images ($\sim300$ counts) in active regions can be obtained by stacking \SI{30}{\second} worth of exposures.
 This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en waves described in \S\,\ref{sec:ScienceObjectives}.
 However, by stacking multiple \SI{10}{\second} exposures, sufficient \SNR\ \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained.
+\roy{Just delete these next three sentences?}
 We also note that the count rates given here are for an unvignetted system which is limited by the baffling of this design.
 While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{subsec:AperturesandBaffles}) to increase throughput.
 Thus, a faster exposure cadence may be obtained by accepting some vignetting in the system.
