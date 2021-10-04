@@ -80,6 +80,7 @@ class Optics(
             coefficients=[1 * u.dimensionless_unscaled, 0 / u.AA, 0 / u.arcsec, 0 / u.arcsec]
         )
     )
+    skin_diameter: u.Quantity = 0 * u.m,
 
     def __post_init__(self):
         self.update()
@@ -345,6 +346,7 @@ class Optics(
         other.distortion_polynomial_degree = self.distortion_polynomial_degree
         other.vignetting_polynomial_degree = self.vignetting_polynomial_degree
         other.vignetting_correction = self.vignetting_correction.copy()
+        other.skin_diameter = self.skin_diameter.copy()
         return other
 
     def __call__(

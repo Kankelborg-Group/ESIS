@@ -405,6 +405,7 @@ def final(
         field_is_stratified_random=field_is_stratified_random,
         sparcs=kgpy.nsroc.sparcs.specification(),
         roll=roll,
+        skin_diameter=22 * u.imperial.inch,
     )
 
 channels_active_min = 1
