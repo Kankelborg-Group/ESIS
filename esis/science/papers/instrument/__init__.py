@@ -927,6 +927,12 @@ def document() -> kgpy.latex.Document:
         value=figures.psf_field_samples,
     )
 
+    doc.set_variable_quantity(
+        name='skinDiameter',
+        value=optics_single.skin_diameter.to(u.m),
+        digits_after_decimal=1,
+    )
+
     doc.preamble.append(kgpy.latex.Acronym('ESIS', r'EUV Snapshot Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('MOSES', r'Multi-order Solar EUV Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'))
@@ -1031,7 +1037,7 @@ Moreover, extended and dynamic scenes can change significantly in the time requi
 
 A different approach is to forego the entrance slit employed by traditional spectrographs entirely.
 The \Acposs{NRL} SO82A \roy{spectroheliograph}~\citep{Tousey73,Tousey77}  was one of the first instruments to pioneer this method.
-The `overlappograms' obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
+The \sout{`overlappograms'} \roy{overlappograms} obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
 recently been used to determine line ratios in solar flares~\citep{Keenan06}.
 Unfortunately, for \sout{closely spaced} \roy{closely-spaced} \EUV\ lines, the dispersed images from the single diffraction order suffer from 
 considerable \sout{overlap confusion} \roy{ambiguity from overlapping images}.
@@ -1087,6 +1093,7 @@ spectroscopy demonstrated by \MOSES.
 Therefore, the design of the new instrument draws heavily from experiences and lessons learned through two flights of 
 the \MOSES\ instrument.
 \ESIS\ and \MOSES\ are both slitless, multi-projection spectrographs.
+\roy{Should we restructure the previous sentence to say that \ESIS\ and \MOSES\ are both \CTISs? I think that would make it more consistent with the mission paper.}
 As such, both produce dispersed images of a narrow portion of the solar spectrum, with the goal of enabling the 
 reconstruction of a spectral line profile at every point in the field of view.
 The similarities end there, however, as the optical layout of \ESIS\ differs significantly from that of \MOSES.
@@ -1096,16 +1103,16 @@ of \ESIS\ addresses these issues."""
         with doc.create(pylatex.Subsection(pylatex.NoEscape('Limitations of the \MOSES\ Design'))):
             doc.append(pylatex.NoEscape(
                 r"""The \MOSES\ design features a single concave diffraction grating forming images on three \CCD\ 
-detectors~\citep{Fox10} (Fig.~\ref{fig:mosesSchematic}). 
-The optical path is folded in half by a single flat secondary mirror (omitted in Fig.~\ref{fig:mosesSchematic}).
-Provided that the three cameras are positioned correctly, this arragement allows the entire telescope to be brought 
+detectors~\citep{Fox10} (Figure~\ref{fig:mosesSchematic}). 
+The optical path is folded in half by a single flat secondary mirror (omitted in Figure~\ref{fig:mosesSchematic}).
+Provided that the three cameras are positioned correctly, this arrangement allows the entire telescope to be brought 
 into focus using only the central (undispersed) order and a visible light source.
 Unfortunately this design uses volume inefficiently for two reasons.
 First, the lack of magnification by the secondary mirror limits the folded length of the entire telescope to be no less 
-than half the \SI{5}{\meter} focal length of the grating~\citep{Fox10,Fox11}.
+than half of the \SI{5}{\meter} focal length of the grating~\citep{Fox10,Fox11}.
 Second, the dispersion of the instrument is controlled by the placement of the cameras.
 To achieve the maximum dispersion of \SI{29}{\kilo\meter\per\second}~\citep{Fox10}, the outboard orders are imaged as 
-far apart as possible in the $\sim22''$ diameter cross section of the rocket payload.
+far apart as possible in the \sout{$\sim22''$} \roy{$\sim\text{\skinDiameter}$} diameter \sout{cross section} \roy{envelope} of the rocket payload.
 The resulting planar dispersion poorly fills the cylindrical volume of the payload, leaving much unused space along the 
 orthogonal planes."""
             ))
@@ -1121,22 +1128,22 @@ Dispersed images are formed on the outboard $m=\pm1$ \CCDs."""
 
             doc.append(pylatex.NoEscape(
                 r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
-allow efficient placement of the dispersed image order cameras.  
-For all practical purposes, the diameter of the payload (\SI{0.56}{\meter}) can only accommodate three diffraction 
+allow efficient placement of the \sout{dispersed image order cameras} \roy{$m=\pm1$ \CCDs}.  
+For all practical purposes, the diameter of the payload \sout{(\SI{0.56}{\meter})} \roy{(\skinDiameter)} can only accommodate three diffraction 
 orders ($m=-1, 0, +1$).
 Therefore, \textit{\MOSES\ can only collect, at most, three pieces of information at each point in the field of view.}
-From this, it is not reasonable to expect the reconstruction of more than three degrees of freedom in this spectrum, 
+From this, it is not reasonable to expect the reconstruction of more than three degrees of freedom \sout{in this spectrum} \roy{for each spectral line}, 
 except in the case very compact, isolated features such as those described by \citet{Fox10} and \citet{Rust17}.
 Consequently, it is a reasonable approximation to say that \MOSES\ is sensitive primarily to spectral line intensities, 
 shifts, and widths \citep{KankThom01}.
 With any tomographic apparatus, the degree of detail that can be resolved in the object depends critically on the 
 number of viewing angles~\citep{Kak88,Descour97,Hagen08}.
 So it is with the spectrum we observe with \MOSES: more dispersed images are required to confer sensitivity to finer 
-spectral details such additional lines in the passband or higher moments of the spectral line shape.
+spectral details such as \sout{additional lines in the passband or} higher moments of the spectral line shape.
 
-A related issue stems from the use of a single grating, with a single plane of dispersion.
+A related issue stems from the use of a single grating, with a single \sout{plane of dispersion} \roy{dispersion plane}.
 Since the solar corona and transition region are structured by magnetic fields, the scene tends to be dominated by 
-field aligned structures such as loops~\citep{Rosner78,Bonnet80}.
+\sout{field aligned} \roy{field-aligned} structures such as loops~\citep{Rosner78,Bonnet80}.
 When the \MOSES\ dispersion direction happens to be aligned nearly perpendicular to the magnetic field, filamentary 
 structures on the transition region serve almost as spectrograph slits unto themselves.
 The estimation of Doppler shifts then becomes a simple act of triangulation, and broadenings are also readily 
@@ -1148,9 +1155,10 @@ In cases where the field is nearly parallel to the instrument dispersion, spectr
 readily apparent.
 
 The single diffraction grating also leads to a compromise in the optical performance of the instrument. 
-Since the \MOSES\ grating forms images in three orders simultaneously, aberration cannot be simultaneously optimized for 
+Since the \MOSES\ grating forms images in three orders simultaneously, \sout{aberration cannot be simultaneously optimized for} 
+\roy{there aren't enough degrees of freedom in the optical system to achieve sub-pixel aberrations in}
 all three of those spectral orders.
-A result of this design is that the orientations (\ie\,the central axis) of the \PSFs\ vary order to order~\citep{Rust17}.
+A result of this design is that the orientations (\ie\,the central \roy{major} axis) of the \PSF\ varies order to order~\citep{Rust17}.
 During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
 inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
 The combination of these two effects results in spurious spectral features that require additional 
@@ -1162,7 +1170,7 @@ aperture of the telescope) and the spatial extent of the \CCDs.
 The \FOV\ in the $m=\pm1$ orders is shifted along the dispersion axis as a function of wavelength, dependant upon where 
 the dispersed spectral images intercept the $m=\pm1$ \CCDs.
 Spatially, this effect is limited to only a handful of pixel columns at the edges of each image order.
-Of higher concern is the `spectral contamination' allowed by this layout; 
+Of higher concern is the \sout{`spectral contamination'} \roy{\textit{spectral contamination}} allowed by this layout; 
 \citet{Parker16} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
 \FOV\ could be diffracted onto the outboard order \CCDs.
 This off-band contamination is detected as systematic intensity variation that lacks an anti-symmetric pairing in the 
@@ -1176,7 +1184,7 @@ Consequently, every second of observing time is precious, both to achieve adequa
 development of dynamical phenomena.
 The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of the \CCDs.
 Thus, valuable observing time is lost.
-The readout data gap impelled us to develop a \MOSES\ exposure sequence with exposures ranging from 
+The readout data gap \sout{impelled} \roy{compelled} us to develop a \MOSES\ exposure sequence with exposures ranging from 
 $0.25$-\SI{24}{\second}, a careful trade-off between deep and fast exposures. 
 
 In summary, our experience leads us to conclude that the \MOSES\ design has the following primary limitations:
@@ -1184,10 +1192,10 @@ In summary, our experience leads us to conclude that the \MOSES\ design has the 
     \item inefficient use of volume \label{item-length} %(x and y direction)
     \item dispersion constrained by payload dimensions \label{item-disp_con}
     \item too few dispersed images (orders) \label{item-orders}
-    \item single plane dispersion \label{item-dispersion}
-    \item lack of aberration control \label{item-PSF}
-    \item insufficiently defined \FOV\ \label{item-FOV}
-    \item sub-optimal exposure cadence \label{item-CAD}
+    \item single \sout{plane dispersion} \roy{dispersion plane} \label{item-dispersion}
+    \item \ \sout{lack of aberration control} \roy{Insufficient degrees of freedom to control aberrations} \label{item-PSF}
+    \item \ \sout{insufficiently defined} \roy{poorly-defined} \FOV\ \label{item-FOV}
+    \item \ \sout{sub-optimal exposure cadence} \roy{low duty cycle} \label{item-CAD}
 \end{enumerate}
 In designing \ESIS, we have sought to improve upon each of these points.
 """
@@ -1661,11 +1669,11 @@ The \ESIS\ passband is defined by a combination of the field stop and grating di
             doc.append(pylatex.NoEscape(
                 r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, 
 pixel-limited imaging from the field stop to the \CCDs.
-The pitch at the center of the grating is $d_0=\text{\gratingRulingSpacing}$ resulting in a 
-dispersion of \SI{17.5}{\kilo\meter\per\second} \roy{\dispersionDoppler} at the center of the \OV\ \FOV.
+The pitch at the center of the grating is $d_0=\text{\gratingRulingSpacing}$ resulting in a dispersion of 
+\dispersionDoppler\ at the center of the \OV\ \FOV.
 The groove profile is optimized for the $m=1$ order, so that each grating serves only a single \CCD.
 The modeled grating groove efficiency in this order is \SI{36}{\percent} \roy{We said \SI{39}{\percent} above, need to 
-find out which it is, I get \gratingGrooveEfficiency} at \SI{63}{\nano\meter} \roy{\OV}. 
+find out which it is, I get \gratingGrooveEfficiency} at \OV. 
 
 Figure specification and groove profile are not well controlled near the edges of the gratings.
 Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
@@ -1675,8 +1683,8 @@ The \ESIS\ passband is defined through a combination of the field stop, the grat
 The passband includes the \HeI\ spectral line through \MgXion\ (\MgXwavelength\ and \MgXdimWavelength) to \OV.
 Figure~\ref{fig:projections} shows where images of each of the strong spectral lines will fall on the \CCD.
 The instrument dispersion satisfies the spectral resolution requirement in Table~\ref{table:scireq} and ensures that the 
-spectral images are well separated; Figure~\ref{fig:projections} shows that He\,\textsc{i} \roy{\HeI} will be completely 
-separated from the target O\,\textsc{v} \roy{\OV} line."""
+spectral images are well-separated; Figure~\ref{fig:projections} shows that \HeI\ will be completely 
+separated from the target \OV\ line."""
             ))
 
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
