@@ -1013,36 +1013,36 @@ The instrument is currently in the build up phase prior to spacecraft integratio
 
     with doc.create(pylatex.Section('Introduction')):
         doc.append(pylatex.NoEscape(
-            r"""The solar atmosphere, as viewed from \sout{space} \roy{earth} in its characteristic short wavelengths (\FUV, \EUV, and soft 
-X-ray), is a three-dimensional scene evolving in time: \sout{$I[x,y,\lambda,t]$} \roy{$I(x, y, \lambda, t)$}.
-Here the \sout{solar sky plane spatial coordinates} \roy{helioprojective longitude and latitude}, $x$ and $y$, and the 
-wavelength axis, $\lambda$, comprise the three dimensions of the scene, while $t$ represents the temporal axis.
-An ideal instrument would capture a spatial/spectral data cube \sout{$I[x,y,\lambda]$}\roy{, $I(x, y, \lambda)$} at a rapid temporal cadence \sout{($t$)}, 
-however, practical limitations lead us to accept various compromises of \sout{these four observables} \roy{the sampling rate along each of these four dimensions}.
+            r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft 
+X-ray), is a three-dimensional scene evolving in time:  $I(x, y, \lambda, t)$.
+Here the helioprojective cartesian coordinates, $x$ and $y$ \citep{Thompson2006}, and the wavelength axis, $\lambda$, comprise the three 
+dimensions of the scene, while $t$ represents the temporal axis.
+An ideal instrument would capture a spatial/spectral data cube, $I(x, y, \lambda)$, at a rapid temporal cadence, 
+however, practical limitations lead us to accept various compromises of the sampling rate along each of these four dimensions.
 Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
 Fabry--P{\'e}rot Interferometer, \citep{Puschmann12}), but the materials do not exist to extend this technology to 
 \EUV\ wavelengths shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
-Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect \sout{high cadence} \roy{high-cadence} 2D \EUV\ spatial scenes, but 
-they collect \sout{spectrally integrated} \roy{spectrally-integrated} intensity over a fixed passband that is not narrow enough to isolate a single 
+Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect high-cadence-2D-\EUV\ spatial scenes, but 
+they collect spectrally-integrated intensity over a fixed passband that is not narrow enough to isolate a single 
 emission line.  
-In principle, filter ratios that make use of \sout{spectrally adjacent} \roy{spectrally-adjacent} multilayer \EUV\ passbands could detect Doppler 
+In principle, filter ratios that make use of spectrally-adjacent multilayer \EUV\ passbands could detect Doppler 
 shifts~\citep{Sakao99}.
 However, the passbands of the multilayer coatings are still wide enough that the presence of weaker contaminant lines 
 limits resolution of Doppler shifts to $\sim$\SI{1000}{\kilo\meter\per\second}~\citep{Kobayashi00}.
 Slit spectrographs (\eg\ the \IRIS~\citep{IRIS14}) obtain fast, high-resolution spatial and spectral observations, but are 
 limited by the narrow \FOV\ of the spectrograph slit.
-The \sout{$I[x,y,\lambda]$} \roy{$I(x, y, \lambda)$} data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
+The $I(x, y, \lambda)$ data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
 raster axis.
-Moreover, extended and dynamic scenes can change significantly in the time required to raster over their \sout{extant} \roy{extent}.  
+Moreover, extended and dynamic scenes can change significantly in the time required to raster over their extent.  
 
 A different approach is to forego the entrance slit employed by traditional spectrographs entirely.
 The \Acposs{NRL} SO82A \roy{spectroheliograph}~\citep{Tousey73,Tousey77}  was one of the first instruments to pioneer this method.
-The \sout{`overlappograms'} \roy{overlappograms} obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
+The ``overlappograms'' obtained by SO82A \roy{insert definition of overlappograms here} identified several spectral line transitions~\citep{Feldman85}, and have more 
 recently been used to determine line ratios in solar flares~\citep{Keenan06}.
-Unfortunately, for \sout{closely spaced} \roy{closely-spaced} \EUV\ lines, the dispersed images from the single diffraction order suffer from 
+Unfortunately, for closely-spaced \EUV\ lines, the dispersed images from the single diffraction order suffer from 
 considerable \sout{overlap confusion} \roy{ambiguity from overlapping images}.
 Image overlap is all but unavoidable with this configuration, however, overlappograms can be disentangled, or inverted, 
-under the right circumstances.  
+to recover the spatial/spectral cube under the right circumstances.  
 
 In analogy to a tomographic imaging problem~\citep{Kak88}, inversion of an overlapping spatial/spectral scene can be 
 facilitated by increasing the number of independent spectral projections, or \sout{`look angles,'} \roy{viewing angles,} through the 3D 
