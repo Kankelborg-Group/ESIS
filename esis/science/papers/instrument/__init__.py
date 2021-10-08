@@ -1015,14 +1015,14 @@ The instrument is currently in the build up phase prior to spacecraft integratio
         doc.append(pylatex.NoEscape(
             r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft 
 X-ray), is a three-dimensional scene evolving in time:  $I(x, y, \lambda, t)$.
-Here the helioprojective cartesian coordinates, $x$ and $y$ \citep{Thompson2006}, and the wavelength axis, $\lambda$, comprise the three 
-dimensions of the scene, while $t$ represents the temporal axis.
+Here, the helioprojective cartesian coordinates, $x$ and $y$ \citep{Thompson2006}, and the wavelength axis, $\lambda$, 
+comprise the three dimensions of the scene, while $t$ represents the temporal axis.
 An ideal instrument would capture a spatial/spectral data cube, $I(x, y, \lambda)$, at a rapid temporal cadence, 
 however, practical limitations lead us to accept various compromises of the sampling rate along each of these four dimensions.
 Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
 Fabry--P{\'e}rot Interferometer, \citep{Puschmann12}), but the materials do not exist to extend this technology to 
 \EUV\ wavelengths shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
-Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect high-cadence-2D-\EUV\ spatial scenes, but 
+Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect \sout{high-cadence-2D-\EUV\ spatial scenes} \roy{\EUV\ images of the solar atmosphere at high cadence}, but 
 they collect spectrally-integrated intensity over a fixed passband that is not narrow enough to isolate a single 
 emission line.  
 In principle, filter ratios that make use of spectrally-adjacent multilayer \EUV\ passbands could detect Doppler 
@@ -1035,9 +1035,21 @@ The $I(x, y, \lambda)$ data cube can be built up by rastering the slit pointing,
 raster axis.
 Moreover, extended and dynamic scenes can change significantly in the time required to raster over their extent.  
 
-A different approach is to forego the entrance slit employed by traditional spectrographs entirely.
-The \Acposs{NRL} SO82A \roy{spectroheliograph}~\citep{Tousey73,Tousey77}  was one of the first instruments to pioneer this method.
-The ``overlappograms'' obtained by SO82A \roy{insert definition of overlappograms here} identified several spectral line transitions~\citep{Feldman85}, and have more 
+\roy{
+A different approach is to use a ``slitless spectrograph'', a spectrograph built without the slit employed by 
+traditional spectrographs.
+This is a radical approach because the slit was there so the spectrum could be interpreted unambiguously.
+Without the slit, the spectral direction and the spatial direction that would have been perpendicular to the slit are 
+degenerate.
+If a slitless spectrograph observed a scene with a continuous spectrum, all it would see is a smear because of this 
+degeneracy.
+However, the solar atmosphere viewed in \EUV\ is a perfect candidate for observation using a slitless spectrograph since 
+the spectrum is dominated by emission lines, and has low continuum.
+So instead of a smear, a slitless spectrograph observing the Sun in \EUV\ would capture an image of many overlapping and shifted
+copies of the Sun, one for each spectral line in the passband, this type of image is known as an ``overlappogram''.}
+\sout{A different approach is to forego the entrance slit} \sout{employed by traditional spectrographs entirely.}
+The \Acposs{NRL} SO82A spectroheliograph~\citep{Tousey73,Tousey77}  was one of the first instruments to pioneer this method.
+The \sout{``overlappograms''} \roy{overlappograms} obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
 recently been used to determine line ratios in solar flares~\citep{Keenan06}.
 Unfortunately, for closely-spaced \EUV\ lines, the dispersed images from the single diffraction order suffer from 
 considerable \sout{overlap confusion} \roy{ambiguity from overlapping images}.
@@ -1061,6 +1073,7 @@ The \MOSES~\citep{Fox10,Fox11} is our first effort aimed at developing the uniqu
 imaging and spectroscopy for solar \EUV\ scenes.
 \MOSES\ is a three-order slitless spectrograph that seeks to combine the simplicity of the SO82A concept with the 
 advantages of a \CTIS\ instrument.
+\roy{If we're calling \MOSES\ a \CTIS\, then why are we combining with SO82A? Can we just say that MOSES is an EUV CTIS?}
 A single diffraction grating (in conjunction with a fold mirror) projects the $m=\pm1$ and the \sout{un-dispersed} \roy{undispersed}  $m=0$ order 
 onto three different detectors.
 Through a combination of dispersion and multi-layer coatings, the passband of the $m=\pm1$ orders encompasses only a few
@@ -1074,16 +1087,16 @@ Through inversion of \MOSES\ overlappograms, \citet{Fox10} obtained unprecedente
 distinct moments of compact \TR\ bright point line profiles.
 
 Building on the working concept demonstrated by \MOSES, here we describe a new instrument, the \ESIS, that will improve 
-on past efforts to produce a solar \EUV\ spectral map.
-\ESIS\ will fly alongside \MOSES\ and will observe the \TR\ and corona of the solar atmosphere in the \OV\ and \MgX\ / 
-\MgXdimWavelength\ spectral lines.
+on past efforts to produce a solar \EUV\ \sout{spectral map} \roy{spectrally-resolved image}.
+\ESIS\ will fly alongside \MOSES\ and will observe the \TR\ and corona of the solar atmosphere in the \OV\ and 
+\MgX/\MgXdimWavelength\ spectral lines.
 In Section~\ref{sec:TheESISConcept} we detail how our experience with the \MOSES\ instrument has shaped the design of 
 \ESIS.
 Section~\ref{sec:ScienceObjectives} describes the narrow scientific objectives and the requirements placed on the new 
 instrument.
 Section~\ref{sec:TheESISInstrument} describes the technical approach to meet our scientific objectives, followed by a 
 brief description of the expected mission profile in Section~\ref{sec:MissionProfile}.
-\sout{The current status and progress toward launch is summarized in Section~\ref{sec:ConclusionsandOutlook}.}"""
+\sout{The current status and progress toward launch is} \sout{summarized in Section~\ref{sec:ConclusionsandOutlook}.}"""
         ))
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Concept'))):
@@ -1094,7 +1107,7 @@ Therefore, the design of the new instrument draws heavily from experiences and l
 the \MOSES\ instrument.
 \ESIS\ and \MOSES\ are both slitless, multi-projection spectrographs.
 \roy{Should we restructure the previous sentence to say that \ESIS\ and \MOSES\ are both \CTISs? I think that would make it more consistent with the mission paper.}
-As such, both produce dispersed images of a narrow portion of the solar spectrum, with the goal of enabling the 
+As such, both produce \sout{dispersed images} \roy{overlappograms} of a narrow portion of the solar spectrum, with the goal of enabling the 
 reconstruction of a spectral line profile at every point in the field of view.
 The similarities end there, however, as the optical layout of \ESIS\ differs significantly from that of \MOSES.
 In this section, we detail some difficulties and limitations encountered with \MOSES, then describe how the new design 
@@ -1158,7 +1171,7 @@ The single diffraction grating also leads to a compromise in the optical perform
 Since the \MOSES\ grating forms images in three orders simultaneously, \sout{aberration cannot be simultaneously optimized for} 
 \roy{there aren't enough degrees of freedom in the optical system to achieve sub-pixel aberrations in}
 all three of those spectral orders.
-A result of this design is that the orientations (\ie\,the central \roy{major} axis) of the \PSF\ varies order to order~\citep{Rust17}.
+A result of this design is that the orientations (\ie\,the \sout{central} \roy{major} axis) of the \PSF\ varies order to order~\citep{Rust17}.
 During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
 inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
 The combination of these two effects results in spurious spectral features that require additional 
@@ -1170,19 +1183,20 @@ aperture of the telescope) and the spatial extent of the \CCDs.
 The \FOV\ in the $m=\pm1$ orders is shifted along the dispersion axis as a function of wavelength, dependant upon where 
 the dispersed spectral images intercept the $m=\pm1$ \CCDs.
 Spatially, this effect is limited to only a handful of pixel columns at the edges of each image order.
-Of higher concern is the \sout{`spectral contamination'} \roy{\textit{spectral contamination}} allowed by this layout; 
+Of higher concern is the ``spectral contamination'' allowed by this layout; 
 \citet{Parker16} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
 \FOV\ could be diffracted onto the outboard order \CCDs.
 This off-band contamination is detected as systematic intensity variation that lacks an anti-symmetric pairing in the 
 opposite dispersed image order.
-Analysis of the spectral contamination is ongoing. 
+\sout{Analysis of the spectral contamination is ongoing.}
+\roy{Is there a way we can update this?}
 
 Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the 
 \CCDs~\citep{Fox11}.
 The observing interval for a solar sounding rocket flight is very short, typically about five minutes.
 Consequently, every second of observing time is precious, both to achieve adequate exposure time and to catch the full 
 development of dynamical phenomena.
-The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of the \CCDs.
+The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of its \CCDs.
 Thus, valuable observing time is lost.
 The readout data gap \sout{impelled} \roy{compelled} us to develop a \MOSES\ exposure sequence with exposures ranging from 
 $0.25$-\SI{24}{\second}, a careful trade-off between deep and fast exposures. 
@@ -1218,7 +1232,7 @@ Eight grating positions appear in this schematic; only six fit within the volume
                 figure.append(kgpy.latex.Label('fig:layout'))
 
             doc.append(pylatex.NoEscape(
-                r"""The layout of \ESIS\ (Fig.~\ref{fig:layout}) is a modified form of Gregorian telescope.
+                r"""The layout of \ESIS\ (Figure~\ref{fig:layout}) is a modified form of Gregorian telescope.
 Incoming light is brought to focus at an octagonal field stop by a parabolic primary mirror.
 In the \ESIS\ layout, the secondary mirror of a typical Gregorian telescope is replaced by a segmented, octagonal array 
 of diffraction gratings.
@@ -1226,11 +1240,11 @@ From the field stop, the gratings re-image to \CCD\ detectors arranged radially 
 The gratings are blazed for first order, so that each \CCD\ is fed by a single corresponding grating, and all the 
 gratings are identical in design.
 The features of this new layout address all of the limitations described in 
-Sect.~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
+Section~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
 
 Replacing the secondary mirror with an array of concave diffraction gratings confers several advantages to \ESIS\ over 
 \MOSES.
-First, the magnification of the \ESIS\ gratings results in a shorter axial length than \MOSES, without sacrificing 
+First, the \sout{magnification of the \ESIS\ gratings} \roy{concavity of the gratings creates magnification in the \ESIS\ optical system, which} results in a shorter axial length than \MOSES, without sacrificing 
 spatial or spectral resolution.
 Second, the magnification and tilt of an individual grating controls the position of the dispersed image with respect 
 to the optical axis, so that the spectral resolution is not as constrained by the payload dimensions.
@@ -1239,9 +1253,9 @@ Furthermore, by arranging the detectors around the optical axis, more dispersed 
 up to eight gratings can be arrayed around the \ESIS\ primary mirror (up to six with the current optical table).
 This contrasts the three image orders available in the planar symmetry of \MOSES.
 Taken together, these three design features make \ESIS\ more compact than \MOSES\ 
-(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-length}), improve spectral resolution 
-(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-disp_con}) and allow the collection of more projections to 
-better constrain the interpretation of the data (\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-orders}).
+\sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-length})} \roy{(Limitation~\ref{item-length})}, improve spectral resolution 
+\sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-disp_con})} \roy{(Limitation~\ref{item-disp_con})} and allow the collection of more projections to 
+better constrain the interpretation of the data \sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-orders})} \roy{(Limitation~\ref{item-orders})}.
  
 The \ESIS\ gratings are arranged in a segmented array, clocked in \SI{45}{\degree} increments, so that there are 
 \numChannelsWords\ distinct dispersion planes.
@@ -1249,9 +1263,9 @@ This will greatly aid in reconstructing spectral line profiles since the dispers
 volume rather than a 2D plane as with \MOSES.
 For \ESIS, there will always be a dispersion plane within \SI{22.5}{\degree} of the normal to any loop-like feature in 
 the solar atmosphere.
-As discussed in \S\,\ref{subsec:LimitationsoftheMOSESDesign}, a nearly perpendicular dispersion plane allows a 
+As discussed in Section~\ref{subsec:LimitationsoftheMOSESDesign}, a nearly perpendicular dispersion plane allows a 
 filamentary structure to serve like a spectrographic slit, resulting in a clear presentation of the spectrum.
-This feature addresses \S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-dispersion}. 
+This feature addresses \sout{\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-dispersion}} \roy{Limitation~\ref{item-dispersion}}. 
 
 Rather than forming images at three spectral orders from a single grating, each \ESIS\ imaging channel has a dedicated 
 grating.
