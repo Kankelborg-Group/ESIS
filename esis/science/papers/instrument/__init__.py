@@ -1217,13 +1217,15 @@ In designing \ESIS, we have sought to improve upon each of these points.
             ))
 
         with doc.create(pylatex.Subsection(pylatex.NoEscape('\ESIS\ Features'))):
-            with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
-                figure.add_image('figures/old/layout', width=pylatex.NoEscape(r'\textwidth'))
+            # with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
+            #     figure.add_image('figures/old/layout', width=pylatex.NoEscape(r'\textwidth'))
 
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
                 figure.add_image(str(figures.layout_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
-                    r"""The \ESIS\ instrument is a pseudo-Gregorian design.
+                    r"""\roy{\ESIS\ optical layout. 
+                    Dashed lines indicate the positions of unpopulated channels. 
+                    The blue lines represent the path of \OV\ through the system.} The \ESIS\ instrument is a pseudo-Gregorian design.
 The secondary mirror is replaced by a segmented array of concave diffraction gratings.
 The field stop at prime focus defines instrument spatial/spectral \FOV.
 \CCDs\ are arrayed around the primary mirror, each associated with a particular grating.
@@ -1495,12 +1497,12 @@ $n_e T = $\,\chiantiPressure.}"""
                                 r'Spectral line',
                                 r'\OV',
                                 r'\EEs',
-                                r'\OVion, \MgXion, \HeIion, Table~\ref{table:prescription} \roy{Figure~\ref{fig:projections}}',
+                                r'\OVion, \MgXion, \HeIion, Figure~\ref{fig:bunch}',
                             ])
                             tabular.add_row([
-                                r'Spectral resolution',
-                                r'\spectralResolutionRequirement\ broadening',
-                                r'\MHD\ waves',
+                                r'Spectral sampling',
+                                r'\spectralResolutionRequirement',
+                                r'Broadening from \MHD\ waves',
                                 r'\dispersionDoppler, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
