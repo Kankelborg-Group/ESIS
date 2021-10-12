@@ -500,7 +500,6 @@ def bunch() -> matplotlib.figure.Figure:
         # plt.show()
         area = np.nanmean(area, (rays.axis.field_x, rays.axis.field_y)).squeeze()
         subtent = optics_measured.system.rays_input.input_grid.field.step_size
-        print('bunch subtent', subtent)
         # area = (area / subtent.x / subtent.y).to(u.cm ** 2)
 
         wavelength = rays.wavelength.squeeze()
