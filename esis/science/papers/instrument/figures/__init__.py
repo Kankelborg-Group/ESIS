@@ -56,8 +56,6 @@ def layout() -> matplotlib.figure.Figure:
     # esis_optics.pointing.y = 60 * u.deg
     esis_optics.central_obscuration = None
     esis_optics.filter = None
-    # esis_optics.primary.substrate_thickness = None
-    # esis_optics.grating.substrate_thickness = None
     esis_optics.source.piston = 1425 * u.mm
     esis_optics.front_aperture.piston = esis_optics.source.piston
 
@@ -70,6 +68,8 @@ def layout() -> matplotlib.figure.Figure:
     esis_optics_rays.detector.cylindrical_azimuth = esis_optics_rays.detector.cylindrical_azimuth[chan_index]
     esis_optics_rays.grating.plot_kwargs['linestyle'] = esis_optics_rays.grating.plot_kwargs['linestyle'][chan_index]
     esis_optics_rays.detector.plot_kwargs['linestyle'] = esis_optics_rays.detector.plot_kwargs['linestyle'][chan_index]
+    esis_optics_rays.grating.plot_kwargs['alpha'] = esis_optics_rays.grating.plot_kwargs['alpha'][chan_index]
+    esis_optics_rays.detector.plot_kwargs['alpha'] = esis_optics_rays.detector.plot_kwargs['alpha'][chan_index]
     esis_optics_rays.num_emission_lines = 1
 
     esis_optics.system.plot(
@@ -82,17 +82,64 @@ def layout() -> matplotlib.figure.Figure:
             linewidth=0.5,
         ),
     )
-    _, colorbar = esis_optics_rays.system.plot(
+
+    index_field_stop = esis_optics_rays.system.surfaces_all.flat_local.index(esis_optics_rays.field_stop.surface)
+    _, colorbar = esis_optics_rays.system.raytrace[:index_field_stop + 1].plot(
         ax=ax_layout,
         components=('y', 'z'),
         component_z='x',
-        # plot_rays=False,
-        plot_annotations=False,
-        # plot_vignetted=True,
         plot_colorbar=False,
         plot_kwargs=dict(
             linewidth=0.5,
+            zorder=25,
+            color='tab:blue',
         ),
+    )
+    _, colorbar = esis_optics_rays.system.raytrace[index_field_stop:].plot(
+        ax=ax_layout,
+        components=('y', 'z'),
+        component_z='x',
+        plot_colorbar=False,
+        plot_kwargs=dict(
+            linewidth=0.5,
+            zorder=30,
+            color='tab:blue',
+        ),
+    )
+
+    ax_layout.text(
+        x=0,
+        y=esis_optics.primary.translation.z.value + 20,
+        z=esis_optics.primary.mech_half_width.value + 15,
+        s='primary mirror',
+        ha='right',
+        va='bottom',
+    )
+
+    ax_layout.text(
+        x=0,
+        y=esis_optics.detector.translation.z.value + 20,
+        z=-(esis_optics.detector.cylindrical_radius + esis_optics.detector.clear_half_width).to(u.mm).value - 20,
+        s='detectors',
+        ha='center',
+        va='center',
+    )
+
+    ax_layout.text(
+        x=0,
+        y=-esis_optics.field_stop.piston.value,
+        z=-(esis_optics.field_stop.mech_radius).to(u.mm).value - 5,
+        s='field stop',
+        ha='center',
+        va='top',
+    )
+    ax_layout.text(
+        x=0,
+        y=esis_optics.grating.translation.z.value - 50,
+        z=-(esis_optics.grating.cylindrical_radius + esis_optics.grating.outer_half_width).to(u.mm).value - 15,
+        s='diffraction gratings',
+        ha='left',
+        va='top',
     )
 
     ax_layout.view_init(elev=0, azim=-40)
@@ -124,11 +171,11 @@ def layout_pdf() -> pathlib.Path:
     path = pathlib.Path(__file__).parent / 'layout_mpl.pdf'
     if not path.exists():
         fig = layout()
-        h = 1.5
+        h = 1.45
         offset = (text_width - h) / 2
         fig.savefig(
             fname=path,
-            bbox_inches=fig.bbox_inches.from_bounds(0, offset, text_width, h)
+            bbox_inches=fig.bbox_inches.from_bounds(0, 3, text_width, h),
         )
         plt.close(fig)
     return path
@@ -357,7 +404,7 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             points = points[index, mask[index]]
             hull = scipy.spatial.ConvexHull(points.xy.quantity)
             vertices = optics.system.transform_all(points[hull.vertices])
-            if optics.grating.plot_kwargs['linestyle'][i] is None:
+            if optics.grating.plot_kwargs['linestyle'][i] is 'solid':
                 alpha = 1.0
                 inactive = ''
             else:
