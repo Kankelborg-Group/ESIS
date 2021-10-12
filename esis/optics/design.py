@@ -180,8 +180,9 @@ def final(
     else:
         roll = 0 * u.deg
 
-    dashstyle = (0, (1, 1))
-    dashstyle_channels = np.array([dashstyle, None, None, None, None, dashstyle], dtype=object)
+    dashstyle = (0, (1, 3))
+    dashstyle_channels = np.array([dashstyle, 'solid', 'solid', 'solid', 'solid', dashstyle], dtype=object)
+    alpha_channels = np.array([0, 1, 1, 1, 1, 0])
 
     primary = Primary()
     primary.radius = 2000 * u.mm
@@ -273,6 +274,7 @@ def final(
     grating.material.cap.thickness = [30, 4, 10] * u.nm
     if all_channels:
         grating.plot_kwargs['linestyle'] = dashstyle_channels
+        grating.plot_kwargs['alpha'] = alpha_channels
 
     if use_uncertainty:
         grating.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.grating_translation_x))
@@ -315,6 +317,7 @@ def final(
     filter.mesh_material = 'Ni'
     if all_channels:
         filter.plot_kwargs['linestyle'] = dashstyle_channels
+        filter.plot_kwargs['alpha'] = alpha_channels
 
     detector = Detector()
     detector.name = Name('CCD230-42')
@@ -364,6 +367,7 @@ def final(
     if all_channels:
         detector.index_trigger = 1
         detector.plot_kwargs['linestyle'] = dashstyle_channels
+        detector.plot_kwargs['alpha'] = alpha_channels
 
     if use_uncertainty:
         detector.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.detector_translation_x))
