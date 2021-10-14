@@ -121,6 +121,8 @@ class Optics(
                 grid_velocity_los=self.grid_velocity_los,
                 pointing=self.pointing,
                 roll=self.roll,
+                distortion_polynomial_degree=self.distortion_polynomial_degree,
+                vignetting_polynomial_degree=self.vignetting_polynomial_degree,
             )
         return self._system
 
@@ -140,8 +142,8 @@ class Optics(
     def magnification(self):
         rays_detector = self.system.rays_output
         rays_fs = self.system.raytrace[self.system.surfaces_all.flat_local.index(self.field_stop.surface)]
-        scale_detector = rays_detector.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
-        scale_fs = rays_fs.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        scale_detector = rays_detector.distortion.plate_scale[..., 0, 0, 0]
+        scale_fs = rays_fs.distortion.plate_scale[..., 0, 0, 0]
         return scale_fs / scale_detector
 
     @property
@@ -171,7 +173,7 @@ class Optics(
 
     @property
     def plate_scale(self) -> vector.Vector2D:
-        return self.rays_output.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        return self.rays_output.distortion.plate_scale[..., 0, 0, 0]
 
     @property
     def resolution_spatial(self) -> vector.Vector2D:
@@ -179,7 +181,7 @@ class Optics(
 
     @property
     def dispersion(self) -> u.Quantity:
-        val = self.rays_output.distortion(self.distortion_polynomial_degree).dispersion[..., 0, 0, 0]
+        val = self.rays_output.distortion.dispersion[..., 0, 0, 0]
         return val.to(u.Angstrom / u.pix)
 
     @property
@@ -358,8 +360,8 @@ class Optics(
             spatial_samples_output: typ.Union[int, typ.Tuple[int, int]],
             inverse: bool = False,
     ):
-        distortion = self.rays_output.distortion(polynomial_degree=2)
-        vignetting = self.rays_output.vignetting(polynomial_degree=1)
+        distortion = self.rays_output.distortion
+        vignetting = self.rays_output.vignetting
         if not inverse:
             data = vignetting(
                 cube=data,
@@ -506,7 +508,7 @@ class Optics(
         # mask_584 = np.broadcast_to(mask_584, (2,) + mask_584.shape, subok=True)
 
         rays = other.rays_output
-        distortion = rays.distortion(polynomial_degree=2)
+        distortion = rays.distortion
         wavelength = distortion.wavelength[..., ::2, 0, 0]
         spatial_domain = oversize_ratio * u.Quantity([other.system.field_min[:2], other.system.field_max[:2]])
         pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
@@ -530,7 +532,7 @@ class Optics(
             inverse=True,
             fill_value=np.nan,
         )
-        vignetting = rays.vignetting(polynomial_degree=1)
+        vignetting = rays.vignetting
         new_images = vignetting(
             cube=new_images,
             wavelength=wavelength,
@@ -776,7 +778,7 @@ class Optics(
                     # simplex[..., :2] /= 10
                     # simplex += x0
                     rays = other.rays_output
-                    distortion = rays.distortion(polynomial_degree=2)
+                    distortion = rays.distortion
                     wavelength = distortion.wavelength[..., ::2, 0, 0]
                     spatial_domain = oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max])[..., :2]
                     pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
@@ -800,7 +802,7 @@ class Optics(
                         inverse=True,
                         fill_value=np.nan,
                     )
-                    vignetting = rays.vignetting(polynomial_degree=1)
+                    vignetting = rays.vignetting
                     new_images = vignetting(
                         cube=new_images,
                         wavelength=wavelength,
@@ -1957,7 +1959,7 @@ class Optics(
                     # label=self.wavelength[..., w],
                 )
 
-            subsystem_model = subsystem.rays_output.distortion(polynomial_degree=2).model()
+            subsystem_model = subsystem.rays_output.distortion.model()
             wire = subsystem_model(wire)
             wire = transform_detectors(wire.to_3d(), num_extra_dims=3)
 
@@ -2054,7 +2056,7 @@ class Optics(
             rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
             rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
             rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
-            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
+            subsystem_model = rays.distortion.model()
             wire = subsystem_model(wire)
             wire = wire.to_3d()
 
@@ -2120,7 +2122,7 @@ class Optics(
             rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
             rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
             rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
-            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
+            subsystem_model = rays.distortion.model()
             wire = subsystem_model(wire_fs)
             mesh = subsystem_model(mesh_fs)
             wire = wire.to_3d()
