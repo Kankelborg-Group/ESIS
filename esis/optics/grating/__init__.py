@@ -54,6 +54,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     tangential_radius_error: u.Quantity = 0 * u.mm
     sagittal_radius: u.Quantity = np.inf * u.mm
     sagittal_radius_error: u.Quantity = 0 * u.mm
+    mtf_degradation_factor: u.Quantity = 0 * u.dimensionless_unscaled
     slope_error: optics.surface.sag.SlopeErrorRMS = dataclasses.field(default_factory=optics.surface.sag.SlopeErrorRMS)
     ripple: optics.surface.sag.RippleRMS = dataclasses.field(default_factory=optics.surface.sag.RippleRMS)
     microroughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
@@ -210,6 +211,7 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         other.tangential_radius_error = self.tangential_radius_error.copy()
         other.sagittal_radius = self.sagittal_radius.copy()
         other.sagittal_radius_error = self.sagittal_radius_error.copy()
+        other.mtf_degradation_factor = self.mtf_degradation_factor.copy()
         other.slope_error = self.slope_error.copy()
         other.ripple = self.ripple.copy()
         other.microroughness = self.microroughness.copy()

@@ -186,6 +186,7 @@ def final(
 
     primary = Primary()
     primary.radius = 2000 * u.mm
+    primary.mtf_degradation_factor = 0.7 * u.dimensionless_unscaled
     primary.slope_error.value = 1.0 * u.urad
     primary.slope_error.length_integration = 4 * u.mm
     primary.slope_error.length_sample = 2 * u.mm
@@ -237,6 +238,7 @@ def final(
     grating.cylindrical_azimuth = channel_angle.copy()
     grating.sagittal_radius = 597.830 * u.mm
     grating.tangential_radius = grating.sagittal_radius
+    grating.mtf_degradation_factor = 0.6 * u.dimensionless_unscaled
     grating.slope_error.value = 3 * u.urad
     grating.slope_error.length_integration = 2 * u.mm
     grating.slope_error.length_sample = 1 * u.mm

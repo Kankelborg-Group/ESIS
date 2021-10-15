@@ -30,6 +30,7 @@ class Primary(optics.component.TranslationComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('primary'))
     radius: u.Quantity = np.inf * u.mm
     conic: u.Quantity = -1 * u.dimensionless_unscaled
+    mtf_degradation_factor: u.Quantity = 0 * u.dimensionless_unscaled
     slope_error: optics.surface.sag.SlopeErrorRMS = dataclasses.field(default_factory=optics.surface.sag.SlopeErrorRMS)
     ripple: optics.surface.sag.RippleRMS = dataclasses.field(default_factory=optics.surface.sag.RippleRMS)
     microroughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
@@ -79,6 +80,7 @@ class Primary(optics.component.TranslationComponent[SurfaceT]):
         other = super().copy()      # type: Primary
         other.radius = self.radius.copy()
         other.conic = self.conic.copy()
+        other.mtf_degradation_factor = self.mtf_degradation_factor.copy()
         other.slope_error = self.slope_error.copy()
         other.ripple = self.ripple.copy()
         other.microroughness = self.microroughness.copy()
