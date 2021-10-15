@@ -426,6 +426,12 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=1,
     )
 
+    doc.set_variable_quantity(
+        name='primaryMtfDegradationFactor',
+        value=optics_single.primary.mtf_degradation_factor,
+        digits_after_decimal=1,
+    )
+
     doc.set_variable(
         name='primaryCoatingMaterial',
         value=pylatex.NoEscape('\\' + optics_single.primary.material.main.material[0]),
@@ -546,6 +552,12 @@ def document() -> kgpy.latex.Document:
             f'${grating_radius_mean.value:0.3f}\\pm{grating_radius_range.value:0.3f}$\\,'
             f'{grating_radius_mean.unit:latex_inline}'
         )
+    )
+
+    doc.set_variable_quantity(
+        name='gratingMtfDegradationFactor',
+        value=optics_single.grating.mtf_degradation_factor,
+        digits_after_decimal=1,
     )
 
     doc.set_variable_quantity(
@@ -1725,9 +1737,9 @@ The model explored a range of power spectral distributions for the surface figur
 0.1 to 4.0.
 For each randomly generated array of optical figure errors, the amplitude was adjusted to yield a target \MTF\ 
 degradation factor, as compared to the diffraction limited \roy{diffraction-limited} \MTF.
-For the primary mirror, the figure of merit was a \MTF\ degradation of 0.7 at \angularResolutionRequirement\ resolution.
+For the primary mirror, the figure of merit was a \MTF\ degradation of 0.7 \roy{\primaryMtfDegradationFactor} at \angularResolutionRequirement\ resolution.
 Though the grating is smaller and closer to the focal plane, it was allocated somewhat more significant \MTF\ 
-degradation of 0.6 based on manufacturing capabilities.
+degradation of 0.6 \roy{\gratingMtfDegradationFactor} based on manufacturing capabilities.
 The derived requirements are described in table~\ref{table:error}.
 Note that this modeling exercise was undertaken before the baffle designs were finalized.
 The estimated diffraction \MTF\ and aberrations were therefore modeled for a rough estimate of the \ESIS\ single sector 
