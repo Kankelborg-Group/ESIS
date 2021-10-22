@@ -84,6 +84,7 @@ def layout() -> matplotlib.figure.Figure:
     )
 
     index_field_stop = esis_optics_rays.system.surfaces_all.flat_local.index(esis_optics_rays.field_stop.surface)
+    esis_optics_rays.system.raytrace[index_field_stop].vignetted_mask = esis_optics_rays.system.raytrace[~0].vignetted_mask
     _, colorbar = esis_optics_rays.system.raytrace[:index_field_stop + 1].plot(
         ax=ax_layout,
         components=('y', 'z'),
