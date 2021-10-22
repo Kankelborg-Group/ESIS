@@ -533,7 +533,7 @@ def bunch() -> matplotlib.figure.Figure:
         optics_measured.filter.clear_radius = 1000 * u.mm
         optics_measured.detector.num_pixels = (4096, 2048)
         sys = optics_measured.system
-        sys.grid_wavelength = kgpy.grid.RegularGrid1D(
+        sys.grid_rays.wavelength = kgpy.grid.RegularGrid1D(
             min=wavelength_min,
             max=wavelength_max,
             num_samples=100,
