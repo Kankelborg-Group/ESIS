@@ -59,10 +59,8 @@ class Optics(
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
     num_emission_lines: int = 3
-    field_samples: typ.Union[int, vector.Vector2D] = 10
-    field_is_stratified_random: bool = False
-    pupil_samples: typ.Union[int, vector.Vector2D] = 10
-    pupil_is_stratified_random: bool = False
+    grid_field: grid.RegularGrid2D = dataclasses.field(default_factory=lambda: grid.RegularGrid2D(num_samples=11))
+    grid_pupil: grid.RegularGrid2D = dataclasses.field(default_factory=lambda: grid.RegularGrid2D(num_samples=11))
     grid_velocity_los: grid.Grid1D = dataclasses.field(default_factory=lambda: grid.RegularGrid1D(
         min=0 * u.km / u.s,
         max=0 * u.km / u.s,
@@ -94,6 +92,18 @@ class Optics(
         return self.grating.cylindrical_azimuth.shape[~0]
 
     @property
+    def grid_rays(self):
+        return kgpy.optics.rays.RayGrid(
+            field=self.grid_field,
+            pupil=self.grid_pupil,
+            wavelength=grid.IrregularGrid1D(
+                points=self.wavelength,
+                name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
+            ),
+            velocity_los=self.grid_velocity_los,
+        )
+
+    @property
     def system(self) -> optics.System:
         if self._system is None:
             surfaces = optics.surface.SurfaceList()
@@ -109,16 +119,8 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                field_samples=self.field_samples,
-                field_is_stratified_random=self.field_is_stratified_random,
+                grid_rays=self.grid_rays,
                 field_margin=1.5 * u.arcsec,
-                pupil_samples=self.pupil_samples,
-                pupil_is_stratified_random=self.pupil_is_stratified_random,
-                grid_wavelength=grid.IrregularGrid1D(
-                    points=self.wavelength,
-                    name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
-                ),
-                grid_velocity_los=self.grid_velocity_los,
                 pointing=self.pointing,
                 roll=self.roll,
                 distortion_polynomial_degree=self.distortion_polynomial_degree,
@@ -325,8 +327,9 @@ class Optics(
         other = super().copy()  # type: Optics
         other.channel_name = self.channel_name.copy()
         other.num_emission_lines = self.num_emission_lines
-        other.pupil_samples = self.pupil_samples
-        other.field_samples = self.field_samples
+        other.grid_field = self.grid_field.copy()
+        other.grid_pupil = self.grid_pupil.copy()
+        other.grid_velocity_los = self.grid_velocity_los.copy()
         other.source = self.source.copy()
         other.front_aperture = self.front_aperture.copy()
         if self.central_obscuration is not None:
@@ -1904,16 +1907,8 @@ class Optics(
                 self.grating.surface,
                 self.detector.surface,
             ]),
-            grid_wavelength=kgpy.grid.IrregularGrid1D(
-                points=self.wavelength,
-                name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
-            ),
-            field_samples=self.field_samples,
+            grid_rays=self.grid_rays,
             field_margin=1 * u.nm,
-            field_is_stratified_random=self.field_is_stratified_random,
-            pupil_samples=self.pupil_samples,
-            pupil_is_stratified_random=self.pupil_is_stratified_random,
-            grid_velocity_los=self.grid_velocity_los,
             pointing=self.pointing,
             roll=self.roll,
         )

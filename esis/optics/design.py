@@ -102,6 +102,7 @@ import kgpy.units
 from kgpy import Name, vector
 import kgpy.optics
 import kgpy.nsroc
+import kgpy.grid
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 from . import primary as module_primary
 from . import optics as module_optics
@@ -393,6 +394,16 @@ def final(
     source.half_width_x = field_limit
     source.half_width_y = field_limit
 
+    if pupil_is_stratified_random:
+        type_grid_pupil = kgpy.grid.StratifiedRandomGrid2D
+    else:
+        type_grid_pupil = kgpy.grid.RegularGrid2D
+
+    if field_is_stratified_random:
+        type_grid_field = kgpy.grid.StratifiedRandomGrid2D
+    else:
+        type_grid_field = kgpy.grid.RegularGrid2D
+
     return module_optics.Optics(
         name=Name('ESIS'),
         channel_name=channel_name,
@@ -405,10 +416,8 @@ def final(
         filter=filter,
         detector=detector,
         num_emission_lines=10,
-        pupil_samples=pupil_samples,
-        pupil_is_stratified_random=pupil_is_stratified_random,
-        field_samples=field_samples,
-        field_is_stratified_random=field_is_stratified_random,
+        grid_field=type_grid_field(num_samples=field_samples),
+        grid_pupil=type_grid_pupil(num_samples=pupil_samples),
         sparcs=kgpy.nsroc.sparcs.specification(),
         roll=roll,
         skin_diameter=22 * u.imperial.inch,
