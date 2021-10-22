@@ -676,7 +676,6 @@ def spot_size_pdf() -> pathlib.Path:
 def focus_curve() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(
         pupil_samples=11,
-        pupil_is_stratified_random=True,
         field_samples=1,
         # field_is_stratified_random=True,
         all_channels=False,
