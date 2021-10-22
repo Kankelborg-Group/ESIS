@@ -402,7 +402,7 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
         for i in range(rays.size):
             index = np.unravel_index(i, rays.shape)
             points = np.broadcast_to(rays.position, mask.shape, subok=True)
-            points = points[index, mask[index]]
+            points = points[index][mask[index]]
             hull = scipy.spatial.ConvexHull(points.xy.quantity)
             vertices = optics.system.transform_all(points[hull.vertices])
             if optics.grating.plot_kwargs['linestyle'][i] is 'solid':
