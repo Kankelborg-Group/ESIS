@@ -538,7 +538,7 @@ def bunch() -> matplotlib.figure.Figure:
             max=wavelength_max,
             num_samples=100,
         )
-        rays = sys.rays_output
+        rays = sys.rays_output_resample_entrance
         area = rays.intensity.copy()
         area[~rays.mask] = np.nan
         area = np.nansum(area, (rays.axis.pupil_x, rays.axis.pupil_y, rays.axis.velocity_los), keepdims=True)
