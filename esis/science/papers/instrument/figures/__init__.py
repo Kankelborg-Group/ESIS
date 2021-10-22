@@ -615,12 +615,14 @@ def psf() -> matplotlib.figure.Figure:
 
     bins = rays.input_grid.pupil.num_samples_normalized.x // 2
 
+    limit_max = 0.5 * u.pix * kgpy.vector.Vector2D()
     fig, axs = rays.plot_pupil_hist2d_vs_field(
         wavlen_index=0,
         norm=matplotlib.colors.PowerNorm(1 / 3),
         bins=bins,
         cmap='gray_r',
-        limits=((-0.5, 0.5), (-0.5, 0.5)),
+        limit_min=-limit_max,
+        limit_max=limit_max,
     )
     fig.set_figheight(2.6)
     fig.set_figwidth(column_width)
