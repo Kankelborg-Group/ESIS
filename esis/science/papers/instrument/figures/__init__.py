@@ -715,7 +715,7 @@ def vignetting() -> matplotlib.figure.Figure:
         constrained_layout=True,
         squeeze=False,
     )
-    model = optics.rays_output.vignetting
+    model = optics.system.rays_output_resample_entrance.vignetting
     model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.fullname(digits_after_decimal))
     return fig
 
