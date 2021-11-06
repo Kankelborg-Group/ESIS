@@ -446,12 +446,15 @@ def final_active(
 
     opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[slice_channels_active]
     opt.grating.plot_kwargs['linestyle'] = None
+    opt.grating.plot_kwargs['alpha'] = 1
 
     opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[slice_channels_active]
     opt.filter.plot_kwargs['linestyle'] = None
+    opt.filter.plot_kwargs['alpha'] = 1
 
     opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[slice_channels_active]
     opt.detector.plot_kwargs['linestyle'] = None
+    opt.detector.plot_kwargs['alpha'] = 1
     opt.detector.index_trigger = opt.detector.index_trigger - slice_channels_active.start
 
     return opt
