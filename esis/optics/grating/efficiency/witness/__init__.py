@@ -17,6 +17,7 @@ file_vs_wavelength_g24 = base_path / 'Witness_g24.txt'
 manufacturing_number_g17 = 'UBO-16-017'
 manufacturing_number_g19 = 'UBO-16-019'
 manufacturing_number_g24 = 'UBO-16-024'
+manufacturing_number_unmeasured = 'UBO-16-014'
 
 angle_input = 4 * u.deg
 

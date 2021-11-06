@@ -95,12 +95,17 @@ Distortion
 
 """
 import dataclasses
-
 import numpy as np
 from astropy import units as u
+import astropy.modeling
 import kgpy.units
 from kgpy import Name, vector
-from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector, Optics
+import kgpy.optics
+import kgpy.nsroc
+import kgpy.grid
+from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
+from . import primary as module_primary
+from . import optics as module_optics
 
 __all__ = [
     'Requirements',
@@ -146,13 +151,16 @@ def final(
         field_samples: int = 10,
         field_is_stratified_random: bool = False,
         all_channels: bool = True,
-) -> Optics:
+        use_uncertainty: bool = False,
+) -> module_optics.Optics:
     """
     Final ESIS optical design prepared by Charles Kankelborg and Hans Courrier.
     :param pupil_samples: Number of rays per axis across the pupil.
     :param field_samples: Number of rays per axis across the field.
     :return: An instance of the as-designed ESIS optics model.
     """
+    axes = module_optics.OpticsAxes()
+
     num_sides = 8
     num_channels = 6
 
@@ -173,19 +181,38 @@ def final(
     else:
         roll = 0 * u.deg
 
-    dashstyle = (0, (1, 1))
-    dashstyle_channels = np.array([dashstyle, None, None, None, None, dashstyle], dtype=object)
+    dashstyle = (0, (1, 3))
+    dashstyle_channels = np.array([dashstyle, 'solid', 'solid', 'solid', 'solid', dashstyle], dtype=object)
+    alpha_channels = np.array([0, 1, 1, 1, 1, 0])
 
     primary = Primary()
     primary.radius = 2000 * u.mm
+    primary.mtf_degradation_factor = 0.7 * u.dimensionless_unscaled
+    primary.slope_error.value = 1.0 * u.urad
+    primary.slope_error.length_integration = 4 * u.mm
+    primary.slope_error.length_sample = 2 * u.mm
+    primary.ripple.value = 2.5 * u.nm
+    primary.ripple.periods_min = 0.06 * u.mm
+    primary.ripple.periods_max = 6 * u.mm
+    primary.microroughness.value = 1 * u.nm
+    primary.microroughness.periods_min = 1.6 * u.um
+    primary.microroughness.periods_max = 70 * u.um
     primary.num_sides = num_sides
     primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
     primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
+    primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror()
     primary.material.thickness = 30 * u.mm
     primary.material.base.material = np.array(['Cr'])
     primary.material.base.thickness = [5] * u.nm
     primary.material.main.material = np.array(['SiC'])
     primary.material.main.thickness = [25] * u.nm
+    primary_angle_input, primary_wavelength, primary_efficiency = module_primary.efficiency.model.vs_wavelength()
+    primary.material.efficiency_data = primary_efficiency
+    primary.material.wavelength_data = primary_wavelength
+
+    if use_uncertainty:
+        primary.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.primary_translation_x))
+        primary.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.primary_translation_y))
 
     front_aperture = FrontAperture()
     front_aperture.piston = primary.focal_length + 500 * u.mm
@@ -207,11 +234,21 @@ def final(
     field_stop.num_sides = num_sides
 
     grating = Grating()
-    grating.piston = primary.focal_length + 374.7 * u.mm
+    grating.translation.z = -(primary.focal_length + 374.7 * u.mm)
     grating.cylindrical_radius = 2.074999998438000e1 * u.mm
     grating.cylindrical_azimuth = channel_angle.copy()
     grating.sagittal_radius = 597.830 * u.mm
     grating.tangential_radius = grating.sagittal_radius
+    grating.mtf_degradation_factor = 0.6 * u.dimensionless_unscaled
+    grating.slope_error.value = 3 * u.urad
+    grating.slope_error.length_integration = 2 * u.mm
+    grating.slope_error.length_sample = 1 * u.mm
+    grating.ripple.value = 4 * u.nm
+    grating.ripple.periods_min = 0.024 * u.mm
+    grating.ripple.periods_max = 2.4 * u.mm
+    grating.microroughness.value = 1 * u.nm
+    grating.microroughness.periods_min = 0.02 * u.um
+    grating.microroughness.periods_max = 2 * u.um
     grating.nominal_input_angle = 1.301 * u.deg
     grating.nominal_output_angle = 8.057 * u.deg
     grating.ruling_density = (2.586608603456000 / u.um).to(1 / u.mm)
@@ -240,9 +277,37 @@ def final(
     grating.material.cap.thickness = [30, 4, 10] * u.nm
     if all_channels:
         grating.plot_kwargs['linestyle'] = dashstyle_channels
+        grating.plot_kwargs['alpha'] = alpha_channels
+
+    if use_uncertainty:
+        grating.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.grating_translation_x))
+        grating.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.grating_translation_y))
+
+        error_alignment_transfer_single_point = 2.5e-5 * u.m
+        error_alignment_transfer_systematic = 5e-6 * u.m
+        error_alignment_transfer = np.sqrt(
+            error_alignment_transfer_single_point ** 2 / 3 + error_alignment_transfer_systematic ** 2).to(u.mm)
+        grating.translation_error.z = np.expand_dims(
+            error_alignment_transfer * [-1, 0, 1],
+            axes.perp_axes(axes.grating_translation_z),
+        )
+
+        roll_error = 1.3e-2 * u.rad
+        grating.roll_error = np.expand_dims(roll_error * [-1, 0, 1], axes.perp_axes(axes.grating_roll)).to(u.deg)
+
+        radius_error = (0.4 * u.percent).to(u.dimensionless_unscaled)
+        tangential_radius_error = grating.tangential_radius * radius_error
+        sagittal_radius_error = grating.sagittal_radius * radius_error
+        grating.tangential_radius_error = np.expand_dims([-1, 0, 1] * tangential_radius_error, axes.perp_axes(axes.grating_tangential_radius))
+        grating.sagittal_radius_error = np.expand_dims([-1, 0, 1] * sagittal_radius_error, axes.perp_axes(axes.grating_sagittal_radius))
+
+        grating.ruling_density_error = np.expand_dims([-1, 0, 1] / u.mm, axes.perp_axes(axes.grating_ruling_density))
+        grating.ruling_spacing_coeff_linear_error = np.expand_dims(0.0512e-5 * ([-1, 0, 1] * u.um / u.mm), axes.perp_axes(axes.grating_ruling_spacing_coeff_linear))
+        grating.ruling_spacing_coeff_quadratic_error = np.expand_dims(0.08558e-7 * ([-1, 0, 1] * u.um / u.mm ** 2), axes.perp_axes(axes.grating_ruling_spacing_coeff_linear))
+
 
     filter = Filter()
-    filter.piston = grating.piston - 1.301661998854058 * u.m
+    filter.translation.z = grating.translation.z + 1.301661998854058 * u.m
     filter.cylindrical_radius = 95.9 * u.mm
     filter.cylindrical_azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
@@ -255,24 +320,69 @@ def final(
     filter.mesh_material = 'Ni'
     if all_channels:
         filter.plot_kwargs['linestyle'] = dashstyle_channels
+        filter.plot_kwargs['alpha'] = alpha_channels
 
     detector = Detector()
     detector.name = Name('CCD230-42')
     detector.manufacturer = 'E2V'
-    detector.piston = filter.piston - 200 * u.mm
+    detector.translation.z = filter.translation.z + 200 * u.mm
     detector.cylindrical_radius = 108 * u.mm
     detector.cylindrical_azimuth = channel_angle.copy()
+    detector.range_focus_adjustment = 13 * u.mm
     detector.inclination = -12.252 * u.deg
     detector.pixel_width = 15 * u.um
     detector.num_pixels = (2048, 1040)
     detector.npix_overscan = 2
     detector.npix_blank = 50
+    detector.temperature = -55 * u.deg_C
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
-    detector.exposure_length_min = 1.2 * u.s
+
+    moses_pixel_width = 13.5 * u.um
+    kernel = [
+                 [.034, .077, .034],
+                 [.076, .558, .076],
+                 [.034, .077, .034],
+             ] * u.dimensionless_unscaled
+    fitter = astropy.modeling.fitting.LevMarLSQFitter()
+    charge_diffusion_model = fitter(
+        astropy.modeling.models.Gaussian2D(x_stddev=3 * u.um, y_stddev=3 * u.um),
+        *np.broadcast_arrays(
+            np.linspace(-1, 1, 3)[:, np.newaxis] * moses_pixel_width,
+            np.linspace(-1, 1, 3)[np.newaxis, :] * moses_pixel_width,
+            kernel,
+            subok=True,
+        )
+    )
+    detector.charge_diffusion = kgpy.vector.Vector2D(
+        x=charge_diffusion_model.x_stddev.quantity,
+        y=charge_diffusion_model.y_stddev.quantity,
+    ).length
+
+    detector.time_frame_transfer = 60 * u.ms
+    detector.time_readout = 1.1 * u.s
+    detector.exposure_length = 10 * u.s
+    detector.exposure_length_min = 2 * u.s
+    detector.exposure_length_max = 600 * u.s
+    detector.exposure_length_increment = 100 * u.ms
     detector.bits_analog_to_digital = 16
+    detector.error_synchronization = 1 * u.ms
     if all_channels:
+        detector.index_trigger = 1
         detector.plot_kwargs['linestyle'] = dashstyle_channels
+        detector.plot_kwargs['alpha'] = alpha_channels
+
+    if use_uncertainty:
+        detector.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.detector_translation_x))
+        detector.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.detector_translation_y))
+
+        uncertainty_focus = 5e-4 * u.m
+        shim_length = 5e-5 * u.m
+        edge_defocus = 1e-4 * u.m
+        detector_defocus = np.sqrt(np.square(uncertainty_focus) + np.square(shim_length) + np.square(edge_defocus))
+        detector_defocus = detector_defocus.to(u.mm)
+        detector.translation_error.z = np.expand_dims(detector_defocus * [-1, 0, 1], axes.perp_axes(axes.detector_translation_z))
+
 
     field_limit = (0.09561 * u.deg).to(u.arcmin)
     if all_channels:
@@ -284,7 +394,17 @@ def final(
     source.half_width_x = field_limit
     source.half_width_y = field_limit
 
-    return Optics(
+    if pupil_is_stratified_random:
+        type_grid_pupil = kgpy.grid.StratifiedRandomGrid2D
+    else:
+        type_grid_pupil = kgpy.grid.RegularGrid2D
+
+    if field_is_stratified_random:
+        type_grid_field = kgpy.grid.StratifiedRandomGrid2D
+    else:
+        type_grid_field = kgpy.grid.RegularGrid2D
+
+    return module_optics.Optics(
         name=Name('ESIS'),
         channel_name=channel_name,
         source=source,
@@ -296,11 +416,11 @@ def final(
         filter=filter,
         detector=detector,
         num_emission_lines=10,
-        pupil_samples=pupil_samples,
-        pupil_is_stratified_random=pupil_is_stratified_random,
-        field_samples=field_samples,
-        field_is_stratified_random=field_is_stratified_random,
+        grid_field=type_grid_field(num_samples=field_samples),
+        grid_pupil=type_grid_pupil(num_samples=pupil_samples),
+        sparcs=kgpy.nsroc.sparcs.specification(),
         roll=roll,
+        skin_diameter=22 * u.imperial.inch,
     )
 
 channels_active_min = 1
@@ -314,7 +434,7 @@ def final_active(
         pupil_is_stratified_random: bool = False,
         field_samples: int = 10,
         field_is_stratified_random: bool = False,
-) -> Optics:
+) -> module_optics.Optics:
     opt = final(
         pupil_samples=pupil_samples,
         pupil_is_stratified_random=pupil_is_stratified_random,
@@ -326,12 +446,16 @@ def final_active(
 
     opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[slice_channels_active]
     opt.grating.plot_kwargs['linestyle'] = None
+    opt.grating.plot_kwargs['alpha'] = 1
 
     opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[slice_channels_active]
     opt.filter.plot_kwargs['linestyle'] = None
+    opt.filter.plot_kwargs['alpha'] = 1
 
     opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[slice_channels_active]
     opt.detector.plot_kwargs['linestyle'] = None
+    opt.detector.plot_kwargs['alpha'] = 1
+    opt.detector.index_trigger = opt.detector.index_trigger - slice_channels_active.start
 
     return opt
 
@@ -342,7 +466,7 @@ def final_from_poletto(
         use_toroidal_grating: bool = False,
         use_vls_grating: bool = False,
         use_one_wavelength_detector_tilt: bool = False,
-) -> Optics:
+) -> module_optics.Optics:
     """
     Try to reproduce the final ESIS design using infrastructure developed from Thomas and Poletto (2004)
     :param pupil_samples: Number of rays across the pupil in each axis.

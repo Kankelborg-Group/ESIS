@@ -1,6 +1,8 @@
+import typing as typ
 import pathlib
 import matplotlib.pyplot as plt
 import astropy.units as u
+import astropy.modeling
 import numpy as np
 import pylatex
 import num2words
@@ -37,6 +39,7 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.packages.append(pylatex.Package('paralist'))
+    doc.packages.append(pylatex.Package('amsmath'))
     doc.packages.append(pylatex.Package('acronym'))
     doc.packages.append(pylatex.Package('savesym'))
     doc.preamble.append(pylatex.NoEscape(
@@ -104,8 +107,9 @@ def document() -> kgpy.latex.Document:
         '425 Riverside Dr., #16G, New York, NY 10025, USA'
     )
 
-    doc.append(kgpy.latex.aas.Author('Hans T. Courrier', affil_msu))
     doc.append(kgpy.latex.aas.Author('Roy T. Smart', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Hans T. Courrier', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Jacob D. Parker', affil_msu))
     doc.append(kgpy.latex.aas.Author('Charles C. Kankelborg', affil_msu))
     doc.append(kgpy.latex.aas.Author('Amy R. Winebarger', affil_msfc))
     doc.append(kgpy.latex.aas.Author('Ken Kobayashi', affil_msfc))
@@ -116,7 +120,6 @@ def document() -> kgpy.latex.Document:
     doc.append(kgpy.latex.aas.Author('James A. Duffy', affil_msfc))
     doc.append(kgpy.latex.aas.Author('Eric Gullikson', affil_lbnl))
     doc.append(kgpy.latex.aas.Author('Micah Johnson', affil_msu))
-    doc.append(kgpy.latex.aas.Author('Jacob D. Parker', affil_msu))
     doc.append(kgpy.latex.aas.Author('Laurel Rachmeler', affil_msfc))
     doc.append(kgpy.latex.aas.Author('Larry Springer', affil_msu))
     doc.append(kgpy.latex.aas.Author('David L. Windt', affil_rxo))
@@ -226,9 +229,10 @@ def document() -> kgpy.latex.Document:
     )
 
     index_he1 = np.nonzero(optics_single.bunch.ion == 'he_1')[0][0]
+    wavelength_he1 = wavelength[index_he1]
     doc.set_variable_quantity(
         name='HeIwavelength',
-        value=wavelength[index_he1],
+        value=wavelength_he1,
         digits_after_decimal=wavl_digits,
     )
     doc.set_variable(
@@ -304,6 +308,17 @@ def document() -> kgpy.latex.Document:
         value=num2words.num2words(optics_all.num_channels).capitalize()
     )
 
+    channel_names_str = ''
+    for i, cname in enumerate(optics_all.channel_name):
+        if i + 1 == optics_all.channel_name.shape[~0]:
+            channel_names_str += f'and {cname}'
+        else:
+            channel_names_str += f'{cname}, '
+    doc.set_variable(
+        name='channelNames',
+        value=channel_names_str,
+    )
+
     doc.set_variable_quantity(
         name='magnification',
         value=optics_single.magnification.quantity,
@@ -316,7 +331,7 @@ def document() -> kgpy.latex.Document:
     )
 
     dr = optics_single.detector.cylindrical_radius - optics_single.grating.cylindrical_radius
-    dz = optics_single.detector.piston - optics_single.grating.piston
+    dz = optics_single.detector.translation.z - optics_single.grating.translation.z
     doc.set_variable_quantity(
         name='tiltMagnification',
         value=1 / np.cos(optics_single.detector.inclination + np.arctan(dr / dz))
@@ -351,8 +366,20 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='plateScaleMean',
+        value=optics_single.plate_scale.quantity.mean(),
+        digits_after_decimal=2,
+    )
+
+    doc.set_variable_quantity(
         name='spatialResolution',
         value=optics_single.resolution_spatial.quantity,
+        digits_after_decimal=2,
+    )
+
+    doc.set_variable_quantity(
+        name='spatialResolutionMax',
+        value=optics_single.resolution_spatial.quantity.max(),
         digits_after_decimal=2,
     )
 
@@ -363,14 +390,21 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
-        name='dispersionDoppler',
-        value=optics_single.dispersion_doppler.to(u.km / u.s / u.pix),
-        digits_after_decimal=1,
+        name='spectralResolution',
+        value=(2 * u.pix) * optics_single.dispersion.to(kgpy.units.mAA / u.pix),
+        digits_after_decimal=0,
     )
 
+    km_per_s_per_pix = u.def_unit(
+        'km_per_s_per_pix',
+        represents=u.km / u.s / u.pix,
+        format=dict(
+            latex=r'\mathrm{km\,s^{-1}\,pix^{-1}}'
+        )
+    )
     doc.set_variable_quantity(
-        name='minCadence',
-        value=optics_single.detector.exposure_length_min,
+        name='dispersionDoppler',
+        value=optics_single.dispersion_doppler.to(km_per_s_per_pix),
         digits_after_decimal=1,
     )
 
@@ -383,6 +417,18 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='primaryFocalLength',
         value=optics_single.primary.focal_length,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='primaryFocalLengthMeasured',
+        value=optics_all.primary.focal_length,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='primaryMtfDegradationFactor',
+        value=optics_single.primary.mtf_degradation_factor,
         digits_after_decimal=1,
     )
 
@@ -414,9 +460,21 @@ def document() -> kgpy.latex.Document:
     )
 
     rays_o5 = kgpy.optics.rays.Rays(wavelength=wavelength_o5)
+    efficiency_primary = optics_single.primary.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='primaryEfficiency',
-        value=optics_all.primary.material.transmissivity(rays_o5).to(u.percent),
+        value=efficiency_primary,
+        digits_after_decimal=0,
+    )
+
+    rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
+    efficiency_primary_he2 = optics_single.primary.material.transmissivity(rays_he2).to(u.percent)
+    rejection_primary_he2 = efficiency_primary_he2 / efficiency_primary
+
+    efficiency_measured_primary = optics_all.primary.material.transmissivity(rays_o5).to(u.percent)
+    doc.set_variable_quantity(
+        name='primaryEfficiencyMeasured',
+        value=efficiency_measured_primary,
         digits_after_decimal=0,
     )
 
@@ -458,6 +516,13 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='gratingRulingSpacing',
         value=optics_single.grating.surface.rulings.ruling_spacing.to(u.um),
+        digits_after_decimal=5,
+    )
+
+    doc.set_variable_quantity(
+        name='gratingRulingSpacingMeasured',
+        value=optics_all.grating.surface.rulings.ruling_spacing.to(u.um),
+        digits_after_decimal=5,
     )
 
     doc.set_variable_quantity(
@@ -475,6 +540,24 @@ def document() -> kgpy.latex.Document:
     doc.set_variable_quantity(
         name='gratingRadius',
         value=optics_single.grating.tangential_radius,
+    )
+
+    grating_radius_min = optics_all.grating.tangential_radius.min()
+    grating_radius_max = optics_all.grating.tangential_radius.max()
+    grating_radius_mean = (grating_radius_max + grating_radius_min) / 2
+    grating_radius_range = (grating_radius_max - grating_radius_min) / 2
+    doc.set_variable(
+        name='gratingRadiusMeasured',
+        value=pylatex.NoEscape(
+            f'${grating_radius_mean.value:0.3f}\\pm{grating_radius_range.value:0.3f}$\\,'
+            f'{grating_radius_mean.unit:latex_inline}'
+        )
+    )
+
+    doc.set_variable_quantity(
+        name='gratingMtfDegradationFactor',
+        value=optics_single.grating.mtf_degradation_factor,
+        digits_after_decimal=1,
     )
 
     doc.set_variable_quantity(
@@ -532,32 +615,37 @@ def document() -> kgpy.latex.Document:
         value=num2words.num2words(grating_nlayers),
     )
 
-    grating_efficiency = optics_all.grating.material.transmissivity(rays_o5).to(u.percent)
+    efficency_grating = optics_all.grating.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='gratingEfficiency',
-        value=grating_efficiency,
+        value=efficency_grating,
         digits_after_decimal=0,
     )
 
-    grating_witness_efficiency = optics_all.grating.witness.transmissivity(rays_o5).to(u.percent)
+    efficiency_grating_witness = optics_all.grating.witness.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='gratingWitnessEfficiency',
-        value=grating_witness_efficiency,
+        value=efficiency_grating_witness,
         digits_after_decimal=0,
     )
 
-    rays_he2 = kgpy.optics.rays.Rays(wavelength=wavelength_he2)
-    grating_witness_efficiency_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
-    grating_rejection_ratio_he2 = (grating_witness_efficiency_he2 / grating_witness_efficiency).to(u.percent)
+    unmeasured = esis.optics.grating.efficiency.witness.manufacturing_number_unmeasured
+    doc.set_variable(
+        name='gratingWitnessMissingChannel',
+        value=optics_all.channel_name[np.nonzero(optics_all.grating.manufacturing_number == unmeasured)][0]
+    )
+
+    efficiency_grating_witness_he2 = optics_all.grating.witness.transmissivity(rays_he2).to(u.percent)
+    rejection_grating_he2 = (efficiency_grating_witness_he2 / efficiency_grating_witness)
     doc.set_variable_quantity(
         name='gratingHeIIRejectionRatio',
-        value=grating_rejection_ratio_he2,
+        value=rejection_grating_he2.to(u.percent),
         digits_after_decimal=0,
     )
 
     doc.set_variable_quantity(
         name='gratingGrooveEfficiency',
-        value=(grating_efficiency / grating_witness_efficiency).to(u.percent),
+        value=(efficency_grating / efficiency_grating_witness).to(u.percent),
         digits_after_decimal=0,
     )
 
@@ -641,15 +729,19 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(f'\\{optics_single.filter.mesh_material}Short'),
     )
 
+    efficiency_filter = optics_single.filter.surface.material.transmissivity(rays_o5).to(u.percent)
     doc.set_variable_quantity(
         name='filterEfficiency',
-        value=optics_single.filter.surface.material.transmissivity(rays_o5).to(u.percent),
+        value=efficiency_filter,
         digits_after_decimal=0,
     )
 
+    efficiency_filter_he2 = optics_single.filter.surface.material.transmissivity(rays_he2).to(u.percent)
+    rejection_filter_he2 = efficiency_filter_he2 / efficiency_filter
+
     doc.set_variable_quantity(
         name='filterToDetectorDistance',
-        value=optics_single.filter.piston - optics_single.detector.piston,
+        value=optics_single.filter.translation.z - optics_single.detector.translation.z,
         digits_after_decimal=0,
     )
 
@@ -661,6 +753,23 @@ def document() -> kgpy.latex.Document:
     doc.set_variable(
         name='detectorManufacturer',
         value=optics_single.detector.manufacturer,
+    )
+
+    detector_serial_numbers = ''
+    for i, cname in enumerate(optics_all.detector.serial_number):
+        if i + 1 == optics_all.detector.serial_number.shape[~0]:
+            detector_serial_numbers += f'and {cname}'
+        else:
+            detector_serial_numbers += f'{cname}, '
+    doc.set_variable(
+        name='detectorSerialNumbers',
+        value=detector_serial_numbers,
+    )
+
+    doc.set_variable_quantity(
+        name='detectorFocusAdjustmentRange',
+        value=optics_single.detector.range_focus_adjustment,
+        digits_after_decimal=0,
     )
 
     doc.set_variable(
@@ -680,14 +789,124 @@ def document() -> kgpy.latex.Document:
     )
 
     doc.set_variable_quantity(
+        name='detectorTemperatureTarget',
+        value=optics_single.detector.temperature,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='detectorGainRange',
+        value=pylatex.NoEscape(
+            f'{optics_all.detector.gain.value.min():0.1f}\\nobreakdash-{optics_all.detector.gain.value.max():0.1f}\\,'
+            f'{optics_all.detector.gain.unit:latex_inline}'
+        ),
+    )
+
+    doc.set_variable(
+        name='detectorNumOverscanColumns',
+        value=str(optics_single.detector.npix_overscan),
+    )
+
+    doc.set_variable(
+        name='detectorNumOverscanColumnWords',
+        value=num2words.num2words(optics_single.detector.npix_overscan),
+    )
+
+    doc.set_variable(
+        name='DetectorNumOverscanColumnWords',
+        value=num2words.num2words(optics_single.detector.npix_overscan).title(),
+    )
+
+    efficiency_detector = optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent)
+    doc.set_variable_quantity(
         name='detectorQuantumEfficiency',
-        value=optics_single.detector.surface.material.transmissivity(rays_o5).to(u.percent),
+        value=efficiency_detector,
         digits_after_decimal=0
+    )
+
+    efficiency_detector_he2 = optics_single.detector.surface.material.transmissivity(rays_he2).to(u.percent)
+    rejection_detector_he2 = efficiency_detector_he2 / efficiency_detector
+
+    rays_he1 = kgpy.optics.rays.Rays(wavelength=wavelength_he1)
+    doc.set_variable_quantity(
+        name='detectorQuantumEfficiencyHeI',
+        value=optics_single.detector.surface.material.transmissivity(rays_he1).to(u.percent),
+        digits_after_decimal=0
+    )
+
+    doc.set_variable_quantity(
+        name='detectorFrameTransferTime',
+        value=optics_single.detector.time_frame_transfer,
+        digits_after_decimal=0
+    )
+
+    doc.set_variable_quantity(
+        name='detectorReadoutTime',
+        value=optics_single.detector.time_readout,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable_quantity(
+        name='detectorExposureLength',
+        value=optics_single.detector.exposure_length,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable_quantity(
+        name='detectorMinExposureLength',
+        value=optics_single.detector.exposure_length_min,
+        digits_after_decimal=1,
+    )
+
+    doc.set_variable(
+        name='detectorMinExposureLengthValue',
+        value=f'{optics_single.detector.exposure_length_min.value:0.0f}',
+    )
+
+    doc.set_variable_quantity(
+        name='detectorMaxExposureLength',
+        value=optics_single.detector.exposure_length_max,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='detectorExposureLengthRange',
+        value=pylatex.NoEscape(r'\detectorMinExposureLengthValue-\detectorMaxExposureLength'),
+    )
+
+    doc.set_variable_quantity(
+        name='detectorExposureLengthIncrement',
+        value=optics_single.detector.exposure_length_increment,
+        digits_after_decimal=0,
+    )
+
+    doc.set_variable(
+        name='detectorTriggerIndex',
+        value=str(optics_all.channel_name[optics_all.detector.index_trigger]),
+    )
+
+    doc.set_variable_quantity(
+        name='detectorSynchronizationError',
+        value=optics_single.detector.error_synchronization,
+        digits_after_decimal=0,
     )
 
     doc.set_variable(
         name='detectorAnalogToDigitalBits',
         value=str(optics_single.detector.bits_analog_to_digital)
+    )
+
+    doc.set_variable_quantity(
+        name='totalEfficiency',
+        value=(efficiency_measured_primary * efficency_grating * efficiency_filter * efficiency_detector).to(u.percent),
+        digits_after_decimal=2,
+    )
+
+    rejection_he2 = rejection_primary_he2 * rejection_grating_he2 * rejection_filter_he2 * rejection_detector_he2
+    doc.set_variable_quantity(
+        name='totalHeIIRejection',
+        value=10 * np.log10(rejection_he2) * u.dB,
+        digits_after_decimal=0,
     )
 
     doc.set_variable(
@@ -720,6 +939,12 @@ def document() -> kgpy.latex.Document:
         value=figures.psf_field_samples,
     )
 
+    doc.set_variable_quantity(
+        name='skinDiameter',
+        value=optics_single.skin_diameter.to(u.m),
+        digits_after_decimal=1,
+    )
+
     doc.preamble.append(kgpy.latex.Acronym('ESIS', r'EUV Snapshot Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('MOSES', r'Multi-order Solar EUV Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'))
@@ -732,19 +957,22 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('MDI', r'Michelson Doppler Imager'))
     doc.preamble.append(kgpy.latex.Acronym('CLASP', r'Chromospheric Lyman-alpha Spectro-polarimeter'))
     doc.preamble.append(kgpy.latex.Acronym('HiC', r'High-Resolution Coronal Imager', 'Hi-C'))
+    doc.preamble.append(kgpy.latex.Acronym('SXI', r'Solar X-ray Imager'))
+    doc.preamble.append(kgpy.latex.Acronym('GOES', r'Geostationary Operational Environmental Satellite'))
+    doc.preamble.append(kgpy.latex.Acronym('SPDE', r'Solar Plasma Diagnostics Experiment'))
     doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('EUV', 'extreme ultraviolet'))
     doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
     doc.preamble.append(kgpy.latex.Acronym('CTIS', 'computed tomography imaging spectrograph', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('FOV', 'field of view'))
-    doc.preamble.append(kgpy.latex.Acronym('SNR', 'signal-to-noise ratio'))
+    doc.preamble.append(kgpy.latex.Acronym('SNR', 'signal-to-noise ratio', short=True))
     doc.preamble.append(kgpy.latex.Acronym('PSF', 'point-spread function', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
     doc.preamble.append(kgpy.latex.Acronym('MHD', 'magnetohydrodynamic'))
     doc.preamble.append(kgpy.latex.Acronym('EE', 'explosive event', plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('QS', 'quiet sun'))
-    doc.preamble.append(kgpy.latex.Acronym('AR', 'active region'))
-    doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole'))
+    doc.preamble.append(kgpy.latex.Acronym('QS', 'quiet sun', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('AR', 'active region', short=True, plural=True))
+    doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole', short=True, plural=True))
     doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('QE', 'quantum efficiency', plural=True))
     doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
@@ -754,6 +982,10 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('LBNL', 'Lawrence Berkley National Laboratory'))
     doc.preamble.append(kgpy.latex.Acronym('MSFC', 'Marshall Space Flight Center', short=True))
     doc.preamble.append(kgpy.latex.Acronym('VR', pylatex.NoEscape('\citet{Vernazza78}'), pylatex.NoEscape('V\&R')))
+    doc.preamble.append(kgpy.latex.Acronym('DACS', 'data acquisition and control system'))
+    doc.preamble.append(kgpy.latex.Acronym('GSE', 'ground support equipment'))
+    doc.preamble.append(kgpy.latex.Acronym('MOTS', 'military off-the-shelf'))
+    doc.preamble.append(kgpy.latex.Acronym('SPARCS', 'Solar Pointing Attitude Rocket Control System', short=True))
 
     doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
@@ -761,6 +993,8 @@ def document() -> kgpy.latex.Document:
     doc.preamble.append(kgpy.latex.Acronym('Si', 'silicon', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Cr', 'chromium', short=True))
     doc.preamble.append(kgpy.latex.Acronym('Ni', 'nickel', short=True))
+    doc.preamble.append(kgpy.latex.Acronym('LN', 'liquid nitrogen',  pylatex.NoEscape('LN$_2$')))
+    doc.preamble.append(kgpy.latex.Acronym('HeNe', 'helium-neon', 'He-Ne'))
 
     doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
@@ -777,9 +1011,9 @@ This field stop is re-imaged  using an array of \numChannelsWords\ spherical dif
 ispersion angles relative to ...? [ I want to say relative to solar north or field stop north or something], with each 
 diffraction grating projecting the spectrum onto a unique detector.}
 The slitless multi-projection design will obtain co-temporal spatial (\plateScale) and spectral (\dispersion) images 
-at high cadence ($>=$\minCadence). 
+at high cadence ($>=$\detectorMinExposureLength). 
 \amy{The instrument is designed to be capable of obtaining co-temporal spatial (\plateScale) and spectral 
-(\dispersion) images at high cadence ($>=$\minCadence).}
+(\dispersion) images at high cadence ($>=$\detectorMinExposureLength).}
 \amy{Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
 at high spatial and spectral resolution over a large (\fov) \FOV. 
 The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. }
@@ -792,38 +1026,50 @@ The instrument is currently in the build up phase prior to spacecraft integratio
     with doc.create(pylatex.Section('Introduction')):
         doc.append(pylatex.NoEscape(
             r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft 
-X-ray), is a three-dimensional scene evolving in time: $I[x,y,\lambda,t]$.
-Here the solar sky plane spatial coordinates, $x$ and $y$, and the wavelength axis, $\lambda$, comprise the three 
-dimensions of the scene, while $t$ represents the temporal axis.
-An ideal instrument would capture a spatial/spectral data cube ($I[x,y,\lambda]$) at a rapid temporal cadence ($t$), 
-however, practical limitations lead us to accept various compromises of these four observables.
+X-ray), is a three-dimensional scene evolving in time:  $I(x, y, \lambda, t)$.
+Here, the helioprojective cartesian coordinates, $x$ and $y$ \citep{Thompson2006}, and the wavelength axis, $\lambda$, 
+comprise the three dimensions of the scene, while $t$ represents the temporal axis.
+An ideal instrument would capture a spatial/spectral data cube, $I(x, y, \lambda)$, at a rapid temporal cadence, 
+however, practical limitations lead us to accept various compromises of the sampling rate along each of these four dimensions.
 Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
 Fabry--P{\'e}rot Interferometer, \citep{Puschmann12}), but the materials do not exist to extend this technology to 
 \EUV\ wavelengths shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
-Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect high cadence 2D \EUV\ spatial scenes, but 
-they collect spectrally integrated intensity over a fixed passband that is not narrow enough to isolate a single 
-emission line.  
-In principle, filter ratios that make use of spectrally adjacent multilayer \EUV\ passbands could detect Doppler 
+Imagers like the \TRACE~\citep{Handy99} and the \AIA~\citep{Lemen12} collect 
+narrowband \EUV\ images of the solar atmosphere at high cadence, but their passbands are too wide to isolate a single emission line.
+In principle, filter ratios that make use of spectrally-adjacent multilayer \EUV\ passbands could detect Doppler 
 shifts~\citep{Sakao99}.
 However, the passbands of the multilayer coatings are still wide enough that the presence of weaker contaminant lines 
 limits resolution of Doppler shifts to $\sim$\SI{1000}{\kilo\meter\per\second}~\citep{Kobayashi00}.
 Slit spectrographs (\eg\ the \IRIS~\citep{IRIS14}) obtain fast, high-resolution spatial and spectral observations, but are 
 limited by the narrow \FOV\ of the spectrograph slit.
-The $I[x,y,\lambda]$ data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
+The $I(x, y, \lambda)$ data cube can be built up by rastering the slit pointing, but it cannot be co-temporal along the 
 raster axis.
-Moreover, extended and dynamic scenes can change significantly in the time required to raster over their extant.  
+Moreover, extended and dynamic scenes can change significantly in the time required to raster over their extent.  
 
-A different approach is to forego the entrance slit employed by traditional spectrographs entirely.
-The \Acposs{NRL} SO82A~\citep{Tousey73,Tousey77} was one of the first instruments to pioneer this method.
-The `overlappograms' obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
+\roy{Since the solar EUV spectrum is an emission line spectrum, what the slitless spectrograph sees is a series of 
+overlapping images, one for each spectral line.}
+
+\roy{
+A different approach is to use a \textit{slitless spectrograph}, a spectrograph built without the slit employed by 
+traditional spectrographs.
+This is a radical approach because the slit was there so the spectrum could be interpreted unambiguously.
+Without the slit, the spectral direction and the spatial direction that would have been perpendicular to the slit are 
+degenerate.
+However, the solar atmosphere viewed in \EUV\ is a perfect candidate for observation using a slitless spectrograph since 
+the spectrum is dominated by emission lines, and has low continuum.
+So instead of a smear, a slitless spectrograph observing the Sun in \EUV\ would capture an image of many overlapping and shifted
+copies of the Sun, one for each spectral line in the passband, this type of image is known as an \textit{overlappogram}.}
+\sout{A different approach is to forego the entrance slit} \sout{employed by traditional spectrographs entirely.}
+The \Acposs{NRL} SO82A spectroheliograph~\citep{Tousey73,Tousey77}  was one of the first instruments to pioneer this method.
+The \sout{``overlappograms''} \roy{overlappograms} obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
 recently been used to determine line ratios in solar flares~\citep{Keenan06}.
-Unfortunately, for closely spaced \EUV\ lines, the dispersed images from the single diffraction order suffer from 
-considerable overlap confusion.
+Unfortunately, for closely-spaced \EUV\ lines, the dispersed images from the single diffraction order suffer from 
+considerable ambiguity from overlapping images.
 Image overlap is all but unavoidable with this configuration, however, overlappograms can be disentangled, or inverted, 
-under the right circumstances.  
+to recover the spatial/spectral cube under the right circumstances.  
 
 In analogy to a tomographic imaging problem~\citep{Kak88}, inversion of an overlapping spatial/spectral scene can be 
-facilitated by increasing the number of independent spectral projections, or `look angles,' through the 3D 
+facilitated by increasing the number of independent spectral projections, or viewing angles, through the 3D 
 $(x,y,\lambda)$ scene~\citep{DeForest04}.
 For example, \citet{DeForest04} demonstrated recovery of Doppler shifts in magnetograms from two dispersed orders of a 
 grating at the output of the \MDI~\citep{Scherrer95}.
@@ -832,14 +1078,14 @@ projections~\citep{Kak88,Descour97}, generally at the cost of computational comp
 \Acp{CTIS}~\citep{okamoto1991,Bulygin91,Descour95} leverage this concept by obtaining multiple, simultaneous dispersed 
 images of an object or scene; 
 upwards of 25 grating diffraction orders may be projected onto a single detector plane~\citep{Descour97}.
-Through post processing of these images, \CTIS\ can recover a 3D data cube from a (spectrally) smooth and continuous 
+Through post-processing of these images, \CTISs\ can recover a 3D data cube from a (spectrally) smooth and continuous 
 scene over a large bandpass (\eg\ \citet{Hagen08}).
 
 The \MOSES~\citep{Fox10,Fox11} is our first effort aimed at developing the unique capability of simultaneous 
 imaging and spectroscopy for solar \EUV\ scenes.
 \MOSES\ is a three-order slitless spectrograph that seeks to combine the simplicity of the SO82A concept with the 
 advantages of a \CTIS\ instrument.
-A single diffraction grating (in conjunction with a fold mirror) projects the $m=\pm1$ and the un-dispersed $m=0$ order 
+A single diffraction grating (in conjunction with a fold mirror) projects the $m=\pm1$ and the undispersed  $m=0$ order 
 onto three different detectors.
 Through a combination of dispersion and multi-layer coatings, the passband of the $m=\pm1$ orders encompasses only a few
 solar \EUV\ emission lines.
@@ -851,27 +1097,30 @@ Through inversion of \MOSES\ overlappograms, \citet{Fox10} obtained unprecedente
 (\ie\ line widths) of \TR\ explosive events as a function of time and space while \citet{Rust17} recovered splitting and 
 distinct moments of compact \TR\ bright point line profiles.
 
-Building on the working concept demonstrated by \MOSES, here we describe a new instrument, the \ESIS, that will improve 
-on past efforts to produce a solar \EUV\ spectral map.
-\ESIS\ will fly alongside \MOSES\ and will observe the \TR\ and corona of the solar atmosphere in the \OV\ and \MgX\ / 
-\MgXdimWavelength\ spectral lines.
+Building on the working concept demonstrated by \MOSES, here we describe a new instrument, the \ESIS, that improves
+on past efforts to perform simultaneous imaging and spectroscopy in \EUV.
+\roy{\ESIS\ and \MOSES\ share the same payload...}
+\roy{\ESIS has been built onto the same optical bench as \MOSES...}
+\ESIS\ will fly alongside \MOSES\ and will observe the \TR\ and corona of the solar atmosphere in the \OV\ and 
+\MgX/\MgXdimWavelength\ spectral lines.
 In Section~\ref{sec:TheESISConcept} we detail how our experience with the \MOSES\ instrument has shaped the design of 
 \ESIS.
 Section~\ref{sec:ScienceObjectives} describes the narrow scientific objectives and the requirements placed on the new 
 instrument.
 Section~\ref{sec:TheESISInstrument} describes the technical approach to meet our scientific objectives, followed by a 
 brief description of the expected mission profile in Section~\ref{sec:MissionProfile}.
-The current status and progress toward launch is summarized in Section~\ref{sec:ConclusionsandOutlook}."""
+\sout{The current status and progress toward launch is} \sout{summarized in Section~\ref{sec:ConclusionsandOutlook}.}"""
         ))
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Concept'))):
         doc.append(pylatex.NoEscape(
-            r"""A primary goal of the \ESIS\ instrument is to improve the implementation of \EUV\ snapshot imaging 
-spectroscopy demonstrated by \MOSES.  
+            r"""A primary goal of the \ESIS\ instrument is to improve upon the imaging spectroscopy 
+demonstrated by \MOSES.  
 Therefore, the design of the new instrument draws heavily from experiences and lessons learned through two flights of 
 the \MOSES\ instrument.
 \ESIS\ and \MOSES\ are both slitless, multi-projection spectrographs.
-As such, both produce dispersed images of a narrow portion of the solar spectrum, with the goal of enabling the 
+\roy{Should we restructure the previous sentence to say that \ESIS\ and \MOSES\ are both \CTISs? I think that would make it more consistent with the mission paper.}
+As such, both produce \sout{dispersed images} \roy{overlappograms} of a narrow portion of the solar spectrum, with the goal of enabling the 
 reconstruction of a spectral line profile at every point in the field of view.
 The similarities end there, however, as the optical layout of \ESIS\ differs significantly from that of \MOSES.
 In this section, we detail some difficulties and limitations encountered with \MOSES, then describe how the new design 
@@ -880,16 +1129,16 @@ of \ESIS\ addresses these issues."""
         with doc.create(pylatex.Subsection(pylatex.NoEscape('Limitations of the \MOSES\ Design'))):
             doc.append(pylatex.NoEscape(
                 r"""The \MOSES\ design features a single concave diffraction grating forming images on three \CCD\ 
-detectors~\citep{Fox10} (Fig.~\ref{fig:mosesSchematic}). 
-The optical path is folded in half by a single flat secondary mirror (omitted in Fig.~\ref{fig:mosesSchematic}).
-Provided that the three cameras are positioned correctly, this arragement allows the entire telescope to be brought 
+detectors~\citep{Fox10} (Figure~\ref{fig:mosesSchematic}). 
+The optical path is folded in half by a single flat secondary mirror (omitted in Figure~\ref{fig:mosesSchematic}).
+Provided that the three cameras are positioned correctly, this arrangement allows the entire telescope to be brought 
 into focus using only the central (undispersed) order and a visible light source.
 Unfortunately this design uses volume inefficiently for two reasons.
 First, the lack of magnification by the secondary mirror limits the folded length of the entire telescope to be no less 
-than half the \SI{5}{\meter} focal length of the grating~\citep{Fox10,Fox11}.
+than half of the \SI{5}{\meter} focal length of the grating~\citep{Fox10,Fox11}.
 Second, the dispersion of the instrument is controlled by the placement of the cameras.
 To achieve the maximum dispersion of \SI{29}{\kilo\meter\per\second}~\citep{Fox10}, the outboard orders are imaged as 
-far apart as possible in the $\sim22''$ diameter cross section of the rocket payload.
+far apart as possible in the \sout{$\sim22''$} \roy{$\sim\text{\skinDiameter}$} diameter \sout{cross section} \roy{envelope} of the rocket payload.
 The resulting planar dispersion poorly fills the cylindrical volume of the payload, leaving much unused space along the 
 orthogonal planes."""
             ))
@@ -905,22 +1154,22 @@ Dispersed images are formed on the outboard $m=\pm1$ \CCDs."""
 
             doc.append(pylatex.NoEscape(
                 r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
-allow efficient placement of the dispersed image order cameras.  
-For all practical purposes, the diameter of the payload (\SI{0.56}{\meter}) can only accommodate three diffraction 
+allow efficient placement of the \sout{dispersed image order cameras} \roy{$m=\pm1$ \CCDs}.  
+For all practical purposes, the diameter of the payload \sout{(\SI{0.56}{\meter})} \roy{(\skinDiameter)} can only accommodate three diffraction 
 orders ($m=-1, 0, +1$).
 Therefore, \textit{\MOSES\ can only collect, at most, three pieces of information at each point in the field of view.}
-From this, it is not reasonable to expect the reconstruction of more than three degrees of freedom in this spectrum, 
+From this, it is not reasonable to expect the reconstruction of more than three degrees of freedom \sout{in this spectrum} \roy{for each spectral line}, 
 except in the case very compact, isolated features such as those described by \citet{Fox10} and \citet{Rust17}.
 Consequently, it is a reasonable approximation to say that \MOSES\ is sensitive primarily to spectral line intensities, 
 shifts, and widths \citep{KankThom01}.
 With any tomographic apparatus, the degree of detail that can be resolved in the object depends critically on the 
 number of viewing angles~\citep{Kak88,Descour97,Hagen08}.
 So it is with the spectrum we observe with \MOSES: more dispersed images are required to confer sensitivity to finer 
-spectral details such additional lines in the passband or higher moments of the spectral line shape.
+spectral details such as \sout{additional lines in the passband or} higher moments of the spectral line shape.
 
-A related issue stems from the use of a single grating, with a single plane of dispersion.
+A related issue stems from the use of a single grating, with a single \sout{plane of dispersion} \roy{dispersion plane}.
 Since the solar corona and transition region are structured by magnetic fields, the scene tends to be dominated by 
-field aligned structures such as loops~\citep{Rosner78,Bonnet80}.
+\sout{field aligned} \roy{field-aligned} structures such as loops~\citep{Rosner78,Bonnet80}.
 When the \MOSES\ dispersion direction happens to be aligned nearly perpendicular to the magnetic field, filamentary 
 structures on the transition region serve almost as spectrograph slits unto themselves.
 The estimation of Doppler shifts then becomes a simple act of triangulation, and broadenings are also readily 
@@ -932,9 +1181,10 @@ In cases where the field is nearly parallel to the instrument dispersion, spectr
 readily apparent.
 
 The single diffraction grating also leads to a compromise in the optical performance of the instrument. 
-Since the \MOSES\ grating forms images in three orders simultaneously, aberration cannot be simultaneously optimized for 
+Since the \MOSES\ grating forms images in three orders simultaneously, \sout{aberration cannot be simultaneously optimized for} 
+\roy{there aren't enough degrees of freedom in the optical system to achieve sub-pixel aberrations in}
 all three of those spectral orders.
-A result of this design is that the orientations (\ie\,the central axis) of the \PSFs\ vary order to order~\citep{Rust17}.
+A result of this design is that the orientations (\ie\,the \sout{central} \roy{major} axis) of the \PSF\ varies order to order~\citep{Rust17}.
 During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
 inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
 The combination of these two effects results in spurious spectral features that require additional 
@@ -946,21 +1196,22 @@ aperture of the telescope) and the spatial extent of the \CCDs.
 The \FOV\ in the $m=\pm1$ orders is shifted along the dispersion axis as a function of wavelength, dependant upon where 
 the dispersed spectral images intercept the $m=\pm1$ \CCDs.
 Spatially, this effect is limited to only a handful of pixel columns at the edges of each image order.
-Of higher concern is the `spectral contamination' allowed by this layout; 
+Of higher concern is the ``spectral contamination'' allowed by this layout; 
 \citet{Parker16} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
 \FOV\ could be diffracted onto the outboard order \CCDs.
 This off-band contamination is detected as systematic intensity variation that lacks an anti-symmetric pairing in the 
 opposite dispersed image order.
-Analysis of the spectral contamination is ongoing. 
+\sout{Analysis of the spectral contamination is ongoing.}
+\roy{Is there a way we can update this?}
 
 Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the 
 \CCDs~\citep{Fox11}.
 The observing interval for a solar sounding rocket flight is very short, typically about five minutes.
 Consequently, every second of observing time is precious, both to achieve adequate exposure time and to catch the full 
 development of dynamical phenomena.
-The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of the \CCDs.
+The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of its \CCDs.
 Thus, valuable observing time is lost.
-The readout data gap impelled us to develop a \MOSES\ exposure sequence with exposures ranging from 
+The readout data gap \sout{impelled} \roy{compelled} us to develop a \MOSES\ exposure sequence with exposures ranging from 
 $0.25$-\SI{24}{\second}, a careful trade-off between deep and fast exposures. 
 
 In summary, our experience leads us to conclude that the \MOSES\ design has the following primary limitations:
@@ -968,23 +1219,25 @@ In summary, our experience leads us to conclude that the \MOSES\ design has the 
     \item inefficient use of volume \label{item-length} %(x and y direction)
     \item dispersion constrained by payload dimensions \label{item-disp_con}
     \item too few dispersed images (orders) \label{item-orders}
-    \item single plane dispersion \label{item-dispersion}
-    \item lack of aberration control \label{item-PSF}
-    \item insufficiently defined FOV \label{item-FOV}
-    \item sub-optimal exposure cadence \label{item-CAD}
+    \item single \sout{plane dispersion} \roy{dispersion plane} \label{item-dispersion}
+    \item \ \sout{lack of aberration control} \roy{Insufficient degrees of freedom to control aberrations} \label{item-PSF}
+    \item \ \sout{insufficiently defined} \roy{poorly-defined} \FOV\ \label{item-FOV}
+    \item \ \sout{sub-optimal exposure cadence} \roy{low duty cycle} \label{item-CAD}
 \end{enumerate}
 In designing \ESIS, we have sought to improve upon each of these points.
 """
             ))
 
         with doc.create(pylatex.Subsection(pylatex.NoEscape('\ESIS\ Features'))):
-            with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
-                figure.add_image('figures/old/layout', width=pylatex.NoEscape(r'\textwidth'))
+            # with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
+            #     figure.add_image('figures/old/layout', width=pylatex.NoEscape(r'\textwidth'))
 
             with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
                 figure.add_image(str(figures.layout_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
-                    r"""The \ESIS\ instrument is a pseudo-Gregorian design.
+                    r"""\roy{\ESIS\ optical layout. 
+                    Dashed lines indicate the positions of unpopulated channels. 
+                    The blue lines represent the path of \OV\ through the system.} The \ESIS\ instrument is a pseudo-Gregorian design.
 The secondary mirror is replaced by a segmented array of concave diffraction gratings.
 The field stop at prime focus defines instrument spatial/spectral \FOV.
 \CCDs\ are arrayed around the primary mirror, each associated with a particular grating.
@@ -994,7 +1247,7 @@ Eight grating positions appear in this schematic; only six fit within the volume
                 figure.append(kgpy.latex.Label('fig:layout'))
 
             doc.append(pylatex.NoEscape(
-                r"""The layout of \ESIS\ (Fig.~\ref{fig:layout}) is a modified form of Gregorian telescope.
+                r"""The layout of \ESIS\ (Figure~\ref{fig:layout}) is a modified form of Gregorian telescope.
 Incoming light is brought to focus at an octagonal field stop by a parabolic primary mirror.
 In the \ESIS\ layout, the secondary mirror of a typical Gregorian telescope is replaced by a segmented, octagonal array 
 of diffraction gratings.
@@ -1002,11 +1255,11 @@ From the field stop, the gratings re-image to \CCD\ detectors arranged radially 
 The gratings are blazed for first order, so that each \CCD\ is fed by a single corresponding grating, and all the 
 gratings are identical in design.
 The features of this new layout address all of the limitations described in 
-Sect.~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
+Section~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
 
 Replacing the secondary mirror with an array of concave diffraction gratings confers several advantages to \ESIS\ over 
 \MOSES.
-First, the magnification of the \ESIS\ gratings results in a shorter axial length than \MOSES, without sacrificing 
+First, the \sout{magnification of the \ESIS\ gratings} \roy{concavity of the gratings creates magnification in the \ESIS\ optical system, which} results in a shorter axial length than \MOSES, without sacrificing 
 spatial or spectral resolution.
 Second, the magnification and tilt of an individual grating controls the position of the dispersed image with respect 
 to the optical axis, so that the spectral resolution is not as constrained by the payload dimensions.
@@ -1015,9 +1268,9 @@ Furthermore, by arranging the detectors around the optical axis, more dispersed 
 up to eight gratings can be arrayed around the \ESIS\ primary mirror (up to six with the current optical table).
 This contrasts the three image orders available in the planar symmetry of \MOSES.
 Taken together, these three design features make \ESIS\ more compact than \MOSES\ 
-(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-length}), improve spectral resolution 
-(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-disp_con}) and allow the collection of more projections to 
-better constrain the interpretation of the data (\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-orders}).
+\sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-length})} \roy{(Limitation~\ref{item-length})}, improve spectral resolution 
+\sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-disp_con})} \roy{(Limitation~\ref{item-disp_con})} and allow the collection of more projections to 
+better constrain the interpretation of the data \sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-orders})} \roy{(Limitation~\ref{item-orders})}.
  
 The \ESIS\ gratings are arranged in a segmented array, clocked in \SI{45}{\degree} increments, so that there are 
 \numChannelsWords\ distinct dispersion planes.
@@ -1025,9 +1278,9 @@ This will greatly aid in reconstructing spectral line profiles since the dispers
 volume rather than a 2D plane as with \MOSES.
 For \ESIS, there will always be a dispersion plane within \SI{22.5}{\degree} of the normal to any loop-like feature in 
 the solar atmosphere.
-As discussed in \S\,\ref{subsec:LimitationsoftheMOSESDesign}, a nearly perpendicular dispersion plane allows a 
+As discussed in Section~\ref{subsec:LimitationsoftheMOSESDesign}, a nearly perpendicular dispersion plane allows a 
 filamentary structure to serve like a spectrographic slit, resulting in a clear presentation of the spectrum.
-This feature addresses \S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-dispersion}. 
+This feature addresses \sout{\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-dispersion}} \roy{Limitation~\ref{item-dispersion}}. 
 
 Rather than forming images at three spectral orders from a single grating, each \ESIS\ imaging channel has a dedicated 
 grating.
@@ -1240,7 +1493,7 @@ meet our science goals."""
                     figure.add_image(str(figures.bunch_pdf()), width=None)
                     figure.add_caption(pylatex.NoEscape(
                         r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
-Calculated using ChiantiPy, with the \chiantiAbundances\ abundances file, the \chiantiDEM\ \DEM\ file, and
+Calculated using ChiantiPy, with the \cite{Schmelz2012} abundances, the \chiantiDEM\ \DEM\ file, and
 $n_e T = $\,\chiantiPressure.}"""
                     ))
                     figure.append(kgpy.latex.Label('fig:bunch'))
@@ -1254,56 +1507,55 @@ $n_e T = $\,\chiantiPressure.}"""
                             tabular.add_hline()
                             tabular.add_row([
                                 r'Spectral line',
-                                r'\OVion\ \roy{\OV}',
-                                r'Explosive events',
-                                r'\OVion, \MgXion, \HeIion, Table~\ref{table:prescription}',
+                                r'\OV',
+                                r'\EEs',
+                                r'\OVion, \MgXion, \HeIion, Figure~\ref{fig:bunch}',
                             ])
                             tabular.add_row([
-                                r'Spectral resolution',
-                                r'\SI{18}{\kilo\meter\per\second} broadening \roy{\spectralResolutionRequirement}',
-                                r'\MHD\ waves',
+                                r'Spectral sampling',
+                                r'\spectralResolutionRequirement',
+                                r'Broadening from \MHD\ waves',
                                 r'\dispersionDoppler, Table~\ref{table:prescription}',
                             ])
                             tabular.add_row([
                                 r'Spatial resolution',
-                                r'\SI{2}{\arcsecond} (\SI{1.5}{\mega\meter}) \roy{\angularResolutionRequirement (\spatialResolutionRequirement)}',
-                                r'Explosive events',
-                                r'\spatialResolution, Table~\ref{table:prescription}',
+                                r'\angularResolutionRequirement (\spatialResolutionRequirement)',
+                                r'\EEs',
+                                r'\spatialResolutionTotal, Table~\ref{table:errorBudget}',
                             ])
                             tabular.add_row([
-                                r'Desired \SNR',
-                                r'\SI{17.3}{} \roy{\snrRequirement} in \CH',
-                                r'\MHD\ waves in \CH',
-                                r'$>$\SI{17.7}{} w/$20\times$\SI{10}{\second} exp., '
-                                r'\S~\ref{subsec:SensitivityandCadence}',
+                                r'\SNRShort',
+                                r'\snrRequirement\ (\CHShort)',
+                                r'\MHD\ waves in \CHShort',
+                                r'\StackedCoronalHoleSNR\ ($\NumExpInStack \times \text{\detectorExposureLength}$ exp.), '
+                                r'Table~\ref{table:counts}',
                             ])
                             tabular.add_row([
                                 r'Cadence',
-                                r'\SI{15}{\second} \roy{\cadenceRequirement}',
+                                r'\cadenceRequirement',
                                 r'Torsional waves',
-                                r'\SI{10}{\second} eff., \S~\ref{subsec:SensitivityandCadence}',
+                                r'\detectorExposureLength\ eff., Section~\ref{subsec:SensitivityandCadence}',
                             ])
                             tabular.add_row([
                                 r'Observing time',
-                                r'$>$\SI{150}{\second} \roy{\observingTimeRequirement}',
-                                r'Explosive events',
-                                r'\SI{270}{\second}, \S~\ref{sec:MissionProfile}',
+                                r'\observingTimeRequirement',
+                                r'\EEs',
+                                r'\SI{270}{\second}, Section~\ref{sec:MissionProfile}',
                             ])
                             tabular.add_row([
-                                r'\FOV',
-                                r'\SI{10}{\arcminute} \roy{\fovRequirement} diameter ',
-                                r'Span \QS, \AR, and limb',
+                                r'\FOV\ diameter',
+                                r'\fovRequirement',
+                                r'Span \QSShort, \ARShort, and limb',
                                 r'\fov, Table~\ref{table:prescription}',
                             ])
                         table.add_caption(pylatex.NoEscape(
-                            r"""\ESIS\ instrument requirements.  
-AR is active region, QS quiet sun, and CH coronal hole."""
+                            r"""\ESIS\ instrument requirements."""
                         ))
                         table.append(kgpy.latex.Label('table:scireq'))
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Instrument'))):
         doc.append(pylatex.NoEscape(
-            r"""\ESIS\ is a multiple projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
+            r"""\ESIS\ is a multi-projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
 widths in a single snapshot over a 2D \FOV.
 Starting from the notional instrument described in Sec.~\ref{sec:TheESISConcept}, \ESIS\ has been designed to ensure all 
 of the science requirements set forth in Table~\ref{table:scireq} are met.
@@ -1319,13 +1571,14 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
             with table.create(pylatex.Center()) as centering:
                 with centering.create(pylatex.Tabular('lll')) as tabular:
                     tabular.escape = False
+                    tabular.add_row(['Surface', 'Parameter', 'Modeled value (measured value)'])
                     tabular.add_hline()
                     tabular.add_row([r'Primary', r'Surface shape', r'Parabolic'])
-                    tabular.add_row([r'', r'Focal length ', r'\primaryFocalLength'])
+                    tabular.add_row([r'', r'Focal length ', r'\primaryFocalLength\ \roy{(\primaryFocalLengthMeasured)}'])
                     tabular.add_row([r'', r'Aperture shape', r'Octagonal'])
                     tabular.add_row([r'', r'Aperture diameter', r'\primaryDiameter'])
                     tabular.add_row([r'', r'Coating', r'SiC \roy{\primaryCoatingMaterialShort} single layer, optimized for \OVwavelength'])
-                    tabular.add_row([r'', r'\roy{Efficiency (\OV)}', r'\roy{\primaryEfficiency}'])
+                    tabular.add_row([r'', r'\roy{Efficiency (\OV)}', r'\roy{\primaryEfficiency\ (\primaryEfficiencyMeasured)}'])
 
                     tabular.add_hline()
                     tabular.add_row([r'Field stop', r'Sky plane diameter', r'\fov'])
@@ -1334,21 +1587,21 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
                     tabular.add_hline()
                     tabular.add_row([r'Gratings (\numChannels)', r'Surface shape', r'Spherical'])
-                    tabular.add_row([r'', r'Surface radius', r'\gratingRadius'])
+                    tabular.add_row([r'', r'Surface radius', r'\gratingRadius\ \roy{(\gratingRadiusMeasured)}'])
                     tabular.add_row([r'', r'Aperture shape', r'Trapezoidal'])
                     tabular.add_row([r'', r'Aperture height', r'\gratingHeight'])
                     tabular.add_row([r'', r'Aperture long base', r'\gratingLongWidth'])
                     tabular.add_row([r'', r'Aperture short base', r'\gratingShortWidth'])
                     tabular.add_row([r'', r'Ruling type', r'Varied line spacing'])
-                    tabular.add_row([r'', r'Constant ruling spacing coefficient', r'\gratingRulingSpacing'])
+                    tabular.add_row([r'', r'Constant ruling spacing coefficient', r'\gratingRulingSpacing\ \roy{(\gratingRulingSpacingMeasured)}'])
                     tabular.add_row([r'', r'Linear ruling spacing coefficient', r'\gratingLinearRulingSpacingCoefficient'])
                     tabular.add_row([r'', r'Quadratic ruling spacing coefficient', r'\gratingQuadraticRulingSpacingCoefficient'])
                     tabular.add_row([r'', r'Input angle', r'\gratingInputAngle'])
                     tabular.add_row([r'', r'Output angle (\OV)', r'\gratingOutputAngle'])
                     tabular.add_row([r'', r'Manufacturing process', r'Individual master gratings'])
                     tabular.add_row([r'', r'Coating', r'Mg/Al/SiC \roy{\gratingCoatingMaterialShort} multilayer, optimized for \OVwavelength'])
+                    tabular.add_row([r'', r'Groove efficiency \roy{(\OV)}', r'\SI{39}{\percent} \roy{\gratingGrooveEfficiency}'])
                     tabular.add_row([r'', r'Efficiency \roy{(\OV)}', r'\SI{14}{\percent} \roy{\gratingEfficiency}'])
-                    tabular.add_row([r'', r'Uncoated efficiency \roy{(\OV)}', r'\SI{39}{\percent} \roy{\gratingGrooveEfficiency}'])
 
                     tabular.add_hline()
                     tabular.add_row([r'Filters (\numChannels)', r'Aperture shape', r'Circular'])
@@ -1365,7 +1618,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'Active area', r'\detectorPixelsX\ $\times$ \detectorPixelsY'])
                     tabular.add_row([r'', r'Pixel size', r'\detectorPixelSize'])
                     tabular.add_row([r'', r'Quantum efficiency \roy{(\OV)}', r'33\% \roy{\detectorQuantumEfficiency}'])
-                    tabular.add_row([r'', r'Minumum cadence', r'\minCadence'])
+                    tabular.add_row([r'', r'Minumum cadence', r'\detectorMinExposureLength'])
 
                     tabular.add_hline()
                     tabular.add_row([r'System', r'Magnification', r'\magnification'])
@@ -1373,6 +1626,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
                     tabular.add_row([r'', r'Nyquist resolution', r'\spatialResolution'])
                     tabular.add_row([r'', r'Dispersion', r'\dispersion\ (\dispersionDoppler)'])
                     tabular.add_row([r'', r'Passband', r'\minWavelength\ to \maxWavelength'])
+                    tabular.add_row([r'', r'\roy{Efficiency}', r'\roy{\totalEfficiency}'])
                     # tabular.add_row([r'Back focal length', r'\SI{127}{\milli\meter}'])
 
                     tabular.add_hline()
@@ -1408,21 +1662,17 @@ channel.
                 figure.append(kgpy.latex.Label('fig:schematic'))
 
             doc.append(pylatex.NoEscape(
-                r"""The primary mirror is octagonal in shape.
-A triangular aperture mask in front of the primary mirror defines the clear aperture of each channel, imaged by a 
-single grating.
-Figure~\ref{fig:schematic}b shows one such aperture mask superimposed upon the primary mirror.
-The octagonal shape of the primary also allows dynamic clearance for filter tubes that are arranged radially around the 
+                r"""
+The primary mirror is octagonal in shape.
+The octagonal shape of the primary allows dynamic clearance for filter tubes that are arranged radially around the 
 mirror (\S\,\ref{subsec:CoatingsandFilters}).
-The mirror is attached to a backing plate by three ``bipods'';
-thin titanium structures that are flexible in the radial dimension, perpendicular to the mirror edge, but rigid in the 
-other two dimensions.
+The mirror is attached to a backing plate by three \textit{bipods}: thin titanium structures that are flexible in the radial 
+dimension, perpendicular to the mirror edge, but rigid in the other two dimensions.
 The bipods form a kinematic mount, isolating the primary mirror figure from mounting stress. 
 
-The mirror will have to maintain its figure under direct solar illumination, so low expansion (Corning \ULE) substrates 
-were used.
-The transparency of \ULE, in conjunction with the transparency of the mirror coating in visible and near IR 
-\roy{near-IR} wavelengths (\eg, Table~\ref{table:prescription} and \S\,\ref{subsec:CoatingsandFilters}), helps minimize 
+The mirror will have to maintain its figure under direct solar illumination, so a Corning \ULE\ substrate was used.
+The transparency of \ULE, in conjunction with the transparency of the mirror coating in visible and near-IR  wavelengths 
+(\eg, Table~\ref{table:prescription} and \S\,\ref{subsec:CoatingsandFilters}), helps minimize 
 the heating of the mirror.
 Surface figure specifications for the \ESIS\ optics are described in Sec.~\ref{subsec:OptimizationandTolerancing}.
 
@@ -1433,16 +1683,6 @@ For these much smaller optics, lightweight bipods were wire \EDM\ cut from thin 
 The bipods are bonded to both the grating and backing plate along the three long edges of each grating.
 The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
             ))
-
-            with doc.create(pylatex.Table()) as table:
-                with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular('rr')) as tabular:
-                        tabular.escape = False
-                        tabular.add_row(['Channel', 'Serial number'])
-                        tabular.add_hline()
-                        for i in range(optics_all.channel_name.size):
-                            index = np.unravel_index(i, optics_all.channel_name.shape)
-                            tabular.add_row([optics_all.channel_name[index], optics_all.grating.serial_number[index]])
 
             with doc.create(pylatex.Figure()) as figure:
                 # figure.add_image('figures/old/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
@@ -1456,26 +1696,24 @@ The \ESIS\ passband is defined by a combination of the field stop and grating di
                 figure.append(kgpy.latex.Label('fig:projections'))
 
             doc.append(pylatex.NoEscape(
-                r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, pixel 
-limited \roy{pixel-limited} imaging from the field stop to the \CCDs.
-The pitch at the center of the grating is $d_0=$\SI{.3866}{\micro\meter} \roy{\gratingRulingSpacing} resulting in a 
-dispersion of \SI{17.5}{\kilo\meter\per\second} \roy{\dispersionDoppler} at the center of the \OV\ \FOV.
+                r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, 
+pixel-limited imaging from the field stop to the \CCDs.
+The pitch at the center of the grating is $d_0=\text{\gratingRulingSpacing}$ resulting in a dispersion of 
+\dispersionDoppler\ at the center of the \OV\ \FOV.
 The groove profile is optimized for the $m=1$ order, so that each grating serves only a single \CCD.
 The modeled grating groove efficiency in this order is \SI{36}{\percent} \roy{We said \SI{39}{\percent} above, need to 
-find out which it is, I get \gratingGrooveEfficiency} at \SI{63}{\nano\meter} \roy{\OV}. 
+find out which it is, I get \gratingGrooveEfficiency} at \OV. 
 
 Figure specification and groove profile are not well controlled near the edges of the gratings.
 Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
 Fig.~\ref{fig:schematic}c
 
 The \ESIS\ passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
-The passband includes the He\,\textsc{i} (\SI{58.43}{\nano\meter}) \roy{\HeI} spectral line through Mg\,\textsc{x} 
-(60.98 and \SI{62.49}{\nano\meter}) \roy{\MgXion\ (\MgXwavelength\ and \MgXdimWavelength)} to O\,\textsc{v} 
-(\SI{62.97}{\nano\meter}) \roy{\OV}.
+The passband includes the \HeI\ spectral line through \MgXion\ (\MgXwavelength\ and \MgXdimWavelength) to \OV.
 Figure~\ref{fig:projections} shows where images of each of the strong spectral lines will fall on the \CCD.
 The instrument dispersion satisfies the spectral resolution requirement in Table~\ref{table:scireq} and ensures that the 
-spectral images are well separated; Figure~\ref{fig:projections} shows that He\,\textsc{i} \roy{\HeI} will be completely 
-separated from the target O\,\textsc{v} \roy{\OV} line."""
+spectral images are well-separated; Figure~\ref{fig:projections} shows that \HeI\ will be completely 
+separated from the target \OV\ line."""
             ))
 
         with doc.create(pylatex.Subsection('Optimization and Tolerancing')):
@@ -1493,15 +1731,15 @@ from the entrance aperture).
 In this sub-section we describe the optimization of the first category to balance the contributions of the second. 
 
 Figure and surface roughness specifications for the primary mirror and gratings were developed first by a rule of thumb 
-and then validated through a Fourier optics based model \roy{Fourier-optics-based model} and MonteCarlo \roy{MonteCarlo} simulations.
+and then validated through a Fourier optics based model \roy{Fourier-optics-based model} and Monte Carlo simulations.
 Surface figure errors were randomly generated, using a power law distribution in frequency.
 The model explored a range of power spectral distributions for the surface figure errors, with power laws ranging from 
 0.1 to 4.0.
 For each randomly generated array of optical figure errors, the amplitude was adjusted to yield a target \MTF\ 
 degradation factor, as compared to the diffraction limited \roy{diffraction-limited} \MTF.
-For the primary mirror, the figure of merit was a \MTF\ degradation of 0.7 at \angularResolutionRequirement\ resolution.
+For the primary mirror, the figure of merit was a \MTF\ degradation of 0.7 \roy{\primaryMtfDegradationFactor} at \angularResolutionRequirement\ resolution.
 Though the grating is smaller and closer to the focal plane, it was allocated somewhat more significant \MTF\ 
-degradation of 0.6 based on manufacturing capabilities.
+degradation of 0.6 \roy{\gratingMtfDegradationFactor} based on manufacturing capabilities.
 The derived requirements are described in table~\ref{table:error}.
 Note that this modeling exercise was undertaken before the baffle designs were finalized.
 The estimated diffraction \MTF\ and aberrations were therefore modeled for a rough estimate of the \ESIS\ single sector 
@@ -1509,7 +1747,7 @@ aperture."""
             ))
 
             with doc.create(pylatex.Table()) as table:
-                # table._star_latex_name = True
+                table._star_latex_name = True
                 with table.create(pylatex.Center()) as centering:
                     with centering.create(pylatex.Tabular('llrr')) as tabular:
                         tabular.escape = False
@@ -1519,14 +1757,14 @@ aperture."""
                         tabular.add_row([r'', r'Integration length (mm)', r'4.0', r''])
                         tabular.add_row([r'', r'Sample length (mm)', r'2.0', r''])
                         tabular.add_hline()
-                        tabular.add_row([r'Primary', r'RMS roughness (mm)', r'$<2.5$', r''])
+                        tabular.add_row([r'Primary', r'RMS roughness (nm)', r'$<2.5$', r''])
                         tabular.add_row([r'', r'Periods (mm)', r'0.1-6', r''])
                         tabular.add_hline()
                         tabular.add_row([r'Grating', r'RMS slope error ($\mu$rad)', r'$<3.0$', r''])
                         tabular.add_row([r'', r'Integration length (mm)', r'2 \roy{why fewer sigfigs?}', r''])
                         tabular.add_row([r'', r'Sample length (mm)', r'1', r''])
                         tabular.add_hline()
-                        tabular.add_row([r'Grating', r'RMS roughness (mm)', r'$<2.3$', r''])
+                        tabular.add_row([r'Grating', r'RMS roughness (nm)', r'$<2.3$', r''])
                         tabular.add_row([r'', r'Periods (mm)', r'0.02-2', r''])
                         tabular.add_hline()
                 table.add_caption(pylatex.NoEscape(
@@ -1535,6 +1773,124 @@ Slope error (both the numerical estimates and the measurements) is worked out wi
 defined per ISO 10110."""
                 ))
                 table.append(kgpy.latex.Label('table:error'))
+
+            # with doc.create(pylatex.Table()) as table:
+            #     table._star_latex_name = True
+            #     with table.create(pylatex.Center()) as centering:
+            #         with centering.create(pylatex.Tabular('l|rrrr')) as tabular:
+            #             tabular.escape = False
+            #             tabular.append(['Element', 'Parameter', 'Requirement', 'Measured'])
+            #             tabular.append([])
+
+            unit_length_integration = u.mm
+            unit_length_sample = u.mm
+            unit_slope_error = u.urad
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('l|rrrr')) as tabular:
+                        tabular.escape = False
+                        tabular.append(
+                            f'Element & '
+                            f'Integration length ({unit_length_integration:latex_inline}) & '
+                            f'Sample length ({unit_length_sample:latex_inline}) & '
+                            f'\\multicolumn{{2}}{{c}}{{RMS slope error ({unit_slope_error:latex_inline})}}\\\\'
+                        )
+                        tabular.add_row([r'', r'', r'', 'Requirement', 'Measured'])
+                        tabular.add_hline()
+                        tabular.add_row([
+                            r'Primary',
+                            f'{optics_single.primary.slope_error.length_integration.to(unit_length_integration).value:0.1f}',
+                            f'{optics_single.primary.slope_error.length_sample.to(unit_length_sample).value:0.1f}',
+                            f'{optics_single.primary.slope_error.value.to(unit_slope_error).value:0.1f}',
+                            f'{optics_all.primary.slope_error.value.to(unit_slope_error).value:0.1f}',
+                        ])
+                        tabular.add_row([
+                            r'Grating',
+                            f'{optics_single.grating.slope_error.length_integration.to(unit_length_integration).value:0.1f}',
+                            f'{optics_single.grating.slope_error.length_sample.to(unit_length_sample).value:0.1f}',
+                            f'{optics_single.grating.slope_error.value.to(unit_slope_error).value:0.1f}',
+                            f'{optics_all.grating.slope_error.value.to(unit_slope_error).value.mean():0.1f}',
+                        ])
+                table.add_caption(pylatex.NoEscape(
+                    r"""RMS slope error requirements compared to metrology for the \ESIS\ optics.
+Slope error (both the numerical estimates and the measurements) is worked out with integration length and sample length 
+defined per ISO 10110."""
+                ))
+                table.append(kgpy.latex.Label('table:slopeError'))
+
+
+            unit_period_min = u.mm
+            unit_period_max = u.mm
+            unit_ripple = u.nm
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('l|rrrr')) as tabular:
+                        tabular.escape = False
+                        tabular.append(
+                            f'Element & '
+                            f'Min. periods ({unit_period_min:latex_inline}) & '
+                            f'Max. periods ({unit_period_max:latex_inline}) & '
+                            f'\\multicolumn{{2}}{{c}}{{RMS mid-spatial ripple ({unit_ripple:latex_inline})}}\\\\'
+                        )
+                        tabular.add_row([r'', r'', r'', 'Requirement', 'Measured'])
+                        tabular.add_hline()
+                        tabular.add_row([
+                            r'Primary',
+                            f'{optics_single.primary.ripple.periods_min.to(unit_period_min).value:0.2f}',
+                            f'{optics_single.primary.ripple.periods_max.to(unit_period_max).value:0.1f}',
+                            f'{optics_single.primary.ripple.value.to(unit_ripple).value:0.1f}',
+                            f'{optics_all.primary.ripple.value.to(unit_ripple).value:0.1f}',
+                        ])
+                        tabular.add_row([
+                            r'Grating',
+                            f'{optics_single.grating.ripple.periods_min.to(unit_period_min).value:0.2f}',
+                            f'{optics_single.grating.ripple.periods_max.to(unit_period_max).value:0.1f}',
+                            f'{optics_single.grating.ripple.value.to(unit_ripple).value:0.1f}',
+                            f'{optics_all.grating.ripple.value.to(unit_ripple).value.mean():0.1f}',
+                        ])
+                table.add_caption(pylatex.NoEscape(
+                    r"""RMS mid-spatial ripple requirements compared to metrology for the \ESIS\ optics."""
+                ))
+                table.append(kgpy.latex.Label('table:ripple'))
+
+
+            unit_period_min = u.um
+            unit_period_max = u.um
+            unit_roughness = u.nm
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('l|rrrr')) as tabular:
+                        tabular.escape = False
+                        tabular.append(
+                            f'Element & '
+                            f'Min. periods ({unit_period_min:latex_inline}) & '
+                            f'Max. periods ({unit_period_max:latex_inline}) & '
+                            f'\\multicolumn{{2}}{{c}}{{RMS roughness ({unit_roughness:latex_inline})}}\\\\'
+                        )
+                        tabular.add_row([r'', r'', r'', 'Requirement', 'Measured'])
+                        tabular.add_hline()
+                        tabular.add_row([
+                            r'Primary',
+                            f'{optics_single.primary.microroughness.periods_min.to(unit_period_min).value:0.2f}',
+                            f'{optics_single.primary.microroughness.periods_max.to(unit_period_max).value:0.1f}',
+                            f'{optics_single.primary.microroughness.value.to(unit_roughness).value:0.1f}',
+                            f'{optics_all.primary.microroughness.value.to(unit_roughness).value:0.1f}',
+                        ])
+                        tabular.add_row([
+                            r'Grating',
+                            f'{optics_single.grating.microroughness.periods_min.to(unit_period_min).value:0.2f}',
+                            f'{optics_single.grating.microroughness.periods_max.to(unit_period_max).value:0.1f}',
+                            f'{optics_single.grating.microroughness.value.to(unit_roughness).value:0.1f}',
+                            f'{optics_all.grating.microroughness.value.to(unit_roughness).value.mean():0.1f}',
+                        ])
+
+                table.add_caption(pylatex.NoEscape(
+                    r"""RMS roughness requirements compared to metrology for the \ESIS\ optics."""
+                ))
+                table.append(kgpy.latex.Label('table:roughness'))
 
             doc.append(pylatex.NoEscape(
                 r"""The initial grating radius of curvature, $R_g$, and ruling pattern of the \ESIS\ gratings were 
@@ -1566,11 +1922,11 @@ The box around each spot represents a single pixel on the detector.
 Each spot was traced using a stratified random grid across the pupil with $\psfPupilSamples \times \psfPupilSamples$ 
 positions per spot.
 }
-(Left:)  Ray traced spot diagrams for \ESIS, illustrated at the center and vertices of the O\,\textsc{v} FOV on the 
+(Left:)  Ray traced spot diagrams for \ESIS, illustrated at the center and vertices of the O\,\textsc{v} \FOV\ on the 
 \CCD.
 The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (overplotted on each spot) radius is \SI{2}{\micro\meter}.
 Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
-(Right:) RMS spot radius through focus for the three centered spots; top of FOV (purple curve), center (maroon), and bottom (red)."""
+(Right:) RMS spot radius through focus for the three centered spots; top of \FOV\ (purple curve), center (maroon), and bottom (red)."""
                 ))
                 figure.append(kgpy.latex.Label('fig:psf'))
 
@@ -1657,7 +2013,7 @@ each of the gaussian blur terms at the Nyquist frequency (\SI{0.5}{cycles\per ar
 From Table~\ref{table:tol}, we estimate the total \MTF\ of \ESIS\ to be $0.109$ at the Nyquist frequency.
 Compared to, for example, the Rayleigh criterion of \SI{0.09}{cycles\per arcsecond}~\citep{Rayleigh_1879} we estimate 
 the resolution of \ESIS\ to be essentially pixel limited.
-Since \ESIS\ pixels span \SI{0.76}{\arcsecond}, the resolution target in Table~\ref{table:scireq} is obtained by this 
+Since \ESIS\ pixels span \SI{0.76}{\arcsecond} \roy{\plateScaleMean}, the resolution target in Table~\ref{table:scireq} is obtained by this 
 design."""
             ))
 
@@ -1666,7 +2022,7 @@ design."""
 \begin{table*}[!htb]
 \caption{Imaging error budget and tolerance analysis results.  \MTF\ is given at \protect\SI{0.5}{cycles\per arcsecond}.}
 \begin{tabular}{llrcc}
-Element 	&	  		& Tolerance & $\sigma^2$ $[\mu m]$ & \MTF \\
+Element 	&	  		& Tolerance & $\sigma$ $[\mu m]$ & \MTF \\
 \hline %-----------------------------------------------------------------------------
 Primary M.	& Surface figure & (Ref. Table~\ref{table:surfaces}) & & 0.700 \\
 			& Decenter	& 1 \si{\milli\meter}		& 1.700 	& 0.881 \\
@@ -1682,7 +2038,7 @@ CCD			& Decenter	& 1 \si{\milli\meter}		& 0.310		& 0.996 \\
 \multicolumn{2}{l}{Max RMS spot radius (modeled)} 	&				& 1.720			& 0.878 \\
 \multicolumn{2}{l}{CCD charge diffusion (est.)} &				& 2.000			& 0.839 \\
 Thermal drift	& 		&				& 0.192			& 0.998 \\
-SPARCS drift	& 		&				& 1.920			& 0.998 \\
+\SPARCSShort\ drift	& 		&				& 1.920			& 0.998 \\
 Pointing jitter & 		&				& 3.430			& 0.597 \\
 Diff. Limit 	& 		&				&				& 0.833 \\
 \hline %-----------------------------------------------------------------------------
@@ -1692,10 +2048,447 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
 \end{table*}
 """
             ))
-            # with doc.create(pylatex.Table()) as table:
-            #     # table._star_latex_name = True
-            #     with table.create(pylatex.Center()) as centering:
-            #         with centering.create(pylatex.Tabular('llrcc')) as tabular:
+
+            units_psf = u.pix
+            plate_scale = optics_single.plate_scale
+            focal_length_effective = optics_single.magnification.x * optics_single.primary.focal_length
+
+            opt = esis.optics.design.final(**optics.error_kwargs)
+            system_psf = np.nanmean(opt.rays_output.spot_size_rms[..., 0, :])
+
+            frequency_mtf_arcsec = 0.5 * u.cycle / u.arcsec
+            frequency_mtf = frequency_mtf_arcsec * plate_scale.x / u.cycle
+            def to_mtf(psf_size: u.Quantity):
+                psf_size = psf_size / np.sqrt(2)
+                alpha = 1 / (2 * psf_size ** 2)
+                return np.exp(-(np.pi * frequency_mtf) ** 2 / alpha)
+                # return np.exp(-(2 * np.pi * frequency_mtf * psf_size) ** 2)
+
+            def to_pix(value: u.Quantity):
+                return value / (optics_single.detector.pixel_width / u.pix)
+
+            def from_pix(value: u.Quantity):
+                return value * (optics_single.detector.pixel_width / u.pix)
+
+            primary_slope_error = optics_single.primary.slope_error.value
+            primary_slope_error_psf = focal_length_effective * np.tan(2 * primary_slope_error)
+            primary_slope_error_psf /= optics_single.detector.pixel_width / u.pix
+
+            opt_primary_decenter_x_max = optics.error_primary_decenter_x_max()
+            opt_primary_decenter_x_min = optics.error_primary_decenter_x_min()
+            opt_primary_decenter_y_max = optics.error_primary_decenter_y_max()
+            opt_primary_decenter_y_min = optics.error_primary_decenter_y_min()
+
+            distance_grating_to_detector = (optics_single.detector.transform.translation_eff - optics_single.grating.transform.translation_eff).length
+            grating_slope_error = optics_single.grating.slope_error.value
+            grating_slope_error_psf = distance_grating_to_detector * np.tan(2 * grating_slope_error)
+            grating_slope_error_psf /= optics_single.detector.pixel_width / u.pix
+
+            opt_grating_translation_x_min = optics.error_grating_translation_x_min()
+            opt_grating_translation_x_max = optics.error_grating_translation_x_max()
+            opt_grating_translation_y_min = optics.error_grating_translation_y_min()
+            opt_grating_translation_y_max = optics.error_grating_translation_y_max()
+            opt_grating_translation_z_min = optics.error_grating_translation_z_min()
+            opt_grating_translation_z_max = optics.error_grating_translation_z_max()
+            opt_grating_roll_min = optics.error_grating_roll_min()
+            opt_grating_roll_max = optics.error_grating_roll_max()
+            opt_grating_radius_min = optics.error_grating_radius_min()
+            opt_grating_radius_max = optics.error_grating_radius_max()
+            opt_grating_ruling_density_min = optics.error_grating_ruling_density_min()
+            opt_grating_ruling_density_max = optics.error_grating_ruling_density_max()
+            opt_grating_ruling_spacing_linear_min = optics.error_grating_ruling_spacing_linear_min()
+            opt_grating_ruling_spacing_linear_max = optics.error_grating_ruling_spacing_linear_max()
+            opt_grating_ruling_spacing_quadratic_min = optics.error_grating_ruling_spacing_quadratic_min()
+            opt_grating_ruling_spacing_quadratic_max = optics.error_grating_ruling_spacing_quadratic_max()
+
+            opt_detector_translation_x_min = optics.error_detector_translation_x_min()
+            opt_detector_translation_x_max = optics.error_detector_translation_x_max()
+            opt_detector_translation_y_min = optics.error_detector_translation_y_min()
+            opt_detector_translation_y_max = optics.error_detector_translation_y_max()
+            opt_detector_translation_z_min = optics.error_detector_translation_z_min()
+            opt_detector_translation_z_max = optics.error_detector_translation_z_max()
+
+            rays = opt.system.rays_input.copy()
+            rays.position = np.broadcast_to(rays.position, opt.rays_output.position.shape, subok=True).copy()
+            rays.position[~opt.rays_output.mask] = np.nan
+            rays_min = np.nanmin(rays.position, axis=(rays.axis.pupil_x, rays.axis.pupil_y))
+            rays_max = np.nanmax(rays.position, axis=(rays.axis.pupil_x, rays.axis.pupil_y))
+            rays_range = np.nanmean(rays_max - rays_min)
+            detector_x = np.linspace(-1, 1, 100) / 2 * u.pix
+            diffraction_intensity = np.sinc(rays_range.x / wavelength_o5 * u.rad * np.sin(detector_x * opt.plate_scale.x)) ** 2
+            model = astropy.modeling.fitting.LevMarLSQFitter()(
+                model=astropy.modeling.models.Gaussian1D(),
+                x=detector_x,
+                y=diffraction_intensity,
+            )
+            diffraction_limit = np.sqrt(2) * model.stddev.quantity
+
+            accumulator = dict(
+                psf_size_squared=0 * u.pix ** 2,
+                mtf=1 * u.dimensionless_unscaled,
+            )
+
+            def add_row_basic(
+                tabular: pylatex.Tabular,
+                optics: typ.Union[esis.optics.Optics, typ.Tuple[esis.optics.Optics, esis.optics.Optics]],
+                name_major: str = '',
+                name_minor: str = '',
+                value_str: str = '',
+                psf_size: u.Quantity = 0 * u.um,
+            ):
+
+                accumulator['psf_size_squared'] += np.square(psf_size)
+
+                mtf = to_mtf(psf_size)
+                accumulator['mtf'] *= mtf
+
+                tabular.add_row([
+                    name_major,
+                    name_minor,
+                    value_str,
+                    f'{psf_size.to(u.pix).value:0.2f}',
+                    f'{(psf_size * optics.plate_scale.x).to(u.arcsec).value:0.2f}',
+                    f'{mtf.value:0.3f}',
+                ])
+
+            def add_row(
+                    tabular: pylatex.Tabular,
+                    optics: typ.Union[esis.optics.Optics, typ.Tuple[esis.optics.Optics, esis.optics.Optics]],
+                    name_major: str = '',
+                    name_minor: str = '',
+                    value: typ.Optional[typ.Union[u.Quantity, typ.Tuple[u.Quantity, u.Quantity]]] = None,
+                    digits_after_decimal: int = 3,
+                    scientific_notation: bool = False,
+                    remove_nominal_psf: bool = True
+            ):
+                format_kwargs = dict(
+                    digits_after_decimal=digits_after_decimal,
+                    scientific_notation=scientific_notation,
+                )
+
+                if not isinstance(optics, esis.optics.Optics):
+                    optics_min, optics_max = optics
+
+                    psf_size_min = np.nanmean(optics_min.rays_output.spot_size_rms[..., 0, :])
+                    psf_size_max = np.nanmean(optics_max.rays_output.spot_size_rms[..., 0, :])
+
+                    if psf_size_max > psf_size_min:
+                        optics = optics_max
+                    else:
+                        optics = optics_min
+
+                    if value is not None:
+                        value_min, value_max = value
+                        if value_max == -value_min:
+                            value_str = f'$\\pm${kgpy.format.quantity(value_max, **format_kwargs)}'
+                        else:
+                            raise NotImplementedError
+                    else:
+                        value_str = ''
+
+                else:
+                    if value is not None:
+                        value_str = f'{kgpy.format.quantity(value, **format_kwargs)}'
+                    else:
+                        value_str = ''
+
+                psf_size = np.nanmean(optics.rays_output.spot_size_rms[..., 0, :])
+                if remove_nominal_psf:
+                    psf_size = np.nan_to_num(np.sqrt(np.square(psf_size) - np.square(system_psf)))
+
+                add_row_basic(
+                    tabular=tabular,
+                    optics=optics,
+                    name_major=name_major,
+                    name_minor=name_minor,
+                    value_str=value_str,
+                    psf_size=psf_size,
+                )
+
+            def ptp_to_rms(value: u.Quantity) -> u.Quantity:
+                return value / np.sqrt(8)
+
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('ll|rrrr')) as tabular:
+                        tabular.escape = False
+                        tabular.add_row([
+                            r'Element',
+                            r'',
+                            r'Tolerance',
+                            f'$\\sigma$ ({units_psf:latex_inline})',
+                            f'$\\sigma$ ({u.arcsec:latex_inline})',
+                            r'\MTF\ '
+                        ])
+                        tabular.add_hline()
+                        add_row(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='System',
+                            name_minor='Aberration',
+                            remove_nominal_psf=False,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Diffraction',
+                            psf_size=diffraction_limit,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Thermal drift',
+                            psf_size=ptp_to_rms(opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length),
+                        )
+                        tabular.add_hline()
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='Primary',
+                            name_minor='Slope error',
+                            value_str=f'{kgpy.format.quantity(primary_slope_error, digits_after_decimal=1)}',
+                            psf_size=primary_slope_error_psf,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_primary_decenter_x_min,
+                                opt_primary_decenter_x_max,
+                            ),
+                            name_minor='Translation $x$',
+                            value=(
+                                -opt_primary_decenter_x_min.primary.translation_error.value.xy.length,
+                                opt_primary_decenter_x_max.primary.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_primary_decenter_y_min,
+                                opt_primary_decenter_y_max,
+                            ),
+                            name_minor='Translation $y$',
+                            value=(
+                                -opt_primary_decenter_y_min.primary.translation_error.value.xy.length,
+                                opt_primary_decenter_y_max.primary.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        tabular.add_hline()
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='Grating',
+                            name_minor='Slope error',
+                            value_str=f'{kgpy.format.quantity(grating_slope_error, digits_after_decimal=1)}',
+                            psf_size=grating_slope_error_psf,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_translation_x_min,
+                                opt_grating_translation_x_max,
+                            ),
+                            name_minor='Translation $x$',
+                            value=(
+                                -opt_grating_translation_x_min.grating.translation_error.value.xy.length,
+                                opt_grating_translation_x_max.grating.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_translation_y_min,
+                                opt_grating_translation_y_max,
+                            ),
+                            name_minor='Translation $y$',
+                            value=(
+                                -opt_grating_translation_y_min.grating.translation_error.value.xy.length,
+                                opt_grating_translation_y_max.grating.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_translation_z_min,
+                                opt_grating_translation_z_max,
+                            ),
+                            name_minor='Translation $z$',
+                            value=(
+                                opt_grating_translation_z_min.grating.translation_error.z,
+                                opt_grating_translation_z_max.grating.translation_error.z,
+                            ),
+                            digits_after_decimal=3,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_roll_min,
+                                opt_grating_roll_max,
+                            ),
+                            name_minor='Roll',
+                            value=(
+                                opt_grating_roll_min.grating.roll_error,
+                                opt_grating_roll_max.grating.roll_error,
+                            ),
+                            digits_after_decimal=3,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_radius_min,
+                                opt_grating_radius_max,
+                            ),
+                            name_minor='Radius',
+                            value=(
+                                opt_grating_radius_min.grating.tangential_radius_error,
+                                opt_grating_radius_max.grating.tangential_radius_error,
+                            ),
+                            digits_after_decimal=1,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_ruling_density_min,
+                                opt_grating_ruling_density_max,
+                            ),
+                            name_minor='Ruling density',
+                            value=(
+                                opt_grating_ruling_density_min.grating.ruling_density_error,
+                                opt_grating_ruling_density_max.grating.ruling_density_error,
+                            ),
+                            digits_after_decimal=1,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_ruling_spacing_linear_min,
+                                opt_grating_ruling_spacing_linear_max,
+                            ),
+                            name_minor='Linear coeff.',
+                            value=(
+                                opt_grating_ruling_spacing_linear_min.grating.ruling_spacing_coeff_linear_error,
+                                opt_grating_ruling_spacing_linear_max.grating.ruling_spacing_coeff_linear_error,
+                            ),
+                            digits_after_decimal=1,
+                            scientific_notation=True,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_grating_ruling_spacing_quadratic_min,
+                                opt_grating_ruling_spacing_quadratic_max,
+                            ),
+                            name_minor='Quadratic coeff.',
+                            value=(
+                                opt_grating_ruling_spacing_quadratic_min.grating.ruling_spacing_coeff_quadratic_error,
+                                opt_grating_ruling_spacing_quadratic_max.grating.ruling_spacing_coeff_quadratic_error,
+                            ),
+                            digits_after_decimal=1,
+                            scientific_notation=True,
+                        )
+                        tabular.add_hline()
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_detector_translation_x_min,
+                                opt_detector_translation_x_max,
+                            ),
+                            name_major='Detector',
+                            name_minor='Translation $x$',
+                            value=(
+                                -opt_detector_translation_x_min.detector.translation_error.value.xy.length,
+                                opt_detector_translation_x_max.detector.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_detector_translation_y_min,
+                                opt_detector_translation_y_max,
+                            ),
+                            name_minor='Translation $y$',
+                            value=(
+                                -opt_detector_translation_y_min.detector.translation_error.value.xy.length,
+                                opt_detector_translation_y_max.detector.translation_error.value.xy.length,
+                            ),
+                            digits_after_decimal=0,
+                        )
+                        add_row(
+                            tabular=tabular,
+                            optics=(
+                                opt_detector_translation_z_min,
+                                opt_detector_translation_z_max,
+                            ),
+                            name_minor='Translation $z$',
+                            value=(
+                                opt_detector_translation_z_min.detector.translation_error.z,
+                                opt_detector_translation_z_max.detector.translation_error.z,
+                            ),
+                            digits_after_decimal=2,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Charge diffusion',
+                            psf_size=to_pix(opt.detector.charge_diffusion),
+                        )
+                        tabular.add_hline()
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major=r'\SPARCSShort',
+                            name_minor='Pointing jitter',
+                            value_str=f'$\\pm${kgpy.format.quantity(opt.sparcs.pointing_jitter / 2, digits_after_decimal=2)}',
+                            psf_size=ptp_to_rms(opt.sparcs.pointing_jitter / opt.plate_scale.x),
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Pointing drift',
+                            value_str=f'{kgpy.format.quantity(opt.sparcs.pointing_drift)}',
+                            psf_size=ptp_to_rms(opt.sparcs.pointing_drift / opt.plate_scale.x * opt.detector.exposure_length),
+                        )
+                        pointing = 10 * u.arcmin
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Roll jitter',
+                            value_str=f'$\\pm${kgpy.format.quantity(opt.sparcs.rlg_jitter / 2, digits_after_decimal=0)}',
+                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_jitter / 2) * pointing / opt.plate_scale.x),
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_minor='Roll drift',
+                            value_str=f'{kgpy.format.quantity(opt.sparcs.rlg_drift)}',
+                            psf_size=ptp_to_rms(2 * np.sin(opt.sparcs.rlg_drift * opt.detector.exposure_length / 2) * pointing / opt.plate_scale.x),
+                        )
+                        tabular.add_hline()
+                        tabular.add_hline()
+                        psf_size_total = np.sqrt(accumulator['psf_size_squared'])
+                        doc.set_variable_quantity(
+                            name='spatialResolutionTotal',
+                            value=2 * psf_size_total * opt.plate_scale.x,
+                            digits_after_decimal=2,
+                        )
+                        add_row_basic(
+                            tabular=tabular,
+                            optics=opt,
+                            name_major='Total',
+                            psf_size=psf_size_total,
+                        )
+                table.add_caption(pylatex.NoEscape(
+                    f"""
+Imaging error budget and tolerance analysis results. \\MTF\\ is given at 
+{kgpy.format.quantity(frequency_mtf_arcsec, digits_after_decimal=1)}."""
+                ))
+                table.append(kgpy.latex.Label('table:errorBudget'))
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
@@ -1723,7 +2516,11 @@ Note flat response in first order over instrument \FOV\ and suppression of zero 
                 figure.add_caption(pylatex.NoEscape(
                     r"""(Top) Measured reflectance for several multilayer coated witness samples 
 \roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
-Note the suppression of second order relative to the first order.
+The white regions indicate wavelengths that intercept the detector and the gray regions indicate wavelengths that
+miss the detector.
+Note the suppression of second order relative to the first order and the consistency of the coatings between each 
+channel.
+The Channel \gratingWitnessMissingChannel\ grating measurement is missing due to issues in the measurement apparatus.
 (Bottom) Comparison of the efficiency of the three main \ESIS\ optical components: primary mirror, grating and filter.
 The primary mirror efficiency is based on measurements of a \Si\ witness sample taken on \primaryMeasurementDate\ at an 
 angle of incidence of \primaryWitnessMeasurementIncidenceAngle. 
@@ -1776,7 +2573,7 @@ A similar issue arises with the bright He\,\textsc{ii} (\SI{30.4}{\nano\meter}) 
 Through careful design of the grating multilayer, the reflectivity at this wavelength is $\sim$\SI{2}{\percent} \roy{\gratingHeIIRejectionRatio} of that 
 at \SI{63}{\nano\meter} \roy{\OV} (lower panel of Figure~\ref{fig:componentEfficiencyVsWavelength}).
 In combination with the primary mirror coating (described below) the rejection ratio at \SI{30.4}{\nano\meter} \roy{\HeIIwavelength} is 
-$\sim$\SI{32}{\decibel}.  Thus, He\,\textsc{ii} \roy{\HeII} emission will be completely attenuated at the \CCD.
+$\sim$\SI{32}{\decibel} \roy{\totalHeIIRejection}.  Thus, He\,\textsc{ii} \roy{\HeII} emission will be completely attenuated at the \CCD.
 
 The flight and spare primary mirrors were coated with the same Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer.
 Corrosion of this multilayer rendered both mirrors unusable.
@@ -1792,12 +2589,12 @@ Visible solar radiation is much stronger than \EUV, and visible stray light can 
 retaining enough intensity to contaminate the \EUV\ images.
 Lux\'el \citep{Powell90} Al \roy{\filterMaterial} filters \SI{100}{\nano\meter} \roy{\filterThickness} thick will be 
 used to shield each \CCD\ from visible light.
-The Al film is supported by a 70 line per inch (lpi) \roy{\filterMeshPitch} Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
+The Al \roy{\filterMaterial} film is supported by a 70 line per inch (lpi) \roy{\filterMeshPitch} Ni \roy{\filterMeshMaterial} mesh, with 82\% \roy{\filterMeshRatio} transmission.
 The theoretical filter transmission curve, modeled from CXRO data \citep{Henke93}, is displayed in 
 Fig.~\ref{fig:componentEfficiencyVsWavelength}.
 We conservatively estimate filter oxidation at the time of launch as a 4nm \roy{\filterOxideThickness} thick layer of Al$_2$O$_3$.
 
-An Al \roy{\Al} filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight \roy{light-tight} box with a 
+An Al \roy{\filterMaterial} filter is positioned in front of the focal plane of each \CCD\ by a filter tube, creating a light tight \roy{light-tight} box with a 
 labyrinthine evacuation vent (e.g., Fig.~\ref{F-cameras}).
 The placement of the filter relative to the \CCD\ is optimized so that the filter mesh shadow is not visible.
 By modeling the filter mesh shadow, we find that a position far from the \CCD\ ($>$\SI{200}{\milli\meter} \roy{\filterToDetectorDistance}) and mesh grid
@@ -1813,7 +2610,8 @@ stored in a nitrogen purged environment until after payload vibration testing.""
             doc.append(pylatex.NoEscape(
                 r"""
 Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the \CCD\ \QE\ listed in Table~\ref{table:prescription}.
-Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data.
+Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data, and
+are given in a variety of solar contexts: \QS, \CHs, and \ARs.
 The \SI{100}{\percent} duty cycle of \ESIS\ (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
 So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant \SNR\ penalty.
 Table~\ref{table:count} shows that \ESIS\ is effectively shot noise limited with a \SI{10}{\second} exposure.
@@ -1821,6 +2619,7 @@ The signal requirement in Table~\ref{table:scireq} is met by stacking exposures.
 Good quality images ($\sim300$ counts) in active regions can be obtained by stacking \SI{30}{\second} worth of exposures.
 This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en waves described in \S\,\ref{sec:ScienceObjectives}.
 However, by stacking multiple \SI{10}{\second} exposures, sufficient \SNR\ \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained.
+\roy{Just delete these next three sentences?}
 We also note that the count rates given here are for an unvignetted system which is limited by the baffling of this design.
 While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{subsec:AperturesandBaffles}) to increase throughput.
 Thus, a faster exposure cadence may be obtained by accepting some vignetting in the system.
@@ -1871,13 +2670,13 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
         area_mg10 = area[2]
 
         pixel_subtent = (optics_single.plate_scale.x * optics_single.plate_scale.y * u.pix * u.pix).to(u.sr)
-        time_integration = 10 * u.s
+        time_integration = optics_single.detector.exposure_length
 
         counts_o5 = (intensity_o5 * area_o5 * pixel_subtent * time_integration / energy_o5).to(u.photon)
         counts_mg10 = (intensity_mg10 * area_mg10 * pixel_subtent * time_integration / energy_mg10).to(u.photon)
         counts_total = counts_o5 + counts_mg10
 
-        stack_num = 3
+        stack_num = 12
         counts_total_stacked = counts_total * stack_num
 
         noise_shot = np.sqrt(counts_total.value) * counts_total.unit
@@ -1897,25 +2696,41 @@ Thus, a faster exposure cadence may be obtained by accepting some vignetting in 
         label = f'1 $\\times$ {kgpy.format.quantity(time_integration, digits_after_decimal=0)} exp.'
         label_stacked = f'{stack_num} $\\times$ {kgpy.format.quantity(time_integration, digits_after_decimal=0)} exp.'
 
+        doc.set_variable(
+            name='NumExpInStack',
+            value=str(stack_num),
+        )
+
+        doc.set_variable_quantity(
+            name='StackedCoronalHoleSNR',
+            value=snr_stacked[np.argmin(intensity_o5)],
+            digits_after_decimal=1,
+        )
+
         with doc.create(pylatex.Table()) as table:
             # table._star_latex_name = True
             with table.create(pylatex.Center()) as centering:
-                with centering.create(pylatex.Tabular('llrrrr')) as tabular:
+                with centering.create(pylatex.Tabular('lrrrr')) as tabular:
                     tabular.escape = False
-                    tabular.add_row([r'Source', r'', r'\VR', r'\VR', r'\VR', r'\CDS'])
-                    tabular.add_row(r'Solar context', r'', r'\QS', r'\CH', r'\AR', r'\AR')
-                    tabular.add_hline()
-                    tabular.add_row([label, r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
-                    tabular.add_row([r'', r'\MgXdim',] + [f'{c:0.0f}' for c in counts_mg10.value])
-                    tabular.add_hline()
-                    tabular.add_row([r'', r'Total', ] + [f'{c:0.0f}' for c in counts_total.value])
-                    tabular.add_row([r'', r'Shot noise', ] + [f'{c:0.1f}' for c in noise_shot.value])
-                    tabular.add_row([r'', r'Read noise', ] + 4 * [f'{noise_read_o5.value:0.1f}'])
-                    tabular.add_row([r'', r'\SNR', ] + [f'{c:0.1f}' for c in snr.value])
+                    tabular.add_row([r'Source', r'\VR', r'\VR', r'\VR', r'\CDS'])
+                    tabular.add_row(r'Solar context', r'\QSShort', r'\CHShort', r'\ARShort', r'\ARShort')
                     tabular.add_hline()
                     tabular.add_hline()
-                    tabular.add_row([label_stacked, 'Total', ] + [f'{c:0.0f}' for c in counts_total_stacked.value])
-                    tabular.add_row([r'', r'\SNR', ] + [f'{c:0.1f}' for c in snr_stacked.value])
+                    tabular.append(f'\\multicolumn{{5}}{{c}}{{{label}}}\\\\')
+                    tabular.add_row([r'\OV', ] + [f'{c:0.0f}' for c in counts_o5.value])
+                    tabular.add_row([r'\MgXdim',] + [f'{c:0.0f}' for c in counts_mg10.value])
+                    tabular.add_hline()
+                    tabular.add_row([r'Total', ] + [f'{c:0.0f}' for c in counts_total.value])
+                    tabular.add_row([r'Shot noise', ] + [f'{c:0.1f}' for c in noise_shot.value])
+                    tabular.add_row([r'Read noise', ] + 4 * [f'{noise_read_o5.value:0.1f}'])
+                    tabular.add_row([r'\SNRShort', ] + [f'{c:0.1f}' for c in snr.value])
+                    tabular.add_hline()
+                    tabular.add_hline()
+                    tabular.append(f'\\multicolumn{{5}}{{c}}{{{label_stacked}}}\\\\')
+                    tabular.add_row(['Total', ] + [f'{c:0.0f}' for c in counts_total_stacked.value])
+                    tabular.add_row([r'\SNRShort', ] + [f'{c:0.1f}' for c in snr_stacked.value])
+                    tabular.add_hline()
+                    tabular.add_hline()
 
             table.add_caption(pylatex.NoEscape(
                 r"""
@@ -1926,7 +2741,7 @@ Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in \
         with doc.create(pylatex.Subsection('Alignment and Focus')):
             doc.append(pylatex.NoEscape(
                 r"""
-In the conceptual phase of \ESIS, the decision was made to perform focus and alignment in visible light with a HeNe 
+In the conceptual phase of \ESIS, the decision was made to perform focus and alignment in visible light with a \HeNe\ 
 source.
 Certain difficulties are introduced by this choice, however, the benefits outweigh the operational complexity and 
 equipment that would be required for focus in \EUV.
@@ -1934,7 +2749,7 @@ Moreover, a sounding rocket instrument requires robust, adjustment-free mounts t
 Such a design is not amenable to iterative adjustment in vacuum.  The choice of alignment wavelength is arbitrary for 
 most components;
 \CCD\ response and multilayer coating reflectively is sufficient across a wide band a visible wavelengths.
-The exceptions are the thin film filters (which will not be installed until just before launch and have no affect on 
+The exceptions are the thin film filters (which will not be installed until just before launch and have no affect \roy{effect} on 
 telescope alignment and focus) and the diffraction gratings.
 Visible light gratings have been manufactured specifically for alignment and focus.
 These gratings are identical to the \EUV\ flight version, but with a ruling pattern scaled to a 
@@ -1957,7 +2772,7 @@ Trapezoidal grating, bipods, and mounting plate are installed on the tuffet in f
 
             doc.append(pylatex.NoEscape(
                 r"""
-After alignment and focus has been obtained with the HeNe source, the instrument will be prepared for flight by 
+After alignment and focus has been obtained with the \HeNe\ source, the instrument will be prepared for flight by 
 replacing the visible gratings by the \EUV\ flight versions.
 Each grating (\EUV\ and alignment) is individually mounted to a backing plate using a bipod system similar to that of the 
 primary mirror.
@@ -1999,7 +2814,7 @@ their alignment and focus to ensure everything was transferred correctly.
 When transferring the focus and alignment two key details were considered.
 First, there is nothing about the tuffet that constrains the grating roll.
 Therefore, we needed to ensure each flight grating had the same roll as each visible grating.
-This was accomplished by using a HeNe laser diverged through a cylindrical optic that illuminated each grating with a 
+This was accomplished by using a \HeNe\ laser diverged through a cylindrical optic that illuminated each grating with a 
 line perpendicular to the grating blaze direction.
 The line of light was reflected back onto a ruled target that could be compared between gratings.
 Since our alignment gratings were ruled to image light of approximately an order of magnitude longer wavelength the
@@ -2044,7 +2859,7 @@ The resulting optimized and non-vignetting stop geometry is shown in Figure~\ref
 
 After final optimization, the stop geometry was analyzed to check for vignetting at the grating with the optical model.
 A footprint diagram was generated at the grating from of multiple grids of rays.
-The incidence angle of each grid of rays corresponded to the extremes of FOV defined by the positions of the eight 
+The incidence angle of each grid of rays corresponded to the extremes of \FOV\ defined by the positions of the eight 
 points of the octagonal field stop.
 The footprint diagram showed that, with the stop completely filled, no ray landed outside of the grating clear aperture
 in Figure~\ref{fig:schematic}c, and no ray was intercepted by the central obscuration.
@@ -2057,12 +2872,12 @@ The \ESIS\ baffles are designed to block direct light paths between the front ap
 $<$\SI{1.4}{\degree} from the optical axis.
 This angle is purposefully larger than the angular diameter of the sun ($\sim$\SI{0.5}{\degree}) so that any direct 
 paths are excluded from bright sources in the solar corona.
-All baffles are bead-blasted, anodized Al sheet metal oriented perpendicular to the optical axis.
+All baffles are bead-blasted, anodized \Al\ sheet metal oriented perpendicular to the optical axis.
 The size and shape of the cutouts were determined using a combination of the ray trace from 
 Section~\ref{subsec:OptimizationandTolerancing} and 3D modeling.
 The light path from the primary mirror to the field stop is defined as the volume that connects each vertex of the 
 primary mirror aperture mask (e.g., Fig.~\ref{fig:schematic}) to every vertex of the octagonal field stop.
-This is a conservative definition that ensures no rays within the FOV are excluded, and therefore unintentionally 
+This is a conservative definition that ensures no rays within the \FOV\ are excluded, and therefore unintentionally 
 vignetted by the baffles.  Light paths from the field stop to the grating, and from the grating to the image formed on 
 the \CCD, are defined in a similar manner.
 The cutouts in the baffles are sized using the projection of these light paths onto the baffle surface.
@@ -2087,28 +2902,28 @@ The \ESIS\ \CCD\ cameras were designed and constructed by \MSFC\ and are the lat
 series of camera systems developed specifically for use on solar space flight instruments.
 The \ESIS\ camera heritage includes those flown on both the \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
 
-The \ESIS\ detectors are CCD230-42 astro-process \CCDs\ from E2V.
-For each camera, the \CCD\ is operated in a split frame transfer mode with each of the four ports read out by a 16-bit A/D 
+The \ESIS\ detectors are CCD230-42 \roy{\detectorName} astro-process \CCDs\ from E2V \roy{\detectorManufacturer}.
+For each camera, the \CCD\ is operated in a split frame transfer mode with each of the four ports read out by a 16-bit \roy{\detectorAnalogToDigitalBits-bit} A/D 
 converter.
-The central $2048 \times 1024$ pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
+The central $2048 \times 1024$ \roy{$\detectorPixelsX \times \detectorPixelsY$} pixels of the $2k\times2k$ device are used for imaging, while the outer two regions are 
 used for storage.
-Two overscan columns on either side of the imaging area and eight extra rows in each storage region will monitor read 
+Two \roy{\DetectorNumOverscanColumnWords} overscan columns on either side of the imaging area and eight extra rows in each storage region will monitor read 
 noise and dark current.
 When the camera receives the trigger signal, it transfers the image from the imaging region to the storage regions and 
 starts image readout.
-The digitized data are sent to the Data Acquisition and Control System (DACS) through a SpaceWire interface immediately, 
+The digitized data are sent to the \DACS\ through a SpaceWire interface immediately, 
 one line at a time.
-The frame transfer takes $<$\SI{60}{\milli\second}, and readout takes \SI{1.1}{\second}.
-The cadence is adjustable from 2-\SI{600}{\second} in increments of \SI{100}{\milli\second}, to satisfy the requirement 
+The frame transfer takes $<$\SI{60}{\milli\second} \roy{\detectorFrameTransferTime}, and readout takes \SI{1.1}{\second} \roy{\detectorReadoutTime}.
+The cadence is adjustable from 2-\SI{600}{\second} \roy{\detectorExposureLengthRange} in increments of \SI{100}{\milli\second} \roy{\detectorExposureLengthIncrement}, to satisfy the requirement 
 listed in Table~\ref{table:scireq}.
 Because the imaging region is continuously illuminated, the action of frame transfer (transferring the image from the 
 imaging region to the storage regions) also starts the next exposure without delay.
 Thus the exposure time is controlled by the time period between triggers.
-Camera 1 (Fig.~\ref{F-cameras}) generates the sync trigger, which is fed back into Camera 1's trigger input and provides 
+Camera 1 \roy{\detectorTriggerIndex} (Fig.~\ref{F-cameras}) generates the sync trigger, which is fed back into Camera 1's \roy{\detectorTriggerIndex's} trigger input and provides 
 independently buffered triggers to the remaining three cameras.
-The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second}.
+The trigger signals are synchronized to better than $\pm$\SI{1}{\milli\second} \roy{$\pm$\detectorSynchronizationError}.
 Shutterless operation allows \ESIS\ to observe with a \SI{100}{\percent} duty cycle.
-The cadence is limited only by the 1.1\,s readout time. 
+The cadence is limited only by the 1.1\,s \roy{\detectorReadoutTime} readout time. 
 
 \MSFC\ custom designed the camera board, enclosure, and mounting structure for \ESIS\ to fit the unique packaging 
 requirements of this experiment (Fig~\ref{F-cameras}).
@@ -2117,23 +2932,22 @@ place.
 The carriers of all cameras are connected to a central two-piece copper (\SI{3}{\kilo\gram}) and aluminum 
 (\SI{1}{\kilo\gram}) thermal reservoir (cold block) by flexible copper cold straps.
 The flexible cold straps allow individual cameras to be translated parallel to the optical axis (by means of shims) up 
-to $\sim$\SI{13}{\milli\meter} to adjust focus in each channel prior to launch.
-The centrally located cold block will be cooled by LN2 flow from outside the payload until just before launch.
-The LN2 flow will be controlled automatically by a Ground Support Equipment (GSE) computer so that all cameras are 
-maintained above survival temperature but below the target temperature of \SI{-55}{\celsius} to insure a negligible dark 
+to $\sim$\SI{13}{\milli\meter} \roy{$\sim$\detectorFocusAdjustmentRange} to adjust focus in each channel prior to launch.
+The centrally located cold block will be cooled by LN2 \roy{\LN} flow from outside the payload until just before launch.
+The LN2 \roy{\LN} flow will be controlled automatically by a Ground Support Equipment (GSE) \roy{\GSE} computer so that all cameras are 
+maintained above survival temperature but below the target temperature of \SI{-55}{\celsius} \roy{\detectorTemperatureTarget} to insure a negligible dark 
 current level.
 
 The gain, read noise, and dark current of the four cameras were measured at \MSFC\ using an ${}^{55}$Fe radioactive 
 source.
-Cameras are labeled 1, 2, 3, and 4 with associated serial numbers SN6, SN7, SN9, and SN10 respectively in 
-Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} in each quadrant of all four cameras.
+Cameras are labeled 1, 2, 3, and 4 \roy{\channelNames} with associated serial numbers SN6, SN7, SN9, and SN10 \roy{\detectorSerialNumbers} respectively in 
+Fig.~\ref{F-cameras}.  Gain ranges from 2.5-\SI{2.6}{e^- \per DN} \roy{\detectorGainRange} in each quadrant of all four cameras.
 Table~\ref{T-cameras} lists gain, read noise, and dark current by quadrant for each camera.  
 
 The \QE\ of the \ESIS\ \CCDs\ will not be measured before flight.
-Similar astro-process \CCDs\ with no AR coating are used in the Solar X-ray Imager (SXI) aboard the Geosynchronous 
-Orbiting Environmental Satellites (GOES) N and O.
-A \QE\ range of 43\% at 583\AA\ to 33\% at 630\AA\ is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
-\citet{Stern04} for GOES SXI instruments.
+Similar astro-process \CCDs\ with no AR \roy{antireflection (because AR is already used for active region)} coating are used in the \SXI\ aboard the \GOES\ N and O.
+A \QE\ range of 43\% at 583\AA\ \roy{\detectorQuantumEfficiencyHeI\ at \HeI} to 33\% at 630\AA\ \roy{\detectorQuantumEfficiency\ at \OV} is expected for the \ESIS\ \CCDs, based on \QE\ measurements by 
+\citet{Stern04} for \GOES\ \SXI\ instruments.
 
 \begin{table}[!htb]
 \caption{\ESIS\ Camera properties.}
@@ -2199,20 +3013,20 @@ Camera & Quad & Gain & Read Noise & Dark Current \\
         with doc.create(pylatex.Subsection('Avionics')):
             doc.append(pylatex.NoEscape(
                 r"""
-The \ESIS\ DACS are based on the designs used for both \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
-The electronics are a combination of Military Off-The-Shelf (MOTS) hardware and custom designed components.
-The DACS is a 6-slot, 3U, open VPX PCIe architecture conduction cooled system using an AiTech C873 single board
+The \ESIS\ \DACS\ are based on the designs used for both \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
+The electronics are a combination of \MOTS\ hardware and custom designed components.
+The \DACS\ is a 6-slot, 3U, open VPX PCIe architecture conduction cooled system using an AiTech C873 single board
 computer.
-The data system also include a MOTS PCIe switch card, \MSFC\ parallel interface card, and two MOTS Spacewire cards.
+The data system also include a \MOTS\ PCIe switch card, \MSFC\ parallel interface card, and two \MOTS\ Spacewire cards.
 A slot for an additional Spacewire card is included to accommodate two more cameras for the next \ESIS\ flight.
 The C873 has a \SI{2.4}{\giga\hertz} Intel i7 processor with \SI{16}{\giga b} of memory.
 The operating temperature range for the data system is -40 to +85 C.
 The operating system for the flight data system is Linux Fedora 23.
 
-The DACS is responsible for several functions;
+The \DACS\ is responsible for several functions;
 it controls the \ESIS\ experiment, responds to timers and uplinks, acquires and stores image data from the cameras, 
 downlinks a subset of images through telemetry, and provides experiment health and status.
-The DACS is housed with the rest of the avionics (power supply, analog signal conditioning system) in a 
+The \DACS\ is housed with the rest of the avionics (power supply, analog signal conditioning system) in a 
 0.56-\SI{0.43}{\meter} transition section outside of the experiment section.
 This relaxes the thermal and cleanliness constraints placed on the avionics.
 Custom DC/DC converters are used for secondary voltages required by other electronic components.
@@ -2223,17 +3037,16 @@ The use of custom designed converters allowed additional ripple filtering for lo
             doc.append(pylatex.NoEscape(
                 r"""
 The imaging target will be selected prior to launch, the morning of the day of flight.
-During flight, pointing will be maintained by the Solar Pointing Attitude Rocket Control System (SPARCS) 
-\citep{Lockheed69}.
-Images from Camera 1 will be downlinked and displayed in real time on the SPARCS control system console at intervals of 
+During flight, pointing will be maintained by the \SPARCS\ \citep{Lockheed69}.
+Images from Camera 1 will be downlinked and displayed in real time on the \SPARCS\ control system console at intervals of 
 $\sim$\SI{16}{\second} to verify pointing is maintained during flight."""
             ))
 
         with doc.create(pylatex.Subsection('Mechanical')):
             doc.append(pylatex.NoEscape(
                 r"""
-\ESIS\ and \MOSES\ are mounted on opposite sides of a composite optical table structure originally developed for the Solar 
-Plasma Diagnostics Experiment rocket mission (SPDE,~\citet{Bruner95lock}).
+\ESIS\ and \MOSES\ are mounted on opposite sides of a composite optical table structure originally developed for the 
+\SPDE~\citep{Bruner95lock}.
 The layered carbon fiber structure features a convenient, precisely coplanar array of threaded inserts with precision 
 counterbores.
 The carbon fiber layup is designed to minimize the longitudinal coefficient of thermal expansion.
@@ -2281,11 +3094,11 @@ gratings to the \EUV\ flight gratings.
 A trade study was conducted, and it was decided to remove the primary aperture stop. The advantage was an increase in 
 sensitivity.
 The disadvantage was to sacrifice the unvignetted design described in Section \ref{subsec:AperturesandBaffles}.
-The effective aperture is increased by a factor of 1.7 to 2.7 as a function of FOV in the radial dimension.
+The effective aperture is increased by a factor of 1.7 to 2.7 as a function of \FOV\ in the radial dimension.
 The corresponding signal gradient is oriented along the dispersion direction of each channel;
 vignetting increases (and signal decreases) when moving towards blue wavelengths 
 (\ie\,moving to the left in Figure~\ref{fig:projections}).
-This gradient is due almost entirely to vignetting by the central obscuration, and is linear across the entire FOV.
+This gradient is due almost entirely to vignetting by the central obscuration, and is linear across the entire \FOV.
 The principal challenge is that the images cannot be corrected directly;
 rather, since the gradient is repeated for each of the overlapping spectral line images, the vignetting can only be 
 accounted for by forward modeling.
@@ -2313,8 +3126,8 @@ a future orbital instrument.
 
 For the first flight, four of the six available \ESIS\ channels will be populated with optics optimized around the 
 O\,\textsc{v} emission line.
-The large (\SI{11.3}{\arcminute}), high resolution FOV (\SI{1.52}{\arcsecond}, \SI{74}{\milli\angstrom}) can 
-simultaneously observe the evolution of small scale \EUV\ flows and large scale MHD waves in high temporal cadence. 
+The large (\SI{11.3}{\arcminute} \roy{\fov}), high resolution \FOV\ (\SI{1.52}{\arcsecond} \roy{\spatialResolutionMax}, \SI{74}{\milli\angstrom} \roy{\spectralResolution}) can 
+simultaneously observe the evolution of small scale \EUV\ flows and large scale \MHD\ waves in high temporal cadence. 
 \ESIS\ also enables the study of transport of mass and energy in the transition region and corona during the $\sim 5$ 
 minute data collection portion of rocket flight.
 

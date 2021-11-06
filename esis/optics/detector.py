@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, vector, transform, optics, format
+from kgpy import Name, vector, transform, optics, format, mixin
 from . import Grating
 from astropy import constants as const
 
@@ -19,11 +19,20 @@ SurfaceT = optics.surface.Surface[
 ]
 
 
+class DetectorAxes(mixin.AutoAxis):
+    def __init__(self):
+        super().__init__()
+        self.detector_translation_x = self.auto_axis_index(from_right=False)
+        self.detector_translation_y = self.auto_axis_index(from_right=False)
+        self.detector_translation_z = self.auto_axis_index(from_right=False)
+
+
 @dataclasses.dataclass
 class Detector(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
     manufacturer: str = ''
     serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
+    range_focus_adjustment: u.Quantity = 0 * u.mm
     inclination: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
     twist: u.Quantity = 0 * u.deg
@@ -36,11 +45,20 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     dynamic_clearance: u.Quantity = 0 * u.mm
     npix_overscan: int = 0
     npix_blank: int = 0
+    temperature: u.Quantity = 0 * u.K
     gain: u.Quantity = 0 * u.electron / u.adu
     readout_noise: u.Quantity = 0 * u.adu
     dark_current: u.Quantity = 0 * u.electron / u.s
+    charge_diffusion: u.Quantity = 0 * u.mm
+    time_frame_transfer: u.Quantity = 0 * u.s
+    time_readout: u.Quantity = 0 * u.s
+    exposure_length: u.Quantity = 0 * u.s
     exposure_length_min: u.Quantity = 0 * u.s
+    exposure_length_max: u.Quantity = 0 * u.s
+    exposure_length_increment: u.Quantity = 0 * u.s
     bits_analog_to_digital: int = 0
+    index_trigger: int = 0
+    error_synchronization: u.Quantity = 0 * u.s
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
@@ -124,6 +142,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     def copy(self) -> 'Detector':
         other = super().copy()  # type: Detector
         other.manufacturer = self.manufacturer
+        other.range_focus_adjustment = self.range_focus_adjustment.copy()
         other.inclination = self.inclination.copy()
         other.roll = self.roll.copy()
         other.twist = self.twist.copy()
@@ -136,16 +155,27 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         other.dynamic_clearance = self.dynamic_clearance.copy()
         other.npix_overscan = self.npix_overscan
         other.npix_blank = self.npix_blank
+        other.temperature = self.temperature.copy()
         other.gain = self.gain.copy()
         other.readout_noise = self.readout_noise.copy()
+        other.dark_current = self.dark_current.copy()
+        other.charge_diffusion = self.charge_diffusion.copy()
+        other.time_frame_transfer = self.time_frame_transfer.copy()
+        other.time_readout = self.time_readout.copy()
+        other.exposure_length = self.exposure_length.copy()
         other.exposure_length_min = self.exposure_length_min.copy()
+        other.exposure_length_max = self.exposure_length_max.copy()
+        other.exposure_length_increment = self.exposure_length_increment.copy()
         other.bits_analog_to_digital = self.bits_analog_to_digital
+        other.index_trigger = self.index_trigger
+        other.error_synchronization = self.error_synchronization.copy()
         return other
 
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe
         dataframe['manufacturer'] = [self.manufacturer]
+        dataframe['focus adjustment range'] = [format.quantity(self.range_focus_adjustment)]
         dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
         dataframe['pixel width'] = [format.quantity(self.pixel_width.to(u.um))]
         dataframe['pixel array shape'] = [self.num_pixels]
@@ -156,10 +186,20 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['dynamic clearance'] = [format.quantity(self.dynamic_clearance.to(u.mm))]
         dataframe['overscan pixels'] = [self.npix_overscan]
         dataframe['blank pixels'] = [self.npix_blank]
+        dataframe['temperature'] = [format.quantity(self.temperature)]
         dataframe['gain'] = [format.quantity(self.gain)]
         dataframe['readout noise'] = [format.quantity(self.readout_noise)]
+        dataframe['dark current'] = [format.quantity(self.dark_current)]
+        dataframe['charge diffusion'] = [format.quantity(self.charge_diffusion)]
+        dataframe['frame transfer time'] = [format.quantity(self.time_frame_transfer)]
+        dataframe['readout time'] = [format.quantity(self.time_readout)]
+        dataframe['exposure length'] = [format.quantity(self.exposure_length)]
         dataframe['minimum exposure length'] = [format.quantity(self.exposure_length_min)]
+        dataframe['maximum exposure length'] = [format.quantity(self.exposure_length_max)]
+        dataframe['exposure length increment'] = [format.quantity(self.exposure_length_increment)]
         dataframe['analog-to-digital bits'] = [self.bits_analog_to_digital]
+        dataframe['trigger index'] = [self.index_trigger]
+        dataframe['synchronization error'] = [format.quantity(self.error_synchronization)]
         return dataframe
 
     def apply_poletto_prescription(

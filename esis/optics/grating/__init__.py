@@ -4,11 +4,14 @@ import numpy as np
 import pandas
 import scipy.optimize
 import astropy.units as u
-from kgpy import Name, optics, format, transform
+from kgpy import Name, optics, format, transform, mixin
 from .. import poletto
 from . import efficiency
 
-__all__ = ['Grating']
+__all__ = [
+    'GratingAxes',
+    'Grating',
+]
 
 SurfaceT = optics.surface.Surface[
     optics.surface.sag.Toroidal,
@@ -19,23 +22,53 @@ SurfaceT = optics.surface.Surface[
 ]
 
 
+class GratingAxes(mixin.AutoAxis):
+    def __init__(self):
+        super().__init__()
+        self.grating_translation_x = self.auto_axis_index(from_right=True)
+        self.grating_translation_y = self.auto_axis_index(from_right=True)
+        self.grating_translation_z = self.auto_axis_index(from_right=True)
+        self.grating_inclination = self.auto_axis_index(from_right=True)
+        self.grating_roll = self.auto_axis_index(from_right=True)
+        self.grating_twist = self.auto_axis_index(from_right=True)
+        self.grating_tangential_radius = self.auto_axis_index(from_right=True)
+        self.grating_sagittal_radius = self.auto_axis_index(from_right=True)
+        self.grating_ruling_density = self.auto_axis_index(from_right=True)
+        self.grating_ruling_spacing_coeff_linear = self.auto_axis_index(from_right=True)
+        self.grating_ruling_spacing_coeff_quadratic = self.auto_axis_index(from_right=True)
+        self.grating_ruling_spacing_coeff_cubic = self.auto_axis_index(from_right=True)
+
+
 @dataclasses.dataclass
 class Grating(optics.component.CylindricalComponent[SurfaceT]):
     name: Name = dataclasses.field(default_factory=lambda: Name('grating'))
     serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     manufacturing_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     inclination: u.Quantity = 0 * u.deg
+    inclination_error: u.Quantity = 0 * u.deg
     roll: u.Quantity = 0 * u.deg
+    roll_error: u.Quantity = 0 * u.deg
     twist: u.Quantity = 0 * u.deg
+    twist_error: u.Quantity = 0 * u.deg
     tangential_radius: u.Quantity = np.inf * u.mm
+    tangential_radius_error: u.Quantity = 0 * u.mm
     sagittal_radius: u.Quantity = np.inf * u.mm
+    sagittal_radius_error: u.Quantity = 0 * u.mm
+    mtf_degradation_factor: u.Quantity = 0 * u.dimensionless_unscaled
+    slope_error: optics.surface.sag.SlopeErrorRMS = dataclasses.field(default_factory=optics.surface.sag.SlopeErrorRMS)
+    ripple: optics.surface.sag.RippleRMS = dataclasses.field(default_factory=optics.surface.sag.RippleRMS)
+    microroughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
     nominal_input_angle: u.Quantity = 0 * u.deg
     nominal_output_angle: u.Quantity = 0 * u.deg
     diffraction_order: u.Quantity = 0 << u.dimensionless_unscaled
     ruling_density: u.Quantity = 0 / u.mm
+    ruling_density_error: u.Quantity = 0 / u.mm
     ruling_spacing_coeff_linear: u.Quantity = 0 * u.dimensionless_unscaled
+    ruling_spacing_coeff_linear_error: u.Quantity = 0 * u.dimensionless_unscaled
     ruling_spacing_coeff_quadratic: u.Quantity = 0 / u.mm
+    ruling_spacing_coeff_quadratic_error: u.Quantity = 0 / u.mm
     ruling_spacing_coeff_cubic: u.Quantity = 0 / u.mm ** 2
+    ruling_spacing_coeff_cubic_error: u.Quantity = 0 / u.mm ** 2
     aper_wedge_angle: u.Quantity = 0 * u.deg
     inner_half_width: u.Quantity = 0 * u.mm
     outer_half_width: u.Quantity = 0 * u.mm
@@ -53,6 +86,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
         dataframe['tangential radius'] = [format.quantity(self.tangential_radius.to(u.mm))]
         dataframe['sagittal radius'] = [format.quantity(self.sagittal_radius.to(u.mm))]
+        dataframe['slope error'] = [format.quantity(self.slope_error.value)]
+        dataframe['ripple'] = [format.quantity(self.ripple.value)]
+        dataframe['microroughness'] = [format.quantity(self.microroughness.value)]
         dataframe['nominal alpha'] = [format.quantity(self.nominal_input_angle.to(u.deg))]
         dataframe['nominal beta'] = [format.quantity(self.nominal_output_angle.to(u.deg))]
         dataframe['diffraction order'] = [format.quantity(self.diffraction_order)]
@@ -127,9 +163,9 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     @property
     def transform(self) -> transform.rigid.TransformList:
         return super().transform + transform.rigid.TransformList([
-            transform.rigid.TiltY(self.inclination),
-            transform.rigid.TiltX(self.twist),
-            transform.rigid.TiltZ(self.roll),
+            transform.rigid.TiltY(self.inclination + self.inclination_error),
+            transform.rigid.TiltX(self.twist + self.twist_error),
+            transform.rigid.TiltZ(self.roll + self.roll_error),
         ])
 
     @property
@@ -137,15 +173,15 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         surface = super().surface  # type: SurfaceT
         surface.is_stop = True
         surface.sag = optics.surface.sag.Toroidal(
-            radius=self.sagittal_radius,
-            radius_of_rotation=self.tangential_radius
+            radius=self.sagittal_radius + self.sagittal_radius_error,
+            radius_of_rotation=self.tangential_radius + self.tangential_radius_error,
         )
         surface.rulings = optics.surface.rulings.CubicPolySpacing(
             diffraction_order=self.diffraction_order,
-            ruling_density=self.ruling_density,
-            ruling_spacing_linear=self.ruling_spacing_coeff_linear,
-            ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic,
-            ruling_spacing_cubic=self.ruling_spacing_coeff_cubic,
+            ruling_density=self.ruling_density + self.ruling_density_error,
+            ruling_spacing_linear=self.ruling_spacing_coeff_linear + self.ruling_spacing_coeff_linear_error,
+            ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic + self.ruling_spacing_coeff_quadratic_error,
+            ruling_spacing_cubic=self.ruling_spacing_coeff_cubic + self.ruling_spacing_coeff_cubic_error,
         )
         surface.material = self.material
         side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
@@ -166,17 +202,30 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
     def copy(self) -> 'Grating':
         other = super().copy()      # type: Grating
         other.inclination = self.inclination.copy()
+        other.inclination_error = self.inclination_error.copy()
         other.roll = self.roll.copy()
+        other.roll_error = self.roll_error.copy()
         other.twist = self.twist.copy()
+        other.twist_error = self.twist_error.copy()
         other.tangential_radius = self.tangential_radius.copy()
+        other.tangential_radius_error = self.tangential_radius_error.copy()
         other.sagittal_radius = self.sagittal_radius.copy()
+        other.sagittal_radius_error = self.sagittal_radius_error.copy()
+        other.mtf_degradation_factor = self.mtf_degradation_factor.copy()
+        other.slope_error = self.slope_error.copy()
+        other.ripple = self.ripple.copy()
+        other.microroughness = self.microroughness.copy()
         other.nominal_input_angle = self.nominal_input_angle.copy()
         other.nominal_output_angle = self.nominal_output_angle.copy()
         other.diffraction_order = self.diffraction_order.copy()
         other.ruling_density = self.ruling_density.copy()
+        other.ruling_density_error = self.ruling_density_error.copy()
         other.ruling_spacing_coeff_linear = self.ruling_spacing_coeff_linear.copy()
+        other.ruling_spacing_coeff_linear_error = self.ruling_spacing_coeff_linear_error.copy()
         other.ruling_spacing_coeff_quadratic = self.ruling_spacing_coeff_quadratic.copy()
+        other.ruling_spacing_coeff_quadratic_error = self.ruling_spacing_coeff_quadratic_error.copy()
         other.ruling_spacing_coeff_cubic = self.ruling_spacing_coeff_cubic.copy()
+        other.ruling_spacing_coeff_cubic_error = self.ruling_spacing_coeff_cubic_error.copy()
         other.aper_wedge_angle = self.aper_wedge_angle.copy()
         other.inner_half_width = self.inner_half_width.copy()
         other.outer_half_width = self.outer_half_width.copy()

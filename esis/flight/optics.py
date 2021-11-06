@@ -27,6 +27,10 @@ def as_measured(
     else:
         opt = esis.optics.design.final(**kwargs, all_channels=all_channels, )
 
+    opt.primary.radius = 2000 * u.mm
+    opt.primary.slope_error.value = 0.436 * u.urad
+    opt.primary.ripple.value = 0.938 * u.nm
+    opt.primary.microroughness.value = ([5.38, 5.68] * u.AA).mean().to(u.nm)
     primary_witness = esis.optics.primary.efficiency.witness.vs_wavelength_recoat_1()
     primary_serial, primary_angle_input, primary_wavelength, primary_efficiency = primary_witness
     opt.primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
@@ -52,6 +56,20 @@ def as_measured(
         'UBO-16-019',
         'UBO-16-014',
     ])
+    radius_014 = [597.170, 597.210, 597.195] * u.mm
+    radius_017 = [597.065, 597.045, 597.050] * u.mm
+    radius_019 = [597.055, 597.045, 597.030] * u.mm
+    radius_024 = [596.890, 596.870, 596.880] * u.mm
+    opt.grating.tangential_radius = u.Quantity([
+        radius_024.mean(),
+        radius_017.mean(),
+        radius_019.mean(),
+        radius_014.mean(),
+    ])
+    opt.grating.sagittal_radius = opt.grating.tangential_radius
+    opt.grating.slope_error.value = [2.05, 2.0, 2.05, 2.0] * u.urad
+    opt.grating.ripple.value = [1.75, 1.75, 1.75, 1.5] * u.nm
+    opt.grating.microroughness.value = [0.5, 0.45, 0.6, 0.65] * u.nm
     grating_measurement = esis.optics.grating.efficiency.vs_wavelength()
     grating_angle_input, grating_wavelength, grating_efficiency = grating_measurement
     opt.grating.material = kgpy.optics.surface.material.MeasuredMultilayerMirror(
@@ -120,6 +138,8 @@ def as_measured(
         chan_index = esis.optics.design.default_channel_active
         opt.grating.serial_number = opt.grating.serial_number[chan_index]
         opt.grating.manufacturing_number = opt.grating.manufacturing_number[chan_index]
+        opt.grating.tangential_radius = opt.grating.tangential_radius[chan_index]
+        opt.grating.sagittal_radius = opt.grating.sagittal_radius[chan_index]
         opt.detector.gain = opt.detector.gain[chan_index]
         opt.detector.readout_noise = opt.detector.readout_noise[chan_index]
 

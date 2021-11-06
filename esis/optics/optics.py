@@ -16,9 +16,26 @@ import kgpy.transform
 from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
 import kgpy.chianti
 import kgpy.format
-from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
+import kgpy.nsroc
+from . import Source, FrontAperture, CentralObscuration, FieldStop, Filter, Detector
+from . import primary as module_primary
+from . import grating as module_grating
+from . import detector as module_detector
 
-__all__ = ['Optics']
+__all__ = [
+    'OpticsAxes',
+    'Optics',
+]
+
+
+class OpticsAxes(
+    module_detector.DetectorAxes,
+    module_grating.GratingAxes,
+    module_primary.PrimaryAxes,
+):
+    def __init__(self):
+        super().__init__()
+        self.channel = self.auto_axis_index()
 
 
 @dataclasses.dataclass
@@ -29,26 +46,27 @@ class Optics(
     """
     Add test docstring to see if this is the problem.
     """
+    axis: typ.ClassVar[OpticsAxes] = OpticsAxes()
+
     name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
     channel_name: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
     source: Source = dataclasses.field(default_factory=Source)
     front_aperture: FrontAperture = dataclasses.field(default_factory=FrontAperture)
     central_obscuration: typ.Optional[CentralObscuration] = dataclasses.field(default_factory=CentralObscuration)
-    primary: Primary = dataclasses.field(default_factory=Primary)
+    primary: module_primary.Primary = dataclasses.field(default_factory=module_primary.Primary)
     field_stop: FieldStop = dataclasses.field(default_factory=FieldStop)
-    grating: Grating = dataclasses.field(default_factory=Grating)
+    grating: module_grating.Grating = dataclasses.field(default_factory=module_grating.Grating)
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
     num_emission_lines: int = 3
-    field_samples: typ.Union[int, vector.Vector2D] = 10
-    field_is_stratified_random: bool = False
-    pupil_samples: typ.Union[int, vector.Vector2D] = 10
-    pupil_is_stratified_random: bool = False
+    grid_field: grid.RegularGrid2D = dataclasses.field(default_factory=lambda: grid.RegularGrid2D(num_samples=11))
+    grid_pupil: grid.RegularGrid2D = dataclasses.field(default_factory=lambda: grid.RegularGrid2D(num_samples=11))
     grid_velocity_los: grid.Grid1D = dataclasses.field(default_factory=lambda: grid.RegularGrid1D(
         min=0 * u.km / u.s,
         max=0 * u.km / u.s,
         num_samples=1,
     ))
+    sparcs: kgpy.nsroc.sparcs.SPARCS = dataclasses.field(default_factory=kgpy.nsroc.sparcs.SPARCS)
     pointing: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.angular)
     roll: u.Quantity = 0 * u.deg
     stray_light: u.Quantity = 0 * u.adu
@@ -60,6 +78,7 @@ class Optics(
             coefficients=[1 * u.dimensionless_unscaled, 0 / u.AA, 0 / u.arcsec, 0 / u.arcsec]
         )
     )
+    skin_diameter: u.Quantity = 0 * u.m,
 
     def __post_init__(self):
         self.update()
@@ -71,6 +90,18 @@ class Optics(
     @property
     def num_channels(self) -> int:
         return self.grating.cylindrical_azimuth.shape[~0]
+
+    @property
+    def grid_rays(self):
+        return kgpy.optics.rays.RayGrid(
+            field=self.grid_field,
+            pupil=self.grid_pupil,
+            wavelength=grid.IrregularGrid1D(
+                points=self.wavelength,
+                name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
+            ),
+            velocity_los=self.grid_velocity_los,
+        )
 
     @property
     def system(self) -> optics.System:
@@ -88,18 +119,12 @@ class Optics(
             self._system = optics.System(
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                field_samples=self.field_samples,
-                field_is_stratified_random=self.field_is_stratified_random,
+                grid_rays=self.grid_rays,
                 field_margin=1.5 * u.arcsec,
-                pupil_samples=self.pupil_samples,
-                pupil_is_stratified_random=self.pupil_is_stratified_random,
-                grid_wavelength=grid.IrregularGrid1D(
-                    points=self.wavelength,
-                    name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
-                ),
-                grid_velocity_los=self.grid_velocity_los,
                 pointing=self.pointing,
                 roll=self.roll,
+                distortion_polynomial_degree=self.distortion_polynomial_degree,
+                vignetting_polynomial_degree=self.vignetting_polynomial_degree,
             )
         return self._system
 
@@ -113,14 +138,14 @@ class Optics(
 
     @property
     def back_focal_length(self) -> u.Quantity:
-        return -self.detector.piston
+        return self.detector.translation.z
 
     @property
     def magnification(self):
         rays_detector = self.system.rays_output
         rays_fs = self.system.raytrace[self.system.surfaces_all.flat_local.index(self.field_stop.surface)]
-        scale_detector = rays_detector.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
-        scale_fs = rays_fs.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        scale_detector = rays_detector.distortion.plate_scale[..., 0, 0, 0]
+        scale_fs = rays_fs.distortion.plate_scale[..., 0, 0, 0]
         return scale_fs / scale_detector
 
     @property
@@ -150,7 +175,7 @@ class Optics(
 
     @property
     def plate_scale(self) -> vector.Vector2D:
-        return self.rays_output.distortion(self.distortion_polynomial_degree).plate_scale[..., 0, 0, 0]
+        return self.rays_output.distortion.plate_scale[..., 0, 0, 0]
 
     @property
     def resolution_spatial(self) -> vector.Vector2D:
@@ -158,7 +183,7 @@ class Optics(
 
     @property
     def dispersion(self) -> u.Quantity:
-        val = self.rays_output.distortion(self.distortion_polynomial_degree).dispersion[..., 0, 0, 0]
+        val = self.rays_output.distortion.dispersion[..., 0, 0, 0]
         return val.to(u.Angstrom / u.pix)
 
     @property
@@ -223,12 +248,88 @@ class Optics(
     def wavelength_sorted(self) -> u.Quantity:
         return np.sort(self.wavelength)
 
+    def _focus_and_align_factory(
+            self,
+            values: np.ndarray,
+            units: typ.List[u.Unit],
+            focus_grating: bool,
+            focus_detector: bool,
+    ) -> typ.NoReturn:
+        values_iter = iter(values)
+        units_iter = iter(units)
+
+        self.grating.inclination_error = next(values_iter) * next(units_iter)
+        self.grating.twist_error = next(values_iter) * next(units_iter)
+
+        if focus_grating:
+            self.grating.translation_error.z = next(values_iter) * next(units_iter)
+
+        if focus_detector:
+            self.detector.translation_error.z = next(values_iter) * next(units_iter)
+
+        self.num_emission_lines = 1
+        self._system = None
+
+    def _focus_and_align_func(
+            self,
+            values: np.ndarray,
+            units: typ.List[u.Unit],
+            other: 'Optics',
+            focus_grating: bool,
+            focus_detector: bool,
+    ) -> float:
+        other._focus_and_align_factory(values, units, focus_grating, focus_detector)
+        result_size = np.nanmean(other.system.rays_output.spot_size_rms[..., 0, :])
+        result_position = np.nanmean(other.system.rays_output.position[..., 0, :])
+        target_position = kgpy.vector.Vector3D(x=7.2090754246099999 * u.mm)
+        result_position = result_position - target_position
+        result = np.sqrt(np.square(result_size) + np.square(result_position.length))
+        return result.value
+
+    def focus_and_align(
+            self,
+            focus_grating: bool = True,
+            focus_detector: bool = False,
+    ) -> 'Optics':
+        other = self.copy()
+        units = [
+            self.grating.inclination_error.unit,
+            self.grating.twist_error.unit,
+        ]
+        if focus_grating:
+            units += [self.grating.translation_error.z.unit]
+        if focus_detector:
+            units += [self.detector.translation_error.z.unit]
+
+        ranges = [
+            ([-0.1, 0.1] * u.deg).to(self.grating.inclination_error.unit).value,
+            ([-0.1, 0.1] * u.deg).to(self.grating.twist_error.unit).value,
+        ]
+        if focus_grating:
+            ranges += [([-3, 3] * u.mm).to(self.grating.translation_error.z.unit).value]
+        if focus_detector:
+            ranges += [([-10, 10] * u.mm).to(self.detector.translation_error.z.unit).value]
+
+        result = scipy.optimize.shgo(
+            func=self._focus_and_align_func,
+            args=(
+                units,
+                other,
+                focus_grating,
+                focus_detector,
+            ),
+            bounds=ranges,
+        )
+        other._focus_and_align_factory(result.x, units, focus_grating, focus_detector)
+        return other
+
     def copy(self) -> 'Optics':
         other = super().copy()  # type: Optics
         other.channel_name = self.channel_name.copy()
         other.num_emission_lines = self.num_emission_lines
-        other.pupil_samples = self.pupil_samples
-        other.field_samples = self.field_samples
+        other.grid_field = self.grid_field.copy()
+        other.grid_pupil = self.grid_pupil.copy()
+        other.grid_velocity_los = self.grid_velocity_los.copy()
         other.source = self.source.copy()
         other.front_aperture = self.front_aperture.copy()
         if self.central_obscuration is not None:
@@ -243,12 +344,14 @@ class Optics(
         else:
             other.filter = self.filter
         other.detector = self.detector.copy()
+        other.sparcs = self.sparcs.copy()
         other.pointing = self.pointing.copy()
         other.roll = self.roll.copy()
         other.stray_light = self.stray_light.copy()
         other.distortion_polynomial_degree = self.distortion_polynomial_degree
         other.vignetting_polynomial_degree = self.vignetting_polynomial_degree
         other.vignetting_correction = self.vignetting_correction.copy()
+        other.skin_diameter = self.skin_diameter.copy()
         return other
 
     def __call__(
@@ -260,8 +363,8 @@ class Optics(
             spatial_samples_output: typ.Union[int, typ.Tuple[int, int]],
             inverse: bool = False,
     ):
-        distortion = self.rays_output.distortion(polynomial_degree=2)
-        vignetting = self.rays_output.vignetting(polynomial_degree=1)
+        distortion = self.rays_output.distortion
+        vignetting = self.rays_output.vignetting
         if not inverse:
             data = vignetting(
                 cube=data,
@@ -408,7 +511,7 @@ class Optics(
         # mask_584 = np.broadcast_to(mask_584, (2,) + mask_584.shape, subok=True)
 
         rays = other.rays_output
-        distortion = rays.distortion(polynomial_degree=2)
+        distortion = rays.distortion
         wavelength = distortion.wavelength[..., ::2, 0, 0]
         spatial_domain = oversize_ratio * u.Quantity([other.system.field_min[:2], other.system.field_max[:2]])
         pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
@@ -432,7 +535,7 @@ class Optics(
             inverse=True,
             fill_value=np.nan,
         )
-        vignetting = rays.vignetting(polynomial_degree=1)
+        vignetting = rays.vignetting
         new_images = vignetting(
             cube=new_images,
             wavelength=wavelength,
@@ -678,7 +781,7 @@ class Optics(
                     # simplex[..., :2] /= 10
                     # simplex += x0
                     rays = other.rays_output
-                    distortion = rays.distortion(polynomial_degree=2)
+                    distortion = rays.distortion
                     wavelength = distortion.wavelength[..., ::2, 0, 0]
                     spatial_domain = oversize_ratio * u.Quantity([other.system.field_min, other.system.field_max])[..., :2]
                     pixel_domain = ([[0, 0], images.shape[~1:]] * u.pix)
@@ -702,7 +805,7 @@ class Optics(
                         inverse=True,
                         fill_value=np.nan,
                     )
-                    vignetting = rays.vignetting(polynomial_degree=1)
+                    vignetting = rays.vignetting
                     new_images = vignetting(
                         cube=new_images,
                         wavelength=wavelength,
@@ -1804,16 +1907,8 @@ class Optics(
                 self.grating.surface,
                 self.detector.surface,
             ]),
-            grid_wavelength=kgpy.grid.IrregularGrid1D(
-                points=self.wavelength,
-                name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
-            ),
-            field_samples=self.field_samples,
+            grid_rays=self.grid_rays,
             field_margin=1 * u.nm,
-            field_is_stratified_random=self.field_is_stratified_random,
-            pupil_samples=self.pupil_samples,
-            pupil_is_stratified_random=self.pupil_is_stratified_random,
-            grid_velocity_los=self.grid_velocity_los,
             pointing=self.pointing,
             roll=self.roll,
         )
@@ -1859,7 +1954,7 @@ class Optics(
                     # label=self.wavelength[..., w],
                 )
 
-            subsystem_model = subsystem.rays_output.distortion(polynomial_degree=2).model()
+            subsystem_model = subsystem.rays_output.distortion.model()
             wire = subsystem_model(wire)
             wire = transform_detectors(wire.to_3d(), num_extra_dims=3)
 
@@ -1956,7 +2051,7 @@ class Optics(
             rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
             rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
             rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
-            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
+            subsystem_model = rays.distortion.model()
             wire = subsystem_model(wire)
             wire = wire.to_3d()
 
@@ -2022,7 +2117,7 @@ class Optics(
             rays.position = rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)
             rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
             rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
-            subsystem_model = rays.distortion(polynomial_degree=self.distortion_polynomial_degree).model()
+            subsystem_model = rays.distortion.model()
             wire = subsystem_model(wire_fs)
             mesh = subsystem_model(mesh_fs)
             wire = wire.to_3d()
@@ -2108,7 +2203,7 @@ class Optics(
 
         for d in delta:
             other = self.copy()
-            other.detector.piston = other.detector.piston - d
+            other.detector.translation.z = other.detector.translation.z - d
             s = other.rays_output.spot_size_rms
             spot_sizes.append(s)
 

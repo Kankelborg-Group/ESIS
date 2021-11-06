@@ -12,6 +12,7 @@ import astropy.visualization
 import kgpy.vector
 import kgpy.format
 import kgpy.plot
+import kgpy.transform
 import kgpy.optics
 import kgpy.grid
 import esis.optics
@@ -55,8 +56,6 @@ def layout() -> matplotlib.figure.Figure:
     # esis_optics.pointing.y = 60 * u.deg
     esis_optics.central_obscuration = None
     esis_optics.filter = None
-    # esis_optics.primary.substrate_thickness = None
-    # esis_optics.grating.substrate_thickness = None
     esis_optics.source.piston = 1425 * u.mm
     esis_optics.front_aperture.piston = esis_optics.source.piston
 
@@ -69,6 +68,8 @@ def layout() -> matplotlib.figure.Figure:
     esis_optics_rays.detector.cylindrical_azimuth = esis_optics_rays.detector.cylindrical_azimuth[chan_index]
     esis_optics_rays.grating.plot_kwargs['linestyle'] = esis_optics_rays.grating.plot_kwargs['linestyle'][chan_index]
     esis_optics_rays.detector.plot_kwargs['linestyle'] = esis_optics_rays.detector.plot_kwargs['linestyle'][chan_index]
+    esis_optics_rays.grating.plot_kwargs['alpha'] = esis_optics_rays.grating.plot_kwargs['alpha'][chan_index]
+    esis_optics_rays.detector.plot_kwargs['alpha'] = esis_optics_rays.detector.plot_kwargs['alpha'][chan_index]
     esis_optics_rays.num_emission_lines = 1
 
     esis_optics.system.plot(
@@ -81,17 +82,65 @@ def layout() -> matplotlib.figure.Figure:
             linewidth=0.5,
         ),
     )
-    _, colorbar = esis_optics_rays.system.plot(
+
+    index_field_stop = esis_optics_rays.system.surfaces_all.flat_local.index(esis_optics_rays.field_stop.surface)
+    esis_optics_rays.system.raytrace[index_field_stop].vignetted_mask = esis_optics_rays.system.raytrace[~0].vignetted_mask
+    _, colorbar = esis_optics_rays.system.raytrace[:index_field_stop + 1].plot(
         ax=ax_layout,
         components=('y', 'z'),
         component_z='x',
-        # plot_rays=False,
-        plot_annotations=False,
-        # plot_vignetted=True,
         plot_colorbar=False,
         plot_kwargs=dict(
             linewidth=0.5,
+            zorder=25,
+            color='tab:blue',
         ),
+    )
+    _, colorbar = esis_optics_rays.system.raytrace[index_field_stop:].plot(
+        ax=ax_layout,
+        components=('y', 'z'),
+        component_z='x',
+        plot_colorbar=False,
+        plot_kwargs=dict(
+            linewidth=0.5,
+            zorder=30,
+            color='tab:blue',
+        ),
+    )
+
+    ax_layout.text(
+        x=0,
+        y=esis_optics.primary.translation.z.value + 20,
+        z=esis_optics.primary.mech_half_width.value + 15,
+        s='primary mirror',
+        ha='right',
+        va='bottom',
+    )
+
+    ax_layout.text(
+        x=0,
+        y=esis_optics.detector.translation.z.value + 20,
+        z=-(esis_optics.detector.cylindrical_radius + esis_optics.detector.clear_half_width).to(u.mm).value - 20,
+        s='detectors',
+        ha='center',
+        va='center',
+    )
+
+    ax_layout.text(
+        x=0,
+        y=-esis_optics.field_stop.piston.value,
+        z=-(esis_optics.field_stop.mech_radius).to(u.mm).value - 5,
+        s='field stop',
+        ha='center',
+        va='top',
+    )
+    ax_layout.text(
+        x=0,
+        y=esis_optics.grating.translation.z.value - 50,
+        z=-(esis_optics.grating.cylindrical_radius + esis_optics.grating.outer_half_width).to(u.mm).value - 15,
+        s='diffraction gratings',
+        ha='left',
+        va='top',
     )
 
     ax_layout.view_init(elev=0, azim=-40)
@@ -123,11 +172,11 @@ def layout_pdf() -> pathlib.Path:
     path = pathlib.Path(__file__).parent / 'layout_mpl.pdf'
     if not path.exists():
         fig = layout()
-        h = 1.5
+        h = 1.45
         offset = (text_width - h) / 2
         fig.savefig(
             fname=path,
-            bbox_inches=fig.bbox_inches.from_bounds(0, offset, text_width, h)
+            bbox_inches=fig.bbox_inches.from_bounds(0, 3, text_width, h),
         )
         plt.close(fig)
     return path
@@ -353,10 +402,10 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
         for i in range(rays.size):
             index = np.unravel_index(i, rays.shape)
             points = np.broadcast_to(rays.position, mask.shape, subok=True)
-            points = points[index, mask[index]]
+            points = points[index][mask[index]]
             hull = scipy.spatial.ConvexHull(points.xy.quantity)
             vertices = optics.system.transform_all(points[hull.vertices])
-            if optics.grating.plot_kwargs['linestyle'][i] is None:
+            if optics.grating.plot_kwargs['linestyle'][i] is 'solid':
                 alpha = 1.0
                 inactive = ''
             else:
@@ -484,12 +533,12 @@ def bunch() -> matplotlib.figure.Figure:
         optics_measured.filter.clear_radius = 1000 * u.mm
         optics_measured.detector.num_pixels = (4096, 2048)
         sys = optics_measured.system
-        sys.grid_wavelength = kgpy.grid.RegularGrid1D(
+        sys.grid_rays.wavelength = kgpy.grid.RegularGrid1D(
             min=wavelength_min,
             max=wavelength_max,
             num_samples=100,
         )
-        rays = sys.rays_output
+        rays = sys.rays_output_resample_entrance
         area = rays.intensity.copy()
         area[~rays.mask] = np.nan
         area = np.nansum(area, (rays.axis.pupil_x, rays.axis.pupil_y, rays.axis.velocity_los), keepdims=True)
@@ -499,7 +548,6 @@ def bunch() -> matplotlib.figure.Figure:
         # plt.show()
         area = np.nanmean(area, (rays.axis.field_x, rays.axis.field_y)).squeeze()
         subtent = optics_measured.system.rays_input.input_grid.field.step_size
-        print('bunch subtent', subtent)
         # area = (area / subtent.x / subtent.y).to(u.cm ** 2)
 
         wavelength = rays.wavelength.squeeze()
@@ -567,12 +615,14 @@ def psf() -> matplotlib.figure.Figure:
 
     bins = rays.input_grid.pupil.num_samples_normalized.x // 2
 
+    limit_max = 0.5 * u.pix * kgpy.vector.Vector2D()
     fig, axs = rays.plot_pupil_hist2d_vs_field(
         wavlen_index=0,
         norm=matplotlib.colors.PowerNorm(1 / 3),
         bins=bins,
         cmap='gray_r',
-        limits=((-0.5, 0.5), (-0.5, 0.5)),
+        limit_min=-limit_max,
+        limit_max=limit_max,
     )
     fig.set_figheight(2.6)
     fig.set_figwidth(column_width)
@@ -629,7 +679,6 @@ def spot_size_pdf() -> pathlib.Path:
 def focus_curve() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(
         pupil_samples=11,
-        pupil_is_stratified_random=True,
         field_samples=1,
         # field_is_stratified_random=True,
         all_channels=False,
@@ -666,7 +715,7 @@ def vignetting() -> matplotlib.figure.Figure:
         constrained_layout=True,
         squeeze=False,
     )
-    model = optics.rays_output.vignetting(polynomial_degree=optics.vignetting_polynomial_degree)
+    model = optics.system.rays_output_resample_entrance.vignetting
     model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.fullname(digits_after_decimal))
     return fig
 
@@ -698,7 +747,10 @@ def distortion_pdf() -> pathlib.Path:
 
 
 def distortion_residual() -> matplotlib.figure.Figure:
-    optics = optics_factories.as_designed_single_channel()
+    optics_quadratic = optics_factories.as_designed_single_channel()
+    optics_linear = optics_quadratic.copy()
+    optics_linear.distortion_polynomial_degree = 1
+    optics_linear.update()
     fig, axs = plt.subplots(
         nrows=2,
         ncols=num_emission_lines_default,
@@ -707,13 +759,13 @@ def distortion_residual() -> matplotlib.figure.Figure:
         figsize=(text_width, 4.4),
         constrained_layout=True,
     )
-    distortion_linear = optics.rays_output.distortion(polynomial_degree=1)
-    distortion_quadratic = optics.rays_output.distortion(polynomial_degree=2)
+    distortion_linear = optics_linear.rays_output.distortion
+    distortion_quadratic = optics_quadratic.rays_output.distortion
 
     distortion_linear.plot_residual(
         axs=axs[0],
         use_xlabels=False,
-        wavelength_name=optics.bunch.fullname(digits_after_decimal),
+        wavelength_name=optics_linear.bunch.fullname(digits_after_decimal),
     )
     distortion_quadratic.plot_residual(
         axs=axs[1],
@@ -868,6 +920,7 @@ def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     wavl_unit = u.Angstrom
     witness = esis.optics.grating.efficiency.witness
     with astropy.visualization.quantity_support():
+        optics_design = esis.optics.design.final()
         optics = esis.flight.optics.as_measured()
         for func in [witness.vs_wavelength_g24, witness.vs_wavelength_g17, witness.vs_wavelength_g19, ]:
             serial, angle_input, wavelength, efficiency = func()
@@ -893,6 +946,14 @@ def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
             optics.primary.material.transmissivity(rays).to(eff_unit),
             label=f'primary',
             color='tab:red'
+        )
+
+        axs[1].plot(
+            wavelength,
+            optics_design.primary.material.transmissivity(rays).to(eff_unit),
+            label=f'primary model',
+            color='tab:red',
+            alpha=0.5,
         )
 
         axs[1].plot(
@@ -1052,3 +1113,99 @@ def ccd_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
 
 def ccd_efficiency_vs_wavelength_pdf() -> pathlib.Path:
     return save_pdf(ccd_efficiency_vs_wavelength)
+
+
+def alignment_transfer() -> matplotlib.figure.Figure:
+
+    fig, ax = plt.subplots(
+        figsize=(column_width, 4),
+        constrained_layout=True,
+    )
+
+    optics = esis.optics.design.final(**kwargs_optics_default)
+    grating = optics.grating
+    grating.piston = 0 * u.mm
+    grating.cylindrical_azimuth = 0 * u.deg
+    grating.cylindrical_radius = 0 * u.mm
+    grating.inclination = 0 * u.deg
+    grating.diffraction_order = 0 * u.dimensionless_unscaled
+    surface_4d = kgpy.optics.surface.Surface(
+        name=kgpy.Name('diverger'),
+        transform=kgpy.transform.rigid.TransformList([kgpy.transform.rigid.Translate(z=grating.sagittal_radius)]),
+        aperture=kgpy.optics.surface.aperture.Circular(radius=10 * u.mm)
+    )
+    surface_4d_return = surface_4d.copy()
+    surface_4d_return.name = kgpy.Name()
+
+    red_hene = 632.8 * u.nm
+    system_alignment = kgpy.optics.System(
+        grid_wavelength=kgpy.grid.RegularGrid1D(
+            min=red_hene,
+            max=red_hene,
+        ),
+        object_surface=surface_4d,
+        surfaces=kgpy.optics.surface.SurfaceList([
+            grating.surface,
+            surface_4d_return,
+        ]),
+        field_samples=1,
+        field_margin=1 * u.nm,
+    )
+    system_alignment.plot(
+        ax=ax,
+        components=('z', 'x'),
+        plot_vignetted=True,
+        plot_colorbar=False,
+    )
+
+    grating.diffraction_order = [0, -1] * u.dimensionless_unscaled
+    green_laser_wavelength = 532 * u.nm
+    cylinder_azimuth = -40 * u.deg
+    system_roll = kgpy.optics.System(
+        grid_wavelength=kgpy.grid.RegularGrid1D(
+            min=green_laser_wavelength,
+            max=green_laser_wavelength,
+        ),
+        object_surface=kgpy.optics.surface.Surface(
+            name=kgpy.Name('cylinder'),
+            transform=kgpy.transform.rigid.TransformList([
+                kgpy.transform.rigid.TiltY(cylinder_azimuth),
+                kgpy.transform.rigid.Translate(z=grating.sagittal_radius)
+            ]),
+            aperture=kgpy.optics.surface.aperture.Rectangular(
+                half_width_x=7 * u.mm,
+                half_width_y=14 * u.mm,
+            )
+        ),
+        surfaces=kgpy.optics.surface.SurfaceList([
+            grating.surface,
+            kgpy.optics.surface.Surface(
+                name=kgpy.Name('screen'),
+                transform=kgpy.transform.rigid.TransformList([
+                    kgpy.transform.rigid.TiltY(u.Quantity([-cylinder_azimuth, cylinder_azimuth])),
+                    kgpy.transform.rigid.Translate(z=grating.sagittal_radius)
+                ]),
+                aperture=kgpy.optics.surface.aperture.Rectangular(
+                    half_width_x=5 * u.imperial.inch,
+                    half_width_y=3 * u.imperial.inch,
+                )
+            )
+        ]),
+        field_samples=1,
+        field_margin=1 * u.nm,
+    )
+    system_roll.plot(
+        ax=ax,
+        components=('z', 'x'),
+        plot_vignetted=True,
+        # plot_rays=False,
+        plot_colorbar=False,
+    )
+
+    ax.set_aspect('equal')
+
+    return fig
+
+
+def alignment_transfer_pdf() -> pathlib.Path:
+    return save_pdf(alignment_transfer)
