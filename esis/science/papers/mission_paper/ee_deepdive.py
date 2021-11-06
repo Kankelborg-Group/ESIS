@@ -165,8 +165,9 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
                               )
         axs_bottom[j].add_patch(box)
 
+    #
+    # Begine Line Profile Fits at all event_pix
 
-    fits = []
     fig2, axs = plt.subplots(n, n, constrained_layout=True, figsize=(7.1, 5))
 
     axs = axs[::-1]  # corrects subplots to match dot locations
@@ -189,9 +190,8 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
                                                            line_profile[guass_fit_trim: -guass_fit_trim], p0=p0,
                                                            bounds=bounds)
             # fit_params = gauss_fit(domain[guass_fit_trim: -guass_fit_trim], line_profile[guass_fit_trim: -guass_fit_trim])
-            fits.append(fit_params)
 
-            flat_axs[i].plot(domain, line_profile, marker='.', linestyle='None', color=colors[j],ms=3)
+            flat_axs[i].plot(domain, line_profile, marker='.', linestyle='None', color=colors[j], ms=3)
             flat_axs[i].plot(domain, two_gauss(domain, *fit_params), color=colors[j], linewidth=1)
             flat_axs[i].set_ylim(top=lp_max)
             flat_axs[i].xaxis.set_minor_locator(AutoMinorLocator())
@@ -199,7 +199,7 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
             w2 = '%.0f' % fit_params[3]
             vel1 = '%.0f' % fit_params[4]
             vel2 = '%.0f' % fit_params[5]
-            flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (60, lp_max - 2.5 * (j+1)), color=colors[j],
+            flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (60, lp_max - 2.5 * (j + 1)), color=colors[j],
                                  fontsize=7)
             # flat_axs[i].annotate('v =' + vel1 + ', ' + vel2, (110, lp_max - 2 * (j+1)), color=colors[j],
             #                      fontsize=7)
@@ -216,7 +216,9 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
     axs[0, 0].set_ylabel('Intensity (photons)')
     axs[1, 0].set_ylabel('Intensity (photons)')
     axs[2, 0].set_ylabel('Intensity (photons)')
-    plt.subplots_adjust(top=.97,right=.97, left=.105)
+    plt.subplots_adjust(top=.97, right=.97, left=.105)
+
+    # Time series plots of intensity for each gaussian
 
     return fig1, fig2
 
@@ -285,7 +287,6 @@ def ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_t
     ax_dif.set_title('Channel 2 - 3')
     cb = plt.colorbar(dif_im, ax=ax_dif, label='Photons')
 
-
     shp = int_cutout.shape
     points = np.array([(0, 0), (0, shp[1]), (shp[0], shp[1]), (shp[0], 0)])
     l3_world_coords = int_wcs.all_pix2world(points, 0)
@@ -321,7 +322,6 @@ def ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_t
                                                        bounds=bounds)
         # fit_params = gauss_fit(domain,line_profile)
 
-
         red_lps.append(
             flat_axs[i].plot(domain, one_gauss(domain, fit_params[0], fit_params[2], fit_params[4]), linestyle='--',
                              color='r'))
@@ -329,7 +329,7 @@ def ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_t
             flat_axs[i].plot(domain, one_gauss(domain, fit_params[1], fit_params[3], fit_params[5]), linestyle='--',
                              color='b'))
         fit.append(flat_axs[i].plot(domain, two_gauss(domain, *fit_params), color='fuchsia', linewidth=1.5))
-        lps.append(flat_axs[i].plot(domain, line_profile, marker='.', linestyle='None', color='lime',ms=4))
+        lps.append(flat_axs[i].plot(domain, line_profile, marker='.', linestyle='None', color='lime', ms=4))
         flat_axs[i].set_ylim(top=lp_max)
         vel1 = '%.0f' % fit_params[4]
         vel2 = '%.0f' % fit_params[5]
@@ -376,6 +376,84 @@ def ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_t
     return FuncAnimation(fig1, update, seqs)
 
 
+def ee_deepdive_timeseries_plot(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_trim=None):
+    l4 = level_4.Level_4.from_pickle(event.mart_inverted_pickle_path)
+
+    if seqs is None:
+        seqs = np.arange(len(l4.cube_list))
+    if time_trim:
+        seqs = seqs[time_trim]
+
+    # plot = l4.plot()
+    # plt.show()
+    l4_int = l4.integrated_intensity
+    brightest_pix = np.unravel_index(l4_int.argmax(), l4_int.shape)
+
+    l3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
+    times = l3.time
+    event_imgs = l3.observation.data[..., event.location[0], event.location[1]]
+
+    event_pix = []
+    spread = 2
+
+    n = 0
+    for i in [-spread, 0, spread]:
+        n += 1
+        for j in [-spread, 0, spread]:
+            event_pix.append([brightest_pix[1] + i, brightest_pix[2] + j])
+
+    event_pix = np.array(event_pix).T
+    double_gauss_fits = np.empty((seqs.shape[0], event_pix.shape[1], 6))
+
+    for seq in seqs:
+        for i in range(event_pix.shape[1]):
+            line_profile = np.array(l4.cube_list)[seq, event_pix[0, i], event_pix[1, i], :]
+            domain = np.array(l4.velocity_axis)
+
+            p0 = [line_profile.max(), line_profile.max() / 2, 50, 50, 100, -100]
+            # p0 = [14, 4, 50, 50, -90, 110]
+
+            bounds = (
+                [0, 0, 15, 15, -200, -200], [line_profile.max() * 1.2, line_profile.max() * 1.2, 100, 100, 200, 200])
+
+            fit_params, fit_cov = scipy.optimize.curve_fit(two_gauss, domain[guass_fit_trim: -guass_fit_trim],
+                                                           line_profile[guass_fit_trim: -guass_fit_trim], p0=p0,
+                                                           bounds=bounds)
+
+            double_gauss_fits[seq, i] = fit_params
+
+    world_1 = l4.wcs_list[0].pixel_to_world_values(0, event_pix[1, 0], event_pix[0, 0])
+    x1, y1 = world_1[1] * 3600, world_1[2] * 3600
+    x1, y1 = "{:3.1f}".format(x1), "{:3.1f}".format(y1)
+    world_2 = l4.wcs_list[0].pixel_to_world_values(0, event_pix[1, 5], event_pix[0, 5])
+    x2, y2 = world_2[1] * 3600, world_2[2] * 3600
+    x2, y2 = "{:3.1f}".format(x2), "{:3.1f}".format(y2)
+
+    fig3, ax = plt.subplots(figsize=(7.1, 4))
+
+    t = times[seqs].strftime('%H:%M:%S')
+    ax.plot(t, double_gauss_fits[:, 0, 1], color='blue', label='x, y =' + str(x1) + '"' + ', ' + str(y1) + '"')
+    ax.plot(t, double_gauss_fits[:, 0, 0], color='red', label='x, y =' + str(x1) + '"' + ', ' + str(y1) + '"')
+    ax.plot(t, double_gauss_fits[:, 5, 1], color='blue', ls='--', label='x, y =' + str(x2) + '"' + ', ' + str(y2) + '"')
+    ax.plot(t, double_gauss_fits[:, 5, 0], color='red', ls='--', label='x, y =' + str(x2) + '"' + ', ' + str(y2) + '"')
+    ax.set_xlabel('UTC')
+    ax.set_ylabel('Intensity (Photons)')
+    ax.xaxis.set_major_locator(MultipleLocator(6))
+    ax.xaxis.set_minor_locator(MultipleLocator(1))
+    ax.legend()
+
+    # fig3, ax = plt.subplots()
+    # # ax.plot(seqs, double_gauss_fits[:, 0, 5], color='blue')
+    # ax.plot(seqs, double_gauss_fits[:, 5, 4], color='red')
+    #
+    # # print(l4.wcs_list[0])
+    # position = l4.wcs_list[0].pixel_to_world(0,event_pix[1,5],event_pix[0,5])
+    # print(position.value)
+
+
+    return fig3
+
+
 if __name__ == '__main__':
     # extent = 150
     # domain = np.arange(-extent, extent)
@@ -397,16 +475,14 @@ if __name__ == '__main__':
     # plt.show()
     #
 
-
     #
-    event = l3_events.perfectx
-    seqs = [6, 11, 15, 19] #for static figure
-    time_trim = slice(0, -4)
+    # event = l3_events.perfectx
+    # seqs = [6, 11, 15, 19] #for static figure
+    # time_trim = slice(0, -4)
 
-
-    # event = l3_events.otherx
-    # seqs = [6, 10, 15, 18]
-    # time_trim=None
+    event = l3_events.otherx
+    seqs = [6, 10, 15, 18]
+    time_trim = None
 
     ### Doesn't work when the thing you care about isn't the brightest in the frame
     # event = l3_events.big_blue
@@ -416,19 +492,20 @@ if __name__ == '__main__':
     guass_fit_trim = 7
     dif_thresh = 50
 
+    # fig1, fig2 = ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh)
+    #
+    # filepath1 = event.name + '_inverta.pdf'
+    # filepath2 = event.name + '_invertb.pdf'
+    # fig1.savefig(fig_path / filepath1)
+    # fig2.savefig(fig_path / filepath2)
+    # # plt.show()
+    #
+    # seqs = None
+    # movie = ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_trim=time_trim)
+    # movie_path = event.name + '_movie.mp4'
+    # movie.save(fig_path / movie_path, 'ffmpeg', dpi=200)
 
 
-    fig1, fig2 = ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh)
-
-    filepath1 = event.name + '_inverta.pdf'
-    filepath2 = event.name + '_invertb.pdf'
-    fig1.savefig(fig_path / filepath1)
-    fig2.savefig(fig_path / filepath2)
-    # plt.show()
-
-
-    seqs = None
-    movie = ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh,time_trim=time_trim)
-    movie_path = event.name + '_movie.mp4'
-    movie.save(fig_path / movie_path, 'ffmpeg', dpi=200)
-
+    fig3 = ee_deepdive_timeseries_plot(event, None, event_pad, guass_fit_trim, dif_thresh, time_trim)
+    filepath3 = event.name + '_timeseries.pdf'
+    fig3.savefig(fig_path / filepath3)
