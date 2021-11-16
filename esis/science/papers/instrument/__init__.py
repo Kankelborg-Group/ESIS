@@ -1003,7 +1003,7 @@ def document() -> kgpy.latex.Document:
             r"""The \ESIS\ is a next generation rocket borne instrument that will investigate magnetic reconnection 
 and energy transport in the solar atmosphere 
 \amy{by observing emission lines formed in the chromosphere (\HeI), the transition region (\OV), and corona (\MgX).}
-\jake{JDP: Would make more sense to talk about the brighter Mg line?  609.8}
+\jake{Hello World}
 The instrument is a pseudo Gregorian telescope; 
 from prime focus, an array of spherical diffraction gratings re-image with differing dispersion angles. 
 \amy{The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
