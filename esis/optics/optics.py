@@ -248,6 +248,152 @@ class Optics(
     def wavelength_sorted(self) -> u.Quantity:
         return np.sort(self.wavelength)
 
+    @property
+    def psf_diffraction(self) -> typ.Tuple[u.Quantity, kgpy.vector.Vector2D]:
+
+        rays = self.system.rays_output_resample_entrance
+        # rays = self.system.rays_input
+        # rays.vignetted_mask = self.rays_output.vignetted_mask
+
+        # rays.position = np.broadcast_to(rays.position, self.rays_output.position.shape, subok=True)
+        # rays.vignetted_mask = np.broadcast_to(rays.vignetted_mask, self.rays_output.vignetted_mask .shape)
+
+        bins = kgpy.vector.Vector2D(
+            x=rays.grid_shape[rays.axis.pupil_x],
+            y=rays.grid_shape[rays.axis.pupil_y],
+        )
+
+        # pupil_func, edges_x, edges_y = rays.pupil_hist2d(
+        #     bins=bins.to_tuple(),
+        # )
+
+
+        pupil_func = rays.mask.astype(np.float)
+        # pad = [(0, 0)] * pupil_func.ndim
+        # pad[rays.axis.pupil_x] = (10, 10)
+        # pad[rays.axis.pupil_y] = (10, 10)
+        # pupil_func = np.pad(pupil_func, pad_width=pad)
+
+        sl = 5, ~0, ..., 0, 0
+
+        print(pupil_func[sl].sum())
+
+        plt.figure()
+        plt.imshow(pupil_func[sl].T)
+        # plt.show()
+
+        psf = np.fft.fft2(pupil_func, axes=rays.axis.pupil_xy)
+
+        psf = np.fft.fftshift(psf, axes=rays.axis.pupil_xy)
+
+        print(psf[sl].sum())
+
+        psf = psf * np.conjugate(psf)
+        # psf = np.square(psf)
+
+        print(psf[sl].sum())
+
+        psf = psf.real
+
+        psf = psf / psf.sum(axis=rays.axis.pupil_xy, keepdims=True)
+
+        grid_pupil = rays.input_grid.pupil
+        print(grid_pupil.step_size)
+        frequency = kgpy.vector.Vector2D(
+            x=np.fft.fftfreq(n=psf.shape[rays.axis.pupil_x], d=grid_pupil.step_size.x),
+            y=np.fft.fftfreq(n=psf.shape[rays.axis.pupil_x], d=grid_pupil.step_size.y),
+        )
+        print(frequency)
+        frequency.x = np.expand_dims(frequency.x, axis=rays.axis.perp_axes(rays.axis.pupil_x))
+        frequency.y = np.expand_dims(frequency.y, axis=rays.axis.perp_axes(rays.axis.pupil_y))
+
+        print(rays.wavelength.shape)
+
+        # position_start = self.grating.transform(kgpy.vector.Vector3D.spatial())
+        # print(position_start)
+        # position_end = self.detector.transform(rays.position_avg_pupil * self.detector.pixel_width / (1 * u.pix)).to(u.mm)
+        # print(position_end)
+        # distance = (position_end - position_start).length
+        # print('mean distance', np.nanmean(distance))
+
+        # position = (frequency * rays.wavelength * distance).to(u.um)
+        # position = position * (1 * u.pix / self.detector.pixel_width)
+
+        position = np.arcsin(frequency * rays.wavelength).to(u.arcsec)
+
+        pmin = np.nanmin(position[..., 0, 0])
+        pmax = np.nanmax(position[..., 0, 0])
+
+        plt.figure()
+        plt.imshow(
+            X=psf[sl].T,
+            extent=[pmin.x.value, pmax.x.value, pmin.y.value, pmax.y.value],
+        )
+        plt.xlabel(pmin.x.unit)
+        plt.ylabel(pmin.y.unit)
+
+        return psf, position
+
+    @property
+    def mtf_diffraction(self):
+
+        rays = self.system.rays_output_resample_entrance
+
+        psf, position = self.psf_diffraction
+
+        # position = position.to_3d(np.broadcast_to(rays.wavelength, position.shape, subok=True).copy())
+        # position = rays.distortion.model(inverse=True)(position).to(u.arcsec)
+
+        mtf, frequency = rays.calc_mtf(
+            psf=psf,
+            limit_min=np.nanmin(position, axis=rays.axis.pupil_xy, keepdims=True),
+            limit_max=np.nanmax(position, axis=rays.axis.pupil_xy, keepdims=True),
+        )
+
+        print(mtf.shape)
+        print(frequency.y.shape)
+
+        slx = slice(None), 0, 0, 0
+        sly = 0, slice(None), 0, 0
+
+        with astropy.visualization.quantity_support():
+            plt.figure()
+            for fx in range(mtf.shape[rays.axis.field_x]):
+                for fy in range(mtf.shape[rays.axis.field_y]):
+
+                    mtf_xy = mtf.take([fx], rays.axis.field_x).take([fy], rays.axis.field_y).take([0], rays.axis.wavelength)
+                    frequency_xy = frequency.take([fx], rays.axis.field_x).take([fy], rays.axis.field_y).take([0], rays.axis.wavelength)
+
+                    if mtf_xy.sum() > 0:
+
+                        plt.plot(
+                            frequency_xy.take([0], rays.axis.pupil_y).x.squeeze(),
+                            mtf_xy.take([0], rays.axis.pupil_y).squeeze(),
+                            color='tab:blue',
+                        )
+                        plt.plot(
+                            frequency_xy.take([0], rays.axis.pupil_x).y.squeeze(),
+                            mtf_xy.take([0], rays.axis.pupil_x).squeeze(),
+                            color='tab:orange',
+                        )
+
+        mtf_obj = kgpy.optics.mtf.MTF(
+            data_field=rays.input_grid.points_field,
+            data_frequency=frequency,
+            data_wavelength=rays.input_grid.points_wavelength,
+            data_velocity_los=rays.input_grid.points_velocity_los,
+            data_mtf=mtf,
+        )
+
+        print('num nans', np.isnan(frequency.x).sum())
+
+        # print(np.nanmean(mtf_obj(
+        #     field=rays.input_grid.points_field,
+        #     frequency=kgpy.vector.Vector2D(x=0 / u.arcsec, y=1 / (2 * u.arcsec)),
+        #     wavelength=self.wavelength[0],
+        # )))
+
+
     def _focus_and_align_factory(
             self,
             values: np.ndarray,
