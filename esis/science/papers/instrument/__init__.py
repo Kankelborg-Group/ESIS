@@ -3,6 +3,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.modeling
+import astropy.visualization
 import numpy as np
 import pylatex
 import num2words
@@ -945,6 +946,11 @@ def document() -> kgpy.latex.Document:
         digits_after_decimal=1,
     )
 
+    doc.set_variable(
+        name='C',
+        value=pylatex.NoEscape(r'\mathbf{C}')
+    )
+
     doc.preamble.append(kgpy.latex.Acronym('ESIS', r'EUV Snapshot Imaging Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('MOSES', r'Multi-order Solar EUV Spectrograph'))
     doc.preamble.append(kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'))
@@ -1549,7 +1555,7 @@ $n_e T = $\,\chiantiPressure.}"""
                                 r'\fov, Table~\ref{table:prescription}',
                             ])
                         table.add_caption(pylatex.NoEscape(
-                            r"""\ESIS\ instrument requirements."""
+                            r"""\ESIS\ instrument requirements and capabilties. Note that MTF exceeds the Rayleigh criterion of 0.109."""
                         ))
                         table.append(kgpy.latex.Label('table:scireq'))
 
@@ -1966,6 +1972,34 @@ The field and pupil grids have the same parameters as the grid for Figure~\ref{f
                 ))
                 figure.append(kgpy.latex.Label('fig:vignetting'))
 
+            doc.append(pylatex.NoEscape(r"""
+\begin{equation}
+\left(x', y'\right) = \C + \C_x x + \C_y y + \C_\lambda \lambda
+\end{equation}
+"""
+            ))
+
+            model_distortion = optics_single.rays_output.distortion.model()
+
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('ll|rr')) as tabular:
+                        tabular.escape = False
+                        tabular.append('\multicolumn{2}{l}{Coefficient} & $x\'$ & $y\'$ & Max. deviation\\\\')
+                        # tabular.add_row(['Coefficient', '$x\'$', '$y\'$'])
+                        tabular.add_hline()
+                        for c, name in enumerate(model_distortion.x.coefficient_names):
+                            tabular.add_row([
+                                f'{name}',
+                                f'({model_distortion.x.coefficients[c].unit:latex_inline})',
+                                f'{model_distortion.x.coefficients[c].squeeze().value:0.3e}',
+                                f'{model_distortion.y.coefficients[c].squeeze().value:0.3e}',
+                                # f'{model_distortion.x.coefficients[c] * 500 * u.pix}',
+                                # f'{model_distortion.x.coefficients[c].squeeze():0.3f}',
+                                # f'{model_distortion.y.coefficients[c].squeeze():0.3f}',
+                            ])
+
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.distortion_pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
@@ -2049,15 +2083,186 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
 """
             ))
 
+            opt = esis.optics.design.final(**optics.error_kwargs)
+            # opt = esis.optics.design.final(
+            #     pupil_samples=101,
+            #     # pupil_is_stratified_random=True,
+            #     field_samples=11,
+            #     all_channels=False,
+            # )
+
+            # psf_diffraction = opt.system.psf_diffraction
+
+            # plt.figure()
+            # plt.imshow(psf_diffraction.data[5,~0,..., 0].T, aspect='auto')
+            #
+            # print('position', psf_diffraction.grid.position)
+            # print('position', psf_diffraction.grid.position.points.x.shape)
+            # print('position', psf_diffraction.grid.position.points.y.shape)
+
+            # opt.psf_diffraction
+            opt.mtf_diffraction
+            plt.show()
+
+            # rays_grating = opt.system.raytrace[opt.system.surfaces_all.flat_local.index(opt.grating.surface)]
+            # rays_grating.pupil_hist2d(bins=100)
+            # plt.show()
+
+            frequency_requirement = 1 / requirements.resolution_angular
+
+            def calc_mtf(optics: esis.optics.Optics):
+                rays = optics.rays_output
+                mtf, frequency = rays.mtf(
+                    bins=200,
+                    frequency_min=frequency_requirement,
+                )
+                print('mtf', mtf.mean())
+                print('frequency', frequency)
+                mtf = np.take(a=mtf, indices=[index_o5], axis=rays.axis.wavelength)
+                print('mtf', mtf.mean())
+                mtf = np.mean(mtf.value, axis=rays.axis.field_xy, keepdims=True, where=mtf != 0) << mtf.unit
+                print('mtf', mtf.mean())
+                frequency = frequency.take(indices=[index_o5], axis=rays.axis.wavelength)
+                frequency = np.mean(frequency, axis=rays.axis.field_xy, keepdims=True)
+
+                plt.figure()
+                plt.imshow(mtf.squeeze().T)
+
+                with astropy.visualization.quantity_support():
+                    plt.figure()
+                    plt.plot(frequency.x.take(indices=0, axis=rays.axis.pupil_x).squeeze(), mtf.take(indices=0, axis=rays.axis.pupil_x).squeeze())
+                    plt.plot(frequency.y.take(indices=0, axis=rays.axis.pupil_y).squeeze(), mtf.take(indices=0, axis=rays.axis.pupil_y).squeeze())
+
+                mtf = np.take(a=mtf, indices=[0], axis=rays.axis.pupil_x)
+                print('mtf', mtf.mean())
+                index_frequency_requirement = np.argmax(frequency.y.take(indices=[0], axis=rays.axis.pupil_x) >= frequency_requirement, axis=rays.axis.pupil_y)
+                index_frequency_requirement = np.expand_dims(index_frequency_requirement, axis=rays.axis.pupil_y)
+                print('index frequency requirement', index_frequency_requirement.shape)
+                # mtf = np.take(a=mtf, indices=[index_frequency_requirement], axis=rays.axis.pupil_y)
+                mtf = np.take_along_axis(mtf, indices=index_frequency_requirement, axis=rays.axis.pupil_y)
+                print('mtf', mtf.mean())
+                print('mtf.shape', mtf.shape)
+                return mtf.squeeze()
+
+            mtf_nominal = calc_mtf(opt)
+
+            accumulator = dict(
+                mtf=1 * u.dimensionless_unscaled,
+            )
+
+            def add_mtf(
+                    tabular: pylatex.Tabular,
+                    name_major: str = '',
+                    name_minor: str = '',
+                    value_str: str = '',
+                    mtf: u.Quantity = 0 * u.dimensionless_unscaled,
+            ):
+                accumulator['mtf'] *= mtf
+
+                tabular.add_row([
+                    name_major,
+                    name_minor,
+                    value_str,
+                    f'',
+                    f'',
+                    f'{mtf.value:0.3f}',
+                ])
+
+            def add_optics(
+                    tabular: pylatex.Tabular,
+                    optics: typ.Union[esis.optics.Optics, typ.Tuple[esis.optics.Optics, esis.optics.Optics]],
+                    name_major: str = '',
+                    name_minor: str = '',
+                    value: typ.Optional[typ.Union[u.Quantity, typ.Tuple[u.Quantity, u.Quantity]]] = None,
+                    value_format_kwargs: typ.Optional[typ.Dict[str, typ.Any]] = None,
+                    remove_nominal_mtf: bool = True
+            ):
+
+                if value_format_kwargs is None:
+                    value_format_kwargs = dict(
+                        digits_after_decimal=3,
+                        scientific_notation=False,
+                    )
+
+                if not isinstance(optics, esis.optics.Optics):
+                    optics_min, optics_max = optics
+
+                    mtf_min, mtf_max = calc_mtf(optics_min), calc_mtf(optics_max)
+
+                    if mtf_max < mtf_min:
+                        mtf = mtf_max
+                    else:
+                        mtf = mtf_min
+
+                    if value is not None:
+                        value_min, value_max = value
+                        if value_max == -value_min:
+                            value_str = f'$\\pm${kgpy.format.quantity(value_max, **value_format_kwargs)}'
+                        else:
+                            raise NotImplementedError
+                    else:
+                        value_str = ''
+
+                else:
+                    mtf = calc_mtf(optics)
+                    if value is not None:
+                        value_str = f'{kgpy.format.quantity(value, **value_format_kwargs)}'
+                    else:
+                        value_str = ''
+
+                if remove_nominal_mtf:
+                    mtf = mtf / mtf_nominal
+
+                add_mtf(
+                    tabular=tabular,
+                    name_major=name_major,
+                    name_minor=name_minor,
+                    value_str=value_str,
+                    mtf=mtf,
+                )
+
+
+            opt = esis.optics.design.final(**optics.error_kwargs)
+            # print(calc_mtf(opt_err))
+
+            # rays_err = opt_err.rays_output
+            # # rays_err.position.z = np.broadcast_to(rays_err.wavelength, rays_err.position.shape, subok=True).copy()
+            # # rays_err.position = rays_err.distortion.model(inverse=True)(rays_err.position).to(u.arcsec)
+            #
+            # mtf, frequency = rays_err.mtf(
+            #     bins=200,
+            #     frequency_min=frequency_requirement,
+            # )
+            #
+            # index_freq = np.argmax(frequency.y == frequency_requirement)
+            # print('index_freq', index_freq)
+            #
+            # mtf[mtf == 0] = np.nan
+            # mtf = np.nanmean(mtf, axis=(rays_err.axis.field_x, rays_err.axis.field_y))[..., 0, 0]
+            # print('mtf', mtf[0, index_freq])
+            #
+            # print(mtf.shape)
+            #
+            # plt.figure()
+            # plt.imshow(mtf.T)
+            # # plt.show()
+            #
+            # with astropy.visualization.quantity_support():
+            #     plt.figure()
+            #     plt.plot(frequency.x, mtf[0])
+            #     plt.plot(frequency.y, mtf[..., 0])
+            #
+            # plt.show()
+
             units_psf = u.pix
             plate_scale = optics_single.plate_scale
-            focal_length_effective = optics_single.magnification.x * optics_single.primary.focal_length
+            focal_length_effective = optics_single.magnification.y * optics_single.primary.focal_length
 
             opt = esis.optics.design.final(**optics.error_kwargs)
             system_psf = np.nanmean(opt.rays_output.spot_size_rms[..., 0, :])
 
             frequency_mtf_arcsec = 0.5 * u.cycle / u.arcsec
-            frequency_mtf = frequency_mtf_arcsec * plate_scale.x / u.cycle
+            frequency_mtf = frequency_mtf_arcsec * plate_scale.y / u.cycle
             def to_mtf(psf_size: u.Quantity):
                 psf_size = psf_size / np.sqrt(2)
                 alpha = 1 / (2 * psf_size ** 2)
@@ -2126,30 +2331,34 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
             accumulator = dict(
                 psf_size_squared=0 * u.pix ** 2,
                 mtf=1 * u.dimensionless_unscaled,
+                mtf_actual=1 * u.dimensionless_unscaled,
             )
 
             def add_row_basic(
-                tabular: pylatex.Tabular,
-                optics: typ.Union[esis.optics.Optics, typ.Tuple[esis.optics.Optics, esis.optics.Optics]],
-                name_major: str = '',
-                name_minor: str = '',
-                value_str: str = '',
-                psf_size: u.Quantity = 0 * u.um,
+                    tabular: pylatex.Tabular,
+                    optics: typ.Union[esis.optics.Optics, typ.Tuple[esis.optics.Optics, esis.optics.Optics]],
+                    name_major: str = '',
+                    name_minor: str = '',
+                    value_str: str = '',
+                    psf_size: u.Quantity = 0 * u.um,
+                    mtf_actual: u.Quantity = 1.0 * u.dimensionless_unscaled,
             ):
 
-                accumulator['psf_size_squared'] += np.square(psf_size)
-
                 mtf = to_mtf(psf_size)
-                accumulator['mtf'] *= mtf
 
                 tabular.add_row([
                     name_major,
                     name_minor,
                     value_str,
                     f'{psf_size.to(u.pix).value:0.2f}',
-                    f'{(psf_size * optics.plate_scale.x).to(u.arcsec).value:0.2f}',
+                    f'{(psf_size * optics.plate_scale.y).to(u.arcsec).value:0.2f}',
                     f'{mtf.value:0.3f}',
+                    f'{mtf_actual.value:0.3f}',
                 ])
+
+                accumulator['psf_size_squared'] += np.square(psf_size)
+                accumulator['mtf_actual'] *= mtf_actual
+                accumulator['mtf'] *= mtf
 
             def add_row(
                     tabular: pylatex.Tabular,
@@ -2159,7 +2368,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                     value: typ.Optional[typ.Union[u.Quantity, typ.Tuple[u.Quantity, u.Quantity]]] = None,
                     digits_after_decimal: int = 3,
                     scientific_notation: bool = False,
-                    remove_nominal_psf: bool = True
+                    remove_nominal_psf: bool = True,
             ):
                 format_kwargs = dict(
                     digits_after_decimal=digits_after_decimal,
@@ -2193,8 +2402,11 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                         value_str = ''
 
                 psf_size = np.nanmean(optics.rays_output.spot_size_rms[..., 0, :])
+                mtf_actual = calc_mtf(optics)
+                print('mtf actual', mtf_actual)
                 if remove_nominal_psf:
                     psf_size = np.nan_to_num(np.sqrt(np.square(psf_size) - np.square(system_psf)))
+                    mtf_actual = mtf_actual / mtf_nominal
 
                 add_row_basic(
                     tabular=tabular,
@@ -2203,6 +2415,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                     name_minor=name_minor,
                     value_str=value_str,
                     psf_size=psf_size,
+                    mtf_actual=mtf_actual,
                 )
 
             def ptp_to_rms(value: u.Quantity) -> u.Quantity:
@@ -2211,7 +2424,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
             with doc.create(pylatex.Table()) as table:
                 table._star_latex_name = True
                 with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular('ll|rrrr')) as tabular:
+                    with centering.create(pylatex.Tabular('ll|rrrrr')) as tabular:
                         tabular.escape = False
                         tabular.add_row([
                             r'Element',
@@ -2219,7 +2432,8 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             r'Tolerance',
                             f'$\\sigma$ ({units_psf:latex_inline})',
                             f'$\\sigma$ ({u.arcsec:latex_inline})',
-                            r'\MTF\ '
+                            r'\MTF\ from $\sigma$',
+                            r'\MTF\ actual ',
                         ])
                         tabular.add_hline()
                         add_row(
@@ -2246,9 +2460,10 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             tabular=tabular,
                             optics=opt,
                             name_major='Primary',
-                            name_minor='Slope error',
+                            name_minor='RMS Slope error',
                             value_str=f'{kgpy.format.quantity(primary_slope_error, digits_after_decimal=1)}',
                             psf_size=primary_slope_error_psf,
+                            mtf_actual=opt.primary.mtf_degradation_factor,
                         )
                         add_row(
                             tabular=tabular,
@@ -2281,9 +2496,10 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             tabular=tabular,
                             optics=opt,
                             name_major='Grating',
-                            name_minor='Slope error',
+                            name_minor='RMS Slope error',
                             value_str=f'{kgpy.format.quantity(grating_slope_error, digits_after_decimal=1)}',
                             psf_size=grating_slope_error_psf,
+                            mtf_actual=opt.grating.mtf_degradation_factor,
                         )
                         add_row(
                             tabular=tabular,
@@ -2482,6 +2698,7 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                             optics=opt,
                             name_major='Total',
                             psf_size=psf_size_total,
+                            mtf_actual=accumulator['mtf_actual'],
                         )
                 table.add_caption(pylatex.NoEscape(
                     f"""
