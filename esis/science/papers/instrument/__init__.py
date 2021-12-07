@@ -1001,25 +1001,20 @@ def document() -> kgpy.latex.Document:
     with doc.create(kgpy.latex.Abstract()):
         doc.append(pylatex.NoEscape(
             r"""The \ESIS\ is a next generation rocket borne instrument that will investigate magnetic reconnection 
-and energy transport in the solar atmosphere 
-\amy{by observing emission lines formed in the chromosphere (\HeI), the transition region (\OV), and corona (\MgX).}
-\jake{Hello World}
-The instrument is a pseudo Gregorian telescope; 
-from prime focus, an array of spherical diffraction gratings re-image with differing dispersion angles. 
-\amy{The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
-This field stop is re-imaged  using an array of \numChannelsWords\ spherical diffraction gratings with differing 
-ispersion angles relative to ...? [ I want to say relative to solar north or field stop north or something], with each 
-diffraction grating projecting the spectrum onto a unique detector.}
+and energy transport in the solar atmosphere by observing emission lines formed in the chromosphere (\HeI), 
+the transition region (\OV), and corona (\MgX). 
+The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
+This field stop is re-imaged using an array of \numChannelsWords\ spherical diffraction gratings with differing 
+dispersion angles oriented in $45^{\circ}$ increments, with each 
+diffraction grating projecting the spectrum onto a unique detector.
 The slitless multi-projection design will obtain co-temporal spatial (\plateScale) and spectral (\dispersion) images 
 at high cadence ($>=$\detectorMinExposureLength). 
 \amy{The instrument is designed to be capable of obtaining co-temporal spatial (\plateScale) and spectral 
 (\dispersion) images at high cadence ($>=$\detectorMinExposureLength).}
-\amy{Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
+\jake{the "co-temporal spatial and spectral" part of this doesn't read quite right}
+Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
 at high spatial and spectral resolution over a large (\fov) \FOV. 
-The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. }
-A single exposure will enable us to reconstruct line profile information at high spatial and spectral resolution over a 
-large (\fov) \FOV. 
-The instrument is currently in the build up phase prior to spacecraft integration, testing, and launch.
+The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. 
 \acresetall"""
         ))
 
@@ -1046,9 +1041,6 @@ The $I(x, y, \lambda)$ data cube can be built up by rastering the slit pointing,
 raster axis.
 Moreover, extended and dynamic scenes can change significantly in the time required to raster over their extent.  
 
-\roy{Since the solar EUV spectrum is an emission line spectrum, what the slitless spectrograph sees is a series of 
-overlapping images, one for each spectral line.}
-
 \roy{
 A different approach is to use a \textit{slitless spectrograph}, a spectrograph built without the slit employed by 
 traditional spectrographs.
@@ -1059,9 +1051,8 @@ However, the solar atmosphere viewed in \EUV\ is a perfect candidate for observa
 the spectrum is dominated by emission lines, and has low continuum.
 So instead of a smear, a slitless spectrograph observing the Sun in \EUV\ would capture an image of many overlapping and shifted
 copies of the Sun, one for each spectral line in the passband, this type of image is known as an \textit{overlappogram}.}
-\sout{A different approach is to forego the entrance slit} \sout{employed by traditional spectrographs entirely.}
 The \Acposs{NRL} SO82A spectroheliograph~\citep{Tousey73,Tousey77}  was one of the first instruments to pioneer this method.
-The \sout{``overlappograms''} \roy{overlappograms} obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
+The overlappograms obtained by SO82A identified several spectral line transitions~\citep{Feldman85}, and have more 
 recently been used to determine line ratios in solar flares~\citep{Keenan06}.
 Unfortunately, for closely-spaced \EUV\ lines, the dispersed images from the single diffraction order suffer from 
 considerable ambiguity from overlapping images.
@@ -1081,7 +1072,7 @@ upwards of 25 grating diffraction orders may be projected onto a single detector
 Through post-processing of these images, \CTISs\ can recover a 3D data cube from a (spectrally) smooth and continuous 
 scene over a large bandpass (\eg\ \citet{Hagen08}).
 
-The \MOSES~\citep{Fox10,Fox11} is our first effort aimed at developing the unique capability of simultaneous 
+The \jake{capitalize "O"?}\MOSES~\citep{Fox10,Fox11} is our first effort aimed at developing the unique capability of simultaneous 
 imaging and spectroscopy for solar \EUV\ scenes.
 \MOSES\ is a three-order slitless spectrograph that seeks to combine the simplicity of the SO82A concept with the 
 advantages of a \CTIS\ instrument.
@@ -1097,19 +1088,16 @@ Through inversion of \MOSES\ overlappograms, \citet{Fox10} obtained unprecedente
 (\ie\ line widths) of \TR\ explosive events as a function of time and space while \citet{Rust17} recovered splitting and 
 distinct moments of compact \TR\ bright point line profiles.
 
+\jake{might just need to go through the whole paper then write this paragraph}
 Building on the working concept demonstrated by \MOSES, here we describe a new instrument, the \ESIS, that improves
 on past efforts to perform simultaneous imaging and spectroscopy in \EUV.
-\roy{\ESIS\ and \MOSES\ share the same payload...}
-\roy{\ESIS has been built onto the same optical bench as \MOSES...}
-\ESIS\ will fly alongside \MOSES\ and will observe the \TR\ and corona of the solar atmosphere in the \OV\ and 
-\MgX/\MgXdimWavelength\ spectral lines.
 In Section~\ref{sec:TheESISConcept} we detail how our experience with the \MOSES\ instrument has shaped the design of 
 \ESIS.
 Section~\ref{sec:ScienceObjectives} describes the narrow scientific objectives and the requirements placed on the new 
 instrument.
 Section~\ref{sec:TheESISInstrument} describes the technical approach to meet our scientific objectives, followed by a 
 brief description of the expected mission profile in Section~\ref{sec:MissionProfile}.
-\sout{The current status and progress toward launch is} \sout{summarized in Section~\ref{sec:ConclusionsandOutlook}.}"""
+"""
         ))
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Concept'))):
@@ -1138,7 +1126,7 @@ First, the lack of magnification by the secondary mirror limits the folded lengt
 than half of the \SI{5}{\meter} focal length of the grating~\citep{Fox10,Fox11}.
 Second, the dispersion of the instrument is controlled by the placement of the cameras.
 To achieve the maximum dispersion of \SI{29}{\kilo\meter\per\second}~\citep{Fox10}, the outboard orders are imaged as 
-far apart as possible in the \sout{$\sim22''$} \roy{$\sim\text{\skinDiameter}$} diameter \sout{cross section} \roy{envelope} of the rocket payload.
+far apart as possible in the $\sim\text{\skinDiameter}$ diameter envelope of the rocket payload.
 The resulting planar dispersion poorly fills the cylindrical volume of the payload, leaving much unused space along the 
 orthogonal planes."""
             ))
@@ -1154,20 +1142,20 @@ Dispersed images are formed on the outboard $m=\pm1$ \CCDs."""
 
             doc.append(pylatex.NoEscape(
                 r"""Furthermore, the monolithic secondary, though it confers the focus advantage noted above, does not 
-allow efficient placement of the \sout{dispersed image order cameras} \roy{$m=\pm1$ \CCDs}.  
-For all practical purposes, the diameter of the payload \sout{(\SI{0.56}{\meter})} \roy{(\skinDiameter)} can only accommodate three diffraction 
+allow efficient placement of the $m=\pm1$ \CCDs.  
+For all practical purposes, the diameter of the payload (\skinDiameter) can only accommodate three diffraction 
 orders ($m=-1, 0, +1$).
 Therefore, \textit{\MOSES\ can only collect, at most, three pieces of information at each point in the field of view.}
-From this, it is not reasonable to expect the reconstruction of more than three degrees of freedom \sout{in this spectrum} \roy{for each spectral line}, 
+From this, it is not reasonable to expect the reconstruction of more than three degrees of freedom for each spectral line, 
 except in the case very compact, isolated features such as those described by \citet{Fox10} and \citet{Rust17}.
 Consequently, it is a reasonable approximation to say that \MOSES\ is sensitive primarily to spectral line intensities, 
 shifts, and widths \citep{KankThom01}.
 With any tomographic apparatus, the degree of detail that can be resolved in the object depends critically on the 
 number of viewing angles~\citep{Kak88,Descour97,Hagen08}.
 So it is with the spectrum we observe with \MOSES: more dispersed images are required to confer sensitivity to finer 
-spectral details such as \sout{additional lines in the passband or} higher moments of the spectral line shape.
+spectral details such as higher moments of the spectral line shape.
 
-A related issue stems from the use of a single grating, with a single \sout{plane of dispersion} \roy{dispersion plane}.
+A related issue stems from the use of a single grating, with a single dispersion plane.
 Since the solar corona and transition region are structured by magnetic fields, the scene tends to be dominated by 
 \sout{field aligned} \roy{field-aligned} structures such as loops~\citep{Rosner78,Bonnet80}.
 When the \MOSES\ dispersion direction happens to be aligned nearly perpendicular to the magnetic field, filamentary 
@@ -1184,11 +1172,16 @@ The single diffraction grating also leads to a compromise in the optical perform
 Since the \MOSES\ grating forms images in three orders simultaneously, \sout{aberration cannot be simultaneously optimized for} 
 \roy{there aren't enough degrees of freedom in the optical system to achieve sub-pixel aberrations in}
 all three of those spectral orders.
-A result of this design is that the orientations (\ie\,the \sout{central} \roy{major} axis) of the \PSF\ varies order to order~\citep{Rust17}.
+A result of this design is that the orientations (\ie\,the major axis) of the \PSF\ varies order to order~\citep{Rust17}.
 During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
 inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
 The combination of these two effects results in spurious spectral features that require additional 
 consideration~\citep{Atwood18} and further increase the complexity of the inversion process~\citep{Rust17,Courrier18}.
+
+\jake{Another complication with \MOSES\ is that each spectral order contains a different combination of
+spatial and spectral information.  This stems from the fact that \MOSES\ lacks a field stop to define a wavelength
+independent \FOV and that \MOSES employs a undispersed channel. Intensity in the undispersed image is defined by the
+wavelength dependent throughput of MOSES, while 
  
 Another complication is that the spatial and spectral content differs slightly between the three \MOSES\ image orders.
 This is because the \MOSES\ \FOV\ is defined by a combination of the aperture of the grating (\ie\,the entrance 
@@ -1197,7 +1190,7 @@ The \FOV\ in the $m=\pm1$ orders is shifted along the dispersion axis as a funct
 the dispersed spectral images intercept the $m=\pm1$ \CCDs.
 Spatially, this effect is limited to only a handful of pixel columns at the edges of each image order.
 Of higher concern is the ``spectral contamination'' allowed by this layout; 
-\citet{Parker16} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
+\citet{Parker16}\jake{can likely update to my thesis at least} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
 \FOV\ could be diffracted onto the outboard order \CCDs.
 This off-band contamination is detected as systematic intensity variation that lacks an anti-symmetric pairing in the 
 opposite dispersed image order.
