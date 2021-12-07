@@ -1106,8 +1106,7 @@ brief description of the expected mission profile in Section~\ref{sec:MissionPro
 demonstrated by \MOSES.  
 Therefore, the design of the new instrument draws heavily from experiences and lessons learned through two flights of 
 the \MOSES\ instrument.
-\ESIS\ and \MOSES\ are both slitless, multi-projection spectrographs.
-\roy{Should we restructure the previous sentence to say that \ESIS\ and \MOSES\ are both \CTISs? I think that would make it more consistent with the mission paper.}
+\ESIS\ and \MOSES\ are both \CTIS\ instruments.
 As such, both produce \sout{dispersed images} \roy{overlappograms} of a narrow portion of the solar spectrum, with the goal of enabling the 
 reconstruction of a spectral line profile at every point in the field of view.
 The similarities end there, however, as the optical layout of \ESIS\ differs significantly from that of \MOSES.
@@ -1168,54 +1167,47 @@ direction.
 In cases where the field is nearly parallel to the instrument dispersion, spectral shifts and broadenings are not 
 readily apparent.
 
-The single diffraction grating also leads to a compromise in the optical performance of the instrument. 
-Since the \MOSES\ grating forms images in three orders simultaneously, \sout{aberration cannot be simultaneously optimized for} 
-\roy{there aren't enough degrees of freedom in the optical system to achieve sub-pixel aberrations in}
-all three of those spectral orders.
-A result of this design is that the orientations (\ie\,the major axis) of the \PSF\ varies order to order~\citep{Rust17}.
-During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{Rust17}, which exacerbated the 
-inter-order \PSF\ variation and caused the individual \PSFs\ to span several pixels~\citep{Rust17,Atwood18}.
-The combination of these two effects results in spurious spectral features that require additional 
-consideration~\citep{Atwood18} and further increase the complexity of the inversion process~\citep{Rust17,Courrier18}.
+The single diffraction grating also leads to a compromise in the optical performance of the instrument. Since the 
+\MOSES\ grating forms images in three orders simultaneously, \sout{aberration cannot be simultaneously optimized for} 
+\roy{there aren't enough degrees of freedom in the optical system to achieve sub-pixel aberrations in} all three of 
+those spectral orders. A result of this design is that the orientations (\ie\,the major axis) of the \PSF\ varies 
+order to order~\citep{Rust17}. During the first mission, \MOSES\ was flown with a small amount of defocus~\citep{
+Rust17}, which exacerbated the inter-order \PSF\ variation and caused the individual \PSFs\ to span several 
+pixels~\citep{Rust17,Atwood18}. The combination of these two effects results in spurious spectral features that 
+require additional consideration~\citep{Atwood18} and further increase the complexity of the inversion 
+process~\citep{Rust17,Courrier18}. 
 
-\jake{Another complication with \MOSES\ is that each spectral order contains a different combination of
-spatial and spectral information.  This stems from the fact that \MOSES\ lacks a field stop to define a wavelength
-independent \FOV and that \MOSES employs a undispersed channel. Intensity in the undispersed image is defined by the
-wavelength dependent throughput of MOSES, while 
- 
-Another complication is that the spatial and spectral content differs slightly between the three \MOSES\ image orders.
-This is because the \MOSES\ \FOV\ is defined by a combination of the aperture of the grating (\ie\,the entrance 
-aperture of the telescope) and the spatial extent of the \CCDs.
-The \FOV\ in the $m=\pm1$ orders is shifted along the dispersion axis as a function of wavelength, dependant upon where 
-the dispersed spectral images intercept the $m=\pm1$ \CCDs.
-Spatially, this effect is limited to only a handful of pixel columns at the edges of each image order.
-Of higher concern is the ``spectral contamination'' allowed by this layout; 
-\citet{Parker16}\jake{can likely update to my thesis at least} found that bright spectral lines and continuum far outside the wavelength passband and nominal $m=0$ 
-\FOV\ could be diffracted onto the outboard order \CCDs.
-This off-band contamination is detected as systematic intensity variation that lacks an anti-symmetric pairing in the 
-opposite dispersed image order.
-\sout{Analysis of the spectral contamination is ongoing.}
-\roy{Is there a way we can update this?}
+\jake{Another complication with \MOSES\ is that each spectral order image contains a different combination of spatial 
+and spectral information.  This stems from the fact that \MOSES\ lacks a field stop to define a wavelength 
+independent \FOV and that it uses an undispersed channel. In this configuration, intensity from wavelengths off the 
+primary observing wavelength, but within the \MOSES\ passband, will be imaged in the zero order, but may be dispersed 
+off the detector in the outboard orders. In the opposite sense, features outside of the \FOV\ of the zeroth order may 
+be dispersed onto either of the outboard order detectors. \citet{Parker2022} compared synthetic \MOSES\ images to the 
+real data and found that approximately ten percent of the intensity in the zeroth order image originated from over 
+ten dims lines in the \MOSES\ passband, most of which are too dim to be visible the dispersed images (assuming they 
+weren't dispersed off the detector).  This study revealed that undispered channels, although attractive because of 
+their lack of spatial-spectral ambiguity, can provide misleading intensity information and have limited utility 
+without careful forward modeling.  Also, that the \FOV\ should be clearly defined, and the same, for each wavelength 
+so that the wavelengths contributing intensity to a given pixel in a dispersed image are known.} 
 
-Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the 
-\CCDs~\citep{Fox11}.
-The observing interval for a solar sounding rocket flight is very short, typically about five minutes.
-Consequently, every second of observing time is precious, both to achieve adequate exposure time and to catch the full 
-development of dynamical phenomena.
-The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is limited by the readout time of its \CCDs.
-Thus, valuable observing time is lost.
-The readout data gap \sout{impelled} \roy{compelled} us to develop a \MOSES\ exposure sequence with exposures ranging from 
-$0.25$-\SI{24}{\second}, a careful trade-off between deep and fast exposures. 
+Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the \CCDs~\citep{
+Fox11}. The observing interval for a solar sounding rocket flight is very short, typically about five minutes. 
+Consequently, every second of observing time is precious, both to achieve adequate exposure time and to catch the 
+full development of dynamical phenomena. The \MOSES\ observing duty cycle is $\sim$\SI{50}{\percent} since it is 
+limited by the readout time of its \CCDs. Thus, valuable observing time is lost. The readout data gap \sout{impelled} 
+\roy{compelled} us to develop a \MOSES\ exposure sequence with exposures ranging from $0.25$-\SI{24}{\second}, 
+a careful trade-off between deep and fast exposures. 
 
 In summary, our experience leads us to conclude that the \MOSES\ design has the following primary limitations:
 \begin{enumerate}
     \item inefficient use of volume \label{item-length} %(x and y direction)
     \item dispersion constrained by payload dimensions \label{item-disp_con}
     \item too few dispersed images (orders) \label{item-orders}
-    \item single \sout{plane dispersion} \roy{dispersion plane} \label{item-dispersion}
-    \item \ \sout{lack of aberration control} \roy{Insufficient degrees of freedom to control aberrations} \label{item-PSF}
-    \item \ \sout{insufficiently defined} \roy{poorly-defined} \FOV\ \label{item-FOV}
-    \item \ \sout{sub-optimal exposure cadence} \roy{low duty cycle} \label{item-CAD}
+    \item single dispersion plane \label{item-dispersion}
+    \item insufficient degrees of freedom to control aberrations \label{item-PSF}
+    \item poorly-defined and wavelength dependent \FOV\ \label{item-FOV}
+    \item misleading intensity in $m=0$ order image
+    \item low duty cycle \label{item-CAD}
 \end{enumerate}
 In designing \ESIS, we have sought to improve upon each of these points.
 """
@@ -1250,42 +1242,39 @@ gratings are identical in design.
 The features of this new layout address all of the limitations described in 
 Section~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
 
-Replacing the secondary mirror with an array of concave diffraction gratings confers several advantages to \ESIS\ over 
-\MOSES.
-First, the \sout{magnification of the \ESIS\ gratings} \roy{concavity of the gratings creates magnification in the \ESIS\ optical system, which} results in a shorter axial length than \MOSES, without sacrificing 
-spatial or spectral resolution.
-Second, the magnification and tilt of an individual grating controls the position of the dispersed image with respect 
-to the optical axis, so that the spectral resolution is not as constrained by the payload dimensions.
-Third, the radial symmetry of the design places the cameras closer together, resulting in a more compact instrument.
-Furthermore, by arranging the detectors around the optical axis, more dispersed grating orders can be populated; 
-up to eight gratings can be arrayed around the \ESIS\ primary mirror (up to six with the current optical table).
-This contrasts the three image orders available in the planar symmetry of \MOSES.
-Taken together, these three design features make \ESIS\ more compact than \MOSES\ 
-\sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-length})} \roy{(Limitation~\ref{item-length})}, improve spectral resolution 
-\sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-disp_con})} \roy{(Limitation~\ref{item-disp_con})} and allow the collection of more projections to 
-better constrain the interpretation of the data \sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-orders})} \roy{(Limitation~\ref{item-orders})}.
+Replacing the secondary mirror with an array of concave diffraction gratings confers several advantages to \ESIS\ 
+over \MOSES. First, the \sout{magnification of the \ESIS\ gratings} \roy{concavity of the gratings creates 
+magnification in the \ESIS\ optical system, which} results in a shorter axial length than \MOSES, without sacrificing 
+spatial or spectral resolution. Second, the magnification and tilt of an individual grating controls the position of 
+the dispersed image with respect to the optical axis, so that the spectral resolution is not as constrained by the 
+payload dimensions. Third, the radial symmetry of the design places the cameras closer together, resulting in a more 
+compact instrument. Furthermore, by arranging the detectors around the optical axis, more dispersed grating orders 
+can be populated; up to eight gratings can be arrayed around the \ESIS\ primary mirror (up to six with the current 
+optical table). This contrasts the three image orders available in the planar symmetry of \MOSES. Taken together, 
+these three design features make \ESIS\ more compact than \MOSES\ \sout{(\S\,\ref{subsec:LimitationsoftheMOSESDesign} 
+item~\ref{item-length})} \roy{(Limitation~\ref{item-length})}, improve spectral resolution \sout{(\S\,
+\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-disp_con})} \roy{(Limitation~\ref{item-disp_con})} and allow 
+the collection of more projections to better constrain the interpretation of the data \sout{(\S\,
+\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-orders})} \roy{(Limitation~\ref{item-orders})}. 
  
 The \ESIS\ gratings are arranged in a segmented array, clocked in \SI{45}{\degree} increments, so that there are 
-\numChannelsWords\ distinct dispersion planes.
-This will greatly aid in reconstructing spectral line profiles since the dispersion space of \ESIS\ occupies a 3D 
-volume rather than a 2D plane as with \MOSES.
-For \ESIS, there will always be a dispersion plane within \SI{22.5}{\degree} of the normal to any loop-like feature in 
-the solar atmosphere.
-As discussed in Section~\ref{subsec:LimitationsoftheMOSESDesign}, a nearly perpendicular dispersion plane allows a 
-filamentary structure to serve like a spectrographic slit, resulting in a clear presentation of the spectrum.
-This feature addresses \sout{\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-dispersion}} \roy{Limitation~\ref{item-dispersion}}. 
+\numChannelsWords\ distinct dispersion planes. This will greatly aid in reconstructing spectral line profiles since 
+the dispersion space of \ESIS\ occupies a 3D volume rather than a 2D plane as with \MOSES. For \ESIS, there will 
+always be a dispersion plane within \SI{22.5}{\degree} of the normal to any loop-like feature in the solar 
+atmosphere. As discussed in Section~\ref{subsec:LimitationsoftheMOSESDesign}, a nearly perpendicular dispersion plane 
+allows a filamentary structure to serve like a spectrographic slit, resulting in a clear presentation of the 
+spectrum. This feature addresses \sout{\S\,\ref{subsec:LimitationsoftheMOSESDesign} item~\ref{item-dispersion}} \roy{
+Limitation~\ref{item-dispersion}}. 
 
-Rather than forming images at three spectral orders from a single grating, each \ESIS\ imaging channel has a dedicated 
-grating.
-Aberrations are controlled by optimizing the grating design to form images in first order, over a narrow range of ray 
-deviation angles.
-This design controls aberration well enough to allow pixel-limited imaging, avoiding the \PSF\ mismatch problems inherent 
-to the \MOSES\ design (\S\,\ref{subsec:LimitationsoftheMOSESDesign} item \ref{item-PSF}).
-A disadvantage of this arrangement is that \ESIS\ lacks a zero order focus.
-In its flight configuration with gratings optimized around a \OVwavelength\ wavelength, the instrument cannot be 
-aligned and focused in visible light like \MOSES.
-Visible gratings and a special alignment transfer apparatus (\S\,\ref{subsec:AlignmentandFocus}) must be used for 
-alignment and focus of \ESIS.
+Rather than forming images at three spectral orders from a single grating, each \ESIS\ imaging channel has a 
+dedicated grating. Aberrations are controlled by optimizing the grating design to form images in first order, 
+over a narrow range of ray deviation angles. This design controls aberration well enough to allow pixel-limited 
+imaging, avoiding the \PSF\ mismatch problems inherent to the \MOSES\ design (\S\,
+\ref{subsec:LimitationsoftheMOSESDesign} item \ref{item-PSF}). \jake{Used to claim a lack of zero order as a 
+disadvantage, maybe we should claim the trade for an additional dispersed channel as an advantage} In its flight 
+configuration with gratings optimized around a \OVwavelength\ wavelength, the instrument cannot be aligned and 
+focused in visible light like \MOSES. Visible gratings and an special alignment transfer procedure(\S\,
+\ref{subsec:AlignmentandFocus}) must be used for alignment and focus of \ESIS. 
 
 The \ESIS\ design also includes an octagonal field stop placed at prime focus.
 This confers two advantages.
