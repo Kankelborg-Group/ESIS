@@ -1179,16 +1179,16 @@ process~\citep{Rust17,Courrier18}.
 
 \jake{Another complication with \MOSES\ is that each spectral order image contains a different combination of spatial 
 and spectral information.  This stems from the fact that \MOSES\ lacks a field stop to define a wavelength 
-independent \FOV and that it uses an undispersed channel. In this configuration, intensity from wavelengths off the 
+independent \FOV\ and that it uses an undispersed channel. In this configuration, intensity from wavelengths off the 
 primary observing wavelength, but within the \MOSES\ passband, will be imaged in the zero order, but may be dispersed 
 off the detector in the outboard orders. In the opposite sense, features outside of the \FOV\ of the zeroth order may 
 be dispersed onto either of the outboard order detectors. \citet{Parker2022} compared synthetic \MOSES\ images to the 
-real data and found that approximately ten percent of the intensity in the zeroth order image originated from over 
-ten dims lines in the \MOSES\ passband, most of which are too dim to be visible the dispersed images (assuming they 
+real data and found that approximately ten percent of the intensity in the zeroth order image originated from more than 
+ten dims lines in the \MOSES\ passband, most of which are too dim to be visible in the dispersed images (in places where they 
 weren't dispersed off the detector).  This study revealed that undispered channels, although attractive because of 
-their lack of spatial-spectral ambiguity, can provide misleading intensity information and have limited utility 
+their lack of spatial-spectral ambiguity, can provide misleading intensity information limiting their utility in inversion
 without careful forward modeling.  Also, that the \FOV\ should be clearly defined, and the same, for each wavelength 
-so that the wavelengths contributing intensity to a given pixel in a dispersed image are known.} 
+so that each wavelength contributing intensity to a given pixel in a dispersed image are known.} 
 
 Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the \CCDs~\citep{
 Fox11}. The observing interval for a solar sounding rocket flight is very short, typically about five minutes. 
@@ -1270,15 +1270,14 @@ Rather than forming images at three spectral orders from a single grating, each 
 dedicated grating. Aberrations are controlled by optimizing the grating design to form images in first order, 
 over a narrow range of ray deviation angles. This design controls aberration well enough to allow pixel-limited 
 imaging, avoiding the \PSF\ mismatch problems inherent to the \MOSES\ design (\S\,
-\ref{subsec:LimitationsoftheMOSESDesign} item \ref{item-PSF}). \jake{Used to claim a lack of zero order as a 
-disadvantage, maybe we should claim the trade for an additional dispersed channel as an advantage} In its flight 
+\ref{subsec:LimitationsoftheMOSESDesign} item \ref{item-PSF}). In its flight 
 configuration with gratings optimized around a \OVwavelength\ wavelength, the instrument cannot be aligned and 
 focused in visible light like \MOSES. Visible gratings and an special alignment transfer procedure(\S\,
-\ref{subsec:AlignmentandFocus}) must be used for alignment and focus of \ESIS. 
+\ref{subsec:AlignmentandFocus}) must be used for the alignment and focus of \ESIS. 
 
 The \ESIS\ design also includes an octagonal field stop placed at prime focus.
 This confers two advantages.
-First, the field stop fully defines the instrument \FOV, so that \ESIS\ is not susceptible to the spectral contamination 
+First, the field stop fully defines the instrument \FOV, so that \ESIS\ is not susceptible to the spectral confusion 
 observed in \MOSES\ data (\S\,\ref{subsec:LimitationsoftheMOSESDesign} limitation~\ref{item-FOV}).
 Second, each spectral image observed by \ESIS\ will be bordered by the outline of the field stop 
 (\eg\,\S\,\ref{subsec:Optics}).
@@ -1316,7 +1315,14 @@ In this section, we set forth specific scientific objectives for the combined \E
 From these objectives, and with an eye toward synergistic operation of \MOSES\ and \ESIS, in 
 \S\,\ref{subsec:ScienceRequirements} we derive the quantitative science requirements that drive the \ESIS\ design.
 
-The combined \ESIS/\MOSES\ mission will address the following two overarching science goals: \begin{inparaenum}[(1)] 
+\jake{Early flights of \MOSES\ demonstrated a working concept of simultaneous \EUV\ imaging and spectroscopy. This 
+concept adds a unique capability to the science that we can obtain from the \EUV\ solar atmosphere. \ESIS\ as 
+designed improves upon the \MOSES\ concept, as discussed in the previous section, and therefore improves our ability 
+to accomplish our scientific objectives. In this section, we set forth the specific scientific objectives of the 
+\ESIS mission. It is from these objectives that we derived the quantitative science requirements (\S\,
+\ref{subsec:ScienceRequirements}) that drove the \ESIS\ design. }
+
+The \ESIS\ mission was designed to achieve the following two overarching science goals: \begin{inparaenum}[(1)] 
 \item observe magnetic reconnection in the \TR\label{item-goal1}, and \item map the transfer of energy through the \TR\ 
 with emphasis on \MHD\ waves\label{item-goal2}. \end{inparaenum}
 These objectives have significant overlap with the missions of \IRIS~\citep{IRIS14}, the \EIS~\citep{Culhane07}
@@ -1324,13 +1330,13 @@ aboard Hinode, the \EUNIS~\citep{Brosius07,Brosius14}, and a long history of \FU
 The \ESIS\ instrument, however, can obtain both spatial and spectral information co-temporally.
 This will allow us to resolve complicated morphologies of compact \TR\ reconnection events (as was done with 
 \MOSES~\citep{Fox11,Rust17,Courrier18}) and observe signatures of \MHD\ waves over a large portion of the solar disk.
-Therefore, in support of goal~\ref{item-goal1}, we will use \ESIS\ and \MOSES\ to map flows as a function of time and 
+Therefore, in support of goal~\ref{item-goal1}, we will use \ESIS\ to map flows as a function of time and 
 space in multiple \TR\ reconnection events.
 To achieve goal~\ref{item-goal2}, we will cross-correlate the evolution at multiple temperatures in the \TR\ to map the 
-vertical transport of energy over a wide \FOV.
-In the latest configuration, the \MOSES\ optics are optimized around Ne\,\textsc{vii} (\SI{0.5}{\mega\kelvin}).
-To achieve our goals, \ESIS\ should have a complementary wavelength choice such that we can observe a reasonably 
-isolated emission line formed in the lower \TR."""
+vertical transport of energy over a wide \FOV."""
+# In the latest configuration, the \MOSES\ optics are optimized around Ne\,\textsc{vii} (\SI{0.5}{\mega\kelvin}).
+# To achieve our goals, \ESIS\ should have a complementary wavelength choice such that we can observe a reasonably
+# isolated emission line formed in the lower \TR."""
         ))
 
         with doc.create(pylatex.Subsection('Magnetic Reconnection Events')):
@@ -1442,8 +1448,7 @@ sources are localized in the \TR, but cover the surface densely enough to appear
 The resulting non-thermal widths for localized sources will be significantly higher than the 
 $\sim$\SI{20}{\kilo\meter\per\second} mean derived above.
 The concentration of non-thermal energy observed by \ESIS\ will serve as an indicator of source density.
-\roy{Should we remove this section considering that \MOSES\ didn't work?}
-Comparison of Doppler maps from \ESIS\ and \MOSES\ will indicate whether a uniform source density originates in the 
+Comparison of Doppler maps captured at different temperatures by \ESIS\ will indicate whether a uniform source density originates in the 
 chromosphere or below (scenario~\ref{wave-1}) or is associated with spatially distributed \TR\ phenomena 
 (scenario~\ref{wave-3}) such as explosive events, or macrospicules.
 Comparison with a wider selection of ground and space based imagery will allow us to determine whether intense, 
@@ -1461,7 +1466,7 @@ reconnection in explosive events, and the transport of mass and energy through t
 The latter may take many forms, from \MHD\ waves of various modes to \EUV\ jets or macro-spicules.
 To fulfill these goals, \ESIS\ will obtain simultaneous intensity, Doppler shift and line width images of the \OV\ line 
 in the solar transition region at rapid cadence.
-This is a lower \TR\ line (\SI{.25}{\mega\kelvin}) that complements the \MOSES\ Ne\,\textsc{vii}.
+This is a lower \TR\ line (\SI{.25}{\mega\kelvin}).
 The bright, optically thin \OVion\ emission line is well isolated except for the two coronal \MgXion\ lines.
 These coronal lines can be viewed as contamination or as a bonus;
 we expect that with the \numChannelsWords\ \ESIS\ projections it will be possible to separate the \OVion\ emission from 
@@ -1661,7 +1666,7 @@ Surface figure specifications for the \ESIS\ optics are described in Sec.~\ref{s
 The spherical gratings (Fig.~\ref{fig:schematic}c) re-image light from the field stop to form dispersed images at the 
 \CCDs.
 Each grating is individually mounted to a backing plate in a similar fashion as the primary mirror.
-For these much smaller optics, lightweight bipods were wire \EDM\ cut from thin titanium sheet.
+For these much smaller optics, lightweight bipods were photo-chemically etched from thin titanium sheet.
 The bipods are bonded to both the grating and backing plate along the three long edges of each grating.
 The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
             ))
@@ -1686,9 +1691,9 @@ The groove profile is optimized for the $m=1$ order, so that each grating serves
 The modeled grating groove efficiency in this order is \SI{36}{\percent} \roy{We said \SI{39}{\percent} above, need to 
 find out which it is, I get \gratingGrooveEfficiency} at \OV. 
 
-Figure specification and groove profile are not well controlled near the edges of the gratings.
-Therefore, a baffle is placed at each grating to restrict illumination to the clear aperture marked in 
-Fig.~\ref{fig:schematic}c
+Figure specification and groove profile are not well controlled near the edges of the gratings. Therefore, 
+\jake{an uncoated section of mirror was left around the edge of the grating when applying the multilayer coating, 
+minimizing reflection in EUV.} Fig.~\ref{fig:schematic}c 
 
 The \ESIS\ passband is defined through a combination of the field stop, the grating dispersion, and the \CCD\ size.
 The passband includes the \HeI\ spectral line through \MgXion\ (\MgXwavelength\ and \MgXdimWavelength) to \OV.
@@ -2820,7 +2825,7 @@ curvature between each optic when transferring alignment and focus.
 
             doc.append(pylatex.NoEscape(
                 r"""
-                
+\jake{Needs a big rework}               
 Each channel of \ESIS\ has two apertures: one at the surface of the grating and another in front of the primary mirror.
 The purpose of the aperture at the grating is to mask the out-of-figure margins at the edges of these optics.
 This provides a well defined edge to the clear aperture of each grating while also keeping unwanted rays from being 
