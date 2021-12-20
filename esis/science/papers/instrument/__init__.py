@@ -3045,7 +3045,7 @@ of the \CCD.
 
 Once the visible gratings were aligned and focused, the challenge is to transfer this alignment to the \EUV\ flight 
 gratings.
-We preformed this transfer using a 4D Phasecam 6000 interferometer.
+We performed this transfer using a 4D Phasecam 6000 interferometer.
 We aligned the interferometer to each visible grating such that the tip, tilt, and defocus aberrations were zero.
 Then, placing the corresponding flight grating in the visible grating's place, we shimmed the mounting screws of the 
 flight grating to match the tip, tilt, and defocus of the alignment grating.
