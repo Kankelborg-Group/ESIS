@@ -1984,21 +1984,31 @@ The field and pupil grids have the same parameters as the grid for Figure~\ref{f
             ))
 
             model_distortion = optics_single.rays_output.distortion.model()
+            model_distortion_relative = optics_single.rays_output_relative.distortion.model()
+
+            def fmt_coeff(coeff: u.Quantity):
+                return kgpy.format.quantity(coeff.value * u.dimensionless_unscaled, scientific_notation=True, digits_after_decimal=2)
+
+            x_max = 500 * u.pix
+            y_max = 500 * u.pix
+            lambda_max = optics_single.wavelength[..., 1] - optics_single.wavelength[..., 0]
 
             with doc.create(pylatex.Table()) as table:
                 table._star_latex_name = True
                 with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular('ll|rr')) as tabular:
+                    with centering.create(pylatex.Tabular('ll|rr|rr')) as tabular:
                         tabular.escape = False
-                        tabular.append('\multicolumn{2}{l}{Coefficient} & $x\'$ & $y\'$ & Max. deviation\\\\')
+                        tabular.append('\multicolumn{2}{l}{Coefficient} & $x\'$ & $y\'$ & $x\'$ rel. & $y\'$ rel.\\\\')
                         # tabular.add_row(['Coefficient', '$x\'$', '$y\'$'])
                         tabular.add_hline()
                         for c, name in enumerate(model_distortion.x.coefficient_names):
                             tabular.add_row([
                                 f'{name}',
                                 f'({model_distortion.x.coefficients[c].unit:latex_inline})',
-                                f'{model_distortion.x.coefficients[c].squeeze().value:0.3e}',
-                                f'{model_distortion.y.coefficients[c].squeeze().value:0.3e}',
+                                fmt_coeff(model_distortion.x.coefficients[c].squeeze()),
+                                fmt_coeff(model_distortion.y.coefficients[c].squeeze()),
+                                fmt_coeff(model_distortion_relative.x.coefficients[c].squeeze()),
+                                fmt_coeff(model_distortion_relative.y.coefficients[c].squeeze()),
                                 # f'{model_distortion.x.coefficients[c] * 500 * u.pix}',
                                 # f'{model_distortion.x.coefficients[c].squeeze():0.3f}',
                                 # f'{model_distortion.y.coefficients[c].squeeze():0.3f}',
