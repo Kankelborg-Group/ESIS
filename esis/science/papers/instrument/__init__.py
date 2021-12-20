@@ -1974,7 +1974,11 @@ The field and pupil grids have the same parameters as the grid for Figure~\ref{f
 
             doc.append(pylatex.NoEscape(r"""
 \begin{equation}
-\left(x', y'\right) = \C + \C_x x + \C_y y + \C_\lambda \lambda
+\begin{split}
+\left(x', y'\right) &= \C + \C_x x + \C_y y + \C_\lambda \lambda \\
+&+ \C_{xx} x^2 + \C_{xy} x y + \C_{y \lambda} x \lambda \\
+&+ \C_{yy} y^2 + \C_{y \lambda} y \lambda + \C_{\lambda \lambda} \lambda^2
+\end{split}
 \end{equation}
 """
             ))
