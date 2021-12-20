@@ -427,7 +427,7 @@ class Optics(
         other._focus_and_align_factory(values, units, focus_grating, focus_detector)
         result_size = np.nanmean(other.system.rays_output.spot_size_rms[..., 0, :])
         result_position = np.nanmean(other.system.rays_output.position[..., 0, :])
-        target_position = kgpy.vector.Vector3D(x=7.2090754246099999 * u.mm)
+        target_position = other.detector.position_ov.to_3d()
         result_position = result_position - target_position
         result = np.sqrt(np.square(result_size) + np.square(result_position.length))
         return result.value
