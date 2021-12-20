@@ -137,6 +137,15 @@ class Optics(
         return rays
 
     @property
+    def rays_output_relative(self) -> optics.rays.Rays:
+        rays = self.system.rays_output.copy()
+        rays.position = rays.position - self.detector.position_ov.to_3d()
+        rays.position = (rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)).to(u.pix)
+        rays.wavelength = rays.wavelength - rays.wavelength.take(0, axis=rays.axis.wavelength)
+        rays.input_grid.wavelength.points = rays.input_grid.wavelength.points - rays.input_grid.wavelength.points[..., 0]
+        return rays
+
+    @property
     def back_focal_length(self) -> u.Quantity:
         return self.detector.translation.z
 
