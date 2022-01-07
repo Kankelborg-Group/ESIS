@@ -107,9 +107,13 @@ def document() -> kgpy.latex.Document:
         '425 Riverside Dr., #16G, New York, NY 10025, USA'
     )
 
+    affil_gsfc = kgpy.latex.aas.Affiliation(
+        'NASA Goddard Space Flight Center'
+    )
+
     doc.append(kgpy.latex.aas.Author('Roy T. Smart', affil_msu))
     doc.append(kgpy.latex.aas.Author('Hans T. Courrier', affil_msu))
-    doc.append(kgpy.latex.aas.Author('Jacob D. Parker', affil_msu))
+    doc.append(kgpy.latex.aas.Author('Jacob D. Parker', affil_gsfc))
     doc.append(kgpy.latex.aas.Author('Charles C. Kankelborg', affil_msu))
     doc.append(kgpy.latex.aas.Author('Amy R. Winebarger', affil_msfc))
     doc.append(kgpy.latex.aas.Author('Ken Kobayashi', affil_msfc))
@@ -1000,7 +1004,7 @@ def document() -> kgpy.latex.Document:
 
     with doc.create(kgpy.latex.Abstract()):
         doc.append(pylatex.NoEscape(
-            r"""The \ESIS\ is a next generation rocket borne instrument that will investigate magnetic reconnection 
+            r"""The \ESIS\ is a next generation rocket borne instrument designed to investigate magnetic reconnection 
 and energy transport in the solar atmosphere by observing emission lines formed in the chromosphere (\HeI), 
 the transition region (\OV), and corona (\MgX). 
 The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
@@ -1011,7 +1015,6 @@ The slitless multi-projection design will obtain co-temporal spatial (\plateScal
 at high cadence ($>=$\detectorMinExposureLength). 
 \amy{The instrument is designed to be capable of obtaining co-temporal spatial (\plateScale) and spectral 
 (\dispersion) images at high cadence ($>=$\detectorMinExposureLength).}
-\jake{the "co-temporal spatial and spectral" part of this doesn't read quite right}
 Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
 at high spatial and spectral resolution over a large (\fov) \FOV. 
 The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. 
@@ -1177,18 +1180,18 @@ pixels~\citep{Rust17,Atwood18}. The combination of these two effects results in 
 require additional consideration~\citep{Atwood18} and further increase the complexity of the inversion 
 process~\citep{Rust17,Courrier18}. 
 
-\jake{Another complication with \MOSES\ is that each spectral order image contains a different combination of spatial 
-and spectral information.  This stems from the fact that \MOSES\ lacks a field stop to define a wavelength 
+\jake{Another complication with \MOSES\ is that the image in each spectral order contains a different combination of 
+spatial and spectral information.  This stems from the fact that \MOSES\ lacks a field stop to define a wavelength 
 independent \FOV\ and that it uses an undispersed channel. In this configuration, intensity from wavelengths off the 
 primary observing wavelength, but within the \MOSES\ passband, will be imaged in the zero order, but may be dispersed 
 off the detector in the outboard orders. In the opposite sense, features outside of the \FOV\ of the zeroth order may 
 be dispersed onto either of the outboard order detectors. \citet{Parker2022} compared synthetic \MOSES\ images to the 
-real data and found that approximately ten percent of the intensity in the zeroth order image originated from more than 
-ten dims lines in the \MOSES\ passband, most of which are too dim to be visible in the dispersed images (in places where they 
-weren't dispersed off the detector).  This study revealed that undispered channels, although attractive because of 
-their lack of spatial-spectral ambiguity, can provide misleading intensity information limiting their utility in inversion
-without careful forward modeling.  Also, that the \FOV\ should be clearly defined, and the same, for each wavelength 
-so that each wavelength contributing intensity to a given pixel in a dispersed image are known.} 
+real data and found that approximately ten percent of the intensity in the zeroth order image originated from more 
+than ten dims lines in the \MOSES\ passband, most of which are too dim to be visible in the dispersed images.  This 
+study revealed that undispered channels, although attractive due to their lack of spatial-spectral ambiguity, 
+can provide misleading intensity information which limits their utility in inversion without careful forward modeling.  
+Also, that the \FOV\ should be clearly defined, and the same, for each wavelength so that the spectral contribution to a 
+given pixel is clearly defined.} 
 
 Finally, the exposure cadence of \MOSES\ is hindered by an $\sim$\SI{6}{\second} readout time for the \CCDs~\citep{
 Fox11}. The observing interval for a solar sounding rocket flight is very short, typically about five minutes. 
@@ -1243,8 +1246,8 @@ The features of this new layout address all of the limitations described in
 Section~\ref{subsec:LimitationsoftheMOSESDesign}, and are summarized here.
 
 Replacing the secondary mirror with an array of concave diffraction gratings confers several advantages to \ESIS\ 
-over \MOSES. First, the \sout{magnification of the \ESIS\ gratings} \roy{concavity of the gratings creates 
-magnification in the \ESIS\ optical system, which} results in a shorter axial length than \MOSES, without sacrificing 
+over \MOSES. First, the concavity of the gratings creates 
+magnification in the \ESIS\ optical system, which results in a shorter axial length than \MOSES, without sacrificing 
 spatial or spectral resolution. Second, the magnification and tilt of an individual grating controls the position of 
 the dispersed image with respect to the optical axis, so that the spectral resolution is not as constrained by the 
 payload dimensions. Third, the radial symmetry of the design places the cameras closer together, resulting in a more 
@@ -2596,20 +2599,24 @@ stored in a nitrogen purged environment until after payload vibration testing.""
         with doc.create(pylatex.Subsection('Sensitivity and Cadence')):
             doc.append(pylatex.NoEscape(
                 r"""
-Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{subsec:CoatingsandFilters} and the \CCD\ \QE\ listed in Table~\ref{table:prescription}.
-Line intensities are derived from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data, and
-are given in a variety of solar contexts: \QS, \CHs, and \ARs.
-The \SI{100}{\percent} duty cycle of \ESIS\ (\S\,\ref{subsec:Cameras}) gives us the flexibility to use the shortest exposures that are scientifically useful.
-So long as the shot noise dominates over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack exposures without a significant \SNR\ penalty.
-Table~\ref{table:count} shows that \ESIS\ is effectively shot noise limited with a \SI{10}{\second} exposure.
-The signal requirement in Table~\ref{table:scireq} is met by stacking exposures.
-Good quality images ($\sim300$ counts) in active regions can be obtained by stacking \SI{30}{\second} worth of exposures.
-This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en waves described in \S\,\ref{sec:ScienceObjectives}.
-However, by stacking multiple \SI{10}{\second} exposures, sufficient \SNR\ \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained.
-\roy{Just delete these next three sentences?}
-We also note that the count rates given here are for an unvignetted system which is limited by the baffling of this design.
-While not explored here, there is the possibility of modifying the instrument baffling (\S\,\ref{subsec:AperturesandBaffles}) to increase throughput.
-Thus, a faster exposure cadence may be obtained by accepting some vignetting in the system.
+
+Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{
+subsec:CoatingsandFilters} and the \CCD\ \QE\ listed in Table~\ref{table:prescription}. Line intensities are derived 
+from \citet{Vernazza78} (V\&R) \roy{\VR} and the \SOHO/\CDS\ \citep{Harrison95} data, and are given in a variety of 
+solar contexts: \QS, \CHs, and \ARs. The \SI{100}{\percent} duty cycle of \ESIS\ (\S\,\ref{subsec:Cameras}) gives us 
+the flexibility to use the shortest exposures that are scientifically useful. So long as the shot noise dominates 
+over read noise (which is true even for our coronal hole estimates at \SI{10}{\second} exposure length), we can stack 
+exposures without a significant \SNR\ penalty. Table~\ref{table:count} shows that \ESIS\ is effectively shot noise 
+limited with a \SI{10}{\second} exposure. The signal requirement in Table~\ref{table:scireq} is met by stacking 
+exposures. Good quality images ($\sim300$ counts) in active regions can be obtained by stacking \SI{30}{\second} 
+worth of exposures. This cadence is sufficient to observe explosive events, but will not resolve torsional Alfv\'en 
+waves described in \S\,\ref{sec:ScienceObjectives}. However, by stacking multiple \SI{10}{\second} exposures, 
+sufficient \SNR\ \emph{and} temporal resolution of torsional Alfv\'en wave oscillations can be obtained. \roy{Just 
+delete these next three sentences?} \jake{Assuming the table and sentences above have been updated to reflect the 
+vignetted system, yes}. We also note that the count rates given here are for an unvignetted system which is limited 
+by the baffling of this design. While not explored here, there is the possibility of modifying the instrument 
+baffling (\S\,\ref{subsec:AperturesandBaffles}) to increase throughput. Thus, a faster exposure cadence may be 
+obtained by accepting some vignetting in the system. 
 
 \begin{table}
     \centering
