@@ -337,7 +337,7 @@ def final(
     detector.temperature = -55 * u.deg_C
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
-    detector.position_ov = kgpy.vector.Vector2D(x=7.2090754246099999 * u.mm)
+    detector.position_ov = kgpy.vector.Vector2D(x=7.2090754246099999 * u.mm, y=0 * u.mm)
 
     moses_pixel_width = 13.5 * u.um
     kernel = [
