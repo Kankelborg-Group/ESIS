@@ -1666,7 +1666,7 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
                 ]))
 
                 figure.add_caption(pylatex.NoEscape(
-                    r"""(a) Schematic diagram of Channel 1 of the \ESIS\ optical system.
+                    r"""(a) Schematic diagram of a single channel of the \ESIS\ optical system.
 (b) Clear aperture of the primary mirror, size of the central obscuration, and the footprint of the beam for each 
 channel.
 (c) Clear aperture of Channel 1's diffraction grating."""
@@ -2732,10 +2732,32 @@ Total \MTF\	 	& 		&				&				& 0.109 \\
                         )
                 table.add_caption(pylatex.NoEscape(
                     f"""
-Imaging error budget and tolerance analysis results. \\MTF\\ is given at 
+Imaging error budget and tolerance analysis results. \\MTF\\ is given at
 {kgpy.format.quantity(frequency_mtf_arcsec, digits_after_decimal=1)}."""
                 ))
                 table.append(kgpy.latex.Label('table:errorBudget'))
+
+        with doc.create(pylatex.Subsection('Vignetting')):
+            doc.append(pylatex.NoEscape(r"""
+The original design of \ESIS\ had no vignetting thanks to an stop placed at the primary mirror that was designed to 
+perfectly fill the grating with the same amount of light for each point in the \FOV.
+This is the \ESIS\ design that was used for the optimization procedure of the grating parameters described in 
+Section~\ref{subsec:OptimizationandTolerancing}, for example.
+All other results described in the paper use the fully-open system.
+Before flight, we decided to remove the primary aperture stop to increase the sensitivity of the instrument at the
+expense of introducing vignetting to the \ESIS\ \FOV.
+This was acceptable since the vignetting was found to be a simple linear field as shown in Figure~\ref{fig:vignetting},
+and could be removed in the post-processing phase.
+"""
+            ))
+
+        with doc.create(pylatex.Subsection('Distortion')):
+            doc.append(pylatex.NoEscape(
+                r"""
+The distortion is due to two factors: first, the tilt of the detector as needed to maintain good focus over the \FOV 
+\citep{Poletto04}; second, the anamorphic magnification of the grating (see \cite{Schweizer1979}).
+"""
+            ))
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
