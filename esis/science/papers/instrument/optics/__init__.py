@@ -15,6 +15,7 @@ def _cache(factory: typ.Callable[[], esis.optics.Optics]):
         else:
             optics = factory()
             rays = optics.rays_output
+            optics._bunch = None
             optics.to_pickle(path)
 
         return optics
