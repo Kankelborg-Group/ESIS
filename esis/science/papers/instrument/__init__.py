@@ -16,6 +16,7 @@ import esis.optics
 import esis.science.papers.instrument.figures as figures
 from . import optics
 from . import preamble
+from . import sections
 
 path_base = pathlib.Path(__file__).parent
 path_pdf = path_base / 'instrument'
@@ -933,25 +934,7 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\mathbf{C}')
     )
 
-
-    with doc.create(kgpy.latex.Abstract()):
-        doc.append(pylatex.NoEscape(
-            r"""The \ESIS\ is a next generation rocket borne instrument designed to investigate magnetic reconnection 
-and energy transport in the solar atmosphere by observing emission lines formed in the chromosphere (\HeI), 
-the transition region (\OV), and corona (\MgX). 
-The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
-This field stop is re-imaged using an array of \numChannelsWords\ spherical diffraction gratings with differing 
-dispersion angles oriented in $45^{\circ}$ increments, with each diffraction grating projecting the spectrum onto a 
-unique detector.
-The slitless multi-projection design will obtain co-temporal spatial (\plateScale) and spectral (\dispersion) images 
-at high cadence ($>=$\detectorMinExposureLength). 
-\amy{The instrument is designed to be capable of obtaining co-temporal spatial (\plateScale) and spectral 
-(\dispersion) images at high cadence ($>=$\detectorMinExposureLength).}
-Combining the co-temporal exposures from all the detectors will enable us to reconstruct line profile information 
-at high spatial and spectral resolution over a large (\fov) \FOV. 
-The instrument was launched on September 30, 2019.  The flight data is described in a subsequent paper. 
-\acresetall"""
-        ))
+    doc.append(sections.abstract.body())
 
     with doc.create(pylatex.Section('Introduction')):
         doc.append(pylatex.NoEscape(
