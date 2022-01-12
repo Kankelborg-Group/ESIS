@@ -17,6 +17,7 @@ import kgpy.optics
 import kgpy.grid
 import esis.optics
 from .. import optics as optics_factories
+from . import formatting
 from . import caching
 from . import schematic_moses
 
@@ -25,15 +26,9 @@ __all__ = [
     'layout_pdf'
 ]
 
-text_width = 513.11743 / 72
-column_width = 242.26653 / 72
-
-digits_after_decimal = 2
-digits_after_decimal_schematic = 1
-
 
 def layout() -> matplotlib.figure.Figure:
-    fig_layout = plt.figure(figsize=(text_width, text_width))
+    fig_layout = plt.figure(figsize=(formatting.text_width, formatting.text_width))
     ax_layout = fig_layout.add_subplot(111, projection='3d')
     # fig_layout, ax_layout = plt.subplots(figsize=(7.1, 4), constrained_layout=True)
     ax_layout.set_axis_off()
@@ -161,17 +156,17 @@ def layout_pdf() -> pathlib.Path:
     if not path.exists():
         fig = layout()
         h = 1.45
-        offset = (text_width - h) / 2
+        offset = (formatting.text_width - h) / 2
         fig.savefig(
             fname=path,
-            bbox_inches=fig.bbox_inches.from_bounds(0, 3, text_width, h),
+            bbox_inches=fig.bbox_inches.from_bounds(0, 3, formatting.text_width, h),
         )
         plt.close(fig)
     return path
 
 
 def schematic() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(formatting.text_width, 2), constrained_layout=True)
     # fig.set_constrained_layout_pads(w_pad=0, h_pad=0, hspace=0, wspace=0)
     ax.margins(x=.01, y=.01)
     # ax.autoscale(enable=True, axis='both', tight=True)
@@ -192,7 +187,7 @@ def schematic() -> matplotlib.figure.Figure:
         ),
         # surface_first=optics.central_obscuration.surface,
     )
-    optics.plot_distance_annotations_zx(ax=ax, digits_after_decimal=digits_after_decimal_schematic,)
+    optics.plot_distance_annotations_zx(ax=ax, digits_after_decimal=formatting.digits_after_decimal_schematic,)
 
     ax.axhline(linestyle=(0, (20, 10)), linewidth=0.4, color='gray')
     ax.text(
@@ -311,7 +306,7 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
     obscuration = optics.central_obscuration
 
     with astropy.visualization.quantity_support():
-        fig, ax = plt.subplots(figsize=(column_width, 3.5), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(formatting.column_width, 3.5), constrained_layout=True)
         ax.margins(x=.01, y=.01)
         ax.set_aspect('equal')
         ax.set_axis_off()
@@ -335,7 +330,7 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             point_1=kgpy.vector.Vector2D.from_cylindrical(primary.mech_radius, 22.5 * u.deg),
             point_2=kgpy.vector.Vector2D.from_cylindrical(primary.mech_radius, (180 - 22.5) * u.deg),
             position_orthogonal=1.6 * primary.mech_half_width.value,
-            digits_after_decimal=digits_after_decimal_schematic,
+            digits_after_decimal=formatting.digits_after_decimal_schematic,
         )
 
         vertices_primary = primary.surface.aperture.vertices
@@ -351,7 +346,7 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             point_1=kgpy.vector.Vector2D.from_cylindrical(primary.clear_radius, 22.5 * u.deg),
             point_2=kgpy.vector.Vector2D.from_cylindrical(primary.clear_radius, (180 - 22.5) * u.deg),
             position_orthogonal=1.4 * primary.mech_half_width.value,
-            digits_after_decimal=digits_after_decimal_schematic,
+            digits_after_decimal=formatting.digits_after_decimal_schematic,
         )
         ax.text(
             x=0,
@@ -375,7 +370,7 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
             point_1=kgpy.vector.Vector2D.from_cylindrical(obscuration.obscured_radius, 22.5 * u.deg),
             point_2=kgpy.vector.Vector2D.from_cylindrical(obscuration.obscured_radius, (180 - 22.5) * u.deg),
             position_orthogonal=1.2 * primary.mech_half_width.value,
-            digits_after_decimal=digits_after_decimal_schematic,
+            digits_after_decimal=formatting.digits_after_decimal_schematic,
         )
         ax.text(
             x=0,
@@ -433,7 +428,7 @@ def schematic_grating() -> matplotlib.figure.Figure:
     grating = optics.grating
 
     with astropy.visualization.quantity_support():
-        fig, ax = plt.subplots(figsize=(column_width, 3.5), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(formatting.column_width, 3.5), constrained_layout=True)
         ax.margins(x=.01, y=.01)
         ax.set_aspect('equal')
         ax.set_axis_off()
@@ -452,7 +447,7 @@ def schematic_grating() -> matplotlib.figure.Figure:
             point_2=kgpy.vector.Vector2D(grating.outer_half_width + grating.border_width, grating.width_mech_long / 2),
             # point_2=kgpy.vector.Vector2D(grating.height_mech / 2, grating.width_mech_long / 2),
             position_orthogonal=1.2 * grating.width_mech_long.value / 2,
-            digits_after_decimal=digits_after_decimal_schematic,
+            digits_after_decimal=formatting.digits_after_decimal_schematic,
         )
 
         vertices_grating_clear = optics.grating.surface.aperture.vertices
@@ -471,7 +466,7 @@ def schematic_grating() -> matplotlib.figure.Figure:
             point_2=kgpy.vector.Vector2D(grating.outer_half_width, grating.width_long / 2),
             component='y',
             position_orthogonal=1.3 * (grating.outer_half_width + grating.border_width).value,
-            digits_after_decimal=digits_after_decimal_schematic,
+            digits_after_decimal=formatting.digits_after_decimal_schematic,
         )
         kgpy.plot.annotate_component(
             ax=ax,
@@ -479,14 +474,14 @@ def schematic_grating() -> matplotlib.figure.Figure:
             point_2=kgpy.vector.Vector2D(-grating.inner_half_width, grating.width_short / 2),
             component='y',
             position_orthogonal=-0.5 * grating.inner_half_width.value,
-            digits_after_decimal=digits_after_decimal_schematic,
+            digits_after_decimal=formatting.digits_after_decimal_schematic,
         )
         kgpy.plot.annotate_component(
             ax=ax,
             point_1=kgpy.vector.Vector2D(-grating.inner_half_width, grating.width_short / 2),
             point_2=kgpy.vector.Vector2D(grating.outer_half_width, grating.width_long / 2),
             position_orthogonal=1 * grating.width_mech_long.value / 2,
-            digits_after_decimal=digits_after_decimal_schematic,
+            digits_after_decimal=formatting.digits_after_decimal_schematic,
         )
 
         ax.text(
@@ -506,12 +501,12 @@ def schematic_grating_pdf() -> pathlib.Path:
 
 def bunch() -> matplotlib.figure.Figure:
     with astropy.visualization.quantity_support():
-        fig, ax = plt.subplots(figsize=(text_width, 2), constrained_layout=True)
+        fig, ax = plt.subplots(figsize=(formatting.text_width, 2), constrained_layout=True)
         optics = esis.optics.design.final()
         optics.bunch.plot(
             ax=ax,
             num_emission_lines=optics.num_emission_lines,
-            digits_after_decimal=digits_after_decimal,
+            digits_after_decimal=formatting.digits_after_decimal,
             label_fontsize=6,
         )
         ax_twin = ax.twinx()
@@ -556,7 +551,7 @@ def bunch_pdf() -> pathlib.Path:
 
 
 def field_stop_projections() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(column_width, 3), constrained_layout=True)
+    fig, ax = plt.subplots(figsize=(formatting.column_width, 3), constrained_layout=True)
     fig.set_constrained_layout_pads(h_pad=.15)
     # ax.margins(x=.01, y=.01)
     optics = esis.optics.design.final(all_channels=False)
@@ -574,7 +569,7 @@ def field_stop_projections() -> matplotlib.figure.Figure:
             'orangered',
             'red',
         ],
-        digits_after_decimal=digits_after_decimal,
+        digits_after_decimal=formatting.digits_after_decimal,
         use_latex=True,
     )
     ax.set_aspect('equal')
@@ -613,7 +608,7 @@ def psf() -> matplotlib.figure.Figure:
         limit_max=limit_max,
     )
     fig.set_figheight(2.6)
-    fig.set_figwidth(column_width)
+    fig.set_figwidth(formatting.column_width)
     fig.suptitle(None)
     for i, axs_i in enumerate(axs):
         for j, axs_ij in enumerate(axs_i):
@@ -648,14 +643,14 @@ def spot_size() -> matplotlib.figure.Figure:
     optics = optics_factories.as_designed_single_channel()
     fig, axs = plt.subplots(
         ncols=num_emission_lines_default,
-        figsize=(text_width, 2.5),
+        figsize=(formatting.text_width, 2.5),
         sharex=True,
         sharey=True,
         constrained_layout=True
     )
     optics.rays_output.plot_spot_size_vs_field(
         axs=axs,
-        digits_after_decimal=digits_after_decimal,
+        digits_after_decimal=formatting.digits_after_decimal,
     )
     return fig
 
@@ -673,7 +668,7 @@ def focus_curve() -> matplotlib.figure.Figure:
     )
     optics.num_emission_lines = num_emission_lines_default
     fig, ax = plt.subplots(
-        figsize=(column_width, 2.5),
+        figsize=(formatting.column_width, 2.5),
         constrained_layout=True,
     )
 
@@ -697,14 +692,14 @@ def focus_curve_pdf() -> pathlib.Path:
 def vignetting() -> matplotlib.figure.Figure:
     optics = optics_factories.as_measured_single_channel()
     fig, axs = plt.subplots(
-        figsize=(column_width, 2.9),
+        figsize=(formatting.column_width, 2.9),
         sharex=True,
         sharey=True,
         constrained_layout=True,
         squeeze=False,
     )
     model = optics.system.rays_output_resample_entrance.vignetting
-    model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.fullname(digits_after_decimal))
+    model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.fullname(formatting.digits_after_decimal))
     return fig
 
 
@@ -716,13 +711,13 @@ def distortion() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(**kwargs_optics_default)
     optics.num_emission_lines = 1
     fig, ax = plt.subplots(
-        figsize=(column_width, 3.5),
+        figsize=(formatting.column_width, 3.5),
         constrained_layout=True,
     )
     # fig.set_constrained_layout_pads(h_pad=.15)
     optics.plot_field_stop_distortion(
         ax=ax,
-        digits_after_decimal=digits_after_decimal,
+        digits_after_decimal=formatting.digits_after_decimal,
         use_latex=True,
     )
     ax.set_aspect('equal')
@@ -744,7 +739,7 @@ def distortion_residual() -> matplotlib.figure.Figure:
         ncols=num_emission_lines_default,
         sharex=True,
         sharey=True,
-        figsize=(text_width, 4.4),
+        figsize=(formatting.text_width, 4.4),
         constrained_layout=True,
     )
     distortion_linear = optics_linear.rays_output.distortion
@@ -753,7 +748,7 @@ def distortion_residual() -> matplotlib.figure.Figure:
     distortion_linear.plot_residual(
         axs=axs[0],
         use_xlabels=False,
-        wavelength_name=optics_linear.bunch.fullname(digits_after_decimal),
+        wavelength_name=optics_linear.bunch.fullname(formatting.digits_after_decimal),
     )
     distortion_quadratic.plot_residual(
         axs=axs[1],
@@ -777,7 +772,7 @@ def distortion_residual_relative() -> matplotlib.figure.Figure:
         ncols=num_emission_lines_default,
         sharex=True,
         sharey=True,
-        figsize=(text_width, 4.4),
+        figsize=(formatting.text_width, 4.4),
         constrained_layout=True,
     )
     distortion_linear = optics_linear.rays_output_relative.distortion
@@ -786,7 +781,7 @@ def distortion_residual_relative() -> matplotlib.figure.Figure:
     distortion_linear.plot_residual(
         axs=axs[0],
         use_xlabels=False,
-        wavelength_name=optics_linear.bunch.fullname(digits_after_decimal),
+        wavelength_name=optics_linear.bunch.fullname(formatting.digits_after_decimal),
     )
     distortion_quadratic.plot_residual(
         axs=axs[1],
@@ -803,7 +798,7 @@ def distortion_residual_relative_pdf() -> pathlib.Path:
 def grating_multilayer_schematic() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(**kwargs_optics_default)
     fig, ax = plt.subplots(
-        figsize=(column_width, 2.2),
+        figsize=(formatting.column_width, 2.2),
         constrained_layout=True,
     )
     optics.grating.surface.material.plot_layers(
@@ -843,7 +838,7 @@ def grating_multilayer_schematic_pdf() -> pathlib.Path:
 def grating_efficiency_vs_angle() -> matplotlib.figure.Figure:
     optics = esis.optics.design.final(**kwargs_optics_default)
     fig, ax = plt.subplots(
-        figsize=(column_width, 2),
+        figsize=(formatting.column_width, 2),
         constrained_layout=True,
     )
     eff_unit = u.percent
@@ -918,13 +913,13 @@ def _annotate_wavelength(
     lines = optics.bunch.plot_wavelength(
         ax=ax,
         num_emission_lines=optics.num_emission_lines,
-        digits_after_decimal=digits_after_decimal,
+        digits_after_decimal=formatting.digits_after_decimal,
         colors=['orangered', 'blue'],
     )
     lines += optics2.bunch.plot_wavelength(
         ax=ax,
         num_emission_lines=optics2.num_emission_lines,
-        digits_after_decimal=digits_after_decimal,
+        digits_after_decimal=formatting.digits_after_decimal,
         colors=['gray', 'black'],
     )
     return lines
@@ -934,7 +929,7 @@ def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     fig, axs = plt.subplots(
         nrows=2,
         sharex=True,
-        figsize=(column_width, 5),
+        figsize=(formatting.column_width, 5),
         constrained_layout=True,
     )
     eff_unit = u.percent
@@ -1009,7 +1004,7 @@ def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
         fig, axs = plt.subplots(
             ncols=2,
             sharey=True,
-            figsize=(text_width, 2.5),
+            figsize=(formatting.text_width, 2.5),
             constrained_layout=True,
         )
 
@@ -1040,7 +1035,7 @@ def grating_efficiency_vs_position_pdf() -> pathlib.Path:
 
 def primary_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     fig, ax = plt.subplots(
-        figsize=(column_width, 2.75),
+        figsize=(formatting.column_width, 2.75),
         constrained_layout=True,
     )
     eff_unit = u.percent
@@ -1071,7 +1066,7 @@ def primary_efficiency_vs_wavelength_pdf() -> pathlib.Path:
 def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     with astropy.visualization.quantity_support():
         fig, ax = plt.subplots(
-            figsize=(column_width, 2.75),
+            figsize=(formatting.column_width, 2.75),
             constrained_layout=True,
         )
         optics = esis.optics.design.final(**kwargs_optics_default)
@@ -1102,7 +1097,7 @@ def filter_efficiency_vs_wavelength_pdf() -> pathlib.Path:
 def ccd_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     with astropy.visualization.quantity_support():
         fig, ax = plt.subplots(
-            figsize=(column_width, 2.75),
+            figsize=(formatting.column_width, 2.75),
             constrained_layout=True,
         )
         wavelength = esis.optics.grating.efficiency.witness.vs_wavelength_g17()[2].to(u.AA)
@@ -1139,7 +1134,7 @@ def ccd_efficiency_vs_wavelength_pdf() -> pathlib.Path:
 def alignment_transfer() -> matplotlib.figure.Figure:
 
     fig, ax = plt.subplots(
-        figsize=(column_width, 4),
+        figsize=(formatting.column_width, 4),
         constrained_layout=True,
     )
 
