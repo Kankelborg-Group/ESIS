@@ -162,13 +162,19 @@ class Optics(
         return np.cos(self.angle_alpha.mean()) / np.cos(self.angle_beta.mean())
 
     @property
-    def arm_ratio(self) -> u.Quantity:
-        arm_entrance = (self.field_stop.transform.inverse + self.grating.transform).translation_eff
+    def arm_entrance(self) -> vector.Vector3D:
+        return (self.field_stop.transform.inverse + self.grating.transform).translation_eff
+
+    @property
+    def arm_exit(self) -> vector.Vector3D:
         transform_ov = kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate(x=self.detector.clear_half_width / 2)
+            kgpy.transform.rigid.Translate.from_vector(self.detector.position_ov.to_3d())
         ])
-        arm_exit = (self.grating.transform.inverse + self.detector.transform + transform_ov).translation_eff
-        return arm_exit.length / arm_entrance.length
+        return (self.grating.transform.inverse + self.detector.transform + transform_ov).translation_eff
+
+    @property
+    def arm_ratio(self) -> u.Quantity:
+        return self.arm_exit.length / self.arm_entrance.length
 
     @property
     def radius_ratio(self) -> u.Quantity:
