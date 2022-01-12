@@ -22,11 +22,6 @@ class FrontAperture(optics.component.PistonComponent[SurfT]):
         # )
         return surface
 
-    def copy(self) -> 'FrontAperture':
-        other = super().copy()      # type: FrontAperture
-        other.clear_radius = self.clear_radius.copy()
-        return other
-
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe

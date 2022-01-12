@@ -199,45 +199,6 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         )
         return surface
 
-    def copy(self) -> 'Grating':
-        other = super().copy()      # type: Grating
-        other.inclination = self.inclination.copy()
-        other.inclination_error = self.inclination_error.copy()
-        other.roll = self.roll.copy()
-        other.roll_error = self.roll_error.copy()
-        other.twist = self.twist.copy()
-        other.twist_error = self.twist_error.copy()
-        other.tangential_radius = self.tangential_radius.copy()
-        other.tangential_radius_error = self.tangential_radius_error.copy()
-        other.sagittal_radius = self.sagittal_radius.copy()
-        other.sagittal_radius_error = self.sagittal_radius_error.copy()
-        other.mtf_degradation_factor = self.mtf_degradation_factor.copy()
-        other.slope_error = self.slope_error.copy()
-        other.ripple = self.ripple.copy()
-        other.microroughness = self.microroughness.copy()
-        other.nominal_input_angle = self.nominal_input_angle.copy()
-        other.nominal_output_angle = self.nominal_output_angle.copy()
-        other.diffraction_order = self.diffraction_order.copy()
-        other.ruling_density = self.ruling_density.copy()
-        other.ruling_density_error = self.ruling_density_error.copy()
-        other.ruling_spacing_coeff_linear = self.ruling_spacing_coeff_linear.copy()
-        other.ruling_spacing_coeff_linear_error = self.ruling_spacing_coeff_linear_error.copy()
-        other.ruling_spacing_coeff_quadratic = self.ruling_spacing_coeff_quadratic.copy()
-        other.ruling_spacing_coeff_quadratic_error = self.ruling_spacing_coeff_quadratic_error.copy()
-        other.ruling_spacing_coeff_cubic = self.ruling_spacing_coeff_cubic.copy()
-        other.ruling_spacing_coeff_cubic_error = self.ruling_spacing_coeff_cubic_error.copy()
-        other.aper_wedge_angle = self.aper_wedge_angle.copy()
-        other.inner_half_width = self.inner_half_width.copy()
-        other.outer_half_width = self.outer_half_width.copy()
-        other.border_width = self.border_width.copy()
-        other.inner_border_width = self.inner_border_width.copy()
-        other.dynamic_clearance = self.dynamic_clearance.copy()
-        other.material = self.material.copy()
-        other.witness = self.witness.copy()
-        other.serial_number = self.serial_number.copy()
-        other.manufacturing_number = self.manufacturing_number.copy()
-        return other
-
     def apply_gregorian_layout(
             self,
             magnification: u.Quantity,

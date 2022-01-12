@@ -26,13 +26,6 @@ class Source(optics.component.PistonComponent):
         )
         return surface
 
-    def copy(self) -> 'Source':
-        other = super().copy()  # type: Source
-        other.decenter = self.decenter.copy()
-        other.half_width_x = self.half_width_x.copy()
-        other.half_width_y = self.half_width_y.copy()
-        return other
-
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe

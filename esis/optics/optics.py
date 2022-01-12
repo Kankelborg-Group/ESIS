@@ -478,37 +478,6 @@ class Optics(
         other._focus_and_align_factory(result.x, units, focus_grating, focus_detector)
         return other
 
-    def copy(self) -> 'Optics':
-        other = super().copy()  # type: Optics
-        other.channel_name = self.channel_name.copy()
-        other.num_emission_lines = self.num_emission_lines
-        other.grid_field = self.grid_field.copy()
-        other.grid_pupil = self.grid_pupil.copy()
-        other.grid_velocity_los = self.grid_velocity_los.copy()
-        other.source = self.source.copy()
-        other.front_aperture = self.front_aperture.copy()
-        if self.central_obscuration is not None:
-            other.central_obscuration = self.central_obscuration.copy()
-        else:
-            other.central_obscuration = self.central_obscuration
-        other.primary = self.primary.copy()
-        other.field_stop = self.field_stop.copy()
-        other.grating = self.grating.copy()
-        if self.filter is not None:
-            other.filter = self.filter.copy()
-        else:
-            other.filter = self.filter
-        other.detector = self.detector.copy()
-        other.sparcs = self.sparcs.copy()
-        other.pointing = self.pointing.copy()
-        other.roll = self.roll.copy()
-        other.stray_light = self.stray_light.copy()
-        other.distortion_polynomial_degree = self.distortion_polynomial_degree
-        other.vignetting_polynomial_degree = self.vignetting_polynomial_degree
-        other.vignetting_correction = self.vignetting_correction.copy()
-        other.skin_diameter = self.skin_diameter.copy()
-        return other
-
     def __call__(
             self,
             data: u.Quantity,

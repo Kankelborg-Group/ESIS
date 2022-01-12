@@ -76,20 +76,6 @@ class Primary(optics.component.TranslationComponent[SurfaceT]):
         )
         return surface
 
-    def copy(self) -> 'Primary':
-        other = super().copy()      # type: Primary
-        other.radius = self.radius.copy()
-        other.conic = self.conic.copy()
-        other.mtf_degradation_factor = self.mtf_degradation_factor.copy()
-        other.slope_error = self.slope_error.copy()
-        other.ripple = self.ripple.copy()
-        other.microroughness = self.microroughness.copy()
-        other.num_sides = self.num_sides
-        other.clear_half_width = self.clear_half_width.copy()
-        other.border_width = self.border_width.copy()
-        other.material = self.material.copy()
-        return other
-
     @property
     def dataframe(self) -> pandas:
         dataframe = super().dataframe
