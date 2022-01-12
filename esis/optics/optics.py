@@ -146,6 +146,16 @@ class Optics(
         return rays
 
     @property
+    def f_number_effective(self) -> u.Quantity:
+        raytrace = self.system.raytrace
+        intercepts = raytrace.intercepts
+        diameter = self.grating.height
+        focal_length = self.arm_exit.length
+        # diameter = 2 * raytrace[~1].position_avg_pupil.length
+        # length = (intercepts[~0] - intercepts[~1]).length.mean(axis=raytrace[0].axis.pupil_xy, keepdims=True)
+        return focal_length / diameter
+
+    @property
     def back_focal_length(self) -> u.Quantity:
         return self.detector.translation.z
 
