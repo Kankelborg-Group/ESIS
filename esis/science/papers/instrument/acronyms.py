@@ -1,0 +1,61 @@
+import typing as typ
+import pylatex
+import kgpy.latex
+
+__all__ = [
+    'all',
+]
+
+
+def all() -> typ.List[kgpy.latex.Acronym]:
+    return [
+        kgpy.latex.Acronym('ESIS', r'EUV Snapshot Imaging Spectrograph'),
+        kgpy.latex.Acronym('MOSES', r'Multi-order Solar EUV Spectrograph'),
+        kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'),
+        kgpy.latex.Acronym('AIA', r'Atmospheric Imaging Assembly'),
+        kgpy.latex.Acronym('IRIS', r'Interface Region Imaging Spectrograph'),
+        kgpy.latex.Acronym('EIS', 'EUV Imaging Spectrograph'),
+        kgpy.latex.Acronym('EUNIS', 'EUV Normal-incidence Spectrometer'),
+        kgpy.latex.Acronym('SOHO', 'Solar and Heliospheric Observatory'),
+        kgpy.latex.Acronym('CDS', 'Coronal Diagnostic Spectrometer', short=True),
+        kgpy.latex.Acronym('MDI', r'Michelson Doppler Imager'),
+        kgpy.latex.Acronym('CLASP', r'Chromospheric Lyman-alpha Spectro-polarimeter'),
+        kgpy.latex.Acronym('HiC', r'High-Resolution Coronal Imager', 'Hi-C'),
+        kgpy.latex.Acronym('SXI', r'Solar X-ray Imager'),
+        kgpy.latex.Acronym('GOES', r'Geostationary Operational Environmental Satellite'),
+        kgpy.latex.Acronym('SPDE', r'Solar Plasma Diagnostics Experiment'),
+        kgpy.latex.Acronym('FUV', 'far ultraviolet'),
+        kgpy.latex.Acronym('EUV', 'extreme ultraviolet'),
+        kgpy.latex.Acronym('TR', 'transition region'),
+        kgpy.latex.Acronym('CTIS', 'computed tomography imaging spectrograph', plural=True),
+        kgpy.latex.Acronym('FOV', 'field of view'),
+        kgpy.latex.Acronym('SNR', 'signal-to-noise ratio', short=True),
+        kgpy.latex.Acronym('PSF', 'point-spread function', plural=True),
+        kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'),
+        kgpy.latex.Acronym('MHD', 'magnetohydrodynamic'),
+        kgpy.latex.Acronym('EE', 'explosive event', plural=True),
+        kgpy.latex.Acronym('QS', 'quiet sun', short=True),
+        kgpy.latex.Acronym('AR', 'active region', short=True, plural=True),
+        kgpy.latex.Acronym('CH', 'coronal hole', short=True, plural=True),
+        kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True),
+        kgpy.latex.Acronym('QE', 'quantum efficiency', plural=True),
+        kgpy.latex.Acronym('ULE', 'ultra-low expansion'),
+        kgpy.latex.Acronym('EDM', 'electrical discharge machining'),
+        kgpy.latex.Acronym('DEM', 'differential emission measure'),
+        kgpy.latex.Acronym('MTF', 'modulation transfer function'),
+        kgpy.latex.Acronym('LBNL', 'Lawrence Berkley National Laboratory'),
+        kgpy.latex.Acronym('MSFC', 'Marshall Space Flight Center', short=True),
+        kgpy.latex.Acronym('VR', pylatex.NoEscape('\citet{Vernazza78}'), pylatex.NoEscape('V\&R')),
+        kgpy.latex.Acronym('DACS', 'data acquisition and control system'),
+        kgpy.latex.Acronym('GSE', 'ground support equipment'),
+        kgpy.latex.Acronym('MOTS', 'military off-the-shelf'),
+        kgpy.latex.Acronym('SPARCS', 'Solar Pointing Attitude Rocket Control System', short=True),
+        kgpy.latex.Acronym('SiC', 'silicon carbide', short=True),
+        kgpy.latex.Acronym('Al', 'aluminum', short=True),
+        kgpy.latex.Acronym('Mg', 'magnesium', short=True),
+        kgpy.latex.Acronym('Si', 'silicon', short=True),
+        kgpy.latex.Acronym('Cr', 'chromium', short=True),
+        kgpy.latex.Acronym('Ni', 'nickel', short=True),
+        kgpy.latex.Acronym('LN', 'liquid nitrogen',  pylatex.NoEscape('LN$_2$')),
+        kgpy.latex.Acronym('HeNe', 'helium-neon', 'He-Ne'),
+    ]

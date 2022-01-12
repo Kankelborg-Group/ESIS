@@ -15,6 +15,7 @@ import kgpy.optics
 import esis.optics
 import esis.science.papers.instrument.figures as figures
 from . import optics
+from . import preamble
 
 path_base = pathlib.Path(__file__).parent
 path_pdf = path_base / 'instrument'
@@ -43,31 +44,6 @@ def document() -> kgpy.latex.Document:
     doc.packages.append(pylatex.Package('amsmath'))
     doc.packages.append(pylatex.Package('acronym'))
     doc.packages.append(pylatex.Package('savesym'))
-    doc.preamble.append(pylatex.NoEscape(
-        '\\savesymbol{tablenum}\n'
-        '\\usepackage{siunitx}\n'
-        '\\restoresymbol{SIX}{tablenum}\n'
-    ))
-
-    doc.preamble.append(pylatex.NoEscape(
-        r"""
-\makeatletter
-\newcommand{\acposs}[1]{%
- \expandafter\ifx\csname AC@#1\endcsname\AC@used
-   \acs{#1}'s%
- \else
-   \aclu{#1}'s (\acs{#1}'s)%
- \fi
-}
-\newcommand{\Acposs}[1]{%
- \expandafter\ifx\csname AC@#1\endcsname\AC@used
-   \acs{#1}'s%
- \else
-   \Aclu{#1}'s (\acs{#1}'s)%
- \fi
-}
-\makeatother"""
-    ))
 
     doc.set_variable(
         name='ie',
@@ -79,11 +55,8 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\textit{e.g.}')
     )
 
-    doc.preamble.append(pylatex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
-    doc.preamble.append(pylatex.NoEscape(r'\newcommand{\jake}[1]{{{\color{purple} #1}}}'))
-    doc.preamble.append(pylatex.NoEscape(r'\newcommand{\roy}[1]{{{\color{blue} #1}}}'))
+    doc.preamble += preamble.body()
 
-    doc.preamble.append(pylatex.Command('bibliographystyle', 'aasjournal'))
     doc.set_variable('spiejatis', pylatex.NoEscape(r'J~.Atmos.~Tel. \& Img.~Sys.'))
 
     doc.append(kgpy.latex.Title('The EUV Snapshot Imaging Spectrograph'))
@@ -960,58 +933,6 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\mathbf{C}')
     )
 
-    doc.preamble.append(kgpy.latex.Acronym('ESIS', r'EUV Snapshot Imaging Spectrograph'))
-    doc.preamble.append(kgpy.latex.Acronym('MOSES', r'Multi-order Solar EUV Spectrograph'))
-    doc.preamble.append(kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'))
-    doc.preamble.append(kgpy.latex.Acronym('AIA', r'Atmospheric Imaging Assembly'))
-    doc.preamble.append(kgpy.latex.Acronym('IRIS', r'Interface Region Imaging Spectrograph'))
-    doc.preamble.append(kgpy.latex.Acronym('EIS', 'EUV Imaging Spectrograph'))
-    doc.preamble.append(kgpy.latex.Acronym('EUNIS', 'EUV Normal-incidence Spectrometer'))
-    doc.preamble.append(kgpy.latex.Acronym('SOHO', 'Solar and Heliospheric Observatory'))
-    doc.preamble.append(kgpy.latex.Acronym('CDS', 'Coronal Diagnostic Spectrometer', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('MDI', r'Michelson Doppler Imager'))
-    doc.preamble.append(kgpy.latex.Acronym('CLASP', r'Chromospheric Lyman-alpha Spectro-polarimeter'))
-    doc.preamble.append(kgpy.latex.Acronym('HiC', r'High-Resolution Coronal Imager', 'Hi-C'))
-    doc.preamble.append(kgpy.latex.Acronym('SXI', r'Solar X-ray Imager'))
-    doc.preamble.append(kgpy.latex.Acronym('GOES', r'Geostationary Operational Environmental Satellite'))
-    doc.preamble.append(kgpy.latex.Acronym('SPDE', r'Solar Plasma Diagnostics Experiment'))
-    doc.preamble.append(kgpy.latex.Acronym('FUV', 'far ultraviolet'))
-    doc.preamble.append(kgpy.latex.Acronym('EUV', 'extreme ultraviolet'))
-    doc.preamble.append(kgpy.latex.Acronym('TR', 'transition region'))
-    doc.preamble.append(kgpy.latex.Acronym('CTIS', 'computed tomography imaging spectrograph', plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('FOV', 'field of view'))
-    doc.preamble.append(kgpy.latex.Acronym('SNR', 'signal-to-noise ratio', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('PSF', 'point-spread function', plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('NRL', 'Naval Research Laboratory'))
-    doc.preamble.append(kgpy.latex.Acronym('MHD', 'magnetohydrodynamic'))
-    doc.preamble.append(kgpy.latex.Acronym('EE', 'explosive event', plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('QS', 'quiet sun', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('AR', 'active region', short=True, plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('CH', 'coronal hole', short=True, plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('CCD', 'charge-coupled device', plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('QE', 'quantum efficiency', plural=True))
-    doc.preamble.append(kgpy.latex.Acronym('ULE', 'ultra-low expansion'))
-    doc.preamble.append(kgpy.latex.Acronym('EDM', 'electrical discharge machining'))
-    doc.preamble.append(kgpy.latex.Acronym('DEM', 'differential emission measure'))
-    doc.preamble.append(kgpy.latex.Acronym('MTF', 'modulation transfer function'))
-    doc.preamble.append(kgpy.latex.Acronym('LBNL', 'Lawrence Berkley National Laboratory'))
-    doc.preamble.append(kgpy.latex.Acronym('MSFC', 'Marshall Space Flight Center', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('VR', pylatex.NoEscape('\citet{Vernazza78}'), pylatex.NoEscape('V\&R')))
-    doc.preamble.append(kgpy.latex.Acronym('DACS', 'data acquisition and control system'))
-    doc.preamble.append(kgpy.latex.Acronym('GSE', 'ground support equipment'))
-    doc.preamble.append(kgpy.latex.Acronym('MOTS', 'military off-the-shelf'))
-    doc.preamble.append(kgpy.latex.Acronym('SPARCS', 'Solar Pointing Attitude Rocket Control System', short=True))
-
-    doc.preamble.append(kgpy.latex.Acronym('SiC', 'silicon carbide', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('Al', 'aluminum', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('Mg', 'magnesium', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('Si', 'silicon', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('Cr', 'chromium', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('Ni', 'nickel', short=True))
-    doc.preamble.append(kgpy.latex.Acronym('LN', 'liquid nitrogen',  pylatex.NoEscape('LN$_2$')))
-    doc.preamble.append(kgpy.latex.Acronym('HeNe', 'helium-neon', 'He-Ne'))
-
-    doc.preamble.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 
     with doc.create(kgpy.latex.Abstract()):
         doc.append(pylatex.NoEscape(
