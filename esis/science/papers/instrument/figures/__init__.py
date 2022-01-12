@@ -18,6 +18,7 @@ import kgpy.grid
 import esis.optics
 from .. import optics as optics_factories
 from . import caching
+from . import schematic_moses
 
 __all__ = [
     'layout',
