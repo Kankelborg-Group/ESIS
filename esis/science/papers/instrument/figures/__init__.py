@@ -17,6 +17,7 @@ import kgpy.optics
 import kgpy.grid
 import esis.optics
 from .. import optics as optics_factories
+from . import caching
 
 __all__ = [
     'layout',
@@ -28,20 +29,6 @@ column_width = 242.26653 / 72
 
 digits_after_decimal = 2
 digits_after_decimal_schematic = 1
-
-
-def save_pdf(fig_factory: typ.Callable[[], matplotlib.figure.Figure]) -> pathlib.Path:
-    path = pathlib.Path(__file__).parent / (fig_factory.__name__ + '.pdf')
-    if not path.exists():
-        fig = fig_factory()
-        fig.savefig(
-            fname=path,
-            # bbox_inches='tight',
-            # pad_inches=0.04,
-            # facecolor='lightblue'
-        )
-        plt.close(fig)
-    return path
 
 
 def layout() -> matplotlib.figure.Figure:
@@ -307,7 +294,7 @@ def schematic() -> matplotlib.figure.Figure:
 
 
 def schematic_pdf() -> pathlib.Path:
-    return save_pdf(schematic)
+    return caching.cache_pdf(schematic)
 
 
 def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
@@ -437,7 +424,7 @@ def schematic_primary_and_obscuration() -> matplotlib.figure.Figure:
 
 
 def schematic_primary_and_obscuration_pdf() -> pathlib.Path:
-    return save_pdf(schematic_primary_and_obscuration)
+    return caching.cache_pdf(schematic_primary_and_obscuration)
 
 
 def schematic_grating() -> matplotlib.figure.Figure:
@@ -513,7 +500,7 @@ def schematic_grating() -> matplotlib.figure.Figure:
 
 
 def schematic_grating_pdf() -> pathlib.Path:
-    return save_pdf(schematic_grating)
+    return caching.cache_pdf(schematic_grating)
 
 
 def bunch() -> matplotlib.figure.Figure:
@@ -564,7 +551,7 @@ def bunch() -> matplotlib.figure.Figure:
 
 
 def bunch_pdf() -> pathlib.Path:
-    return save_pdf(bunch)
+    return caching.cache_pdf(bunch)
 
 
 def field_stop_projections() -> matplotlib.figure.Figure:
@@ -595,7 +582,7 @@ def field_stop_projections() -> matplotlib.figure.Figure:
 
 
 def field_stop_projections_pdf() -> pathlib.Path:
-    return save_pdf(field_stop_projections)
+    return caching.cache_pdf(field_stop_projections)
 
 
 psf_pupil_samples = 201
@@ -642,7 +629,7 @@ def psf() -> matplotlib.figure.Figure:
 
 
 def psf_pdf() -> pathlib.Path:
-    return save_pdf(psf)
+    return caching.cache_pdf(psf)
 
 
 kwargs_optics_default = dict(
@@ -673,7 +660,7 @@ def spot_size() -> matplotlib.figure.Figure:
 
 
 def spot_size_pdf() -> pathlib.Path:
-    return save_pdf(spot_size)
+    return caching.cache_pdf(spot_size)
 
 
 def focus_curve() -> matplotlib.figure.Figure:
@@ -703,7 +690,7 @@ def focus_curve() -> matplotlib.figure.Figure:
 
 
 def focus_curve_pdf() -> pathlib.Path:
-    return save_pdf(focus_curve)
+    return caching.cache_pdf(focus_curve)
 
 
 def vignetting() -> matplotlib.figure.Figure:
@@ -721,7 +708,7 @@ def vignetting() -> matplotlib.figure.Figure:
 
 
 def vignetting_pdf() -> pathlib.Path:
-    return save_pdf(vignetting)
+    return caching.cache_pdf(vignetting)
 
 
 def distortion() -> matplotlib.figure.Figure:
@@ -743,7 +730,7 @@ def distortion() -> matplotlib.figure.Figure:
 
 
 def distortion_pdf() -> pathlib.Path:
-    return save_pdf(distortion)
+    return caching.cache_pdf(distortion)
 
 
 def distortion_residual() -> matplotlib.figure.Figure:
@@ -776,7 +763,7 @@ def distortion_residual() -> matplotlib.figure.Figure:
 
 
 def distortion_residual_pdf() -> pathlib.Path:
-    return save_pdf(distortion_residual)
+    return caching.cache_pdf(distortion_residual)
 
 
 def distortion_residual_relative() -> matplotlib.figure.Figure:
@@ -809,7 +796,7 @@ def distortion_residual_relative() -> matplotlib.figure.Figure:
 
 
 def distortion_residual_relative_pdf() -> pathlib.Path:
-    return save_pdf(distortion_residual_relative)
+    return caching.cache_pdf(distortion_residual_relative)
 
 
 def grating_multilayer_schematic() -> matplotlib.figure.Figure:
@@ -849,7 +836,7 @@ def grating_multilayer_schematic() -> matplotlib.figure.Figure:
 
 
 def grating_multilayer_schematic_pdf() -> pathlib.Path:
-    return save_pdf(grating_multilayer_schematic)
+    return caching.cache_pdf(grating_multilayer_schematic)
 
 
 def grating_efficiency_vs_angle() -> matplotlib.figure.Figure:
@@ -895,7 +882,7 @@ def grating_efficiency_vs_angle() -> matplotlib.figure.Figure:
 
 
 def grating_efficiency_vs_angle_pdf() -> pathlib.Path:
-    return save_pdf(grating_efficiency_vs_angle)
+    return caching.cache_pdf(grating_efficiency_vs_angle)
 
 
 def _annotate_wavelength(
@@ -1013,7 +1000,7 @@ def component_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
 
 
 def component_efficiency_vs_wavelength_pdf() -> pathlib.Path:
-    return save_pdf(component_efficiency_vs_wavelength)
+    return caching.cache_pdf(component_efficiency_vs_wavelength)
 
 
 def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
@@ -1047,7 +1034,7 @@ def grating_efficiency_vs_position() -> matplotlib.figure.Figure:
 
 
 def grating_efficiency_vs_position_pdf() -> pathlib.Path:
-    return save_pdf(grating_efficiency_vs_position)
+    return caching.cache_pdf(grating_efficiency_vs_position)
 
 
 def primary_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
@@ -1077,7 +1064,7 @@ def primary_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
 
 
 def primary_efficiency_vs_wavelength_pdf() -> pathlib.Path:
-    return save_pdf(primary_efficiency_vs_wavelength)
+    return caching.cache_pdf(primary_efficiency_vs_wavelength)
 
 
 def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
@@ -1108,7 +1095,7 @@ def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
 
 
 def filter_efficiency_vs_wavelength_pdf() -> pathlib.Path:
-    return save_pdf(filter_efficiency_vs_wavelength)
+    return caching.cache_pdf(filter_efficiency_vs_wavelength)
 
 
 def ccd_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
@@ -1145,7 +1132,7 @@ def ccd_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
 
 
 def ccd_efficiency_vs_wavelength_pdf() -> pathlib.Path:
-    return save_pdf(ccd_efficiency_vs_wavelength)
+    return caching.cache_pdf(ccd_efficiency_vs_wavelength)
 
 
 def alignment_transfer() -> matplotlib.figure.Figure:
@@ -1241,4 +1228,4 @@ def alignment_transfer() -> matplotlib.figure.Figure:
 
 
 def alignment_transfer_pdf() -> pathlib.Path:
-    return save_pdf(alignment_transfer)
+    return caching.cache_pdf(alignment_transfer)
