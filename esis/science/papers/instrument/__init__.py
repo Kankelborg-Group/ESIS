@@ -320,6 +320,11 @@ def document() -> kgpy.latex.Document:
         value=channel_names_str,
     )
 
+    doc.set_variable(
+        name='fNumber',
+        value=pylatex.NoEscape(f'$f$/{int(optics_single.f_number_effective)}'),
+    )
+
     doc.set_variable_quantity(
         name='magnification',
         value=optics_single.magnification.quantity,
@@ -1628,6 +1633,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
                     tabular.add_hline()
                     tabular.add_row([r'System', r'Magnification', r'\magnification'])
+                    tabular.add_row([r'', r'$f$-number', r'\fNumber'])
                     tabular.add_row([r'', r'Plate scale', r'\plateScale'])
                     tabular.add_row([r'', r'Nyquist resolution', r'\spatialResolution'])
                     tabular.add_row([r'', r'Dispersion', r'\dispersion\ (\dispersionDoppler)'])
