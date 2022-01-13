@@ -16,6 +16,7 @@ import esis.optics
 import esis.science.papers.instrument.figures as figures
 from . import optics
 from . import preamble
+from . import tables
 from . import sections
 
 path_base = pathlib.Path(__file__).parent
@@ -999,60 +1000,7 @@ meet our science goals."""
 
             doc.append(figures.bunch.figure())
 
-            with doc.create(pylatex.Table(position='htb!')) as table:
-                table._star_latex_name = True
-                with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular(table_spec='llll', )) as tabular:
-                        tabular.escape = False
-                        tabular.add_row(['Parameter', 'Requirement', 'Science Driver', 'Capabilities'])
-                        tabular.add_hline()
-                        tabular.add_row([
-                            r'Spectral line',
-                            r'\OV',
-                            r'\EEs',
-                            r'\OVion, \MgXion, \HeIion, Figure~\ref{fig:bunch}',
-                        ])
-                        tabular.add_row([
-                            r'Spectral sampling',
-                            r'\spectralResolutionRequirement',
-                            r'Broadening from \MHD\ waves',
-                            r'\dispersionDoppler, Table~\ref{table:prescription}',
-                        ])
-                        tabular.add_row([
-                            r'Spatial resolution',
-                            r'\angularResolutionRequirement (\spatialResolutionRequirement)',
-                            r'\EEs',
-                            r'\spatialResolutionTotal, Table~\ref{table:errorBudget}',
-                        ])
-                        tabular.add_row([
-                            r'\SNRShort',
-                            r'\snrRequirement\ (\CHShort)',
-                            r'\MHD\ waves in \CHShort',
-                            r'\StackedCoronalHoleSNR\ ($\NumExpInStack \times \text{\detectorExposureLength}$ exp.), '
-                            r'Table~\ref{table:counts}',
-                        ])
-                        tabular.add_row([
-                            r'Cadence',
-                            r'\cadenceRequirement',
-                            r'Torsional waves',
-                            r'\detectorExposureLength\ eff., Section~\ref{subsec:SensitivityandCadence}',
-                        ])
-                        tabular.add_row([
-                            r'Observing time',
-                            r'\observingTimeRequirement',
-                            r'\EEs',
-                            r'\SI{270}{\second}, Section~\ref{sec:MissionProfile}',
-                        ])
-                        tabular.add_row([
-                            r'\FOV\ diameter',
-                            r'\fovRequirement',
-                            r'Span \QSShort, \ARShort, and limb',
-                            r'\fov, Table~\ref{table:prescription}',
-                        ])
-                    table.add_caption(pylatex.NoEscape(
-                        r"""\ESIS\ instrument requirements and capabilties. Note that MTF exceeds the Rayleigh criterion of 0.109."""
-                    ))
-                    table.append(kgpy.latex.Label('table:scireq'))
+            doc.append(tables.requirements.table())
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Instrument'))):
         doc.append(pylatex.NoEscape(
