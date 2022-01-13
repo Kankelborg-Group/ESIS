@@ -498,13 +498,11 @@ kwargs_optics_default = dict(
     all_channels=False,
 )
 
-num_emission_lines_default = 3
-
 
 def spot_size() -> matplotlib.figure.Figure:
     optics = optics_factories.as_designed_single_channel()
     fig, axs = plt.subplots(
-        ncols=num_emission_lines_default,
+        ncols=optics_factories.num_emission_lines_default,
         figsize=(formatting.text_width, 2.5),
         sharex=True,
         sharey=True,
@@ -528,7 +526,7 @@ def focus_curve() -> matplotlib.figure.Figure:
         # field_is_stratified_random=True,
         all_channels=False,
     )
-    optics.num_emission_lines = num_emission_lines_default
+    optics.num_emission_lines = optics_factories.num_emission_lines_default
     fig, ax = plt.subplots(
         figsize=(formatting.column_width, 2.5),
         constrained_layout=True,
@@ -598,7 +596,7 @@ def distortion_residual() -> matplotlib.figure.Figure:
     optics_linear.update()
     fig, axs = plt.subplots(
         nrows=2,
-        ncols=num_emission_lines_default,
+        ncols=optics_factories.num_emission_lines_default,
         sharex=True,
         sharey=True,
         figsize=(formatting.text_width, 4.4),
@@ -631,7 +629,7 @@ def distortion_residual_relative() -> matplotlib.figure.Figure:
     optics_linear.update()
     fig, axs = plt.subplots(
         nrows=2,
-        ncols=num_emission_lines_default,
+        ncols=optics_factories.num_emission_lines_default,
         sharex=True,
         sharey=True,
         figsize=(formatting.text_width, 4.4),

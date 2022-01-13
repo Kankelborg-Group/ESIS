@@ -28,6 +28,8 @@ default_pupil_is_stratified_random = True
 default_field_samples = 15
 default_field_is_stratified_random = False
 
+num_emission_lines_default = 3
+
 
 @_cache
 def as_designed_single_channel() -> esis.optics.Optics:
