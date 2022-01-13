@@ -9,8 +9,9 @@ def section() -> pylatex.Section:
     result = pylatex.Section('Introduction')
     result.escape = False
     result.append(
-        r"""The solar atmosphere, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft 
-X-ray), is a three-dimensional scene evolving in time:  $I(x, y, \lambda, t)$.
+        r"""
+The solar atmosphere, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft X-ray), is a 
+three-dimensional scene evolving in time:  $I(x, y, \lambda, t)$.
 Here, the helioprojective cartesian coordinates, $x$ and $y$ \citep{Thompson2006}, and the wavelength axis, $\lambda$, 
 comprise the three dimensions of the scene, while $t$ represents the temporal axis.
 An ideal instrument would capture a spatial/spectral data cube, $I(x, y, \lambda)$, at a rapid temporal cadence, 
