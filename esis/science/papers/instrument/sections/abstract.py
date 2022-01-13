@@ -1,11 +1,11 @@
 import kgpy.latex
 
 __all__ = [
-    'body'
+    'section'
 ]
 
 
-def body() -> kgpy.latex.Abstract:
+def section() -> kgpy.latex.Abstract:
     result = kgpy.latex.Abstract()
     result.escape = False
     result.append(

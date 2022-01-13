@@ -934,7 +934,7 @@ def document() -> kgpy.latex.Document:
         value=pylatex.NoEscape(r'\mathbf{C}')
     )
 
-    doc.append(sections.abstract.body())
+    doc.append(sections.abstract.section())
 
     doc.append(sections.introduction.body())
 
