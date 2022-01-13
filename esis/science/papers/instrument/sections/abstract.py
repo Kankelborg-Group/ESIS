@@ -9,7 +9,8 @@ def section() -> kgpy.latex.Abstract:
     result = kgpy.latex.Abstract()
     result.escape = False
     result.append(
-        r"""The \ESIS\ is a next generation rocket borne instrument designed to investigate magnetic reconnection 
+        r"""
+The \ESIS\ is a next generation rocket borne instrument designed to investigate magnetic reconnection 
 and energy transport in the solar atmosphere by observing emission lines formed in the chromosphere (\HeI), 
 the transition region (\OV), and corona (\MgX). 
 The instrument is a pseudo Gregorian telescope with an octagonal field stop at prime focus.  
