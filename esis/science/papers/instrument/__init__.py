@@ -916,12 +916,12 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable(
         name='psfPupilSamples',
-        value=figures.psf_pupil_samples,
+        value=figures.psf.pupil_samples,
     )
 
     doc.set_variable(
         name='psfFieldSamples',
-        value=figures.psf_field_samples,
+        value=figures.psf.field_samples,
     )
 
     doc.set_variable_quantity(
@@ -1236,7 +1236,7 @@ Figure~\ref{fig:schematic}. """
             ))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.psf_pdf()), width=None)
+                figure.add_image(str(figures.psf.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
 \roy{
