@@ -973,7 +973,7 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
 
                 figure.append(kgpy.latex.aas.Gridline([
                     kgpy.latex.aas.LeftFig(figures.schematic_primary.pdf(), kgpy.latex.columnwidth, '(b)'),
-                    kgpy.latex.aas.RightFig(figures.schematic_grating_pdf(), kgpy.latex.columnwidth, '(c)'),
+                    kgpy.latex.aas.RightFig(figures.schematic_grating.pdf(), kgpy.latex.columnwidth, '(c)'),
                 ]))
 
                 figure.add_caption(pylatex.NoEscape(
