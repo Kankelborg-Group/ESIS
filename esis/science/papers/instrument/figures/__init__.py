@@ -21,6 +21,7 @@ from . import formatting
 from . import caching
 from . import schematic_moses
 from . import layout
+from . import bunch
 
 __all__ = [
 
@@ -359,57 +360,6 @@ def schematic_grating() -> matplotlib.figure.Figure:
 
 def schematic_grating_pdf() -> pathlib.Path:
     return caching.cache_pdf(schematic_grating)
-
-
-def bunch() -> matplotlib.figure.Figure:
-    with astropy.visualization.quantity_support():
-        fig, ax = plt.subplots(figsize=(formatting.text_width, 2), constrained_layout=True)
-        optics = esis.optics.design.final()
-        optics.bunch.plot(
-            ax=ax,
-            num_emission_lines=optics.num_emission_lines,
-            digits_after_decimal=formatting.digits_after_decimal,
-            label_fontsize=6,
-        )
-        ax_twin = ax.twinx()
-        optics_measured = esis.flight.optics.as_measured(**kwargs_optics_default)
-        wavelength_min = optics_measured.wavelength_min
-        wavelength_max = optics_measured.wavelength_max
-        optics_measured.filter.clear_radius = 1000 * u.mm
-        optics_measured.detector.num_pixels = (4096, 2048)
-        sys = optics_measured.system
-        sys.grid_rays.wavelength = kgpy.grid.RegularGrid1D(
-            min=wavelength_min,
-            max=wavelength_max,
-            num_samples=100,
-        )
-        rays = sys.rays_output_resample_entrance
-        area = rays.intensity.copy()
-        area[~rays.mask] = np.nan
-        area = np.nansum(area, (rays.axis.pupil_x, rays.axis.pupil_y, rays.axis.velocity_los), keepdims=True)
-        area[area == 0] = np.nan
-        # plt.figure()
-        # plt.imshow(area.squeeze()[..., 0])
-        # plt.show()
-        area = np.nanmean(area, (rays.axis.field_x, rays.axis.field_y)).squeeze()
-        subtent = optics_measured.system.rays_input.input_grid.field.step_size
-        # area = (area / subtent.x / subtent.y).to(u.cm ** 2)
-
-        wavelength = rays.wavelength.squeeze()
-        sorted_indices = np.argsort(wavelength)
-        area = area[sorted_indices]
-        wavelength = wavelength[sorted_indices]
-        ax_twin.plot(wavelength, area, color='red', zorder=0)
-        bottom, top = ax_twin.get_ylim()
-        margin = 0.05 * (top - bottom)
-        ax_twin.set_ylim(bottom=-margin, top=top + 4 * margin)
-        ax_twin.set_ylabel(f'mean effective area ({ax_twin.get_ylabel()})')
-
-    return fig
-
-
-def bunch_pdf() -> pathlib.Path:
-    return caching.cache_pdf(bunch)
 
 
 def field_stop_projections() -> matplotlib.figure.Figure:

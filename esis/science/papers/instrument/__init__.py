@@ -998,7 +998,7 @@ meet our science goals."""
                 ))
 
             with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
-                figure.add_image(str(figures.bunch_pdf()), width=None)
+                figure.add_image(str(figures.bunch.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
 Calculated using ChiantiPy, with the \cite{Schmelz2012} abundances, the \chiantiDEM\ \DEM\ file, and
