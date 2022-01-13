@@ -25,6 +25,7 @@ from . import bunch
 from . import schematic
 from . import schematic_primary
 from . import schematic_grating
+from . import field_stop_projections
 
 __all__ = [
     'schematic_moses',
@@ -33,38 +34,8 @@ __all__ = [
     'schematic',
     'schematic_primary',
     'schematic_grating',
+    'field_stop_projections',
 ]
-
-
-def field_stop_projections() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(figsize=(formatting.column_width, 3), constrained_layout=True)
-    fig.set_constrained_layout_pads(h_pad=.15)
-    # ax.margins(x=.01, y=.01)
-    optics = esis.optics.design.final(all_channels=False)
-    optics.plot_field_stop_projections_local(
-        ax=ax,
-        wavelength_color=[
-            'darkviolet',
-            'indigo',
-            'blue',
-            'dodgerblue',
-            'cyan',
-            'green',
-            'chartreuse',
-            'orange',
-            'orangered',
-            'red',
-        ],
-        digits_after_decimal=formatting.digits_after_decimal,
-        use_latex=True,
-    )
-    ax.set_aspect('equal')
-    ax.legend(bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
-    return fig
-
-
-def field_stop_projections_pdf() -> pathlib.Path:
-    return caching.cache_pdf(field_stop_projections)
 
 
 psf_pupil_samples = 201

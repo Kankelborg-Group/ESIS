@@ -1010,7 +1010,7 @@ The individual mounts allow each grating to be adjusted in tip and tilt to cente
             with doc.create(pylatex.Figure()) as figure:
                 # figure.add_image('figures/old/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
                 # figure.append('\n')
-                figure.add_image(str(figures.field_stop_projections_pdf()), width=None)
+                figure.add_image(str(figures.field_stop_projections.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""Areas occupied by strong spectral lines on the \ESIS\ detectors.
 The plot axes are sized exactly to the \CCD\ active area.
