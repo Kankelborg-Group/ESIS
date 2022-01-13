@@ -1,4 +1,5 @@
 import typing as typ
+import inspect
 import pathlib
 import matplotlib.figure
 import matplotlib.axes
@@ -10,7 +11,7 @@ __all__ = [
 
 
 def cache_pdf(fig_factory: typ.Callable[[], matplotlib.figure.Figure]) -> pathlib.Path:
-    path = pathlib.Path(__file__).parent / (fig_factory.__name__ + '.pdf')
+    path = pathlib.Path(__file__).parent / 'output' / f'{inspect.getmodule(fig_factory).__name__.split(".")[~0]}.{fig_factory.__name__}.pdf'
     if not path.exists():
         fig = fig_factory()
         fig.savefig(
