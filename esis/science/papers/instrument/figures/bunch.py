@@ -6,6 +6,7 @@ import astropy.units as u
 import astropy.visualization
 import pylatex
 import kgpy.grid
+import kgpy.latex
 import esis
 from . import formatting
 from . import caching
@@ -66,3 +67,20 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
+
+
+def figure() -> pylatex.Figure:
+    result = pylatex.Figure(position='htb!')
+    result._star_latex_name = True
+    result.add_image(
+        filename=str(pdf()),
+        width=None,
+    )
+    result.add_caption(pylatex.NoEscape(
+        r"""
+\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
+Calculated using ChiantiPy, with the \cite{Schmelz2012} abundances, the \chiantiDEM\ \DEM\ file, and
+$n_e T = $\,\chiantiPressure.}"""
+    ))
+    result.append(kgpy.latex.Label('fig:bunch'))
+    return result
