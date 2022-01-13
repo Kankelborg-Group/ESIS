@@ -955,22 +955,8 @@ of \ESIS\ addresses these issues."""
         doc.append(sections.esis_concept.moses_limitations.subsection())
 
         with doc.create(pylatex.Subsection(pylatex.NoEscape('\ESIS\ Features'))):
-            # with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
-            #     figure.add_image('figures/old/layout', width=pylatex.NoEscape(r'\textwidth'))
 
-            with doc.create(kgpy.latex.FigureStar(position='!ht')) as figure:
-                figure.add_image(str(figures.layout_pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{\ESIS\ optical layout. 
-                    Dashed lines indicate the positions of unpopulated channels. 
-                    The blue lines represent the path of \OV\ through the system.} The \ESIS\ instrument is a pseudo-Gregorian design.
-The secondary mirror is replaced by a segmented array of concave diffraction gratings.
-The field stop at prime focus defines instrument spatial/spectral \FOV.
-\CCDs\ are arrayed around the primary mirror, each associated with a particular grating.
-Eight grating positions appear in this schematic; only six fit within the volume of the rocket payload.
-\NumChannelsWords\ channels are populated for the first flight."""
-                ))
-                figure.append(kgpy.latex.Label('fig:layout'))
+            doc.append(figures.layout.figure())
 
             doc.append(pylatex.NoEscape(
                 r"""The layout of \ESIS\ (Figure~\ref{fig:layout}) is a modified form of Gregorian telescope.
