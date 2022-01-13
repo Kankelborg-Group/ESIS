@@ -968,7 +968,7 @@ cameras are covered in Sec.~\ref{subsec:Cameras}. """
 
             with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
                 figure.append(kgpy.latex.aas.Gridline([
-                    kgpy.latex.aas.Fig(figures.schematic_pdf(), kgpy.latex.textwidth, '(a)')
+                    kgpy.latex.aas.Fig(figures.schematic.pdf(), kgpy.latex.textwidth, '(a)')
                 ]))
 
                 figure.append(kgpy.latex.aas.Gridline([
