@@ -995,7 +995,7 @@ that of \MgXion.
 From the important temporal, spatial, and velocity scales referenced Sections~\ref{subsec:MagneticReconnectionEvents} 
 and \ref{subsec:EnergyTransfer} we define the instrument requirements in Table~\ref{table:scireq} that are needed to 
 meet our science goals."""
-                ))
+            ))
 
             with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
                 figure.add_image(str(figures.bunch.pdf()), width=None)
