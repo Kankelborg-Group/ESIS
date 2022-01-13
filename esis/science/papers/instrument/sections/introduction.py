@@ -1,11 +1,11 @@
 import pylatex
 
 __all__ = [
-    'body',
+    'section',
 ]
 
 
-def body() -> pylatex.Section:
+def section() -> pylatex.Section:
     result = pylatex.Section('Introduction')
     result.escape = False
     result.append(

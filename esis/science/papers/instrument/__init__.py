@@ -936,7 +936,7 @@ def document() -> kgpy.latex.Document:
 
     doc.append(sections.abstract.section())
 
-    doc.append(sections.introduction.body())
+    doc.append(sections.introduction.section())
 
     doc.append(sections.esis_concept.section())
 
