@@ -895,22 +895,22 @@ def document() -> kgpy.latex.Document:
 
     doc.set_variable(
         name='defaultPupilSamples',
-        value=figures.kwargs_optics_default['pupil_samples'],
+        value=optics.default_kwargs['pupil_samples'],
     )
 
     doc.set_variable(
         name='defaultFieldSamples',
-        value=figures.kwargs_optics_default['field_samples']
+        value=optics.default_kwargs['field_samples']
     )
 
     doc.set_variable(
         name='defaultNumEmissionLines',
-        value=figures.num_emission_lines_default,
+        value=optics.num_emission_lines_default,
     )
 
     doc.set_variable(
         name='defaultNumEmissionLinesWords',
-        value=num2words.num2words(figures.num_emission_lines_default),
+        value=num2words.num2words(optics.num_emission_lines_default),
     )
 
     doc.set_variable(
