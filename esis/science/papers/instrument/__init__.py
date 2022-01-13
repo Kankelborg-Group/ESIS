@@ -1051,9 +1051,9 @@ A spatial resolution of $\sim$\SI{2}{\mega\meter} will be sufficient to localize
 tubes that are rooted in photospheric inter-granular network lanes (\eg\,\citet{Berger95ApJ})."""
             ))
 
-            with doc.create(pylatex.Subsection('Science Requirements')):
-                doc.append(pylatex.NoEscape(
-                    r"""\ESIS\ will investigate two science targets; 
+        with doc.create(pylatex.Subsection('Science Requirements')):
+            doc.append(pylatex.NoEscape(
+                r"""\ESIS\ will investigate two science targets; 
 reconnection in explosive events, and the transport of mass and energy through the transition region.
 The latter may take many forms, from \MHD\ waves of various modes to \EUV\ jets or macro-spicules.
 To fulfill these goals, \ESIS\ will obtain simultaneous intensity, Doppler shift and line width images of the \OV\ line 
@@ -1068,69 +1068,69 @@ and \ref{subsec:EnergyTransfer} we define the instrument requirements in Table~\
 meet our science goals."""
                 ))
 
-                with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
-                    figure.add_image(str(figures.bunch_pdf()), width=None)
-                    figure.add_caption(pylatex.NoEscape(
-                        r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
+            with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
+                figure.add_image(str(figures.bunch_pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""\roy{Plot of the \numEmissionLines\ brightest emission lines in the \ESIS\ passband.
 Calculated using ChiantiPy, with the \cite{Schmelz2012} abundances, the \chiantiDEM\ \DEM\ file, and
 $n_e T = $\,\chiantiPressure.}"""
-                    ))
-                    figure.append(kgpy.latex.Label('fig:bunch'))
+                ))
+                figure.append(kgpy.latex.Label('fig:bunch'))
 
-                with doc.create(pylatex.Table(position='htb!')) as table:
-                    table._star_latex_name = True
-                    with table.create(pylatex.Center()) as centering:
-                        with centering.create(pylatex.Tabular(table_spec='llll', )) as tabular:
-                            tabular.escape = False
-                            tabular.add_row(['Parameter', 'Requirement', 'Science Driver', 'Capabilities'])
-                            tabular.add_hline()
-                            tabular.add_row([
-                                r'Spectral line',
-                                r'\OV',
-                                r'\EEs',
-                                r'\OVion, \MgXion, \HeIion, Figure~\ref{fig:bunch}',
-                            ])
-                            tabular.add_row([
-                                r'Spectral sampling',
-                                r'\spectralResolutionRequirement',
-                                r'Broadening from \MHD\ waves',
-                                r'\dispersionDoppler, Table~\ref{table:prescription}',
-                            ])
-                            tabular.add_row([
-                                r'Spatial resolution',
-                                r'\angularResolutionRequirement (\spatialResolutionRequirement)',
-                                r'\EEs',
-                                r'\spatialResolutionTotal, Table~\ref{table:errorBudget}',
-                            ])
-                            tabular.add_row([
-                                r'\SNRShort',
-                                r'\snrRequirement\ (\CHShort)',
-                                r'\MHD\ waves in \CHShort',
-                                r'\StackedCoronalHoleSNR\ ($\NumExpInStack \times \text{\detectorExposureLength}$ exp.), '
-                                r'Table~\ref{table:counts}',
-                            ])
-                            tabular.add_row([
-                                r'Cadence',
-                                r'\cadenceRequirement',
-                                r'Torsional waves',
-                                r'\detectorExposureLength\ eff., Section~\ref{subsec:SensitivityandCadence}',
-                            ])
-                            tabular.add_row([
-                                r'Observing time',
-                                r'\observingTimeRequirement',
-                                r'\EEs',
-                                r'\SI{270}{\second}, Section~\ref{sec:MissionProfile}',
-                            ])
-                            tabular.add_row([
-                                r'\FOV\ diameter',
-                                r'\fovRequirement',
-                                r'Span \QSShort, \ARShort, and limb',
-                                r'\fov, Table~\ref{table:prescription}',
-                            ])
-                        table.add_caption(pylatex.NoEscape(
-                            r"""\ESIS\ instrument requirements and capabilties. Note that MTF exceeds the Rayleigh criterion of 0.109."""
-                        ))
-                        table.append(kgpy.latex.Label('table:scireq'))
+            with doc.create(pylatex.Table(position='htb!')) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular(table_spec='llll', )) as tabular:
+                        tabular.escape = False
+                        tabular.add_row(['Parameter', 'Requirement', 'Science Driver', 'Capabilities'])
+                        tabular.add_hline()
+                        tabular.add_row([
+                            r'Spectral line',
+                            r'\OV',
+                            r'\EEs',
+                            r'\OVion, \MgXion, \HeIion, Figure~\ref{fig:bunch}',
+                        ])
+                        tabular.add_row([
+                            r'Spectral sampling',
+                            r'\spectralResolutionRequirement',
+                            r'Broadening from \MHD\ waves',
+                            r'\dispersionDoppler, Table~\ref{table:prescription}',
+                        ])
+                        tabular.add_row([
+                            r'Spatial resolution',
+                            r'\angularResolutionRequirement (\spatialResolutionRequirement)',
+                            r'\EEs',
+                            r'\spatialResolutionTotal, Table~\ref{table:errorBudget}',
+                        ])
+                        tabular.add_row([
+                            r'\SNRShort',
+                            r'\snrRequirement\ (\CHShort)',
+                            r'\MHD\ waves in \CHShort',
+                            r'\StackedCoronalHoleSNR\ ($\NumExpInStack \times \text{\detectorExposureLength}$ exp.), '
+                            r'Table~\ref{table:counts}',
+                        ])
+                        tabular.add_row([
+                            r'Cadence',
+                            r'\cadenceRequirement',
+                            r'Torsional waves',
+                            r'\detectorExposureLength\ eff., Section~\ref{subsec:SensitivityandCadence}',
+                        ])
+                        tabular.add_row([
+                            r'Observing time',
+                            r'\observingTimeRequirement',
+                            r'\EEs',
+                            r'\SI{270}{\second}, Section~\ref{sec:MissionProfile}',
+                        ])
+                        tabular.add_row([
+                            r'\FOV\ diameter',
+                            r'\fovRequirement',
+                            r'Span \QSShort, \ARShort, and limb',
+                            r'\fov, Table~\ref{table:prescription}',
+                        ])
+                    table.add_caption(pylatex.NoEscape(
+                        r"""\ESIS\ instrument requirements and capabilties. Note that MTF exceeds the Rayleigh criterion of 0.109."""
+                    ))
+                    table.append(kgpy.latex.Label('table:scireq'))
 
     with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Instrument'))):
         doc.append(pylatex.NoEscape(
