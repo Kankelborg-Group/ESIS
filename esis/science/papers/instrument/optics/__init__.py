@@ -28,6 +28,14 @@ default_pupil_is_stratified_random = True
 default_field_samples = 15
 default_field_is_stratified_random = False
 
+default_kwargs = dict(
+    pupil_samples=default_pupil_samples,
+    pupil_is_stratified_random=default_pupil_is_stratified_random,
+    field_samples=default_field_samples,
+    field_is_stratified_random=default_field_is_stratified_random,
+    all_channels=False,
+)
+
 num_emission_lines_default = 3
 
 

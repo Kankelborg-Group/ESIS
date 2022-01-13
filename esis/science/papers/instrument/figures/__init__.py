@@ -490,15 +490,6 @@ def psf_pdf() -> pathlib.Path:
     return caching.cache_pdf(psf)
 
 
-kwargs_optics_default = dict(
-    pupil_samples=optics_factories.default_pupil_samples,
-    pupil_is_stratified_random=optics_factories.default_pupil_is_stratified_random,
-    field_samples=optics_factories.default_field_samples,
-    field_is_stratified_random=optics_factories.default_field_is_stratified_random,
-    all_channels=False,
-)
-
-
 def spot_size() -> matplotlib.figure.Figure:
     optics = optics_factories.as_designed_single_channel()
     fig, axs = plt.subplots(
@@ -568,7 +559,7 @@ def vignetting_pdf() -> pathlib.Path:
 
 
 def distortion() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics = esis.optics.design.final(**optics_factories.default_kwargs)
     optics.num_emission_lines = 1
     fig, ax = plt.subplots(
         figsize=(formatting.column_width, 3.5),
@@ -656,7 +647,7 @@ def distortion_residual_relative_pdf() -> pathlib.Path:
 
 
 def grating_multilayer_schematic() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics = esis.optics.design.final(**optics_factories.default_kwargs)
     fig, ax = plt.subplots(
         figsize=(formatting.column_width, 2.2),
         constrained_layout=True,
@@ -696,7 +687,7 @@ def grating_multilayer_schematic_pdf() -> pathlib.Path:
 
 
 def grating_efficiency_vs_angle() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics = esis.optics.design.final(**optics_factories.default_kwargs)
     fig, ax = plt.subplots(
         figsize=(formatting.column_width, 2),
         constrained_layout=True,
@@ -745,7 +736,7 @@ def _annotate_wavelength(
         ax: matplotlib.axes.Axes,
         label_orders: bool = True
 ) -> typ.List[matplotlib.lines.Line2D]:
-    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics = esis.optics.design.final(**optics_factories.default_kwargs)
     optics.num_emission_lines = 2
     optics2 = optics.copy()
     optics2.grating.diffraction_order = 2
@@ -929,7 +920,7 @@ def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
             figsize=(formatting.column_width, 2.75),
             constrained_layout=True,
         )
-        optics = esis.optics.design.final(**kwargs_optics_default)
+        optics = esis.optics.design.final(**optics_factories.default_kwargs)
         wavelength = esis.optics.grating.efficiency.witness.vs_wavelength_g17()[2].to(u.AA)
         rays = kgpy.optics.rays.Rays(
             wavelength=wavelength,
@@ -998,7 +989,7 @@ def alignment_transfer() -> matplotlib.figure.Figure:
         constrained_layout=True,
     )
 
-    optics = esis.optics.design.final(**kwargs_optics_default)
+    optics = esis.optics.design.final(**optics_factories.default_kwargs)
     grating = optics.grating
     grating.piston = 0 * u.mm
     grating.cylindrical_azimuth = 0 * u.deg
