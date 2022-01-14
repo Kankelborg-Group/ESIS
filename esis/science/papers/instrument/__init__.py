@@ -147,74 +147,6 @@ Figure~\ref{fig:schematic}. """
 
             doc.append(figures.focus_curve.figure())
 
-            doc.append(pylatex.NoEscape(r"""
-\begin{equation}
-\begin{split}
-\left(x', y'\right) &= \C + \C_x x + \C_y y + \C_\lambda \lambda \\
-&+ \C_{xx} x^2 + \C_{xy} x y + \C_{y \lambda} x \lambda \\
-&+ \C_{yy} y^2 + \C_{y \lambda} y \lambda + \C_{\lambda \lambda} \lambda^2
-\end{split}
-\end{equation}
-"""
-            ))
-
-            model_distortion = optics_single.rays_output.distortion.model()
-            model_distortion_relative = optics_single.rays_output_relative.distortion.model()
-
-            def fmt_coeff(coeff: u.Quantity):
-                return kgpy.format.quantity(coeff.value * u.dimensionless_unscaled, scientific_notation=True, digits_after_decimal=2)
-
-            x_max = 500 * u.pix
-            y_max = 500 * u.pix
-            lambda_max = optics_single.wavelength[..., 1] - optics_single.wavelength[..., 0]
-
-            with doc.create(pylatex.Table()) as table:
-                table._star_latex_name = True
-                with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular('ll|rr|rr')) as tabular:
-                        tabular.escape = False
-                        tabular.append('\multicolumn{2}{l}{Coefficient} & $x\'$ & $y\'$ & $x\'$ rel. & $y\'$ rel.\\\\')
-                        # tabular.add_row(['Coefficient', '$x\'$', '$y\'$'])
-                        tabular.add_hline()
-                        for c, name in enumerate(model_distortion.x.coefficient_names):
-                            tabular.add_row([
-                                f'{name}',
-                                f'({model_distortion.x.coefficients[c].unit:latex_inline})',
-                                fmt_coeff(model_distortion.x.coefficients[c].squeeze()),
-                                fmt_coeff(model_distortion.y.coefficients[c].squeeze()),
-                                fmt_coeff(model_distortion_relative.x.coefficients[c].squeeze()),
-                                fmt_coeff(model_distortion_relative.y.coefficients[c].squeeze()),
-                                # f'{model_distortion.x.coefficients[c] * 500 * u.pix}',
-                                # f'{model_distortion.x.coefficients[c].squeeze():0.3f}',
-                                # f'{model_distortion.y.coefficients[c].squeeze():0.3f}',
-                            ])
-
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.distortion.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-Plot of the magnified, undistorted field stop aperture vs. the distorted \OV\ image of the 
-field stop aperture on the \ESIS\ detector.
-The magnification factor used for the undistorted field stop aperture is the ratio of the grating exit arm to the 
-grating entrance arm (\armRatio).
-The distorted image of the field stop aperture was calculated using the \ESIS\ distortion model, described in 
-Table~\ref{table:distortion}.
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:distortion'))
-
-            with doc.create(pylatex.Figure()) as figure:
-                figure._star_latex_name = True
-                figure.add_image(str(figures.distortion_residual.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-Magnitude of the residual between a linear distortion model and the raytrace model (top) and between a quadratic 
-distortion model and the raytrace model (bottom). This figure demonstrates that a quadratic distortion model is
-sufficient to achieve sub-pixel accuracy.
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:distortionResidual'))
-
             doc.append(pylatex.NoEscape(
                 r"""The ray trace model was also used to quantify how mirror and positional tolerances affect the 
 instrument's spatial resolution.
@@ -930,6 +862,74 @@ The distortion is due to two factors: first, the tilt of the detector as needed 
 \citep{Poletto04}; second, the anamorphic magnification of the grating (see \cite{Schweizer1979}).
 """
             ))
+            doc.append(pylatex.NoEscape(r"""
+            \begin{equation}
+            \begin{split}
+            \left(x', y'\right) &= \C + \C_x x + \C_y y + \C_\lambda \lambda \\
+            &+ \C_{xx} x^2 + \C_{xy} x y + \C_{y \lambda} x \lambda \\
+            &+ \C_{yy} y^2 + \C_{y \lambda} y \lambda + \C_{\lambda \lambda} \lambda^2
+            \end{split}
+            \end{equation}
+            """
+                                        ))
+
+            model_distortion = optics_single.rays_output.distortion.model()
+            model_distortion_relative = optics_single.rays_output_relative.distortion.model()
+
+            def fmt_coeff(coeff: u.Quantity):
+                return kgpy.format.quantity(coeff.value * u.dimensionless_unscaled, scientific_notation=True,
+                                            digits_after_decimal=2)
+
+            x_max = 500 * u.pix
+            y_max = 500 * u.pix
+            lambda_max = optics_single.wavelength[..., 1] - optics_single.wavelength[..., 0]
+
+            with doc.create(pylatex.Table()) as table:
+                table._star_latex_name = True
+                with table.create(pylatex.Center()) as centering:
+                    with centering.create(pylatex.Tabular('ll|rr|rr')) as tabular:
+                        tabular.escape = False
+                        tabular.append('\multicolumn{2}{l}{Coefficient} & $x\'$ & $y\'$ & $x\'$ rel. & $y\'$ rel.\\\\')
+                        # tabular.add_row(['Coefficient', '$x\'$', '$y\'$'])
+                        tabular.add_hline()
+                        for c, name in enumerate(model_distortion.x.coefficient_names):
+                            tabular.add_row([
+                                f'{name}',
+                                f'({model_distortion.x.coefficients[c].unit:latex_inline})',
+                                fmt_coeff(model_distortion.x.coefficients[c].squeeze()),
+                                fmt_coeff(model_distortion.y.coefficients[c].squeeze()),
+                                fmt_coeff(model_distortion_relative.x.coefficients[c].squeeze()),
+                                fmt_coeff(model_distortion_relative.y.coefficients[c].squeeze()),
+                                # f'{model_distortion.x.coefficients[c] * 500 * u.pix}',
+                                # f'{model_distortion.x.coefficients[c].squeeze():0.3f}',
+                                # f'{model_distortion.y.coefficients[c].squeeze():0.3f}',
+                            ])
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.distortion.pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""\roy{
+Plot of the magnified, undistorted field stop aperture vs. the distorted \OV\ image of the 
+field stop aperture on the \ESIS\ detector.
+The magnification factor used for the undistorted field stop aperture is the ratio of the grating exit arm to the 
+grating entrance arm (\armRatio).
+The distorted image of the field stop aperture was calculated using the \ESIS\ distortion model, described in 
+Table~\ref{table:distortion}.
+}"""
+                ))
+                figure.append(kgpy.latex.Label('fig:distortion'))
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure._star_latex_name = True
+                figure.add_image(str(figures.distortion_residual.pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""\roy{
+Magnitude of the residual between a linear distortion model and the raytrace model (top) and between a quadratic 
+distortion model and the raytrace model (bottom). This figure demonstrates that a quadratic distortion model is
+sufficient to achieve sub-pixel accuracy.
+}"""
+                ))
+                figure.append(kgpy.latex.Label('fig:distortionResidual'))
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
