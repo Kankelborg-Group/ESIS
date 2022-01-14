@@ -226,7 +226,8 @@ obtained by accepting some vignetting in the system.
 
             table.add_caption(pylatex.NoEscape(
                 r"""
-Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in \CH, \QS, and \AR."""
+Estimated signal statistics per channel (in photon counts) for \ESIS\ lines in \CH, \QS, and \AR.
+Note that the \SNR\ estimates are lower bounds since charge diffusion decreases the shot noise."""
             ))
             table.append(kgpy.latex.Label('table:counts'))
 
