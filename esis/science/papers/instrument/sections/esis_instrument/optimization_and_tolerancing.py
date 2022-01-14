@@ -40,7 +40,7 @@ Note that this modeling exercise was undertaken before the baffle designs were f
 The estimated diffraction \MTF\ and aberrations were therefore modeled for a rough estimate of the \ESIS\ single sector 
 aperture."""
     )
-    result.append(tables.surface_error.table_old())
+    # result.append(tables.surface_error.table_old())
     result.append(tables.surface_error.table())
     result.append(
         r"""
@@ -90,6 +90,6 @@ the resolution of \ESIS\ to be essentially pixel limited.
 Since \ESIS\ pixels span \SI{0.76}{\arcsecond} \roy{\plateScaleMean}, the resolution target in Table~\ref{table:scireq} is obtained by this 
 design."""
     )
-    result.append(pylatex.NoEscape(tables.error_budget.table_old))
+    # result.append(pylatex.NoEscape(tables.error_budget.table_old))
     result.append(tables.error_budget.table(doc))
     return result
