@@ -485,16 +485,6 @@ sufficient to achieve sub-pixel accuracy.
                 ))
                 figure.append(kgpy.latex.Label('fig:distortionResidual'))
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure._star_latex_name = True
-                figure.add_image(str(figures.distortion_residual_relative_pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-Same as Figure \ref{fig:distortionResidual} but for a coordinate system relative to \OV.
-}"""
-                ))
-                # figure.append(kgpy.latex.Label('fig:distortionResidual'))
-
             doc.append(pylatex.NoEscape(
                 r"""The ray trace model was also used to quantify how mirror and positional tolerances affect the 
 instrument's spatial resolution.
