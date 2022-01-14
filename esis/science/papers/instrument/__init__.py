@@ -100,15 +100,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
             doc.append(figures.component_efficiency_vs_wavelength.figure())
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure._star_latex_name = True
-                figure.add_image(str(figures.grating_efficiency_vs_position.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-\roy{Channel \testGratingChannelIndex\ grating efficiency at \gratingTestWavelength\ vs. position for two orthogonal slices across the optical 
-surface on \testGratingDate.}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:gratingEfficiencyVsPosition'))
+            doc.append(figures.grating_efficiency_vs_position.figure())
 
             doc.append(pylatex.NoEscape(
                 r"""
