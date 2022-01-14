@@ -1232,7 +1232,7 @@ The filter efficiency is a theoretical model that includes the filter mesh, \fil
 
             with doc.create(pylatex.Figure()) as figure:
                 figure._star_latex_name = True
-                figure.add_image(str(figures.grating_efficiency_vs_position_pdf()), width=None)
+                figure.add_image(str(figures.grating_efficiency_vs_position.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
 \roy{Channel \testGratingChannelIndex\ grating efficiency at \gratingTestWavelength\ vs. position for two orthogonal slices across the optical 
