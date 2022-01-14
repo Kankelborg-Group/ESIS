@@ -112,17 +112,7 @@ The distortion is due to two factors: first, the tilt of the detector as needed 
 
             doc.append(figures.distortion.figure())
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure._star_latex_name = True
-                figure.add_image(str(figures.distortion_residual.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-Magnitude of the residual between a linear distortion model and the raytrace model (top) and between a quadratic 
-distortion model and the raytrace model (bottom). This figure demonstrates that a quadratic distortion model is
-sufficient to achieve sub-pixel accuracy.
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:distortionResidual'))
+            doc.append(figures.distortion_residual.figure())
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 

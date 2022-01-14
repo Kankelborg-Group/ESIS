@@ -1,6 +1,8 @@
 import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
+import pylatex
+import kgpy.latex
 from .. import optics as optics_factories
 from . import formatting
 from . import caching
@@ -42,3 +44,17 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
+
+
+def figure() -> pylatex.Figure:
+    result = pylatex.Figure()
+    result._star_latex_name = True
+    result.add_image(str(pdf()), width=None)
+    result.add_caption(pylatex.NoEscape(
+        r"""
+\roy{Magnitude of the residual between a linear distortion model and the raytrace model (top) and between a quadratic 
+distortion model and the raytrace model (bottom). This figure demonstrates that a quadratic distortion model is
+sufficient to achieve sub-pixel accuracy.}"""
+    ))
+    result.append(kgpy.latex.Label('fig:distortionResidual'))
+    return result
