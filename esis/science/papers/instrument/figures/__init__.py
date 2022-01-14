@@ -206,36 +206,6 @@ def grating_efficiency_vs_position_pdf() -> pathlib.Path:
     return caching.cache_pdf(grating_efficiency_vs_position)
 
 
-def primary_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
-    fig, ax = plt.subplots(
-        figsize=(formatting.column_width, 2.75),
-        constrained_layout=True,
-    )
-    eff_unit = u.percent
-    wavl_unit = u.Angstrom
-    witness = esis.optics.primary.efficiency.witness
-    with astropy.visualization.quantity_support():
-        for func in [witness.vs_wavelength_p1, witness.vs_wavelength_p2, witness.vs_wavelength_recoat_1]:
-            serial, angle_input, wavelength, efficiency = func()
-            ax.plot(
-                wavelength.to(wavl_unit),
-                efficiency.to(eff_unit),
-                label=serial,
-            )
-        ax.legend()
-        ax.add_artist(ax.legend())
-        lines = _annotate_wavelength(ax=ax)
-        ax.set_xlabel(f'wavelength ({wavl_unit:latex})')
-        ax.set_ylabel(f'reflectivity ({eff_unit:latex})')
-        ax.legend(handles=lines, bbox_to_anchor=(0.5, -0.25), loc='upper center', ncol=2)
-
-    return fig
-
-
-def primary_efficiency_vs_wavelength_pdf() -> pathlib.Path:
-    return caching.cache_pdf(primary_efficiency_vs_wavelength)
-
-
 def filter_efficiency_vs_wavelength() -> matplotlib.figure.Figure:
     with astropy.visualization.quantity_support():
         fig, ax = plt.subplots(
