@@ -96,15 +96,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
             doc.append(figures.grating_multilayer_schematic.figure())
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.grating_efficiency_vs_angle.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-Measured efficiency \roy{at \gratingTestWavelength} of a single grating \roy{the Channel \testGratingChannelIndex\ grating} as a function of reflection angle on \roy{\testGratingDate}.
-Note flat response in first order over instrument \FOV\ and suppression of zero order.
-"""
-                ))
-                figure.append(kgpy.latex.Label('fig:gratingEfficiencyVsAngle'))
+            doc.append(figures.grating_efficiency_vs_angle.figure())
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.component_efficiency_vs_wavelength.pdf()), width=None)

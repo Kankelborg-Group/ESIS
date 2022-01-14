@@ -2,6 +2,8 @@ import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
+import pylatex
+import kgpy.latex
 import kgpy.format
 import esis.optics
 from .. import optics as optics_factories
@@ -11,6 +13,7 @@ from . import caching
 __all__ = [
     'figure_mpl',
     'pdf',
+    'figure',
 ]
 
 
@@ -58,3 +61,15 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
+
+
+def figure() -> pylatex.Figure:
+    result = pylatex.Figure()
+    result.add_image(str(pdf()), width=None)
+    result.add_caption(pylatex.NoEscape(
+        r"""
+Measured efficiency \roy{at \gratingTestWavelength} of a single grating \roy{the Channel \testGratingChannelIndex\ grating} as a function of reflection angle on \roy{\testGratingDate}.
+Note flat response in first order over instrument \FOV\ and suppression of zero order."""
+    ))
+    result.append(kgpy.latex.Label('fig:gratingEfficiencyVsAngle'))
+    return result
