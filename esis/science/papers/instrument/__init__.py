@@ -115,18 +115,7 @@ These gratings are identical to the \EUV\ flight version, but with a ruling patt
 """
             ))
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image('figures/old/Alignment_transfer_1gr_text', width=kgpy.latex.columnwidth)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-\jake{Will update this figure.  Will include a rendering of the secondary mount pointing to the tuffet, grating
-backplate, bipod, etc. Capturing the same as before but without TEA.}
-\ESIS\ alignment transfer device, consisting of three miniature confocal microscopes that translate along the optical 
-axis.  
-Trapezoidal grating, bipods, and mounting plate are installed on the tuffet in front of the apparatus 
-(left of center)"""
-                ))
-                figure.append(kgpy.latex.Label('F-alt'))
+            doc.append(figures.alignment_transfer.figure())
 
             doc.append(pylatex.NoEscape(
                 r"""

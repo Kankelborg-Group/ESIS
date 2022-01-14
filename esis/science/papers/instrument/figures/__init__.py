@@ -18,6 +18,7 @@ from . import grating_efficiency_vs_angle
 from . import component_efficiency_vs_wavelength
 from . import grating_efficiency_vs_position
 from . import ccd_efficiency_vs_wavelength
+from . import alignment_transfer
 
 __all__ = [
     'schematic_moses',
