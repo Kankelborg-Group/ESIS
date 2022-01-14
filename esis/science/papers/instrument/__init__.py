@@ -405,7 +405,7 @@ Focus curve for the field angle at the middle of the \ESIS\ \FOV\ for the
                 figure.append(kgpy.latex.Label('fig:focusCurve'))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.vignetting_pdf()), width=None)
+                figure.add_image(str(figures.vignetting.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 (Top) 2D histogram counting the number of rays that were unvignetted by the \ESIS\ optical 

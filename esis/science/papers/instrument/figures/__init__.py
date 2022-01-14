@@ -28,6 +28,8 @@ from . import schematic_grating
 from . import field_stop_projections
 from . import psf
 from . import spot_size
+from . import focus_curve
+from . import vignetting
 
 __all__ = [
     'schematic_moses',
@@ -39,25 +41,9 @@ __all__ = [
     'field_stop_projections',
     'psf',
     'spot_size',
+    'focus_curve',
+    'vignetting',
 ]
-
-
-def vignetting() -> matplotlib.figure.Figure:
-    optics = optics_factories.as_measured_single_channel()
-    fig, axs = plt.subplots(
-        figsize=(formatting.column_width, 2.9),
-        sharex=True,
-        sharey=True,
-        constrained_layout=True,
-        squeeze=False,
-    )
-    model = optics.system.rays_output_resample_entrance.vignetting
-    model.plot_unvignetted(axs=axs[0], wavelength_name=optics.bunch.fullname(formatting.digits_after_decimal))
-    return fig
-
-
-def vignetting_pdf() -> pathlib.Path:
-    return caching.cache_pdf(vignetting)
 
 
 def distortion() -> matplotlib.figure.Figure:
