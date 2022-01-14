@@ -460,7 +460,7 @@ The field and pupil grids have the same parameters as the grid for Figure~\ref{f
                             ])
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.distortion_pdf()), width=None)
+                figure.add_image(str(figures.distortion.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 Plot of the magnified, undistorted field stop aperture vs. the distorted \OV\ image of the 

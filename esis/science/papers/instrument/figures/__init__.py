@@ -30,6 +30,7 @@ from . import psf
 from . import spot_size
 from . import focus_curve
 from . import vignetting
+from . import distortion
 
 __all__ = [
     'schematic_moses',
@@ -43,29 +44,8 @@ __all__ = [
     'spot_size',
     'focus_curve',
     'vignetting',
+    'distortion',
 ]
-
-
-def distortion() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(**optics_factories.default_kwargs)
-    optics.num_emission_lines = 1
-    fig, ax = plt.subplots(
-        figsize=(formatting.column_width, 3.5),
-        constrained_layout=True,
-    )
-    # fig.set_constrained_layout_pads(h_pad=.15)
-    optics.plot_field_stop_distortion(
-        ax=ax,
-        digits_after_decimal=formatting.digits_after_decimal,
-        use_latex=True,
-    )
-    ax.set_aspect('equal')
-    ax.legend(bbox_to_anchor=(0.5, -0.15), loc='upper center')
-    return fig
-
-
-def distortion_pdf() -> pathlib.Path:
-    return caching.cache_pdf(distortion)
 
 
 def distortion_residual() -> matplotlib.figure.Figure:
