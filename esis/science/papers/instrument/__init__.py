@@ -119,16 +119,7 @@ The bipods are bonded to both the grating and backing plate along the three long
 The individual mounts allow each grating to be adjusted in tip and tilt to center the image on the \CCD. """
             ))
 
-            with doc.create(pylatex.Figure()) as figure:
-                # figure.add_image('figures/old/dispersion_opt1', width=pylatex.NoEscape('\columnwidth'))
-                # figure.append('\n')
-                figure.add_image(str(figures.field_stop_projections.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""Areas occupied by strong spectral lines on the \ESIS\ detectors.
-The plot axes are sized exactly to the \CCD\ active area.
-The \ESIS\ passband is defined by a combination of the field stop and grating dispersion."""
-                ))
-                figure.append(kgpy.latex.Label('fig:projections'))
+            doc.append(figures.field_stop_projections.figure())
 
             doc.append(pylatex.NoEscape(
                 r"""The gratings have a varied line space ruling pattern optimized to provide, in principle, 

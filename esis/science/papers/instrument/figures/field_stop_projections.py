@@ -1,6 +1,8 @@
 import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
+import pylatex
+import kgpy.latex
 import esis.optics
 from . import formatting
 from . import caching
@@ -40,3 +42,16 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
+
+
+def figure() -> pylatex.Figure:
+    result = pylatex.Figure()
+    result.add_image(str(pdf()), width=None)
+    result.add_caption(pylatex.NoEscape(
+        r"""
+Areas occupied by strong spectral lines on the \ESIS\ detectors.
+The plot axes are sized exactly to the \CCD\ active area.
+The \ESIS\ passband is defined by a combination of the field stop and grating dispersion."""
+    ))
+    result.append(kgpy.latex.Label('fig:projections'))
+    return result
