@@ -141,23 +141,7 @@ The optical prescription derived from the ray trace is listed in Table~\ref{tabl
 Figure~\ref{fig:schematic}. """
             ))
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.psf.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-\roy{
-Raytraced spot diagrams for \OV\ with $\psfFieldSamples \times \psfFieldSamples$ field angles across the \FOV.
-The box around each spot represents a single pixel on the detector.
-Each spot was traced using a stratified random grid across the pupil with $\psfPupilSamples \times \psfPupilSamples$ 
-positions per spot.
-}
-(Left:)  Ray traced spot diagrams for \ESIS, illustrated at the center and vertices of the O\,\textsc{v} \FOV\ on the 
-\CCD.
-The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (overplotted on each spot) radius is \SI{2}{\micro\meter}.
-Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
-(Right:) RMS spot radius through focus for the three centered spots; top of \FOV\ (purple curve), center (maroon), and bottom (red)."""
-                ))
-                figure.append(kgpy.latex.Label('fig:psf'))
+            doc.append(figures.psf.figure())
 
             with doc.create(kgpy.latex.FigureStar()) as figure:
                 figure.add_image(str(figures.spot_size.pdf()), width=None)
