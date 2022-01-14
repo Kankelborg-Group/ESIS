@@ -1210,7 +1210,7 @@ Note flat response in first order over instrument \FOV\ and suppression of zero 
                 figure.append(kgpy.latex.Label('fig:gratingEfficiencyVsAngle'))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.component_efficiency_vs_wavelength_pdf()), width=None)
+                figure.add_image(str(figures.component_efficiency_vs_wavelength.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""(Top) Measured reflectance for several multilayer coated witness samples 
 \roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
