@@ -42,36 +42,6 @@ __all__ = [
 ]
 
 
-def focus_curve() -> matplotlib.figure.Figure:
-    optics = esis.optics.design.final(
-        pupil_samples=11,
-        field_samples=1,
-        # field_is_stratified_random=True,
-        all_channels=False,
-    )
-    optics.num_emission_lines = optics_factories.num_emission_lines_default
-    fig, ax = plt.subplots(
-        figsize=(formatting.column_width, 2.5),
-        constrained_layout=True,
-    )
-
-    optics.plot_focus_curve(
-        ax=ax,
-        delta_detector=5 * u.mm,
-        num_samples=51,
-        digits_after_decimal=2,
-        use_latex=True,
-    )
-    ax.legend(bbox_to_anchor=(0.5, -0.3), loc='upper center', ncol=2)
-    fig.set_constrained_layout_pads(w_pad=.10, h_pad=0.10)
-
-    return fig
-
-
-def focus_curve_pdf() -> pathlib.Path:
-    return caching.cache_pdf(focus_curve)
-
-
 def vignetting() -> matplotlib.figure.Figure:
     optics = optics_factories.as_measured_single_channel()
     fig, axs = plt.subplots(

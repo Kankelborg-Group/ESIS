@@ -395,7 +395,7 @@ The images appear flipped compared to Figure~\ref{fig:projections} since the opt
                 figure.append(kgpy.latex.Label('fig:spotSize'))
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.focus_curve_pdf()), width=None)
+                figure.add_image(str(figures.focus_curve.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 Focus curve for the field angle at the middle of the \ESIS\ \FOV\ for the 
