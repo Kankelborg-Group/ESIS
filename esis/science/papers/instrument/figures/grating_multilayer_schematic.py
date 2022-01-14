@@ -2,6 +2,8 @@ import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import esis.optics
+import pylatex
+import kgpy.latex
 from .. import optics as optics_factories
 from . import formatting
 from . import caching
@@ -9,6 +11,7 @@ from . import caching
 __all__ = [
     'figure_mpl',
     'pdf',
+    'figure',
 ]
 
 
@@ -50,3 +53,14 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
+
+
+def figure() -> pylatex.Figure:
+    result = pylatex.Figure()
+    result.add_image(str(pdf()), width=None)
+    result.add_caption(pylatex.NoEscape(
+        r"""
+Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N=4$ \roy{$N=\gratingCoatingNumLayers$} layers."""
+    ))
+    result.append(kgpy.latex.Label('fig:gratingMultilayerSchematic'))
+    return result

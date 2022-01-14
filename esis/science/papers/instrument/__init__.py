@@ -94,14 +94,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.grating_multilayer_schematic.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N=4$ \roy{$N=\gratingCoatingNumLayers$} layers.
-"""
-                ))
-                figure.append(kgpy.latex.Label('fig:gratingMultilayerSchematic'))
+            doc.append(figures.grating_multilayer_schematic.figure())
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.grating_efficiency_vs_angle.pdf()), width=None)
