@@ -55,7 +55,7 @@ where $r$ runs radially outward from the optical axis with its origin at the cen
 The parameters of Equation~\ref{Eq-d} and $R_g$ were chosen so that the spatial and spectral focal curves intersect at 
 the center of the O\,\textsc{v} \roy{\OV} image on the \CCD.
 
-Starting from the analytically derived optical prescription, a model of the system was developed in ray-trace \roy{raytrace} software.
+Starting from the analytically-derived optical prescription, a model of the system was developed in ray-trace \roy{raytrace} software.
 Since the instrument is radially symmetric, only one grating and its associated lightpath was analyzed. \roy{delete previous sentence, all lightpaths were analyzed}
 In the ray trace model, $R_g$, $d_1$, $d_2$, grating cant angle, \CCD\ cant angle, and focus position were then 
 optimized to minimize the RMS spot at select positions in the O\,\textsc{v} \roy{\OV} \FOV, illustrated in Fig.~\ref{fig:psf}.
@@ -73,18 +73,18 @@ Each element of the model was individually perturbed, then a compensation applie
 The compensation optimized grating tip/tilt angle and \CCD\ focus position, so that the image was re-centered and RMS 
 spot size minimized at the positions in Fig.~\ref{F-spot} \roy{minimized at the vertices of the field stop and the central field angle}.
 We then computed the maximum change in RMS spot size over all spot positions between the optimized and perturbed models.
-The computed positional tolerances for each element in the \ESIS\ optical system are listed in Table~\ref{table:tol}.
+The computed positional tolerances for each element in the \ESIS\ optical system are listed in Table~\ref{table:errorBudget}.
 
-The imaging error budget is displayed in Table~\ref{table:tol}.
+The imaging error budget is displayed in Table~\ref{table:errorBudget}.
 For the primary mirror and grating surface figure contributions, we choose the \MTF\ figures of merit from the surface 
 roughness specifications described earlier.
 To quantify the remaining entries, we assume that each term can be represented by a gaussian function of width 
 $\sigma^2$ that ``blurs'' the final image.
 The value of $\sigma$ then corresponds to the maximum change in RMS spot size for each term as it is perturbed in the 
 tolerance analysis described above.
-The value of the \MTF\ in the right-most column of Table~\ref{table:tol} is computed from 
+The value of the \MTF\ in the right-most column of Table~\ref{table:errorBudget} is computed from 
 each of the gaussian blur terms at the Nyquist frequency (\SI{0.5}{cycles\per arcsecond}).
-From Table~\ref{table:tol}, we estimate the total \MTF\ of \ESIS\ to be $0.109$ at the Nyquist frequency.
+From Table~\ref{table:errorBudget}, we estimate the total \MTF\ of \ESIS\ to be $0.109$ at the Nyquist frequency.
 Compared to, for example, the Rayleigh criterion of \SI{0.09}{cycles\per arcsecond}~\citep{Rayleigh_1879} we estimate 
 the resolution of \ESIS\ to be essentially pixel limited.
 Since \ESIS\ pixels span \SI{0.76}{\arcsecond} \roy{\plateScaleMean}, the resolution target in Table~\ref{table:scireq} is obtained by this 
