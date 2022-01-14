@@ -2,10 +2,14 @@ import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
+import pylatex
+import kgpy.latex
 import kgpy.vector
 import esis.optics
 from . import formatting
 from . import caching
+from . import schematic_primary
+from . import schematic_grating
 
 __all__ = [
     'figure_mpl',
@@ -138,3 +142,25 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
+
+
+def figure() -> pylatex.Figure:
+    result = pylatex.Figure(position='htb!')
+    result._star_latex_name = True
+    result.append(kgpy.latex.aas.Gridline([
+        kgpy.latex.aas.Fig(pdf(), kgpy.latex.textwidth, '(a)')
+    ]))
+
+    result.append(kgpy.latex.aas.Gridline([
+        kgpy.latex.aas.LeftFig(schematic_primary.pdf(), kgpy.latex.columnwidth, '(b)'),
+        kgpy.latex.aas.RightFig(schematic_grating.pdf(), kgpy.latex.columnwidth, '(c)'),
+    ]))
+
+    result.add_caption(pylatex.NoEscape(
+        r"""(a) Schematic diagram of a single channel of the \ESIS\ optical system.
+(b) Clear aperture of the primary mirror, size of the central obscuration, and the footprint of the beam for each 
+channel.
+(c) Clear aperture of Channel 1's diffraction grating."""
+    ))
+    result.append(kgpy.latex.Label('fig:schematic'))
+    return result

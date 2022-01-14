@@ -94,23 +94,7 @@ The features of the field stop have been described previously in Sec.~\ref{subse
 cameras are covered in Sec.~\ref{subsec:Cameras}. """
             ))
 
-            with doc.create(kgpy.latex.FigureStar(position='htb!')) as figure:
-                figure.append(kgpy.latex.aas.Gridline([
-                    kgpy.latex.aas.Fig(figures.schematic.pdf(), kgpy.latex.textwidth, '(a)')
-                ]))
-
-                figure.append(kgpy.latex.aas.Gridline([
-                    kgpy.latex.aas.LeftFig(figures.schematic_primary.pdf(), kgpy.latex.columnwidth, '(b)'),
-                    kgpy.latex.aas.RightFig(figures.schematic_grating.pdf(), kgpy.latex.columnwidth, '(c)'),
-                ]))
-
-                figure.add_caption(pylatex.NoEscape(
-                    r"""(a) Schematic diagram of a single channel of the \ESIS\ optical system.
-(b) Clear aperture of the primary mirror, size of the central obscuration, and the footprint of the beam for each 
-channel.
-(c) Clear aperture of Channel 1's diffraction grating."""
-                ))
-                figure.append(kgpy.latex.Label('fig:schematic'))
+            doc.append(figures.schematic.figure())
 
             doc.append(pylatex.NoEscape(
                 r"""
