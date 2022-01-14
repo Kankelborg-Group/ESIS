@@ -147,19 +147,6 @@ Figure~\ref{fig:schematic}. """
 
             doc.append(figures.focus_curve.figure())
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.vignetting.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-(Top) 2D histogram counting the number of rays that were unvignetted by the \ESIS\ optical 
-system as a function of field position.
-The count is normalized to the maximum number of unvignetted rays at any field point.
-The field and pupil grids have the same parameters as the grid for Figure~\ref{fig:spotSize}.
-(Bottom) Residual between the top histogram and the vignetting model described in Table~\ref{table:vignetting}
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:vignetting'))
-
             doc.append(pylatex.NoEscape(r"""
 \begin{equation}
 \begin{split}
@@ -922,6 +909,19 @@ This was acceptable since the vignetting was found to be a simple linear field a
 and could be removed in the post-processing phase.
 """
             ))
+
+            with doc.create(pylatex.Figure()) as figure:
+                figure.add_image(str(figures.vignetting.pdf()), width=None)
+                figure.add_caption(pylatex.NoEscape(
+                    r"""\roy{
+(Top) 2D histogram counting the number of rays that were unvignetted by the \ESIS\ optical 
+system as a function of field position.
+The count is normalized to the maximum number of unvignetted rays at any field point.
+The field and pupil grids have the same parameters as the grid for Figure~\ref{fig:spotSize}.
+(Bottom) Residual between the top histogram and the vignetting model described in Table~\ref{table:vignetting}
+}"""
+                ))
+                figure.append(kgpy.latex.Label('fig:vignetting'))
 
         with doc.create(pylatex.Subsection('Distortion')):
             doc.append(pylatex.NoEscape(
