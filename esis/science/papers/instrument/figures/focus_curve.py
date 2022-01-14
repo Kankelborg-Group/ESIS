@@ -3,6 +3,8 @@ import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
 import esis.optics
+import pylatex
+import kgpy.latex
 from .. import optics as optics_factories
 from . import formatting
 from . import caching
@@ -41,3 +43,16 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
+
+
+def figure() -> pylatex.Figure:
+    result = pylatex.Figure()
+    result.add_image(str(pdf()), width=None)
+    result.add_caption(pylatex.NoEscape(
+        r"""
+\roy{Focus curve for the field angle at the middle of the \ESIS\ \FOV\ for the 
+\defaultNumEmissionLines\ brightest wavelengths in the passband.
+}"""
+    ))
+    result.append(kgpy.latex.Label('fig:focusCurve'))
+    return result

@@ -145,15 +145,7 @@ Figure~\ref{fig:schematic}. """
 
             doc.append(figures.spot_size.figure())
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.focus_curve.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-Focus curve for the field angle at the middle of the \ESIS\ \FOV\ for the 
-\defaultNumEmissionLines\ brightest wavelengths in the passband.
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:focusCurve'))
+            doc.append(figures.focus_curve.figure())
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.vignetting.pdf()), width=None)
