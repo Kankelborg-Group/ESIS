@@ -1191,7 +1191,7 @@ The distortion is due to two factors: first, the tilt of the detector as needed 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
             with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.grating_multilayer_schematic_pdf()), width=None)
+                figure.add_image(str(figures.grating_multilayer_schematic.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""
 Schematic of the Al/SiC/Mg \roy{\gratingCoatingMaterialShort} multilayer with $N=4$ \roy{$N=\gratingCoatingNumLayers$} layers.
