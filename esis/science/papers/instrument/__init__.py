@@ -117,33 +117,7 @@ The estimated diffraction \MTF\ and aberrations were therefore modeled for a rou
 aperture."""
             ))
 
-            with doc.create(pylatex.Table()) as table:
-                table._star_latex_name = True
-                with table.create(pylatex.Center()) as centering:
-                    with centering.create(pylatex.Tabular('llrr')) as tabular:
-                        tabular.escape = False
-                        tabular.add_row([r'Element', r'Parameter', r'Requirement', r'Measured'])
-                        tabular.add_hline()
-                        tabular.add_row([r'Primary', r'RMS slope error ($\mu$rad)', r'$<1.0$', r''])
-                        tabular.add_row([r'', r'Integration length (mm)', r'4.0', r''])
-                        tabular.add_row([r'', r'Sample length (mm)', r'2.0', r''])
-                        tabular.add_hline()
-                        tabular.add_row([r'Primary', r'RMS roughness (nm)', r'$<2.5$', r''])
-                        tabular.add_row([r'', r'Periods (mm)', r'0.1-6', r''])
-                        tabular.add_hline()
-                        tabular.add_row([r'Grating', r'RMS slope error ($\mu$rad)', r'$<3.0$', r''])
-                        tabular.add_row([r'', r'Integration length (mm)', r'2 \roy{why fewer sigfigs?}', r''])
-                        tabular.add_row([r'', r'Sample length (mm)', r'1', r''])
-                        tabular.add_hline()
-                        tabular.add_row([r'Grating', r'RMS roughness (nm)', r'$<2.3$', r''])
-                        tabular.add_row([r'', r'Periods (mm)', r'0.02-2', r''])
-                        tabular.add_hline()
-                table.add_caption(pylatex.NoEscape(
-                    r"""Figure and surface roughness requirements compared to metrology for the \ESIS\ optics.
-Slope error (both the numerical estimates and the measurements) is worked out with integration length and sample length 
-defined per ISO 10110."""
-                ))
-                table.append(kgpy.latex.Label('table:error'))
+            doc.append(tables.surface_error.table_old())
 
             # with doc.create(pylatex.Table()) as table:
             #     table._star_latex_name = True
