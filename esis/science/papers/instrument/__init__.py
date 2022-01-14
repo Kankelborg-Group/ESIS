@@ -143,18 +143,7 @@ Figure~\ref{fig:schematic}. """
 
             doc.append(figures.psf.figure())
 
-            with doc.create(kgpy.latex.FigureStar()) as figure:
-                figure.add_image(str(figures.spot_size.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-2D histogram of RMS spot sizes for the \defaultNumEmissionLines\ brightest wavelengths in the \ESIS\ passband. 
-Each wavelength has $\defaultFieldSamples \times \defaultFieldSamples$ field points across the \FOV, and each field point
-has a stratified random grid containing $\defaultPupilSamples \times \defaultPupilSamples$ pupil positions.
-The \HeI\ line appears cropped since it is cut off by the edge of the detector.
-The images appear flipped compared to Figure~\ref{fig:projections} since the optical system inverts the image of the skyplane.
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:spotSize'))
+            doc.append(figures.spot_size.figure())
 
             with doc.create(pylatex.Figure()) as figure:
                 figure.add_image(str(figures.focus_curve.pdf()), width=None)
