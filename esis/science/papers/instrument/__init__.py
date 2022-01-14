@@ -98,26 +98,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
             doc.append(figures.grating_efficiency_vs_angle.figure())
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.component_efficiency_vs_wavelength.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""(Top) Measured reflectance for several multilayer coated witness samples 
-\roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
-The white regions indicate wavelengths that intercept the detector and the gray regions indicate wavelengths that
-miss the detector.
-Note the suppression of second order relative to the first order and the consistency of the coatings between each 
-channel.
-The Channel \gratingWitnessMissingChannel\ grating measurement is missing due to issues in the measurement apparatus.
-(Bottom) Comparison of the efficiency of the three main \ESIS\ optical components: primary mirror, grating and filter.
-The primary mirror efficiency is based on measurements of a \Si\ witness sample taken on \primaryMeasurementDate\ at an 
-angle of incidence of \primaryWitnessMeasurementIncidenceAngle. 
-The grating efficiency is from a measurement of the Channel \testGratingChannelIndex\ grating taken on \testGratingDate\
-at an angle of incidence of \gratingMeasurementIncidenceAngle.
-The filter efficiency is a theoretical model that includes the filter mesh, \filterThickness\ of \filterMaterial\ and
-\filterOxideThickness\ of \filterMaterial\ oxide.
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:componentEfficiencyVsWavelength'))
+            doc.append(figures.component_efficiency_vs_wavelength.figure())
 
             with doc.create(pylatex.Figure()) as figure:
                 figure._star_latex_name = True
