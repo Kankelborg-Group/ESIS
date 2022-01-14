@@ -90,29 +90,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
         doc.append(sections.esis_instrument.vignetting.subsection())
 
-        with doc.create(pylatex.Subsection('Distortion')):
-            doc.append(pylatex.NoEscape(
-                r"""
-The distortion is due to two factors: first, the tilt of the detector as needed to maintain good focus over the \FOV 
-\citep{Poletto04}; second, the anamorphic magnification of the grating (see \cite{Schweizer1979}).
-"""
-            ))
-            doc.append(pylatex.NoEscape(r"""
-            \begin{equation}
-            \begin{split}
-            \left(x', y'\right) &= \C + \C_x x + \C_y y + \C_\lambda \lambda \\
-            &+ \C_{xx} x^2 + \C_{xy} x y + \C_{y \lambda} x \lambda \\
-            &+ \C_{yy} y^2 + \C_{y \lambda} y \lambda + \C_{\lambda \lambda} \lambda^2
-            \end{split}
-            \end{equation}
-            """
-                                        ))
-
-            doc.append(tables.distortion.table())
-
-            doc.append(figures.distortion.figure())
-
-            doc.append(figures.distortion_residual.figure())
+        doc.append(sections.esis_instrument.distortion.subsection())
 
         with doc.create(pylatex.Subsection('Coatings and Filters')):
 
