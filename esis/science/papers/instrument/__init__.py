@@ -110,19 +110,7 @@ The distortion is due to two factors: first, the tilt of the detector as needed 
 
             doc.append(tables.distortion.table())
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image(str(figures.distortion.pdf()), width=None)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""\roy{
-Plot of the magnified, undistorted field stop aperture vs. the distorted \OV\ image of the 
-field stop aperture on the \ESIS\ detector.
-The magnification factor used for the undistorted field stop aperture is the ratio of the grating exit arm to the 
-grating entrance arm (\armRatio).
-The distorted image of the field stop aperture was calculated using the \ESIS\ distortion model, described in 
-Table~\ref{table:distortion}.
-}"""
-                ))
-                figure.append(kgpy.latex.Label('fig:distortion'))
+            doc.append(figures.distortion.figure())
 
             with doc.create(pylatex.Figure()) as figure:
                 figure._star_latex_name = True
