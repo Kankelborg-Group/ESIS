@@ -475,7 +475,7 @@ Table~\ref{table:distortion}.
 
             with doc.create(pylatex.Figure()) as figure:
                 figure._star_latex_name = True
-                figure.add_image(str(figures.distortion_residual_pdf()), width=None)
+                figure.add_image(str(figures.distortion_residual.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 Magnitude of the residual between a linear distortion model and the raytrace model (top) and between a quadratic 
