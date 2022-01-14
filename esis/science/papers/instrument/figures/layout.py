@@ -137,7 +137,7 @@ def figure_mpl() -> matplotlib.figure.Figure:
 
 
 def pdf() -> pathlib.Path:
-    path = pathlib.Path(__file__).parent / 'layout.pdf'
+    path = pathlib.Path(__file__).parent / 'output' / 'layout.pdf'
     if not path.exists():
         fig = figure_mpl()
         h = 1.45
