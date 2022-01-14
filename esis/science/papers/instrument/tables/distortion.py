@@ -21,18 +21,15 @@ def table() -> pylatex.Table:
         )
 
     result = pylatex.Table()
-    result._star_latex_name = True
     with result.create(pylatex.Center()) as centering:
-        with centering.create(pylatex.Tabular('ll|rr|rr')) as tabular:
+        with centering.create(pylatex.Tabular('ll|rr')) as tabular:
             tabular.escape = False
-            tabular.append('\multicolumn{2}{l}{Coefficient} & $x\'$ & $y\'$ & $x\'$ rel. & $y\'$ rel.\\\\')
+            tabular.append('\multicolumn{2}{l}{Coefficient} & $x\'$ & $y\'$\\\\')
             tabular.add_hline()
             for c, name in enumerate(model_distortion.x.coefficient_names):
                 tabular.add_row([
                     f'{name}',
                     f'({model_distortion.x.coefficients[c].unit:latex_inline})',
-                    fmt_coeff(model_distortion.x.coefficients[c].squeeze()),
-                    fmt_coeff(model_distortion.y.coefficients[c].squeeze()),
                     fmt_coeff(model_distortion_relative.x.coefficients[c].squeeze()),
                     fmt_coeff(model_distortion_relative.y.coefficients[c].squeeze()),
                 ])
