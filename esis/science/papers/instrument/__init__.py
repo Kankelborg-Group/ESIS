@@ -382,7 +382,7 @@ Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
                 figure.append(kgpy.latex.Label('fig:psf'))
 
             with doc.create(kgpy.latex.FigureStar()) as figure:
-                figure.add_image(str(figures.spot_size_pdf()), width=None)
+                figure.add_image(str(figures.spot_size.pdf()), width=None)
                 figure.add_caption(pylatex.NoEscape(
                     r"""\roy{
 2D histogram of RMS spot sizes for the \defaultNumEmissionLines\ brightest wavelengths in the \ESIS\ passband. 

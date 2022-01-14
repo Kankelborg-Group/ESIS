@@ -27,6 +27,7 @@ from . import schematic_primary
 from . import schematic_grating
 from . import field_stop_projections
 from . import psf
+from . import spot_size
 
 __all__ = [
     'schematic_moses',
@@ -37,27 +38,8 @@ __all__ = [
     'schematic_grating',
     'field_stop_projections',
     'psf',
+    'spot_size',
 ]
-
-
-def spot_size() -> matplotlib.figure.Figure:
-    optics = optics_factories.as_designed_single_channel()
-    fig, axs = plt.subplots(
-        ncols=optics_factories.num_emission_lines_default,
-        figsize=(formatting.text_width, 2.5),
-        sharex=True,
-        sharey=True,
-        constrained_layout=True
-    )
-    optics.rays_output.plot_spot_size_vs_field(
-        axs=axs,
-        digits_after_decimal=formatting.digits_after_decimal,
-    )
-    return fig
-
-
-def spot_size_pdf() -> pathlib.Path:
-    return caching.cache_pdf(spot_size)
 
 
 def focus_curve() -> matplotlib.figure.Figure:
