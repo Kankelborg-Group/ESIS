@@ -102,14 +102,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
         with doc.create(pylatex.Subsection('Cameras')):
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure.add_image('figures/old/ESIS_Cameras_1gr_text', width=kgpy.latex.columnwidth)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""
-\ESIS\ camera assembly as built by \MSFCShort.  
-Thin film filters and filter tubes are not installed in this image."""
-                ))
-                figure.append(kgpy.latex.Label('F-cameras'))
+            doc.append(figures.cameras.figure())
 
             doc.append(pylatex.NoEscape(
                 r"""

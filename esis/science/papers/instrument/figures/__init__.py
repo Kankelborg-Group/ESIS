@@ -20,6 +20,7 @@ from . import grating_efficiency_vs_position
 from . import ccd_efficiency_vs_wavelength
 from . import alignment_transfer
 from . import baffles
+from . import cameras
 
 __all__ = [
     'schematic_moses',
