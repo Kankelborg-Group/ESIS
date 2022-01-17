@@ -7,3 +7,4 @@ from . import sensitivity_and_cadence
 from . import alignment_and_focus
 from . import apertures_and_baffles
 from . import cameras
+from . import avionics
