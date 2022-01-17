@@ -4,3 +4,4 @@ from . import vignetting
 from . import distortion
 from . import coatings_and_filters
 from . import sensitivity_and_cadence
+from . import alignment_and_focus
