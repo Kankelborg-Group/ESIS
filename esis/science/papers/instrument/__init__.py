@@ -100,13 +100,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
         with doc.create(pylatex.Subsection('Apertures and Baffles')):
 
-            with doc.create(pylatex.Figure()) as figure:
-                figure._star_latex_name = True
-                figure.add_image('figures/old/Baffles_1clr', width=kgpy.latex.textwidth)
-                figure.add_caption(pylatex.NoEscape(
-                    r"""Model view of \ESIS\ baffle placement and cutouts."""
-                ))
-                figure.append(kgpy.latex.Label('F-Baff1'))
+            doc.append(figures.baffles.figure())
 
             doc.append(pylatex.NoEscape(
                 r"""
