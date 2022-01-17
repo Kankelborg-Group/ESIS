@@ -1,23 +1,14 @@
-import typing as typ
 import pathlib
 import matplotlib.pyplot as plt
-import astropy.units as u
-import astropy.modeling
-import astropy.visualization
-import numpy as np
 import pylatex
 import kgpy.format
 import kgpy.latex
 import kgpy.units
 import kgpy.chianti
 import kgpy.optics
-import esis.optics
-import esis.science.papers.instrument.figures as figures
-from . import optics
 from . import preamble
 from . import variables
 from . import authors
-from . import tables
 from . import sections
 
 path_base = pathlib.Path(__file__).parent
