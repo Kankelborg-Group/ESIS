@@ -104,14 +104,7 @@ of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b an
 
         doc.append(sections.esis_instrument.avionics.subsection())
 
-        with doc.create(pylatex.Subsection('Pointing System')):
-            doc.append(pylatex.NoEscape(
-                r"""
-The imaging target will be selected prior to launch, the morning of the day of flight.
-During flight, pointing will be maintained by the \SPARCS\ \citep{Lockheed69}.
-Images from Camera 1 will be downlinked and displayed in real time on the \SPARCS\ control system console at intervals of 
-$\sim$\SI{16}{\second} to verify pointing is maintained during flight."""
-            ))
+        doc.append(sections.esis_instrument.pointing_system.subsection())
 
         with doc.create(pylatex.Subsection('Mechanical')):
             doc.append(pylatex.NoEscape(
