@@ -9,3 +9,4 @@ from . import apertures_and_baffles
 from . import cameras
 from . import avionics
 from . import pointing_system
+from . import mechanical
