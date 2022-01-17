@@ -70,43 +70,7 @@ def document() -> kgpy.latex.Document:
 
     doc.append(sections.science_objectives.section())
 
-    with doc.create(pylatex.Section(pylatex.NoEscape('The \ESIS\ Instrument'))):
-        doc.append(pylatex.NoEscape(
-            r"""\ESIS\ is a multi-projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
-widths in a single snapshot over a 2D \FOV.
-Starting from the notional instrument described in Sec.~\ref{sec:TheESISConcept}, \ESIS\ has been designed to ensure all 
-of the science requirements set forth in Table~\ref{table:scireq} are met.
-The final design parameters are summarized in Table~\ref{table:prescription}.
-
-A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{fig:schematic}a, while the mechanical features 
-of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b and \ref{fig:schematic}c, respectively."""
-        ))
-
-        doc.append(tables.prescription.table())
-
-        doc.append(sections.esis_instrument.optics.subsection())
-
-        doc.append(sections.esis_instrument.optimization_and_tolerancing.subsection(doc))
-
-        doc.append(sections.esis_instrument.vignetting.subsection())
-
-        doc.append(sections.esis_instrument.distortion.subsection())
-
-        doc.append(sections.esis_instrument.coatings_and_filters.subsection())
-
-        doc.append(sections.esis_instrument.sensitivity_and_cadence.subsection(doc))
-
-        doc.append(sections.esis_instrument.alignment_and_focus.subsection())
-
-        doc.append(sections.esis_instrument.apertures_and_baffles.subsection())
-
-        doc.append(sections.esis_instrument.cameras.subsection())
-
-        doc.append(sections.esis_instrument.avionics.subsection())
-
-        doc.append(sections.esis_instrument.pointing_system.subsection())
-
-        doc.append(sections.esis_instrument.mechanical.subsection())
+    doc.append(sections.esis_instrument.section(doc))
 
     with doc.create(pylatex.Section('Mission Profile')):
 
