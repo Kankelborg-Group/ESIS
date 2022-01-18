@@ -12,7 +12,7 @@ def table() -> pylatex.Table:
     with result.create(pylatex.Center()) as centering:
         with centering.create(pylatex.Tabular('lll')) as tabular:
             tabular.escape = False
-            tabular.add_row(['Surface', 'Parameter', 'Modeled value (measured value)'])
+            tabular.add_row(['Surface', 'Parameter', 'Calculated value (measured value)'])
             tabular.add_hline()
             tabular.add_row([r'Primary', r'Surface shape', r'Parabolic'])
             tabular.add_row([r'', r'Focal length ', r'\primaryFocalLength\ (\primaryFocalLengthMeasured)'])
