@@ -137,6 +137,25 @@ class Optics(
         return rays
 
     @property
+    def rays_output_relative(self) -> optics.rays.Rays:
+        rays = self.system.rays_output.copy()
+        rays.position = rays.position - self.detector.position_ov.to_3d()
+        rays.position = (rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)).to(u.pix)
+        rays.wavelength = rays.wavelength - rays.wavelength.take(0, axis=rays.axis.wavelength)
+        rays.input_grid.wavelength.points = rays.input_grid.wavelength.points - rays.input_grid.wavelength.points[..., 0]
+        return rays
+
+    @property
+    def f_number_effective(self) -> u.Quantity:
+        raytrace = self.system.raytrace
+        intercepts = raytrace.intercepts
+        diameter = self.grating.height
+        focal_length = self.arm_exit.length
+        # diameter = 2 * raytrace[~1].position_avg_pupil.length
+        # length = (intercepts[~0] - intercepts[~1]).length.mean(axis=raytrace[0].axis.pupil_xy, keepdims=True)
+        return focal_length / diameter
+
+    @property
     def back_focal_length(self) -> u.Quantity:
         return self.detector.translation.z
 
@@ -153,13 +172,19 @@ class Optics(
         return np.cos(self.angle_alpha.mean()) / np.cos(self.angle_beta.mean())
 
     @property
-    def arm_ratio(self) -> u.Quantity:
-        arm_entrance = (self.field_stop.transform.inverse + self.grating.transform).translation_eff
+    def arm_entrance(self) -> vector.Vector3D:
+        return (self.field_stop.transform.inverse + self.grating.transform).translation_eff
+
+    @property
+    def arm_exit(self) -> vector.Vector3D:
         transform_ov = kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate(x=self.detector.clear_half_width / 2)
+            kgpy.transform.rigid.Translate.from_vector(self.detector.position_ov.to_3d())
         ])
-        arm_exit = (self.grating.transform.inverse + self.detector.transform + transform_ov).translation_eff
-        return arm_exit.length / arm_entrance.length
+        return (self.grating.transform.inverse + self.detector.transform + transform_ov).translation_eff
+
+    @property
+    def arm_ratio(self) -> u.Quantity:
+        return self.arm_exit.length / self.arm_entrance.length
 
     @property
     def radius_ratio(self) -> u.Quantity:
@@ -427,7 +452,7 @@ class Optics(
         other._focus_and_align_factory(values, units, focus_grating, focus_detector)
         result_size = np.nanmean(other.system.rays_output.spot_size_rms[..., 0, :])
         result_position = np.nanmean(other.system.rays_output.position[..., 0, :])
-        target_position = kgpy.vector.Vector3D(x=7.2090754246099999 * u.mm)
+        target_position = other.detector.position_ov.to_3d()
         result_position = result_position - target_position
         result = np.sqrt(np.square(result_size) + np.square(result_position.length))
         return result.value
@@ -467,37 +492,6 @@ class Optics(
             bounds=ranges,
         )
         other._focus_and_align_factory(result.x, units, focus_grating, focus_detector)
-        return other
-
-    def copy(self) -> 'Optics':
-        other = super().copy()  # type: Optics
-        other.channel_name = self.channel_name.copy()
-        other.num_emission_lines = self.num_emission_lines
-        other.grid_field = self.grid_field.copy()
-        other.grid_pupil = self.grid_pupil.copy()
-        other.grid_velocity_los = self.grid_velocity_los.copy()
-        other.source = self.source.copy()
-        other.front_aperture = self.front_aperture.copy()
-        if self.central_obscuration is not None:
-            other.central_obscuration = self.central_obscuration.copy()
-        else:
-            other.central_obscuration = self.central_obscuration
-        other.primary = self.primary.copy()
-        other.field_stop = self.field_stop.copy()
-        other.grating = self.grating.copy()
-        if self.filter is not None:
-            other.filter = self.filter.copy()
-        else:
-            other.filter = self.filter
-        other.detector = self.detector.copy()
-        other.sparcs = self.sparcs.copy()
-        other.pointing = self.pointing.copy()
-        other.roll = self.roll.copy()
-        other.stray_light = self.stray_light.copy()
-        other.distortion_polynomial_degree = self.distortion_polynomial_degree
-        other.vignetting_polynomial_degree = self.vignetting_polynomial_degree
-        other.vignetting_correction = self.vignetting_correction.copy()
-        other.skin_diameter = self.skin_diameter.copy()
         return other
 
     def __call__(

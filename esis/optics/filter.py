@@ -49,18 +49,6 @@ class Filter(optics.component.CylindricalComponent[SurfT]):
         )
         return surface
 
-    def copy(self) -> 'Filter':
-        other = super().copy()      # type: Filter
-        other.inclination = self.inclination.copy()
-        other.clocking = self.clocking.copy()
-        other.clear_radius = self.clear_radius.copy()
-        other.border_width = self.border_width.copy()
-        other.thickness = self.thickness.copy()
-        other.thickness_oxide = self.thickness_oxide.copy()
-        other.mesh_ratio = self.mesh_ratio.copy()
-        other.mesh_pitch = self.mesh_pitch.copy()
-        return other
-
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe

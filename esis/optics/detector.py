@@ -59,6 +59,7 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
     bits_analog_to_digital: int = 0
     index_trigger: int = 0
     error_synchronization: u.Quantity = 0 * u.s
+    position_ov: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.spatial)
 
     @property
     def num_pixels_all(self) -> typ.Tuple[int, int]:
@@ -138,38 +139,6 @@ class Detector(optics.component.CylindricalComponent[SurfaceT]):
         )
         surface.material = optics.surface.material.CCDStern2004()
         return surface
-
-    def copy(self) -> 'Detector':
-        other = super().copy()  # type: Detector
-        other.manufacturer = self.manufacturer
-        other.range_focus_adjustment = self.range_focus_adjustment.copy()
-        other.inclination = self.inclination.copy()
-        other.roll = self.roll.copy()
-        other.twist = self.twist.copy()
-        other.pixel_width = self.pixel_width.copy()
-        other.num_pixels = self.num_pixels
-        other.border_width_right = self.border_width_right.copy()
-        other.border_width_left = self.border_width_left.copy()
-        other.border_width_top = self.border_width_top.copy()
-        other.border_width_bottom = self.border_width_bottom.copy()
-        other.dynamic_clearance = self.dynamic_clearance.copy()
-        other.npix_overscan = self.npix_overscan
-        other.npix_blank = self.npix_blank
-        other.temperature = self.temperature.copy()
-        other.gain = self.gain.copy()
-        other.readout_noise = self.readout_noise.copy()
-        other.dark_current = self.dark_current.copy()
-        other.charge_diffusion = self.charge_diffusion.copy()
-        other.time_frame_transfer = self.time_frame_transfer.copy()
-        other.time_readout = self.time_readout.copy()
-        other.exposure_length = self.exposure_length.copy()
-        other.exposure_length_min = self.exposure_length_min.copy()
-        other.exposure_length_max = self.exposure_length_max.copy()
-        other.exposure_length_increment = self.exposure_length_increment.copy()
-        other.bits_analog_to_digital = self.bits_analog_to_digital
-        other.index_trigger = self.index_trigger
-        other.error_synchronization = self.error_synchronization.copy()
-        return other
 
     @property
     def dataframe(self) -> pandas.DataFrame:

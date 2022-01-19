@@ -35,13 +35,6 @@ class FieldStop(optics.component.PistonComponent[SurfaceT]):
         )
         return surface
 
-    def copy(self) -> 'FieldStop':
-        other = super().copy()      # type: FieldStop
-        other.clear_radius = self.clear_radius.copy()
-        other.mech_radius = self.mech_radius.copy()
-        other.num_sides = self.num_sides
-        return other
-
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe

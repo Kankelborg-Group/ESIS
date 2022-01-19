@@ -37,13 +37,6 @@ class CentralObscuration(optics.component.PistonComponent[SurfaceT]):
         )
         return surface
 
-    def copy(self) -> 'CentralObscuration':
-        other = super().copy()      # type: CentralObscuration
-        other.obscured_half_width = self.obscured_half_width.copy()
-        # other.num_sides = self.num_sides
-        other.position_error = self.position_error.copy()
-        return other
-
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe
