@@ -78,7 +78,7 @@ class Optics(
             coefficients=[1 * u.dimensionless_unscaled, 0 / u.AA, 0 / u.arcsec, 0 / u.arcsec]
         )
     )
-    skin_diameter: u.Quantity = 0 * u.m,
+    skin_diameter: u.Quantity = 0 * u.m
 
     def __post_init__(self):
         self.update()
