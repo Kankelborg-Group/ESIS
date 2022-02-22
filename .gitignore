@@ -42,7 +42,7 @@
 workspace.xml
 /KSO-III/Engineering/MOSES/Software/Flight/src/Flight Computer/build/
 /KSO-III/Engineering/MOSES/Software/Flight/src/Flight Computer/dist/
-
+venv
 # pydoit files
 .doit.db
 
