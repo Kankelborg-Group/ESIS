@@ -82,7 +82,7 @@ def model(
     #     **rotation_kwargs
     # )
     rotated_cube = rotate(
-        image = cube.copy(),
+        image=cube.copy(),
         angle=az,
     )
 
@@ -131,8 +131,6 @@ def deproject(
         w_axis: int = ~0,
         rotation_kwargs: typ.Dict = None
 ) -> np.ndarray:
-
-
     if rotation_kwargs is None:
         rotation_kwargs = {'reshape': False, 'prefilter': False, 'order': 3, 'mode': 'nearest', }
 
