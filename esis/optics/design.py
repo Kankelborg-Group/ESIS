@@ -360,7 +360,7 @@ def final(
         y=charge_diffusion_model.y_stddev.quantity,
     ).length
 
-    detector.time_frame_transfer = 60 * u.ms
+    detector.time_frame_transfer = 49.598 * u.ms
     detector.time_readout = 1.1 * u.s
     detector.exposure_length = 10 * u.s
     detector.exposure_length_min = 2 * u.s
