@@ -129,5 +129,5 @@ class Level_1(kgpy.obs.Image):
     #         time_end=self.time_exp_end[~0],
     #     )
 
-    def optics_fit(self, aia_obs: kgpy.observatories.sdo.aia.AIA):
+    def optics_fit(self, aia_obs: kgpy.observatories.sdo.aia.RadiantIntensity):
         pass
