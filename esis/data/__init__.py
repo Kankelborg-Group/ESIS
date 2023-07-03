@@ -8,6 +8,7 @@ __all__ = [
     'Level_4'
 ]
 
+from . import inversion
 from . import nsroc
 from .level_0 import Level_0
 from .level_1 import Level_1

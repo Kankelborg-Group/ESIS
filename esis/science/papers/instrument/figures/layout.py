@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import astropy.units as u
 import pylatex
 import kgpy.latex
-import kgpy.vector
+import kgpy.vectors
 import esis.optics
 from . import formatting
 from . import caching
@@ -19,7 +19,7 @@ def figure_mpl() -> matplotlib.figure.Figure:
     ax_layout.set_axis_off()
     # ax_layout.set_aspect('equal')
     # ax_layout.set_proj_type('ortho')
-    esis_optics = esis.optics.design.final(pupil_samples=kgpy.vector.Vector2D(3, 1), field_samples=1)
+    esis_optics = esis.optics.design.final(pupil_samples=kgpy.vectors.Vector2D(3, 1), field_samples=1)
     # esis_optics.pointing.x = 3 * u.deg
     # esis_optics.pointing.y = 60 * u.deg
     esis_optics.central_obscuration = None
