@@ -13,7 +13,7 @@ import scipy.stats
 import scipy.interpolate
 import scipy.optimize
 # import scipy.signal
-import kgpy.vector
+# import kgpy.vectors
 import kgpy.atmosphere
 import kgpy.model
 import kgpy.obs
