@@ -12,44 +12,43 @@ import astropy.units as u
 import astropy.visualization
 import astropy.time
 import astropy.constants
-import kgpy.transform
-from kgpy import Name, mixin, vector, optics, observatories, polynomial, grid, plot
+import kgpy.mixin
+import kgpy.labeled
+import kgpy.vectors
+import kgpy.transforms
+import kgpy.optics
+import kgpy.plot
 import kgpy.chianti
 import kgpy.format
 import kgpy.nsroc
+import kgpy.ctis
 from . import Source, FrontAperture, CentralObscuration, FieldStop, Filter, Detector
 from . import primary as module_primary
 from . import grating as module_grating
 from . import detector as module_detector
 
 __all__ = [
-    'OpticsAxes',
+    # 'OpticsAxes',
     'Optics',
 ]
 
 
-class OpticsAxes(
-    module_detector.DetectorAxes,
-    module_grating.GratingAxes,
-    module_primary.PrimaryAxes,
-):
-    def __init__(self):
-        super().__init__()
-        self.channel = self.auto_axis_index()
+OpticsT = typ.TypeVar('OpticsT', bound='Optics')
 
 
 @dataclasses.dataclass
 class Optics(
-    mixin.Pickleable,
-    mixin.Named,
+    kgpy.ctis.instruments.AbstractSystemInstrument,
+    kgpy.mixin.Pickleable,
+    kgpy.mixin.Named,
 ):
     """
     Add test docstring to see if this is the problem.
     """
-    axis: typ.ClassVar[OpticsAxes] = OpticsAxes()
+    # axis: typ.ClassVar[OpticsAxes] = OpticsAxes()
 
-    name: Name = dataclasses.field(default_factory=lambda: Name('ESIS'))
-    channel_name: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
+    name: str = 'ESIS'
+    channel_name: typ.Union[str, kgpy.labeled.Array[str]] = ''
     source: Source = dataclasses.field(default_factory=Source)
     front_aperture: FrontAperture = dataclasses.field(default_factory=FrontAperture)
     central_obscuration: typ.Optional[CentralObscuration] = dataclasses.field(default_factory=CentralObscuration)
@@ -59,25 +58,13 @@ class Optics(
     filter: typ.Optional[Filter] = dataclasses.field(default_factory=Filter)
     detector: Detector = dataclasses.field(default_factory=Detector)
     num_emission_lines: int = 3
-    grid_field: grid.RegularGrid2D = dataclasses.field(default_factory=lambda: grid.RegularGrid2D(num_samples=11))
-    grid_pupil: grid.RegularGrid2D = dataclasses.field(default_factory=lambda: grid.RegularGrid2D(num_samples=11))
-    grid_velocity_los: grid.Grid1D = dataclasses.field(default_factory=lambda: grid.RegularGrid1D(
-        min=0 * u.km / u.s,
-        max=0 * u.km / u.s,
-        num_samples=1,
-    ))
+    object_grid_normalized: kgpy.optics.vectors.ObjectVector = dataclasses.field(default_factory=kgpy.optics.vectors.ObjectVector)
+    resample_over_entrance: bool = True
     sparcs: kgpy.nsroc.sparcs.SPARCS = dataclasses.field(default_factory=kgpy.nsroc.sparcs.SPARCS)
-    pointing: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.angular)
-    roll: u.Quantity = 0 * u.deg
+    transform_pointing: kgpy.transforms.TransformList = dataclasses.field(default_factory=kgpy.transforms.TransformList)
     stray_light: u.Quantity = 0 * u.adu
     distortion_polynomial_degree: int = 2
     vignetting_polynomial_degree: int = 1
-    vignetting_correction: polynomial.Polynomial3D = dataclasses.field(
-        default_factory=lambda: polynomial.Polynomial3D(
-            degree=1,
-            coefficients=[1 * u.dimensionless_unscaled, 0 / u.AA, 0 / u.arcsec, 0 / u.arcsec]
-        )
-    )
     skin_diameter: u.Quantity = 0 * u.m,
 
     def __post_init__(self):
@@ -89,24 +76,24 @@ class Optics(
 
     @property
     def num_channels(self) -> int:
-        return self.grating.cylindrical_azimuth.shape[~0]
+        return self.grating.translation_cylindrical.azimuth.shape['channel']
+
+    # @property
+    # def grid_rays(self):
+    #     return kgpy.optics.rays.RayGrid(
+    #         field=self.grid_field,
+    #         pupil=self.grid_pupil,
+    #         wavelength=grid.IrregularGrid1D(
+    #             points=self.wavelength,
+    #             name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
+    #         ),
+    #         velocity_los=self.grid_velocity_los,
+    #     )
 
     @property
-    def grid_rays(self):
-        return kgpy.optics.rays.RayGrid(
-            field=self.grid_field,
-            pupil=self.grid_pupil,
-            wavelength=grid.IrregularGrid1D(
-                points=self.wavelength,
-                name=self.bunch.ion_spectroscopic[:self.num_emission_lines],
-            ),
-            velocity_los=self.grid_velocity_los,
-        )
-
-    @property
-    def system(self) -> optics.System:
+    def system(self) -> kgpy.optics.systems.System:
         if self._system is None:
-            surfaces = optics.surface.SurfaceList()
+            surfaces = kgpy.optics.surfaces.SurfaceList()
             surfaces.append(self.front_aperture.surface)
             if self.central_obscuration is not None:
                 surfaces.append(self.central_obscuration.surface)
@@ -116,28 +103,41 @@ class Optics(
             if self.filter is not None:
                 surfaces.append(self.filter.surface)
             surfaces.append(self.detector.surface)
-            self._system = optics.System(
+
+            object_grid = self.object_grid_normalized
+            object_grid.wavelength_base = self.wavelength_range * object_grid.wavelength_base + self.wavelength_min
+
+            self._system = kgpy.optics.systems.System(
+                transform_pointing=self.transform_pointing,
                 object_surface=self.source.surface,
                 surfaces=surfaces,
-                grid_rays=self.grid_rays,
-                field_margin=1.5 * u.arcsec,
-                pointing=self.pointing,
-                roll=self.roll,
+                object_grid_normalized=object_grid,
+                resample_over_entrance=self.resample_over_entrance,
+                field_margin=10 * u.um,
                 distortion_polynomial_degree=self.distortion_polynomial_degree,
                 vignetting_polynomial_degree=self.vignetting_polynomial_degree,
             )
         return self._system
 
     @property
-    def rays_output(self) -> optics.rays.Rays:
+    def system_interpolated(self) -> kgpy.optics.systems.InterpolatedSystem:
+        result = self.system.interpolated
+        result.field_stop = kgpy.optics.aberrations.FieldStop(
+            aperture=self.field_stop.surface.aperture,
+        )
+        result.field_stop.aperture.radius = (result.field_stop.aperture.radius / self.primary.focal_length * u.rad).to(u.arcsec)
+        return result
+
+    @property
+    def rays_output(self) -> kgpy.optics.rays.RayFunction:
         rays = self.system.rays_output.copy()
-        rays.position = (rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)).to(u.pix)
-        rays.position.x = rays.position.x + self.detector.num_pixels[vector.ix] * u.pix / 2
-        rays.position.y = rays.position.y + self.detector.num_pixels[vector.iy] * u.pix / 2
+        rays.output.position = (rays.output.position / (self.detector.pixel_width.to(u.mm) / u.pix)).to(u.pix)
+        rays.output.position.x = rays.output.position.x + self.detector.num_pixels.x * u.pix / 2
+        rays.output.position.y = rays.output.position.y + self.detector.num_pixels.y * u.pix / 2
         return rays
 
     @property
-    def rays_output_relative(self) -> optics.rays.Rays:
+    def rays_output_relative(self) -> kgpy.optics.rays.RayFunction:
         rays = self.system.rays_output.copy()
         rays.position = rays.position - self.detector.position_ov.to_3d()
         rays.position = (rays.position / (self.detector.pixel_width.to(u.mm) / u.pix)).to(u.pix)
@@ -163,8 +163,8 @@ class Optics(
     def magnification(self):
         rays_detector = self.system.rays_output
         rays_fs = self.system.raytrace[self.system.surfaces_all.flat_local.index(self.field_stop.surface)]
-        scale_detector = rays_detector.distortion.plate_scale[..., 0, 0, 0]
-        scale_fs = rays_fs.distortion.plate_scale[..., 0, 0, 0]
+        scale_detector = rays_detector.distortion(polynomial_degree=self.distortion_polynomial_degree).plate_scale
+        scale_fs = rays_fs.distortion(polynomial_degree=self.distortion_polynomial_degree).plate_scale
         return scale_fs / scale_detector
 
     @property
@@ -172,15 +172,15 @@ class Optics(
         return np.cos(self.angle_alpha.mean()) / np.cos(self.angle_beta.mean())
 
     @property
-    def arm_entrance(self) -> vector.Vector3D:
-        return (self.field_stop.transform.inverse + self.grating.transform).translation_eff
+    def arm_entrance(self) -> kgpy.vectors.Cartesian2D:
+        return (self.field_stop.transform.inverse + self.grating.transform).vector
 
     @property
-    def arm_exit(self) -> vector.Vector3D:
-        transform_ov = kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate.from_vector(self.detector.position_ov.to_3d())
+    def arm_exit(self) -> kgpy.vectors.Cartesian2D:
+        transform_ov = kgpy.transforms.TransformList([
+            kgpy.transforms.Translation(self.detector.position_ov.to_3d())
         ])
-        return (self.grating.transform.inverse + self.detector.transform + transform_ov).translation_eff
+        return (self.grating.transform.inverse + self.detector.transform + transform_ov).vector
 
     @property
     def arm_ratio(self) -> u.Quantity:
@@ -199,63 +199,65 @@ class Optics(
         return np.arctan2(self.detector.pixel_width, self.effective_focal_length) << u.rad
 
     @property
-    def plate_scale(self) -> vector.Vector2D:
-        return self.rays_output.distortion.plate_scale[..., 0, 0, 0]
+    def plate_scale(self) -> kgpy.vectors.Cartesian2D:
+        return self.rays_output.distortion(self.distortion_polynomial_degree).plate_scale
 
     @property
-    def resolution_spatial(self) -> vector.Vector2D:
+    def resolution_spatial(self) -> kgpy.vectors.Cartesian2D:
         return 2 * u.pix * self.plate_scale
 
     @property
     def dispersion(self) -> u.Quantity:
-        val = self.rays_output.distortion.dispersion[..., 0, 0, 0]
+        val = self.rays_output.distortion(self.distortion_polynomial_degree).dispersion
         return val.to(u.Angstrom / u.pix)
 
     @property
     def dispersion_doppler(self) -> u.Quantity:
-        val = self.dispersion / self.wavelength[..., 0] * astropy.constants.c
+        val = self.dispersion / self.wavelength * astropy.constants.c
         return val.to(u.km / u.s / u.pix)
     
     @property
-    def field_of_view(self) -> kgpy.vector.Vector2D:
-        return 2 * kgpy.vector.Vector2D(self.source.half_width_x, self.source.half_width_y)
+    def field_of_view(self) -> kgpy.vectors.Cartesian2D:
+        return self.system.rays_input.input.field_xy.ptp(axis=('field_x', 'field_y'))
 
     @property
     def angle_alpha(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.field_stop.transform
-        t = t + kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate.from_vector(
-                self.field_stop.surface.aperture.vertices[(...,) + (np.newaxis,) * t.translation_eff.ndim]
+        t = t + kgpy.transforms.TransformList([
+            kgpy.transforms.Translation(
+                np.moveaxis(self.field_stop.surface.aperture.vertices, 'vertex', 'field_stop_vertex'),
             )
         ])
-        t = np.moveaxis(t.translation_eff, 0, ~0)
-        return np.arctan2(t.x, t.z)
+        return np.arctan2(t.vector.x, t.vector.z)
 
     @property
     def angle_beta(self) -> u.Quantity:
         t = self.grating.transform.inverse + self.detector.transform
-        t = t + kgpy.transform.rigid.TransformList([
-            kgpy.transform.rigid.Translate.from_vector(
-                self.detector.surface.aperture.vertices[(...,) + (np.newaxis,) * t.translation_eff.ndim]
+        t = t + kgpy.transforms.TransformList([
+            kgpy.transforms.Translation(
+                np.moveaxis(self.detector.surface.aperture.vertices, 'vertex', 'detector_vertex'),
             )
         ])
-        t = np.moveaxis(t.translation_eff, 0, ~0)
-        return np.arctan2(t.x, t.z)
+        return np.arctan2(t.vector.x, t.vector.z)
 
     @property
     def _wavelength_test_grid(self) -> u.Quantity:
-        return self.grating.surface.rulings.wavelength_from_angles(
-            input_angle=self.angle_alpha[..., :, np.newaxis],
-            output_angle=self.angle_beta[..., np.newaxis, :]
+        return self.grating.surface.ruling.wavelength_from_angles(
+            input_angle=self.angle_alpha,
+            output_angle=self.angle_beta,
         )
 
     @property
     def wavelength_min(self) -> u.Quantity:
-        return self._wavelength_test_grid.min((~1, ~0)).to(u.AA)
+        return self._wavelength_test_grid.min(('field_stop_vertex', 'detector_vertex')).to(u.AA)
 
     @property
     def wavelength_max(self) -> u.Quantity:
-        return self._wavelength_test_grid.max((~1, ~0)).to(u.AA)
+        return self._wavelength_test_grid.max(('field_stop_vertex', 'detector_vertex')).to(u.AA)
+
+    @property
+    def wavelength_range(self) -> kgpy.labeled.Array:
+        return self.wavelength_max - self.wavelength_min
 
     @property
     def bunch(self) -> kgpy.chianti.Bunch:
@@ -266,15 +268,21 @@ class Optics(
         return self._bunch
 
     @property
-    def wavelength(self) -> u.Quantity:
-        return self.bunch.wavelength[:self.num_emission_lines]
+    def wavelength(self) -> kgpy.labeled.AbstractArray:
+        return self.bunch.wavelength[dict(ion=slice(None, self.num_emission_lines))]
 
     @property
     def wavelength_sorted(self) -> u.Quantity:
         return np.sort(self.wavelength)
 
+    # @property
+    # def aberration(self: OpticsT) -> kgpy.optics.aberrations.Aberration:
+    #     return kgpy.optics.aberrations.Aberration(
+    #         # distortion=
+    #     )
+
     @property
-    def psf_diffraction(self) -> typ.Tuple[u.Quantity, kgpy.vector.Vector2D]:
+    def psf_diffraction(self):
 
         rays = self.system.rays_output_resample_entrance
         # rays = self.system.rays_input
@@ -1856,27 +1864,28 @@ class Optics(
     def plot_distance_annotations_zx(
             self,
             ax: matplotlib.axes.Axes,
-            transform_extra: typ.Optional[kgpy.transform.rigid.TransformList] = None,
+            transform_extra: typ.Optional[kgpy.transforms.TransformList] = None,
             digits_after_decimal: int = 3,
     ):
         with astropy.visualization.quantity_support():
             if transform_extra is None:
-                transform_extra = kgpy.transform.rigid.TransformList()
+                transform_extra = kgpy.transforms.TransformList()
             # transform_base = transform_extra + self.transform
 
             for surf in self.system.surfaces_all.flat_global:
+                zero_vector = kgpy.vectors.Cartesian3D() * u.mm
                 if surf.name == self.central_obscuration.name:
-                    position_obscuration = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                    position_obscuration = (transform_extra + surf.transform)(zero_vector)
                 elif surf.name == self.primary.name:
-                    position_primary = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                    position_primary = (transform_extra + surf.transform)(zero_vector)
                 elif surf.name == self.field_stop.name:
-                    position_fs = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                    position_fs = (transform_extra + surf.transform)(zero_vector)
                 elif surf.name == self.grating.name:
-                    position_grating = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                    position_grating = (transform_extra + surf.transform)(zero_vector)
                 elif surf.name == self.filter.name:
-                    position_filter = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                    position_filter = (transform_extra + surf.transform)(zero_vector)
                 elif surf.name == self.detector.name:
-                    position_detector = (transform_extra + surf.transform)(vector.Vector3D.spatial())
+                    position_detector = (transform_extra + surf.transform)(zero_vector)
 
             # position_obscuration = (transform_base + self.central_obscuration.transform)(vector.Vector3D.spatial())
             # position_primary = (transform_base + self.primary.transform)(vector.Vector3D.spatial())
@@ -1902,8 +1911,8 @@ class Optics(
 
             blended_transform_x = matplotlib.transforms.blended_transform_factory(ax.transData, ax.figure.dpi_scale_trans)
             # print(self.primary.mech_half_width * kgpy.vector.z_hat)
-            xh = kgpy.vector.x_hat.zx
-            annotation_primary_to_fs_x = plot.annotate_component(
+            xh = kgpy.vectors.Cartesian3D.x_hat().zx
+            annotation_primary_to_fs_x = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx + self.primary.mech_half_width * xh,
                 point_2=position_fs.zx,
@@ -1912,7 +1921,7 @@ class Optics(
                 transform=ax.get_xaxis_transform(),
                 digits_after_decimal=digits_after_decimal,
             )
-            annotation_fs_to_grating_x = plot.annotate_component(
+            annotation_fs_to_grating_x = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_fs.zx,
                 point_2=position_grating.zx + (self.grating.outer_half_width + self.grating.border_width) * xh,
@@ -1921,7 +1930,7 @@ class Optics(
                 transform=ax.get_xaxis_transform(),
                 digits_after_decimal=digits_after_decimal,
             )
-            annotation_fs_to_obscuration_x = plot.annotate_component(
+            annotation_fs_to_obscuration_x = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_fs.zx,
                 point_2=position_obscuration.zx + self.central_obscuration.obscured_half_width * xh,
@@ -1932,7 +1941,7 @@ class Optics(
                 transform=ax.get_xaxis_transform(),
                 digits_after_decimal=digits_after_decimal,
             )
-            annotation_primary_to_grating_y = plot.annotate_component(
+            annotation_primary_to_grating_y = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx,
                 point_2=position_grating.zx,
@@ -1945,7 +1954,7 @@ class Optics(
                 plot_bar_1=False,
                 digits_after_decimal=digits_after_decimal,
             )
-            annotation_primary_to_filter_x = plot.annotate_component(
+            annotation_primary_to_filter_x = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx + (self.primary.clear_half_width + self.primary.border_width) * xh,
                 point_2=position_filter.zx + self.filter.clear_radius * xh,
@@ -1958,7 +1967,7 @@ class Optics(
                 transparent=True,
                 digits_after_decimal=digits_after_decimal,
             )
-            annotation_primary_to_filter_y = plot.annotate_component(
+            annotation_primary_to_filter_y = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx,
                 point_2=position_filter.zx,
@@ -1969,7 +1978,7 @@ class Optics(
                 digits_after_decimal=digits_after_decimal,
             )
 
-            annotation_primary_to_detector_x = plot.annotate_component(
+            annotation_primary_to_detector_x = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx + (self.primary.clear_half_width + self.primary.border_width) * xh,
                 point_2=position_detector.zx + self.detector.clear_half_width * xh,
@@ -1982,7 +1991,7 @@ class Optics(
                 transparent=True,
                 digits_after_decimal=digits_after_decimal,
             )
-            annotation_primary_to_detector_y = plot.annotate_component(
+            annotation_primary_to_detector_y = kgpy.plot.annotate_component(
                 ax=ax,
                 point_1=position_primary.zx + self.primary.material.thickness * kgpy.vector.z_hat.zx,
                 point_2=position_detector.zx,
@@ -1995,7 +2004,7 @@ class Optics(
 
             diff = (self.grating.transform)
             default_radius = 100 * u.mm
-            annotation_grating_tip = plot.annotate_angle(
+            annotation_grating_tip = kgpy.plot.annotate_angle(
                 ax=ax,
                 point_center=position_grating.zx,
                 # radius=15 * self.grating.surface.aperture_mechanical.max.y,
@@ -2009,7 +2018,7 @@ class Optics(
                 digits_after_decimal=digits_after_decimal,
             )
 
-            annotation_filter_tip = plot.annotate_angle(
+            annotation_filter_tip = kgpy.plot.annotate_angle(
                 ax=ax,
                 point_center=position_filter.zx,
                 # radius=5 * self.filter.surface.aperture_mechanical.max.y,
@@ -2023,7 +2032,7 @@ class Optics(
                 digits_after_decimal=digits_after_decimal,
             )
 
-            annotation_detector_tip = plot.annotate_angle(
+            annotation_detector_tip = kgpy.plot.annotate_angle(
                 ax=ax,
                 point_center=position_detector.zx,
                 # radius=10 * self.detector.surface.aperture_mechanical.max.y,
@@ -2038,7 +2047,7 @@ class Optics(
             )
 
     @property
-    def subsystem_spectrograph(self) -> optics.System:
+    def subsystem_spectrograph(self) -> kgpy.optics.systems.System:
         fs = self.field_stop.surface
         fs.transform.append(kgpy.transform.rigid.TiltZ(self.roll))
         return optics.System(

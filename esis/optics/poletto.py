@@ -1,7 +1,6 @@
 import typing as typ
 import numpy as np
 import astropy.units as u
-from kgpy import vector
 # from . import Grating, Detector
 
 __all__ = [

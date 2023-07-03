@@ -3,141 +3,124 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, vector, transform, optics, format, mixin
+import kgpy.format
+import kgpy.labeled
+import kgpy.uncertainty
+import kgpy.vectors
+import kgpy.transforms
+import kgpy.optics
+import kgpy.mixin
 from . import Grating
 from astropy import constants as const
 
 
 __all__ = ['Detector']
 
-SurfaceT = optics.surface.Surface[
+SurfaceT = kgpy.optics.surfaces.Surface[
     None,
     None,
-    optics.surface.aperture.Rectangular,
-    optics.surface.aperture.AsymmetricRectangular,
+    kgpy.optics.surfaces.apertures.Rectangular,
+    kgpy.optics.surfaces.apertures.Rectangular,
     None,
 ]
 
 
-class DetectorAxes(mixin.AutoAxis):
-    def __init__(self):
-        super().__init__()
-        self.detector_translation_x = self.auto_axis_index(from_right=False)
-        self.detector_translation_y = self.auto_axis_index(from_right=False)
-        self.detector_translation_z = self.auto_axis_index(from_right=False)
-
-
 @dataclasses.dataclass
-class Detector(optics.component.CylindricalComponent[SurfaceT]):
-    name: Name = dataclasses.field(default_factory=lambda: Name('detector'))
+class Detector(kgpy.optics.components.CylindricalComponent[SurfaceT]):
+    name: str = 'detector'
     manufacturer: str = ''
-    serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
-    range_focus_adjustment: u.Quantity = 0 * u.mm
-    inclination: u.Quantity = 0 * u.deg
-    roll: u.Quantity = 0 * u.deg
-    twist: u.Quantity = 0 * u.deg
-    pixel_width: u.Quantity = 0 * u.um
-    num_pixels: typ.Tuple[int, int] = (0, 0)
-    border_width_right: u.Quantity = 0 * u.mm
-    border_width_left: u.Quantity = 0 * u.mm
-    border_width_top: u.Quantity = 0 * u.mm
-    border_width_bottom: u.Quantity = 0 * u.mm
-    dynamic_clearance: u.Quantity = 0 * u.mm
+    serial_number: typ.Union[str, kgpy.labeled.Array[str]] = ''
+    range_focus_adjustment: kgpy.labeled.ArrayLike = 0 * u.mm
+    inclination: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    roll: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    twist: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    pixel_width: kgpy.labeled.ArrayLike = 0 * u.um
+    num_pixels: kgpy.vectors.Cartesian2D[int, int] = dataclasses.field(default_factory=kgpy.vectors.Cartesian2D)
+    border_width: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    dynamic_clearance: kgpy.labeled.ArrayLike = 0 * u.mm
     npix_overscan: int = 0
     npix_blank: int = 0
-    temperature: u.Quantity = 0 * u.K
-    gain: u.Quantity = 0 * u.electron / u.adu
-    readout_noise: u.Quantity = 0 * u.adu
-    dark_current: u.Quantity = 0 * u.electron / u.s
-    charge_diffusion: u.Quantity = 0 * u.mm
-    time_frame_transfer: u.Quantity = 0 * u.s
-    time_readout: u.Quantity = 0 * u.s
-    exposure_length: u.Quantity = 0 * u.s
-    exposure_length_min: u.Quantity = 0 * u.s
-    exposure_length_max: u.Quantity = 0 * u.s
-    exposure_length_increment: u.Quantity = 0 * u.s
+    temperature: kgpy.uncertainty.ArrayLike = 0 * u.K
+    gain: kgpy.uncertainty.ArrayLike = 0 * u.electron / u.adu
+    readout_noise: kgpy.uncertainty.ArrayLike = 0 * u.adu
+    dark_current: kgpy.uncertainty.ArrayLike = 0 * u.electron / u.s
+    charge_diffusion: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    time_frame_transfer: kgpy.uncertainty.ArrayLike = 0 * u.s
+    time_readout: kgpy.uncertainty.ArrayLike = 0 * u.s
+    exposure_length: kgpy.uncertainty.ArrayLike = 0 * u.s
+    exposure_length_min: kgpy.labeled.ArrayLike = 0 * u.s
+    exposure_length_max: kgpy.labeled.ArrayLike = 0 * u.s
+    exposure_length_increment: kgpy.labeled.ArrayLike = 0 * u.s
     bits_analog_to_digital: int = 0
     index_trigger: int = 0
     error_synchronization: u.Quantity = 0 * u.s
-    position_ov: vector.Vector2D = dataclasses.field(default_factory=vector.Vector2D.spatial)
+    position_ov: kgpy.vectors.Cartesian2D = dataclasses.field(default_factory=lambda: kgpy.vectors.Cartesian2D() * u.mm)
 
     @property
-    def num_pixels_all(self) -> typ.Tuple[int, int]:
+    def num_pixels_all(self) -> kgpy.vectors.Cartesian2D:
         """
-        Number of pixels in each axis including the overscan and blank pixels
-
-        Returns
-        -------
-        A tuple containing the total number of pixels along the long axis and short axis.
+        Number of pixels in each axis including the overscan and blank pixels.
         """
-        npix_x = self.num_pixels[vector.ix] + 2 * self.npix_overscan + 2 * self.npix_blank
-        npix_y = self.num_pixels[vector.iy]
-        return npix_x, npix_y
+        result = self.num_pixels.copy()
+        result.x = result.x + 2 * self.npix_overscan + 2 * self.npix_blank
+        return result
 
     @property
-    def quadrants(self) -> typ.Tuple[typ.Tuple[slice, slice], ...]:
+    def quadrants(self) -> typ.Tuple[typ.Dict[str, slice], ...]:
         """
         Slices for isolating the pixels associated with each tap on the CCD
-
-        Returns
-        -------
-        A 4-tuple containing the pixel ranges for each axis of each quadrant on the sensor.
         """
-        half_height = self.num_pixels_all[vector.iy] // 2
-        half_width = self.num_pixels_all[vector.ix] // 2
-        quad_1 = slice(half_height), slice(half_width)
-        quad_2 = slice(half_height, None), slice(half_width)
-        quad_3 = slice(half_height, None), slice(half_width, None)
-        quad_4 = slice(half_height), slice(half_width, None)
+        npix = self.num_pixels_all
+        pix = npix // 2
+        quad_1 = dict(x=slice(pix.x), y=slice(pix.y))
+        quad_2 = dict(x=slice(pix.x, None), y=slice(pix.y))
+        quad_3 = dict(x=slice(pix.x, None), y=slice(pix.y, None))
+        quad_4 = dict(x=slice(pix.x), y=slice(pix.y, None))
         return quad_1, quad_2, quad_3, quad_4
 
     @property
-    @u.quantity_input
-    def pixel_half_width(self) -> u.um:
+    def pixel_half_width(self) -> kgpy.labeled.ArrayLike:
         return self.pixel_width / 2
 
     @property
-    @u.quantity_input
-    def clear_width(self) -> u.mm:
-        return (self.num_pixels[vector.ix] * self.pixel_width).to(u.mm)
+    def clear_width(self) -> kgpy.labeled.ArrayLike:
+        return (self.num_pixels.x * self.pixel_width).to(u.mm)
 
     @property
-    @u.quantity_input
-    def clear_height(self) -> u.mm:
-        return (self.num_pixels[vector.iy] * self.pixel_width).to(u.mm)
+    def clear_height(self) -> kgpy.labeled.ArrayLike:
+        return (self.num_pixels.y * self.pixel_width).to(u.mm)
 
     @property
-    @u.quantity_input
-    def clear_half_width(self) -> u.mm:
+    def clear_half_width(self) -> kgpy.labeled.ArrayLike:
         return self.clear_width / 2
 
     @property
-    @u.quantity_input
-    def clear_half_height(self) -> u.mm:
+    def clear_half_height(self) -> kgpy.labeled.ArrayLike:
         return self.clear_height / 2
 
     @property
-    def transform(self) -> transform.rigid.TransformList:
-        return super().transform + transform.rigid.TransformList([
-            transform.rigid.TiltZ(self.roll),
-            transform.rigid.TiltY(self.inclination),
-            transform.rigid.TiltX(self.twist),
+    def transform(self) -> kgpy.transforms.TransformList:
+        return super().transform + kgpy.transforms.TransformList([
+            kgpy.transforms.RotationZ(self.roll),
+            kgpy.transforms.RotationY(self.inclination),
+            kgpy.transforms.RotationX(self.twist),
         ])
 
     @property
-    def surface(self) -> SurfaceT:
-        surface = super().surface
-        surface.aperture = optics.surface.aperture.Rectangular(
-            half_width_x=self.clear_half_width,
-            half_width_y=self.clear_half_height,
+    def surface(self) -> kgpy.optics.detectors.Detector:
+        surface = kgpy.optics.detectors.Detector()
+        surface.name = self.name
+        surface.transform = self.transform
+        surface.plot_kwargs = {**surface.plot_kwargs, **self.plot_kwargs}
+        surface.aperture = kgpy.optics.surfaces.apertures.Rectangular(
+            is_active=False,
+            half_width=kgpy.vectors.Cartesian2D(self.clear_half_width, self.clear_half_height),
         )
-        surface.aperture_mechanical = optics.surface.aperture.AsymmetricRectangular(
-            width_x_neg=-(self.clear_half_width + self.border_width_left),
-            width_x_pos=self.clear_half_width + self.border_width_right,
-            width_y_neg=-(self.clear_half_height + self.border_width_bottom),
-            width_y_pos=self.clear_half_height + self.border_width_top,
+        surface.aperture_mechanical = kgpy.optics.surfaces.apertures.Rectangular(
+            half_width=kgpy.vectors.Cartesian2D(self.clear_half_width, self.clear_half_height) + self.border_width,
         )
-        surface.material = optics.surface.material.CCDStern2004()
+        surface.material = kgpy.optics.surfaces.materials.CCDStern2004()
+        surface.shape_pixels = self.num_pixels
         return surface
 
     @property

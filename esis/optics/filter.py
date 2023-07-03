@@ -3,46 +3,57 @@ import dataclasses
 import numpy as np
 import pandas
 import astropy.units as u
-from kgpy import Name, transform, optics, format, units
+import kgpy.units
+import kgpy.labeled
+import kgpy.uncertainty
+import kgpy.transforms
+import kgpy.optics
 
 __all__ = ['Filter']
 
-SurfT = optics.surface.Surface[None, None, optics.surface.aperture.Circular, optics.surface.aperture.Circular, None]
+SurfT = kgpy.optics.surfaces.Surface[
+    None,
+    None,
+    kgpy.optics.surfaces.apertures.Circular,
+    kgpy.optics.surfaces.apertures.Circular,
+    None,
+]
 
 
 @dataclasses.dataclass
-class Filter(optics.component.CylindricalComponent[SurfT]):
-    name: Name = dataclasses.field(default_factory=lambda: Name('filter'))
-    inclination: u.Quantity = 0 * u.deg
-    clocking: u.Quantity = 0 * u.deg
-    clear_radius: u.Quantity = 0 * u.mm
-    border_width: u.Quantity = 0 * u.mm
-    thickness: u.Quantity = 0 * u.mm
-    thickness_oxide: u.Quantity = 0 * u.mm
-    mesh_ratio: u.Quantity = 100 * u.percent
-    mesh_pitch: u.Quantity = 0 * units.line / u.imperial.inch
+class Filter(kgpy.optics.components.CylindricalComponent[SurfT]):
+    name: str = 'filter'
+    inclination: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    clocking: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    clear_radius: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    border_width: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    thickness: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    thickness_oxide: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    mesh_ratio: kgpy.uncertainty.ArrayLike = 100 * u.percent
+    mesh_pitch: kgpy.uncertainty.ArrayLike= 0 * kgpy.units.line / u.imperial.inch
     mesh_material: str = ''
 
     @property
-    def clear_diameter(self) -> u.Quantity:
+    def clear_diameter(self) -> kgpy.uncertainty.ArrayLike:
         return 2 * self.clear_radius
 
     @property
-    def transform(self) -> transform.rigid.TransformList:
-        return super().transform + transform.rigid.TransformList([
-            transform.rigid.TiltY(-self.inclination)
+    def transform(self) -> kgpy.transforms.TransformList:
+        return super().transform + kgpy.transforms.TransformList([
+            kgpy.transforms.RotationY(-self.inclination)
         ])
 
     @property
     def surface(self) -> SurfT:
         surface = super().surface
-        surface.aperture = optics.surface.aperture.Circular(
+        surface.aperture = kgpy.optics.surfaces.apertures.Circular(
+            is_active=False,
             radius=self.clear_radius
         )
-        surface.aperture_mechanical = optics.surface.aperture.Circular(
+        surface.aperture_mechanical = kgpy.optics.surfaces.apertures.Circular(
             radius=self.clear_radius + self.border_width,
         )
-        surface.material = optics.surface.material.AluminumThinFilm(
+        surface.material = kgpy.optics.surfaces.materials.AluminumThinFilm(
             thickness=self.thickness,
             thickness_oxide=self.thickness_oxide,
             mesh_ratio=self.mesh_ratio,

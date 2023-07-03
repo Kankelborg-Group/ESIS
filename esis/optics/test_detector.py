@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.units as u
-from kgpy import vector, transform, optics
+from kgpy import vectors, transforms, optics
 from . import Detector
 
 __all__ = []

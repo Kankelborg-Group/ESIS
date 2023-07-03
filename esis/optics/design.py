@@ -99,10 +99,12 @@ import numpy as np
 from astropy import units as u
 import astropy.modeling
 import kgpy.units
-from kgpy import Name, vector
+import kgpy.labeled
+import kgpy.uncertainty
+import kgpy.vectors
+import kgpy.transforms
 import kgpy.optics
 import kgpy.nsroc
-import kgpy.grid
 from . import Source, FrontAperture, CentralObscuration, Primary, FieldStop, Grating, Filter, Detector
 from . import primary as module_primary
 from . import optics as module_optics
@@ -146,9 +148,11 @@ default_channel = 1
 
 
 def final(
-        pupil_samples: int = 10,
+        wavelength_samples: int = 3,
+        velocity_samples: int = 1,
+        pupil_samples: int = 11,
         pupil_is_stratified_random: bool = False,
-        field_samples: int = 10,
+        field_samples: int = 11,
         field_is_stratified_random: bool = False,
         all_channels: bool = True,
         use_uncertainty: bool = False,
@@ -159,22 +163,28 @@ def final(
     :param field_samples: Number of rays per axis across the field.
     :return: An instance of the as-designed ESIS optics model.
     """
-    axes = module_optics.OpticsAxes()
+    # axes = module_optics.OpticsAxes()
 
     num_sides = 8
     num_channels = 6
 
-    channel_name = np.array([i for i in range(num_channels)])
+    channel_name = kgpy.labeled.Array(np.array([i for i in range(num_channels)]), axes=['channel'])
     if not all_channels:
-        channel_name = channel_name[default_channel]
+        channel_name = channel_name[dict(channel=default_channel)]
 
     deg_per_channel = 360 * u.deg / num_sides
     channel_offset_angle = -deg_per_channel / 2
-    channel_angle = np.linspace(0 * u.deg, num_channels * deg_per_channel, num_channels, endpoint=False)
-    channel_angle += channel_offset_angle
+    channel_angle = kgpy.labeled.LinearSpace(
+        start=0 * u.deg,
+        stop=num_channels * deg_per_channel,
+        num=num_channels,
+        endpoint=False,
+        axis='channel',
+    )
+    channel_angle = channel_angle + channel_offset_angle
     # channel_angle = channel_angle[::-1]
     if not all_channels:
-        channel_angle = channel_angle[default_channel]
+        channel_angle = channel_angle[dict(channel=default_channel)]
 
     if not all_channels:
         roll = -channel_angle
@@ -182,8 +192,11 @@ def final(
         roll = 0 * u.deg
 
     dashstyle = (0, (1, 3))
-    dashstyle_channels = np.array([dashstyle, 'solid', 'solid', 'solid', 'solid', dashstyle], dtype=object)
-    alpha_channels = np.array([0, 1, 1, 1, 1, 0])
+    dashstyle_channels = kgpy.labeled.Array(
+        array=np.array([dashstyle, 'solid', 'solid', 'solid', 'solid', dashstyle], dtype=object),
+        axes=['channel'],
+    )
+    alpha_channels = kgpy.labeled.Array(np.array([0, 1, 1, 1, 1, 0]), axes=['channel'])
 
     primary = Primary()
     primary.radius = 2000 * u.mm
@@ -200,19 +213,17 @@ def final(
     primary.num_sides = num_sides
     primary.clear_half_width = 77.9 * u.mm * np.cos(deg_per_channel / 2)
     primary.border_width = (83.7 * u.mm - primary.clear_radius) * np.cos(deg_per_channel / 2)
-    primary.material = kgpy.optics.surface.material.MeasuredMultilayerMirror()
+    primary.material = kgpy.optics.surfaces.materials.MeasuredMultilayerMirror()
     primary.material.thickness = 30 * u.mm
-    primary.material.base.material = np.array(['Cr'])
-    primary.material.base.thickness = [5] * u.nm
-    primary.material.main.material = np.array(['SiC'])
-    primary.material.main.thickness = [25] * u.nm
-    primary_angle_input, primary_wavelength, primary_efficiency = module_primary.efficiency.model.vs_wavelength()
-    primary.material.efficiency_data = primary_efficiency
-    primary.material.wavelength_data = primary_wavelength
+    primary.material.base.material = kgpy.labeled.Array(np.array(['Cr'], dtype=object), axes=['layer'])
+    primary.material.base.thickness = kgpy.labeled.Array([5] * u.nm, axes=['layer'])
+    primary.material.main.material = kgpy.labeled.Array(np.array(['SiC'], dtype=object), axes=['layer'])
+    primary.material.main.thickness = kgpy.labeled.Array([25] * u.nm, axes=['layer'])
+    primary.material.transmissivity_function = module_primary.efficiency.model.vs_wavelength()
 
     if use_uncertainty:
-        primary.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.primary_translation_x))
-        primary.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.primary_translation_y))
+        primary.translation.x = kgpy.uncertainty.Uniform(primary.translation.x, width=1 * u.mm)
+        primary.translation.y = kgpy.uncertainty.Uniform(primary.translation.y, width=1 * u.mm)
 
     front_aperture = FrontAperture()
     front_aperture.piston = primary.focal_length + 500 * u.mm
@@ -235,8 +246,8 @@ def final(
 
     grating = Grating()
     grating.translation.z = -(primary.focal_length + 374.7 * u.mm)
-    grating.cylindrical_radius = 2.074999998438000e1 * u.mm
-    grating.cylindrical_azimuth = channel_angle.copy()
+    grating.translation_cylindrical.radius = 2.074999998438000e1 * u.mm
+    grating.translation_cylindrical.azimuth = channel_angle.copy()
     grating.sagittal_radius = 597.830 * u.mm
     grating.tangential_radius = grating.sagittal_radius
     grating.mtf_degradation_factor = 0.6 * u.dimensionless_unscaled
@@ -268,48 +279,57 @@ def final(
     grating.outer_half_width = 10.49 * u.mm - grating.border_width
     grating.dynamic_clearance = 1.25 * u.mm
     grating.material.thickness = -10 * u.mm
-    grating.material.base.material = np.array(['Al'])
-    grating.material.base.thickness = [10] * u.nm
-    grating.material.main.material = np.array(['Mg', 'SiC', 'Al'])
-    grating.material.main.thickness = [30, 10, 1] * u.nm
+    grating.material.base.material = kgpy.labeled.Array(np.array(['Al'], dtype=object), axes=['layer'])
+    grating.material.base.thickness = kgpy.labeled.Array([10] * u.nm, axes=['layer'])
+    grating.material.main.material = kgpy.labeled.Array(np.array(['Mg', 'SiC', 'Al'], dtype=object), axes=['layer'])
+    grating.material.main.thickness = kgpy.labeled.Array([30, 10, 1] * u.nm, axes=['layer'])
     grating.material.main.num_periods = 3
-    grating.material.cap.material = np.array(['Mg', 'Al', 'SiC'])
-    grating.material.cap.thickness = [30, 4, 10] * u.nm
+    grating.material.cap.material = kgpy.labeled.Array(np.array(['Mg', 'Al', 'SiC'], dtype=object), axes=['layer'])
+    grating.material.cap.thickness = kgpy.labeled.Array([30, 4, 10] * u.nm, axes=['layer'])
     if all_channels:
         grating.plot_kwargs['linestyle'] = dashstyle_channels
         grating.plot_kwargs['alpha'] = alpha_channels
 
     if use_uncertainty:
-        grating.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.grating_translation_x))
-        grating.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.grating_translation_y))
+        grating.translation.x = kgpy.uncertainty.Uniform(grating.translation.x, width=1 * u.mm)
+        grating.translation.y = kgpy.uncertainty.Uniform(grating.translation.y, width=1 * u.mm)
 
         error_alignment_transfer_single_point = 2.5e-5 * u.m
         error_alignment_transfer_systematic = 5e-6 * u.m
-        error_alignment_transfer = np.sqrt(
-            error_alignment_transfer_single_point ** 2 / 3 + error_alignment_transfer_systematic ** 2).to(u.mm)
-        grating.translation_error.z = np.expand_dims(
-            error_alignment_transfer * [-1, 0, 1],
-            axes.perp_axes(axes.grating_translation_z),
-        )
+        error_alignment_transfer = np.sqrt(error_alignment_transfer_single_point ** 2 / 3 + error_alignment_transfer_systematic ** 2).to(u.mm)
+        grating.translation.z = kgpy.uncertainty.Uniform(grating.translation.z, width=error_alignment_transfer)
 
         roll_error = 1.3e-2 * u.rad
-        grating.roll_error = np.expand_dims(roll_error * [-1, 0, 1], axes.perp_axes(axes.grating_roll)).to(u.deg)
+        grating.roll = kgpy.uncertainty.Uniform(grating.roll, width=roll_error.to(u.deg))
 
         radius_error = (0.4 * u.percent).to(u.dimensionless_unscaled)
-        tangential_radius_error = grating.tangential_radius * radius_error
-        sagittal_radius_error = grating.sagittal_radius * radius_error
-        grating.tangential_radius_error = np.expand_dims([-1, 0, 1] * tangential_radius_error, axes.perp_axes(axes.grating_tangential_radius))
-        grating.sagittal_radius_error = np.expand_dims([-1, 0, 1] * sagittal_radius_error, axes.perp_axes(axes.grating_sagittal_radius))
+        grating.tangential_radius = kgpy.uncertainty.Uniform(
+            nominal=grating.tangential_radius,
+            width=grating.tangential_radius * radius_error,
+        )
+        grating.sagittal_radius = kgpy.uncertainty.Uniform(
+            nominal=grating.sagittal_radius,
+            width=grating.sagittal_radius* radius_error,
+        )
 
-        grating.ruling_density_error = np.expand_dims([-1, 0, 1] / u.mm, axes.perp_axes(axes.grating_ruling_density))
-        grating.ruling_spacing_coeff_linear_error = np.expand_dims(0.0512e-5 * ([-1, 0, 1] * u.um / u.mm), axes.perp_axes(axes.grating_ruling_spacing_coeff_linear))
-        grating.ruling_spacing_coeff_quadratic_error = np.expand_dims(0.08558e-7 * ([-1, 0, 1] * u.um / u.mm ** 2), axes.perp_axes(axes.grating_ruling_spacing_coeff_linear))
+        grating.ruling_density = kgpy.uncertainty.Uniform(
+            nominal=grating.ruling_density,
+            width=1 / u.mm,
+        )
+        grating.ruling_spacing_coeff_linear = kgpy.uncertainty.Uniform(
+            nominal=grating.ruling_spacing_coeff_linear,
+            width=0.0512e-5 * u.um / u.mm,
+        )
+        grating.ruling_spacing_coeff_quadratic = kgpy.uncertainty.Uniform(
+            nominal=grating.ruling_spacing_coeff_quadratic,
+            width=0.08558e-7 * u.um / u.mm ** 2,
+        )
 
 
     filter = Filter()
     filter.translation.z = grating.translation.z + 1.301661998854058 * u.m
-    filter.cylindrical_radius = 95.9 * u.mm
-    filter.cylindrical_azimuth = channel_angle.copy()
+    filter.translation_cylindrical.radius = 95.9 * u.mm
+    filter.translation_cylindrical.azimuth = channel_angle.copy()
     filter.inclination = -3.45 * u.deg
     filter.clocking = 45 * u.deg
     filter.clear_radius = 15 * u.mm
@@ -323,21 +343,21 @@ def final(
         filter.plot_kwargs['alpha'] = alpha_channels
 
     detector = Detector()
-    detector.name = Name('CCD230-42')
+    detector.name = 'CCD230-42'
     detector.manufacturer = 'E2V'
     detector.translation.z = filter.translation.z + 200 * u.mm
-    detector.cylindrical_radius = 108 * u.mm
-    detector.cylindrical_azimuth = channel_angle.copy()
+    detector.translation_cylindrical.radius = 108 * u.mm
+    detector.translation_cylindrical.azimuth = channel_angle.copy()
     detector.range_focus_adjustment = 13 * u.mm
     detector.inclination = -12.252 * u.deg
     detector.pixel_width = 15 * u.um
-    detector.num_pixels = (2048, 1040)
+    detector.num_pixels = kgpy.vectors.Cartesian2D(2048, 1040)
     detector.npix_overscan = 2
     detector.npix_blank = 50
     detector.temperature = -55 * u.deg_C
     detector.gain = 1 * u.electron / u.adu
     detector.readout_noise = 4 * u.adu
-    detector.position_ov = kgpy.vector.Vector2D(x=7.2090754246099999 * u.mm, y=0 * u.mm)
+    detector.position_ov = kgpy.vectors.Cartesian2D(x=7.2090754246099999 * u.mm, y=0 * u.mm)
 
     moses_pixel_width = 13.5 * u.um
     kernel = [
@@ -355,7 +375,7 @@ def final(
             subok=True,
         )
     )
-    detector.charge_diffusion = kgpy.vector.Vector2D(
+    detector.charge_diffusion = kgpy.vectors.Cartesian2D(
         x=charge_diffusion_model.x_stddev.quantity,
         y=charge_diffusion_model.y_stddev.quantity,
     ).length
@@ -374,39 +394,55 @@ def final(
         detector.plot_kwargs['alpha'] = alpha_channels
 
     if use_uncertainty:
-        detector.translation_error.x = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.detector_translation_x))
-        detector.translation_error.y = np.expand_dims([-1, 0, 1] * u.mm, axes.perp_axes(axes.detector_translation_y))
+        detector.translation.x = kgpy.uncertainty.Uniform(detector.translation.x, width=1 * u.mm)
+        detector.translation.y = kgpy.uncertainty.Uniform(detector.translation.y, width=1 * u.mm)
 
         uncertainty_focus = 5e-4 * u.m
         shim_length = 5e-5 * u.m
         edge_defocus = 1e-4 * u.m
         detector_defocus = np.sqrt(np.square(uncertainty_focus) + np.square(shim_length) + np.square(edge_defocus))
         detector_defocus = detector_defocus.to(u.mm)
-        detector.translation_error.z = np.expand_dims(detector_defocus * [-1, 0, 1], axes.perp_axes(axes.detector_translation_z))
+        detector.translation.z = kgpy.uncertainty.Uniform(detector.translation.z, width=detector_defocus)
 
-
-    field_limit = (0.09561 * u.deg).to(u.arcmin)
-    if all_channels:
-        field_limit = np.arctan2(field_stop.clear_radius, primary.focal_length).to(u.arcmin)
-    else:
-        field_limit = np.arctan2(field_stop.clear_width / 2, primary.focal_length).to(u.arcmin)
+    # field_limit = (0.09561 * u.deg).to(u.arcmin)
+    # if all_channels:
+    #     field_limit = np.arctan2(field_stop.clear_radius, primary.focal_length).to(u.arcmin)
+    # else:
+    #     field_limit = np.arctan2(field_stop.clear_width / 2, primary.focal_length).to(u.arcmin)
     source = Source()
     source.piston = front_aperture.piston + 100 * u.mm
-    source.half_width_x = field_limit
-    source.half_width_y = field_limit
+    # source.half_width_x = field_limit
+    # source.half_width_y = field_limit
 
-    if pupil_is_stratified_random:
-        type_grid_pupil = kgpy.grid.StratifiedRandomGrid2D
-    else:
-        type_grid_pupil = kgpy.grid.RegularGrid2D
+    # if pupil_is_stratified_random:
+    #     type_grid_pupil = kgpy.grid.StratifiedRandomGrid2D
+    # else:
+    #     type_grid_pupil = kgpy.grid.RegularGrid2D
+    #
+    # if field_is_stratified_random:
+    #     type_grid_field = kgpy.grid.StratifiedRandomGrid2D
+    # else:
+    #     type_grid_field = kgpy.grid.RegularGrid2D
 
-    if field_is_stratified_random:
-        type_grid_field = kgpy.grid.StratifiedRandomGrid2D
-    else:
-        type_grid_field = kgpy.grid.RegularGrid2D
+    if isinstance(pupil_samples, int):
+        pupil_samples = kgpy.vectors.Cartesian2D(x=pupil_samples, y=pupil_samples)
+
+    if isinstance(field_samples, int):
+        field_samples = kgpy.vectors.Cartesian2D(x=field_samples, y=field_samples)
+
+    object_grid_normalized = kgpy.optics.vectors.ObjectVector(
+        wavelength_base=kgpy.labeled.LinearSpace(0, 1, num=wavelength_samples, axis='spectral_line'),
+        wavelength_offset=kgpy.labeled.LinearSpace(-1 * u.AA, 1 * u.AA, num=velocity_samples, axis='velocity'),
+        field_x=kgpy.labeled.LinearSpace(-1, 1, num=field_samples.x, axis='field_x'),
+        field_y=kgpy.labeled.LinearSpace(-1, 1, num=field_samples.y, axis='field_y'),
+        pupil_x=kgpy.labeled.LinearSpace(-1, 1, num=pupil_samples.x, axis='pupil_x'),
+        pupil_y=kgpy.labeled.LinearSpace(-1, 1, num=pupil_samples.y, axis='pupil_y'),
+
+        # velocity_los=kgpy.labeled.LinearSpace(-100 * u.km / u.s, 100 * u.km / u.s, num=3, axis='velocity_los')
+    )
 
     return module_optics.Optics(
-        name=Name('ESIS'),
+        name='ESIS',
         channel_name=channel_name,
         source=source,
         front_aperture=front_aperture,
@@ -417,26 +453,31 @@ def final(
         filter=filter,
         detector=detector,
         num_emission_lines=10,
-        grid_field=type_grid_field(num_samples=field_samples),
-        grid_pupil=type_grid_pupil(num_samples=pupil_samples),
+        object_grid_normalized=object_grid_normalized,
         sparcs=kgpy.nsroc.sparcs.specification(),
-        roll=roll,
+        transform_pointing=kgpy.transforms.TransformList([
+            kgpy.transforms.RotationZ(roll),
+        ]),
         skin_diameter=22 * u.imperial.inch,
     )
 
 channels_active_min = 1
 channels_active_max = 4
-slice_channels_active = slice(channels_active_min, channels_active_max + 1)
+slice_channels_active = dict(channel=slice(channels_active_min, channels_active_max + 1))
 default_channel_active = default_channel - channels_active_min
 
 
 def final_active(
-        pupil_samples: int = 10,
+        wavelength_samples: int = 3,
+        velocity_samples: int = 1,
+        pupil_samples: int = 11,
         pupil_is_stratified_random: bool = False,
-        field_samples: int = 10,
+        field_samples: int = 11,
         field_is_stratified_random: bool = False,
 ) -> module_optics.Optics:
     opt = final(
+        wavelength_samples=wavelength_samples,
+        velocity_samples=velocity_samples,
         pupil_samples=pupil_samples,
         pupil_is_stratified_random=pupil_is_stratified_random,
         field_samples=field_samples,
@@ -445,18 +486,18 @@ def final_active(
 
     opt.channel_name = opt.channel_name[slice_channels_active]
 
-    opt.grating.cylindrical_azimuth = opt.grating.cylindrical_azimuth[slice_channels_active]
+    opt.grating.translation_cylindrical.azimuth = opt.grating.translation_cylindrical.azimuth[slice_channels_active]
     opt.grating.plot_kwargs['linestyle'] = None
     opt.grating.plot_kwargs['alpha'] = 1
 
-    opt.filter.cylindrical_azimuth = opt.filter.cylindrical_azimuth[slice_channels_active]
+    opt.filter.translation_cylindrical.azimuth = opt.filter.translation_cylindrical.azimuth[slice_channels_active]
     opt.filter.plot_kwargs['linestyle'] = None
     opt.filter.plot_kwargs['alpha'] = 1
 
-    opt.detector.cylindrical_azimuth = opt.detector.cylindrical_azimuth[slice_channels_active]
+    opt.detector.translation_cylindrical.azimuth = opt.detector.translation_cylindrical.azimuth[slice_channels_active]
     opt.detector.plot_kwargs['linestyle'] = None
     opt.detector.plot_kwargs['alpha'] = 1
-    opt.detector.index_trigger = opt.detector.index_trigger - slice_channels_active.start
+    opt.detector.index_trigger = opt.detector.index_trigger - slice_channels_active['channel'].start
 
     return opt
 
