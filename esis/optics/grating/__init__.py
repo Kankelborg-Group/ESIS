@@ -4,108 +4,87 @@ import numpy as np
 import pandas
 import scipy.optimize
 import astropy.units as u
-from kgpy import Name, optics, format, transform, mixin
+import kgpy.mixin
+import kgpy.format
+import kgpy.labeled
+import kgpy.uncertainty
+import kgpy.transforms
+import kgpy.optics
 from .. import poletto
 from . import efficiency
 
 __all__ = [
-    'GratingAxes',
     'Grating',
 ]
 
-SurfaceT = optics.surface.Surface[
-    optics.surface.sag.Toroidal,
-    optics.surface.material.MultilayerMirror,
-    optics.surface.aperture.IsoscelesTrapezoid,
-    optics.surface.aperture.IsoscelesTrapezoid,
-    optics.surface.rulings.CubicPolyDensity,
+SurfaceT = kgpy.optics.surfaces.Surface[
+    kgpy.optics.surfaces.sags.Toroidal,
+    kgpy.optics.surfaces.materials.MultilayerMirror,
+    kgpy.optics.surfaces.apertures.IsoscelesTrapezoid,
+    kgpy.optics.surfaces.apertures.IsoscelesTrapezoid,
+    kgpy.optics.surfaces.rulings.CubicPolyDensity,
 ]
 
 
-class GratingAxes(mixin.AutoAxis):
-    def __init__(self):
-        super().__init__()
-        self.grating_translation_x = self.auto_axis_index(from_right=True)
-        self.grating_translation_y = self.auto_axis_index(from_right=True)
-        self.grating_translation_z = self.auto_axis_index(from_right=True)
-        self.grating_inclination = self.auto_axis_index(from_right=True)
-        self.grating_roll = self.auto_axis_index(from_right=True)
-        self.grating_twist = self.auto_axis_index(from_right=True)
-        self.grating_tangential_radius = self.auto_axis_index(from_right=True)
-        self.grating_sagittal_radius = self.auto_axis_index(from_right=True)
-        self.grating_ruling_density = self.auto_axis_index(from_right=True)
-        self.grating_ruling_spacing_coeff_linear = self.auto_axis_index(from_right=True)
-        self.grating_ruling_spacing_coeff_quadratic = self.auto_axis_index(from_right=True)
-        self.grating_ruling_spacing_coeff_cubic = self.auto_axis_index(from_right=True)
-
-
 @dataclasses.dataclass
-class Grating(optics.component.CylindricalComponent[SurfaceT]):
-    name: Name = dataclasses.field(default_factory=lambda: Name('grating'))
-    serial_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
-    manufacturing_number: np.ndarray = dataclasses.field(default_factory=lambda: np.array(''))
-    inclination: u.Quantity = 0 * u.deg
-    inclination_error: u.Quantity = 0 * u.deg
-    roll: u.Quantity = 0 * u.deg
-    roll_error: u.Quantity = 0 * u.deg
-    twist: u.Quantity = 0 * u.deg
-    twist_error: u.Quantity = 0 * u.deg
-    tangential_radius: u.Quantity = np.inf * u.mm
-    tangential_radius_error: u.Quantity = 0 * u.mm
-    sagittal_radius: u.Quantity = np.inf * u.mm
-    sagittal_radius_error: u.Quantity = 0 * u.mm
-    mtf_degradation_factor: u.Quantity = 0 * u.dimensionless_unscaled
-    slope_error: optics.surface.sag.SlopeErrorRMS = dataclasses.field(default_factory=optics.surface.sag.SlopeErrorRMS)
-    ripple: optics.surface.sag.RippleRMS = dataclasses.field(default_factory=optics.surface.sag.RippleRMS)
-    microroughness: optics.surface.sag.RoughnessRMS = dataclasses.field(default_factory=optics.surface.sag.RoughnessRMS)
-    nominal_input_angle: u.Quantity = 0 * u.deg
-    nominal_output_angle: u.Quantity = 0 * u.deg
-    diffraction_order: u.Quantity = 0 << u.dimensionless_unscaled
-    ruling_density: u.Quantity = 0 / u.mm
-    ruling_density_error: u.Quantity = 0 / u.mm
-    ruling_spacing_coeff_linear: u.Quantity = 0 * u.dimensionless_unscaled
-    ruling_spacing_coeff_linear_error: u.Quantity = 0 * u.dimensionless_unscaled
-    ruling_spacing_coeff_quadratic: u.Quantity = 0 / u.mm
-    ruling_spacing_coeff_quadratic_error: u.Quantity = 0 / u.mm
-    ruling_spacing_coeff_cubic: u.Quantity = 0 / u.mm ** 2
-    ruling_spacing_coeff_cubic_error: u.Quantity = 0 / u.mm ** 2
-    aper_wedge_angle: u.Quantity = 0 * u.deg
-    inner_half_width: u.Quantity = 0 * u.mm
-    outer_half_width: u.Quantity = 0 * u.mm
-    border_width: u.Quantity = 0 * u.mm
-    inner_border_width: u.Quantity = 0 * u.mm
-    dynamic_clearance: u.Quantity = 0 * u.mm
-    material: optics.surface.material.MultilayerMirror = dataclasses.field(
-        default_factory=optics.surface.material.MultilayerMirror)
-    witness: optics.surface.material.MultilayerMirror = dataclasses.field(
-        default_factory=optics.surface.material.MultilayerMirror)
+class Grating(kgpy.optics.components.CylindricalComponent[SurfaceT]):
+    name: str = 'grating'
+    serial_number: typ.Union[str, kgpy.labeled.Array[str]] = ''
+    manufacturing_number: typ.Union[str, kgpy.labeled.Array[str]] = ''
+    inclination: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    roll: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    twist: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    tangential_radius: kgpy.uncertainty.ArrayLike = np.inf * u.mm
+    sagittal_radius: kgpy.uncertainty.ArrayLike = np.inf * u.mm
+    mtf_degradation_factor: kgpy.uncertainty.ArrayLike = 0 * u.dimensionless_unscaled
+    slope_error: kgpy.optics.surfaces.sags.SlopeErrorRMS = dataclasses.field(
+        default_factory=kgpy.optics.surfaces.sags.SlopeErrorRMS)
+    ripple: kgpy.optics.surfaces.sags.RippleRMS = dataclasses.field(default_factory=kgpy.optics.surfaces.sags.RippleRMS)
+    microroughness: kgpy.optics.surfaces.sags.RoughnessRMS = dataclasses.field(default_factory=kgpy.optics.surfaces.sags.RoughnessRMS)
+    nominal_input_angle: kgpy.labeled.ArrayLike = 0 * u.deg
+    nominal_output_angle: kgpy.labeled.ArrayLike = 0 * u.deg
+    diffraction_order: kgpy.labeled.ArrayLike = 0 << u.dimensionless_unscaled
+    ruling_density: kgpy.uncertainty.ArrayLike = 0 / u.mm
+    ruling_spacing_coeff_linear: kgpy.uncertainty.ArrayLike = 0 * u.dimensionless_unscaled
+    ruling_spacing_coeff_quadratic: kgpy.uncertainty.ArrayLike = 0 / u.mm
+    ruling_spacing_coeff_cubic: kgpy.uncertainty.ArrayLike = 0 / u.mm ** 2
+    aper_wedge_angle: kgpy.uncertainty.ArrayLike = 0 * u.deg
+    inner_half_width: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    outer_half_width: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    border_width: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    inner_border_width: kgpy.uncertainty.ArrayLike = 0 * u.mm
+    dynamic_clearance: kgpy.labeled.ArrayLike = 0 * u.mm
+    material: kgpy.optics.surfaces.materials.MultilayerMirror = dataclasses.field(
+        default_factory=kgpy.optics.surfaces.materials.MultilayerMirror)
+    witness: kgpy.optics.surfaces.materials.MultilayerMirror = dataclasses.field(
+        default_factory=kgpy.optics.surfaces.materials.MultilayerMirror)
 
     @property
     def dataframe(self) -> pandas.DataFrame:
         dataframe = super().dataframe
-        dataframe['inclination'] = [format.quantity(self.inclination.to(u.deg))]
-        dataframe['tangential radius'] = [format.quantity(self.tangential_radius.to(u.mm))]
-        dataframe['sagittal radius'] = [format.quantity(self.sagittal_radius.to(u.mm))]
-        dataframe['slope error'] = [format.quantity(self.slope_error.value)]
-        dataframe['ripple'] = [format.quantity(self.ripple.value)]
-        dataframe['microroughness'] = [format.quantity(self.microroughness.value)]
-        dataframe['nominal alpha'] = [format.quantity(self.nominal_input_angle.to(u.deg))]
-        dataframe['nominal beta'] = [format.quantity(self.nominal_output_angle.to(u.deg))]
-        dataframe['diffraction order'] = [format.quantity(self.diffraction_order)]
-        dataframe['nominal ruling density'] = [format.quantity(self.ruling_density.to(1 / u.mm))]
+        dataframe['inclination'] = [kgpy.format.quantity(self.inclination.to(u.deg))]
+        dataframe['tangential radius'] = [kgpy.format.quantity(self.tangential_radius.to(u.mm))]
+        dataframe['sagittal radius'] = [kgpy.format.quantity(self.sagittal_radius.to(u.mm))]
+        dataframe['slope error'] = [kgpy.format.quantity(self.slope_error.value)]
+        dataframe['ripple'] = [kgpy.format.quantity(self.ripple.value)]
+        dataframe['microroughness'] = [kgpy.format.quantity(self.microroughness.value)]
+        dataframe['nominal alpha'] = [kgpy.format.quantity(self.nominal_input_angle.to(u.deg))]
+        dataframe['nominal beta'] = [kgpy.format.quantity(self.nominal_output_angle.to(u.deg))]
+        dataframe['diffraction order'] = [kgpy.format.quantity(self.diffraction_order)]
+        dataframe['nominal ruling density'] = [kgpy.format.quantity(self.ruling_density.to(1 / u.mm))]
         dataframe['linear ruling coefficient'] = [
-            format.quantity(self.ruling_spacing_coeff_linear, scientific_notation=True)]
+            kgpy.format.quantity(self.ruling_spacing_coeff_linear, scientific_notation=True)]
         dataframe['quadratic ruling coefficient'] = [
-            format.quantity(self.ruling_spacing_coeff_quadratic, scientific_notation=True)]
+            kgpy.format.quantity(self.ruling_spacing_coeff_quadratic, scientific_notation=True)]
         dataframe['cubic ruling coefficient'] = [
-            format.quantity(self.ruling_spacing_coeff_cubic, scientific_notation=True)]
-        dataframe['aperture wedge angle'] = [format.quantity(self.aper_wedge_angle.to(u.deg))]
-        dataframe['inner half-width'] = [format.quantity(self.inner_half_width.to(u.mm))]
-        dataframe['outer half-width'] = [format.quantity(self.outer_half_width.to(u.mm))]
-        dataframe['border width'] = [format.quantity(self.border_width.to(u.mm))]
-        dataframe['inner border width'] = [format.quantity(self.inner_border_width.to(u.mm))]
-        dataframe['dynamic clearance'] = [format.quantity(self.dynamic_clearance.to(u.mm))]
-        dataframe['substrate thickness'] = [format.quantity(self.substrate_thickness.to(u.mm))]
+            kgpy.format.quantity(self.ruling_spacing_coeff_cubic, scientific_notation=True)]
+        dataframe['aperture wedge angle'] = [kgpy.format.quantity(self.aper_wedge_angle.to(u.deg))]
+        dataframe['inner half-width'] = [kgpy.format.quantity(self.inner_half_width.to(u.mm))]
+        dataframe['outer half-width'] = [kgpy.format.quantity(self.outer_half_width.to(u.mm))]
+        dataframe['border width'] = [kgpy.format.quantity(self.border_width.to(u.mm))]
+        dataframe['inner border width'] = [kgpy.format.quantity(self.inner_border_width.to(u.mm))]
+        dataframe['dynamic clearance'] = [kgpy.format.quantity(self.dynamic_clearance.to(u.mm))]
+        dataframe['substrate thickness'] = [kgpy.format.quantity(self.substrate_thickness.to(u.mm))]
         return dataframe
 
     @property
@@ -120,79 +99,79 @@ class Grating(optics.component.CylindricalComponent[SurfaceT]):
         return a or b or c
 
     @property
-    def aper_wedge_half_angle(self) -> u.Quantity:
+    def aper_wedge_half_angle(self) -> kgpy.uncertainty.ArrayLike:
         return self.aper_wedge_angle / 2
 
     @property
-    def height(self) -> u.Quantity:
+    def height(self) -> kgpy.uncertainty.ArrayLike:
         return self.outer_half_width + self.inner_half_width
 
     @property
-    def height_mech(self):
+    def height_mech(self) -> kgpy.uncertainty.ArrayLike:
         return self.height + self.border_width + self.inner_border_width
 
     @property
-    def width_short(self) -> u.Quantity:
+    def width_short(self) -> kgpy.uncertainty.ArrayLike:
         return 2 * np.tan(self.aper_wedge_half_angle) * (-self.surface.aperture.apex_offset - self.inner_half_width)
 
     @property
-    def width_long(self) -> u.Quantity:
+    def width_long(self) -> kgpy.uncertainty.ArrayLike:
         return 2 * np.tan(self.aper_wedge_half_angle) * (-self.surface.aperture.apex_offset + self.outer_half_width)
 
     @property
-    def width_mech_short(self) -> u.Quantity:
+    def width_mech_short(self) -> kgpy.uncertainty.ArrayLike:
         pos_x = -self.surface.aperture_mechanical.apex_offset - self.inner_half_width - self.inner_border_width
         return 2 * np.tan(self.aper_wedge_half_angle) * pos_x
 
     @property
-    def width_mech_long(self) -> u.Quantity:
+    def width_mech_long(self) -> kgpy.uncertainty.ArrayLike:
         pos_x = -self.surface.aperture_mechanical.apex_offset + self.outer_half_width + self.border_width
         return 2 * np.tan(self.aper_wedge_half_angle) * pos_x
 
     @property
-    def dynamic_clearance_x(self):
+    def dynamic_clearance_x(self) -> kgpy.uncertainty.ArrayLike:
         return self.dynamic_clearance / np.sin(self.aper_wedge_half_angle)
 
-    def diffraction_angle(self, wavelength: u.Quantity, input_angle: u.Quantity = 0 * u.deg):
-        return self.surface.rulings.diffraction_angle(wavelength=wavelength, input_angle=input_angle)
+    def diffraction_angle(self, wavelength: u.Quantity, input_angle: u.Quantity = 0 * u.deg) -> kgpy.uncertainty.ArrayLike:
+        return self.surface.ruling.diffraction_angle(wavelength=wavelength, input_angle=input_angle)
 
     @property
-    def magnification_anamorphic(self) -> u.Quantity:
+    def magnification_anamorphic(self) -> kgpy.labeled.ArrayLike:
         return np.cos(self.nominal_input_angle) / np.cos(self.nominal_output_angle)
 
     @property
-    def transform(self) -> transform.rigid.TransformList:
-        return super().transform + transform.rigid.TransformList([
-            transform.rigid.TiltY(self.inclination + self.inclination_error),
-            transform.rigid.TiltX(self.twist + self.twist_error),
-            transform.rigid.TiltZ(self.roll + self.roll_error),
+    def transform(self) -> kgpy.transforms.TransformList:
+        return super().transform + kgpy.transforms.TransformList([
+            kgpy.transforms.RotationY(self.inclination),
+            kgpy.transforms.RotationX(self.twist),
+            kgpy.transforms.RotationZ(self.roll),
         ])
 
     @property
     def surface(self) -> SurfaceT:
         surface = super().surface  # type: SurfaceT
-        surface.is_stop = True
-        surface.sag = optics.surface.sag.Toroidal(
-            radius=self.sagittal_radius + self.sagittal_radius_error,
-            radius_of_rotation=self.tangential_radius + self.tangential_radius_error,
+        surface.is_pupil_stop = True
+        surface.sag = kgpy.optics.surfaces.sags.Toroidal(
+            radius=self.sagittal_radius,
+            radius_of_rotation=self.tangential_radius,
         )
-        surface.rulings = optics.surface.rulings.CubicPolySpacing(
+        surface.ruling = kgpy.optics.surfaces.rulings.CubicPolySpacing(
             diffraction_order=self.diffraction_order,
-            ruling_density=self.ruling_density + self.ruling_density_error,
-            ruling_spacing_linear=self.ruling_spacing_coeff_linear + self.ruling_spacing_coeff_linear_error,
-            ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic + self.ruling_spacing_coeff_quadratic_error,
-            ruling_spacing_cubic=self.ruling_spacing_coeff_cubic + self.ruling_spacing_coeff_cubic_error,
+            ruling_density=self.ruling_density,
+            ruling_spacing_linear=self.ruling_spacing_coeff_linear,
+            ruling_spacing_quadratic=self.ruling_spacing_coeff_quadratic,
+            ruling_spacing_cubic=self.ruling_spacing_coeff_cubic,
         )
         surface.material = self.material
         side_border_x = self.border_width / np.sin(self.aper_wedge_half_angle) + self.dynamic_clearance_x
-        surface.aperture = optics.surface.aperture.IsoscelesTrapezoid(
-            apex_offset=-(self.cylindrical_radius - side_border_x),
+        surface.aperture = kgpy.optics.surfaces.apertures.IsoscelesTrapezoid(
+            apex_offset=-(self.translation_cylindrical.radius - side_border_x),
             half_width_left=self.inner_half_width,
             half_width_right=self.outer_half_width,
             wedge_half_angle=self.aper_wedge_half_angle,
         )
-        surface.aperture_mechanical = optics.surface.aperture.IsoscelesTrapezoid(
-            apex_offset=-(self.cylindrical_radius - self.dynamic_clearance_x),
+        surface.aperture_mechanical = kgpy.optics.surfaces.apertures.IsoscelesTrapezoid(
+            apex_offset=-(self.translation_cylindrical.radius - self.dynamic_clearance_x),
             half_width_left=self.inner_half_width + self.inner_border_width,
             half_width_right=self.outer_half_width + self.border_width,
             wedge_half_angle=self.aper_wedge_half_angle,
