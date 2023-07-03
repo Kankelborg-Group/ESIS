@@ -7,7 +7,7 @@ __all__ = ['Timeline']
 @dataclasses.dataclass
 class Timeline(kgpy.nsroc.Timeline):
     esis_exp_launch: kgpy.nsroc.Event = dataclasses.field(
-        default_factory=lambda: kgpy.nsroc.Event(name=kgpy.Name('ESIS EXP launch')))
+        default_factory=lambda: kgpy.nsroc.Event(name='ESIS EXP launch'))
 
     def __iter__(self):
         yield from super().__iter__()
