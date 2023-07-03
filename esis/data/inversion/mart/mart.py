@@ -7,7 +7,6 @@ import scipy
 from . import antialias, Result, SimpleMART, LGOFMART, forward
 
 
-
 # Looking for Charles' original MART? it is located at:
 # esis.data.inversion.moses_mart.moses
 
@@ -24,7 +23,7 @@ class MART:
     simple_mart: SimpleMART = None
     lgof_mart: LGOFMART = None
     track_cube_history: bool = False
-    rotation_kwargs: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {},)
+    rotation_kwargs: typ.Dict[str, typ.Any] = dataclasses.field(default_factory=lambda: {}, )
     verbose: bool = False
 
     """ MART is the Multiplicative Algebraic Reconstruction Technique, developed here for use and application in 
@@ -56,16 +55,16 @@ class MART:
         #     self.rotation_kwargs = {'reshape': False, 'prefilter': False, 'order': 3, 'mode': 'nearest', }
 
         if self.simple_mart is None:
-            self.simple_mart = SimpleMART(track_cube_history = self.track_cube_history,
-                                          anti_aliasing = self.anti_aliasing,
-                                          rotation_kwargs=  self.rotation_kwargs,
-                                          verbose = self.verbose)
+            self.simple_mart = SimpleMART(track_cube_history=self.track_cube_history,
+                                          anti_aliasing=self.anti_aliasing,
+                                          rotation_kwargs=self.rotation_kwargs,
+                                          verbose=self.verbose)
 
         if self.lgof_mart is None:
-            self.lgof_mart = LGOFMART(track_cube_history = self.track_cube_history,
-                                      anti_aliasing = self.anti_aliasing,
-                                      rotation_kwargs = self.rotation_kwargs,
-                                      verbose = self.verbose)
+            self.lgof_mart = LGOFMART(track_cube_history=self.track_cube_history,
+                                      anti_aliasing=self.anti_aliasing,
+                                      rotation_kwargs=self.rotation_kwargs,
+                                      verbose=self.verbose)
 
     @staticmethod
     def maximize(
@@ -78,7 +77,7 @@ class MART:
         """
         signal = cube.copy().flatten()
         # signal = signal[signal !=0] # attempting to account for zero paddings influence on entropy
-        signal*=100  # adding resolution to negentropy ... so noticeable difference in behavior
+        signal *= 100  # adding resolution to negentropy ... so noticeable difference in behavior
         signal = np.round(signal)
         unique_values, unique_counts = np.unique(signal, return_counts=True)
         probability = unique_counts / signal.size
@@ -129,7 +128,7 @@ class MART:
         """
 
         # cube_exp = cube ** self.contrast_exponent
-        cube_exp = (cube/1) ** self.contrast_exponent
+        cube_exp = (cube / 1) ** self.contrast_exponent
 
         cube_filtered = cube * (1 + cube_exp)
 
@@ -269,7 +268,7 @@ class MART:
                 r.cube = self.filter(r.cube, kernel=filtering_kernel)
 
             self.simple_mart(r, projections, projections_azimuth, spectral_order,
-                             self.photon_read_noise,  self.max_multiplicative_iteration,
+                             self.photon_read_noise, self.max_multiplicative_iteration,
                              cube_shape, projections_offset_x, projections_offset_y, cube_offset_x, cube_offset_y,
                              m_axis, a_axis, x_axis, y_axis, w_axis, )
 
@@ -294,6 +293,3 @@ class MART:
         if not self.use_maximize:
             r.best_cube = r.cube
         return r
-
-
-

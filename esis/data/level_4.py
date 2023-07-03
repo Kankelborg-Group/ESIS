@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from kgpy.mixin import Pickleable
-from esis.data.inversion.mart import Result
+from kgpy.ctis.inversion.mart import Result
 import typing as typ
 from astropy import wcs
 import pathlib
 from kgpy.plot import HypercubeSlicer
 import numpy as np
 import kgpy.moment
-from esis.data.inversion import mart
+from kgpy.ctis.inversion import mart
 import astropy.units as u
 
 all = ['default_path','main_event']

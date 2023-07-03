@@ -585,6 +585,7 @@ def lev1_prep(lev1, line=None):
 
 
 def full_level3_prep(despike=True, line=None):
+    print('Prepping Level 1 Data')
     lev1 = esis.flight.level_1()
     if despike:
         intensity_unit = lev1.intensity.unit

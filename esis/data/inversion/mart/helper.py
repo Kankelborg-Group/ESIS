@@ -5,7 +5,7 @@ import astropy.units as u
 import astropy.io.fits
 import astropy.wcs
 import dataclasses
-import esis.data.inversion
+import kgpy.ctis.inversion
 from . import mart
 from kgpy.observatories.iris import mosaics
 

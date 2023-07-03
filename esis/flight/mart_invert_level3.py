@@ -2,7 +2,7 @@ import numpy as np
 from esis.data import level_3, level_4
 import matplotlib.pyplot as plt
 import scipy.ndimage
-from esis.data.inversion import mart
+from kgpy.ctis.inversion import mart
 import astropy.units as u
 import kgpy.img.coalignment.image_coalignment as kgpy_img
 import astropy.wcs as wcs
