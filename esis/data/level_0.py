@@ -122,8 +122,8 @@ class Level_0(kgpy.obs.Image):
     def zeros(cls, shape: typ.Sequence[int]) -> 'Level_0':
         sh = shape[:2]
         self = super().zeros(shape)  # type: Level_0
-        self.cam_sn = np.zeros(sh, dtype=np.int)
-        self.global_index = np.zeros(sh, dtype=np.int)
+        self.cam_sn = np.zeros(sh, dtype=int)
+        self.global_index = np.zeros(sh, dtype=int)
         self.requested_exposure_time = np.zeros(sh) * u.s
         self.run_mode = np.zeros(sh, dtype='S20')
         self.status = np.zeros(sh, dtype='S20')
@@ -214,7 +214,7 @@ class Level_0(kgpy.obs.Image):
         bias = np.empty(bias_shape) << self.intensity.unit
         for q in range(len(quadrants)):
             data_quadrant = self.intensity[(...,) + quadrants[q]]
-            a = data_quadrant[blank_pix[q]]
+            a = data_quadrant[tuple(blank_pix[q])]
             # bias[..., q] = np.median(a=a, axis=self.axis.xy)
             bias[..., q] = scipy.stats.trim_mean(
                 a=a.reshape(a.shape[:~1] + (-1,)),
@@ -255,8 +255,8 @@ class Level_0(kgpy.obs.Image):
         slice_lower[cls.axis.y] = slice(None, num_pixels)
         slice_upper[cls.axis.y] = slice(~(num_pixels - 1), None)
 
-        strip_lower = intensity[slice_lower]
-        strip_upper = intensity[slice_upper]
+        strip_lower = intensity[tuple(slice_lower)]
+        strip_upper = intensity[tuple(slice_upper)]
 
         proportion = 0.3
 

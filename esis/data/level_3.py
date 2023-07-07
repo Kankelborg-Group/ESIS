@@ -27,7 +27,8 @@ from matplotlib.patches import Polygon
 
 __all__ = ['ov_Level3_initial',
            'ov_Level3_updated', 'mgx_masks', 'ov_Level3_transforms',
-           'ov_Level3_masked', 'hei_transforms', 'ov_final_path', 'hei_final_path', 'ov_final_path_spikes']
+           'ov_Level3_masked', 'hei_transforms', 'ov_final_path', 'hei_final_path', 'ov_final_path_spikes',
+           'lev1_despiked']
 
 # intermediate pickles for testing
 ov_Level3_initial = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_initial.pickle'
@@ -35,6 +36,7 @@ ov_Level3_updated = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_update
 ov_Level3_transforms = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_transform.pickle'
 ov_Level3_transforms_updated = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_transform_updated.pickle'
 ov_Level3_masked = pathlib.Path(__file__).parents[1] / 'flight/ov_Level3_masked.pickle'
+lev1_despiked = pathlib.Path(__file__).parents[1] / 'flight/level_1_despiked.pickle'
 
 mgx_masks = [pathlib.Path(__file__).parents[1] / 'flight/masks/esis_cam{}_mgx_mask.csv'.format(i + 1) for i in range(4)]
 hei_masks = [pathlib.Path(__file__).parents[1] / 'flight/masks/esis_cam{}_hei_mask.csv'.format(i + 1) for i in range(4)]
@@ -315,15 +317,19 @@ class Level_3(Pickleable):
 
         return self
 
-    def correct_vignetting(self):
-        if self.vignetting_correction_params == None:
+    def correct_vignetting(self, vignetting_params=None):
+        if self.vignetting_correction_params is None and vignetting_params is None:
             self.vignetting_correction_params = self.find_vignetting_correction()
             self.observation.data[...] /= self.vignetting_correction()
-        else:
+        elif self.vignetting_correction_params is not None and vignetting_params is not None:
             print('Vignetting Already Corrected')
+        elif self.vignetting_correction_params is not None and vignetting_params is None:
+            print('Vignetting Already Corrected')
+        elif self.vignetting_correction_params is None and vignetting_params is not None:
+            self.vignetting_correction_params = vignetting_params
+            self.observation.data[...] /= self.vignetting_correction()
 
         return self
-
 
     def vignetting_correction(self, scale_factor=None) -> np.ndarray:
 
@@ -333,7 +339,6 @@ class Level_3(Pickleable):
                 assert False
             else:
                 scale_factor = self.vignetting_correction_params
-
 
         octagon_size_pix = 1140
         octagon_edge_pix = 65
@@ -372,7 +377,8 @@ class Level_3(Pickleable):
         # fit = scipy.optimize.minimize(vignetting_correction_quality, guess, args=(self,), bounds=bounds,
         #                               options={'ftol': 1e-5})
         # fit = scipy.optimize.differential_evolution(vignetting_correction_quality, bounds, args=(self,), polish=True, workers=4)
-        fit = scipy.optimize.differential_evolution(vignetting_correction_quality, bounds, args=(self,), polish=True, workers=-1)
+        fit = scipy.optimize.differential_evolution(vignetting_correction_quality, bounds, args=(self,), polish=True,
+                                                    workers=-1)
         print('Fit Duration = ', time.time() - start)
         print('Fit Params = ', fit.x)
         return fit.x
@@ -389,27 +395,52 @@ class Level_3(Pickleable):
         '''
 
         path.mkdir(parents=True, exist_ok=True)
-        len1 = self.observation.data.shape[0]
-        len2 = self.observation.data.shape[1]
-        for sequence in range(len1):
-            for camera in range(len2):
-                date_obs = self.observation.meta['times'][sequence].to_value('isot')
-                name = label + str(sequence) + '_' + date_obs + '_' + str(camera + 1) + '.fits'
-                filename = path / name
-                print(filename)
+        # len1 = self.observation.data.shape[0]
+        # len2 = self.observation.data.shape[1]
+        #
+        # date_obs = self.time
+        # for sequence in range(len1):
+        #     for camera in range(len2):
+        #         data_name = label + str(sequence) + '_' + date_obs[sequence] + '_' + str(camera + 1) + '.fits'
+        #         data_filename = path / data_name
+        #
+        #         mask_name = label + str(sequence) + '_' + date_obs[sequence] + '_' + str(camera + 1) + '_mask.fits'
+        #         mask_filename = path / mask_name
+        #
+        #         hdr = self.observation[sequence, camera].wcs.dropaxis(-1).dropaxis(-1).to_header()
+        #         # hdr['CAM_ID'] = self.cam_id[sequence, camera]
+        #
+        #         hdr['DATE_OBS'] = date_obs
+        #
+        #         hdul = fits.HDUList()
+        #         hdul.append(fits.PrimaryHDU(np.array(self.observation.data[sequence, camera, ...]), hdr))
+        #         hdul.writeto(data_filename, overwrite=True)
+        #
+        #         hdul_mask = fits.HDUList()
+        #         hdul_mask.append(fits.PrimaryHDU(np.array(self.observation.mask[sequence, camera, ...]), hdr))
+        #         hdul.writeto(data_filename, overwrite=True)
 
-                hdr = self.observation[sequence, camera].wcs.dropaxis(-1).dropaxis(-1).to_header()
-                # hdr['CAM_ID'] = self.cam_id[sequence, camera]
+        hdr = self.observation.wcs.to_header()
 
-                hdr['DATE_OBS'] = date_obs
+        hdul = fits.HDUList()
+        hdul.append(fits.PrimaryHDU(self.observation.data, hdr))
+        data_path = path / 'ESIS_level3.fits'
+        hdul.writeto(data_path)
 
-                hdul = fits.HDUList()
-                hdul.append(fits.PrimaryHDU(np.array(self.observation.data[sequence, camera, ...]), hdr))
-                hdul.writeto(filename, overwrite=True)
+        output_file = data_path.name + '.tar.gz'
+        with tarfile.open(path / output_file, "w:gz") as tar:
+            tar.add(data_path, arcname=data_path.name)
 
-        output_file = path.name + '.tar.gz'
-        with tarfile.open(path.parent / output_file, "w:gz") as tar:
-            tar.add(path, arcname=path.name)
+        hdul = fits.HDUList()
+        hdul.append(fits.PrimaryHDU(self.observation.mask, hdr))
+        mask_path = path / 'ESIS_level3_mgx_mask.fits'
+        hdul.writeto(mask_path)
+
+        output_file = mask_path.name + '.tar.gz'
+        with tarfile.open(path / output_file, "w:gz") as tar:
+            tar.add(mask_path, arcname=mask_path.name)
+
+
 
     def to_aia_object(self, aia_channel=304 * u.AA) -> 'Level_3':
         '''
@@ -455,7 +486,7 @@ class Level_3(Pickleable):
         hmi_obj.observation.meta['times'] = hmi_times
         return hmi_obj
 
-    def normalize_intensites(self):
+    def normalize_intensities(self):
         '''
         Normalizes all channels to the highest mean (normalizing interchannel intensity and correcting for absorption)
         Returns
@@ -584,32 +615,49 @@ def lev1_prep(lev1, line=None):
     return cropped_imgs, initial_cropping, l1
 
 
-def full_level3_prep(despike=True, line=None):
+def full_level3_prep(despike=True, line=None, full_prep=False):
     lev1 = esis.flight.level_1()
     if despike:
-        intensity_unit = lev1.intensity.unit
-        print('Despiking L1 data, this will take a while ...')
-        intensity, mask, stats = img.spikes.identify_and_fix(
-            data=lev1.intensity.value,
-            axis=(0, 2, 3),
-            percentile_threshold=(0, 99.9),
-            poly_deg=1,
-        )
-        lev1.intensity = intensity << intensity_unit
+        if lev1_despiked.exists() and not full_prep:
+            print('Loading Despiked Level1 Data')
+            lev1 = level_1.Level_1.from_pickle(lev1_despiked)
+        else:
+            intensity_unit = lev1.intensity.unit
+            print('Despiking L1 data, this will take a while ...')
+            intensity, mask, stats = img.spikes.identify_and_fix(
+                data=lev1.intensity.value,
+                axis=(0, 2, 3),
+                percentile_threshold=(0, 99.9),
+                poly_deg=1,
+            )
+            lev1.intensity = intensity << intensity_unit
+            lev1.to_pickle(lev1_despiked)
 
-    lev3_initial = Level_3.from_aia_level1(lev1, line=line)
     if line == 'ov' or line is None:
-        lev3_initial.to_pickle(ov_Level3_initial)
-    lev3_updated = lev3_initial.update_internal_alignment(lev1)
+        if ov_Level3_initial.exists() and not full_prep:
+            print('Loading' + str(ov_Level3_initial))
+            lev3_initial = Level_3.from_pickle(ov_Level3_initial)
+        else:
+            lev3_initial = Level_3.from_aia_level1(lev1, line=line)
+            lev3_initial.to_pickle(ov_Level3_initial)
 
-    if line == 'ov' or line is None:
-        lev3_updated.to_pickle(ov_Level3_updated)
-    lev3_masked = lev3_updated.add_mask(lev1)
-    if line == 'ov' or line is None:
-        lev3_updated.to_pickle(ov_Level3_masked)
-    lev3_final = lev3_masked.correct_vignetting()
-    lev3_final = lev3_final.normalize_intensites()
-    if line == 'ov' or line is None:
+        if ov_Level3_updated.exists() and not full_prep:
+            print('Loading' + str(ov_Level3_updated))
+            lev3_updated = Level_3.from_pickle(ov_Level3_updated)
+        else:
+            lev3_updated = lev3_initial.update_internal_alignment(lev1)
+            lev3_updated.to_pickle(ov_Level3_updated)
+
+        if ov_Level3_masked.exists() and not full_prep:
+            print('Loading' + str(ov_Level3_masked))
+            lev3_masked = Level_3.from_pickle(ov_Level3_masked)
+        else:
+            lev3_masked = lev3_updated.add_mask(lev1)
+            lev3_updated.to_pickle(ov_Level3_masked)
+
+        lev3_final = lev3_masked.correct_vignetting()
+        lev3_final = lev3_final.normalize_intensities()
+
         if despike:
             lev3_final.to_pickle(ov_final_path)
         else:

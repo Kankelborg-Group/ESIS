@@ -194,11 +194,11 @@ def level_2() -> data.Level_2:
     else:
         pass
 
-def level_3(despike=True) -> data.Level_3:
+def level_3(despike=True, full_prep=False) -> data.Level_3:
 
     if level_3_cache.exists():
         return data.Level_3.from_pickle(level_3_cache)
 
     else:
-        l3 = data.level_3.full_level3_prep(despike=despike)
+        l3 = data.level_3.full_level3_prep(despike=despike, full_prep=full_prep)
         return l3
