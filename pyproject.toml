@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "euv-snapshot-imaging-spectrograph"
+authors = [
+    {name = "Roy T. Smart", email = "roytsmart@gmail.com"},
+    {name = "Jacob D. Parker", email="jacobdparker@gmail.com"}
+]
+description = "Python code for processesing and analysing data from the EUV Snapshot Imaging Spectrograph (ESIS)"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    'pytest',
+    'numpy',
+    'matplotlib',
+    'scipy',
+    'astropy',
+    'sphinx-autodoc-typehints',
+    'astropy-sphinx-theme',
+    'kgpy',
+    'ndcube',
+    'tensorflow',
+    'pylatex',
+    'num2words',
+    'bokeh',
+    'pandas',
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/Kankelborg-Group/ESIS"
+Documentation = "https://kankelborg-group.github.io/ESIS/_build/html/index.html"
+
+[tool.setuptools_scm]
