@@ -37,3 +37,8 @@ Homepage = "https://github.com/Kankelborg-Group/ESIS"
 Documentation = "https://kankelborg-group.github.io/ESIS/_build/html/index.html"
 
 [tool.setuptools_scm]
+
+[tool.setuptools]
+packages = [
+    'esis'
+]
