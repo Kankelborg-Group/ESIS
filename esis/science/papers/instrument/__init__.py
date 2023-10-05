@@ -45,19 +45,19 @@ def document() -> kgpy.latex.Document:
 
     doc += authors.author_list()
 
-    doc.append(sections.abstract.section())
+    # doc.append(sections.abstract.section())
 
     doc.append(sections.introduction.section())
 
-    doc.append(sections.esis_concept.section())
-
-    doc.append(sections.science_objectives.section())
-
-    doc.append(sections.esis_instrument.section(doc))
-
-    doc.append(sections.mission_profile.section())
-
-    doc.append(sections.conclusion.section())
+    # doc.append(sections.esis_concept.section())
+    #
+    # doc.append(sections.science_objectives.section())
+    #
+    # doc.append(sections.esis_instrument.section(doc))
+    #
+    # doc.append(sections.mission_profile.section())
+    #
+    # doc.append(sections.conclusion.section())
 
     doc.append(pylatex.Command('bibliography', arguments='sources'))
 
