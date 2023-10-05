@@ -1,0 +1,25 @@
+name: instrument-paper
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: compile Latex document
+    steps:
+      - uses: actions/checkout
+      - uses: actions/setup-python
+      - name: install package
+        run: |
+          python -m pip install --upgrade pip
+          pip install setuptools wheel
+          pip install -e .
+      - name: upload PDF
+        uses: actions/upload-artifact
+        with:
+          name: esis-instrument-paper
+          path: ESIS/esis/science/papers/instrument/instrument.pdf
