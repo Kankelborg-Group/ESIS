@@ -10,7 +10,7 @@ __all__ = [
 def all() -> typ.List[kgpy.latex.Acronym]:
     return [
         kgpy.latex.Acronym('ESIS', r'EUV Snapshot Imaging Spectrograph'),
-        kgpy.latex.Acronym('MOSES', r'Multi-order Solar EUV Spectrograph'),
+        kgpy.latex.Acronym('MOSES', r'Multi-Order Solar EUV Spectrograph'),
         kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'),
         kgpy.latex.Acronym('AIA', r'Atmospheric Imaging Assembly'),
         kgpy.latex.Acronym('IRIS', r'Interface Region Imaging Spectrograph'),
