@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: compile Latex document
+    name: compile and upload Latex document
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
@@ -18,6 +18,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel
           pip install -e .
+      - name: run Latex compiler
+        run: |
+          python -c "from esis.science.papers import instrument; doc=instrument.document(); doc.generate_pdf()"
       - name: upload PDF
         uses: actions/upload-artifact@v3
         with:
