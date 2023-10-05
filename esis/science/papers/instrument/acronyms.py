@@ -14,6 +14,7 @@ def all() -> typ.List[kgpy.latex.Acronym]:
         kgpy.latex.Acronym('TRACE', r'Transition Region and Coronal Explorer'),
         kgpy.latex.Acronym('AIA', r'Atmospheric Imaging Assembly'),
         kgpy.latex.Acronym('IRIS', r'Interface Region Imaging Spectrograph'),
+        kgpy.latex.Acronym('MUSE', r'Multi-slit Solar Explorer'),
         kgpy.latex.Acronym('EIS', 'EUV Imaging Spectrograph'),
         kgpy.latex.Acronym('EUNIS', 'EUV Normal-incidence Spectrometer'),
         kgpy.latex.Acronym('SOHO', 'Solar and Heliospheric Observatory'),
