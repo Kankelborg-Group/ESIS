@@ -90,6 +90,8 @@ html_theme_options = {
     ],
 }
 
+html_logo = "_static/logo.png"
+
 favicons = [
     dict(href="favicon_io/favicon-16x16.png"),
     dict(href="favicon_io/favicon-32x32.png"),
