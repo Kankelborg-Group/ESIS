@@ -41,7 +41,8 @@ doc = [
 Homepage = "https://github.com/Kankelborg-Group/ESIS"
 Documentation = "https://kankelborg-group.github.io/ESIS/"
 
-[tool.setuptools_scm]
+[tool.setuptools]
+packages = ["esis"]
 
 [tool.pytest.ini_options]
 testpaths = [
