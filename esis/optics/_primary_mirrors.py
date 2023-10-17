@@ -6,7 +6,6 @@ import named_arrays as na
 import optika.mixins
 
 __all__ = [
-    "AbstractPrimaryMirror",
     "PrimaryMirror",
 ]
 
