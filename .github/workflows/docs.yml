@@ -24,6 +24,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install setuptools wheel
+          apt install graphviz
           pip install -e .[doc]
       - name: Setup Pages
         id: pages
