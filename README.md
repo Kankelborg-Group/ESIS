@@ -5,3 +5,10 @@
 
 Repository for code and information relating to the _EUV Snapshot Imaging Spectrograph_ (ESIS).
 
+## Installation
+
+The ESIS package can be installed using pip:
+
+```bash
+pip install euv-snapshot-imaging-spectrograph
+```
