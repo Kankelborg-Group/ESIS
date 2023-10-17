@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        python-version: [3.11, ]
+        python-version: ["3.11"]
     name: ${{ matrix.os }}, Python ${{ matrix.python-version }} tests
     steps:
       - uses: actions/checkout@v2
