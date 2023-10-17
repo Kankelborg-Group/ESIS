@@ -88,7 +88,7 @@ class AbstractPrimaryMirror(
 
 @dataclasses.dataclass(eq=False, repr=False)
 class PrimaryMirror(
-    AbstractPrimaryMirror
+    AbstractPrimaryMirror,
 ):
     name: str = ""
     sag: None | optika.sags.AbstractSag = None

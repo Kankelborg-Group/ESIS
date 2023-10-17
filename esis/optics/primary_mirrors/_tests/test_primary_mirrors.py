@@ -78,7 +78,7 @@ class AbstractTestAbstractPrimaryMirror(
             num_sides=8,
             material=optika.materials.Mirror(),
         ),
-    ]
+    ],
 )
 class TestPrimaryMirror(
     AbstractTestAbstractPrimaryMirror,
