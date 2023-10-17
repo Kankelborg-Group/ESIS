@@ -27,7 +27,7 @@ class AbstractPrimaryMirror(
 
     @property
     @abc.abstractmethod
-    def num_folds(self) -> na.ScalarLike:
+    def num_folds(self) -> u.Quantity | na.AbstractScalar:
         """
         The order of the rotational symmetry of the optical system.
         This is also the number of sides of the regular polygonal aperture.
@@ -35,11 +35,11 @@ class AbstractPrimaryMirror(
 
     @property
     @abc.abstractmethod
-    def width_clear(self) -> na.ScalarLike:
+    def width_clear(self) -> u.Quantity | na.AbstractScalar:
         """width of the clear aperture from edge to edge"""
 
     @property
-    def radius_clear(self) -> na.ScalarLike:
+    def radius_clear(self) -> u.Quantity | na.AbstractScalar:
         """clear radius of the aperture from center to vertex"""
         halfwidth_clear = self.width_clear / 2
         num_sides = self.num_folds
@@ -50,11 +50,11 @@ class AbstractPrimaryMirror(
 
     @property
     @abc.abstractmethod
-    def width_border(self) -> na.ScalarLike:
+    def width_border(self) -> u.Quantity | na.AbstractScalar:
         """width of the border around the clear aperture"""
 
     @property
-    def radius_mechanical(self) -> na.ScalarLike:
+    def radius_mechanical(self) -> u.Quantity | na.AbstractScalar:
         """radius of the mechanical aperture from center to vertex"""
         halfwidth_clear = self.width_clear / 2
         width_border = self.width_border
@@ -95,7 +95,7 @@ class PrimaryMirror(
     name: str = ""
     sag: None | optika.sags.AbstractSag = None
     num_folds: int = 0
-    width_clear = 0 * u.mm
-    width_border = 0 * u.mm
+    width_clear: u.Quantity | na.AbstractScalar = 0 * u.mm
+    width_border: u.Quantity | na.AbstractScalar = 0 * u.mm
     material: None | optika.materials.AbstractMaterial = None
     transformation: None | na.transformations.AbstractTransformation = None
