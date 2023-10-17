@@ -21,12 +21,12 @@ class AbstractTestAbstractPrimaryMirror(
     ):
         assert isinstance(a.sag, optika.sags.AbstractSag)
 
-    def test_num_sides(
+    def test_num_folds(
         self,
         a: esis.optics.primary_mirrors.AbstractPrimaryMirror,
     ):
-        assert isinstance(a.num_sides, int)
-        assert a.num_sides > 2
+        assert isinstance(a.num_folds, int)
+        assert a.num_folds > 2
 
     def test_width_clear(
         self,
@@ -75,7 +75,7 @@ class AbstractTestAbstractPrimaryMirror(
         esis.optics.primary_mirrors.PrimaryMirror(
             name="primary",
             sag=optika.sags.ParabolicSag(1000 * u.mm),
-            num_sides=8,
+            num_folds=8,
             material=optika.materials.Mirror(),
         ),
     ],

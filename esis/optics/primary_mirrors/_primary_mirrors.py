@@ -28,8 +28,11 @@ class AbstractPrimaryMirror(
 
     @property
     @abc.abstractmethod
-    def num_sides(self) -> na.ScalarLike:
-        """number of sides of the regular polygon"""
+    def num_folds(self) -> na.ScalarLike:
+        """
+        The order of the rotational symmetry of the optical system.
+        This is also the number of sides of the regular polygonal aperture.
+        """
 
     @property
     @abc.abstractmethod
@@ -40,7 +43,7 @@ class AbstractPrimaryMirror(
     def radius_clear(self) -> na.ScalarLike:
         """clear radius of the aperture from center to vertex"""
         halfwidth_clear = self.width_clear / 2
-        num_sides = self.num_sides
+        num_sides = self.num_folds
         if (num_sides % 2) != 0:
             raise ValueError("odd numbers of sides not supported")
         result = halfwidth_clear / np.cos(360 * u.deg / num_sides / 2)
@@ -57,7 +60,7 @@ class AbstractPrimaryMirror(
         halfwidth_clear = self.width_clear / 2
         width_border = self.width_border
         halfwidth = halfwidth_clear + width_border
-        num_sides = self.num_sides
+        num_sides = self.num_folds
         if (num_sides % 2) != 0:
             raise ValueError("odd numbers of sides not supported")
         result = halfwidth / np.cos(360 * u.deg / num_sides / 2)
@@ -76,11 +79,11 @@ class AbstractPrimaryMirror(
             material=self.material,
             aperture=optika.apertures.RegularPolygonalAperture(
                 radius=self.radius_clear,
-                num_vertices=self.num_sides,
+                num_vertices=self.num_folds,
             ),
             aperture_mechanical=optika.apertures.RegularPolygonalAperture(
                 radius=self.radius_mechanical,
-                num_vertices=self.num_sides,
+                num_vertices=self.num_folds,
             ),
             transformation=self.transformation,
         )
@@ -92,7 +95,7 @@ class PrimaryMirror(
 ):
     name: str = ""
     sag: None | optika.sags.AbstractSag = None
-    num_sides: int = 0
+    num_folds: int = 0
     width_clear = 0 * u.mm
     width_border = 0 * u.mm
     material: None | optika.materials.AbstractMaterial = None
