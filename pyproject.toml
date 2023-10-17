@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "euv-snapshot-imaging-spectrograph"
+authors = [
+    {name = "Roy T. Smart", email = "roytsmart@gmail.com"},
+]
+description = "A Python library for modeling and interpreting data from the EUV Snapshot Imaging Spectrograph (ESIs)"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "astropy",
+    "named-arrays",
+    "optika",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+doc = [
+    "pytest",
+    "matplotlib",
+    "graphviz",
+    "sphinx-autodoc-typehints",
+    "pydata-sphinx-theme",
+    "ipykernel",
+    "jupyter-sphinx",
+    "sphinx-favicon",
+]
+
+[project.urls]
+Homepage = "https://github.com/Kankelborg-Group/ESIS"
+Documentation = "https://kankelborg-group.github.io/ESIS/"
+
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "esis/optics/primary_mirrors",
+]
