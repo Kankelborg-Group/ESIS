@@ -26,7 +26,8 @@ jobs:
         uses: actions/configure-pages@v3
       - name: Build with Sphinx
         run: |
-          ./docs/make html
+          cd ./docs
+          make html
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
