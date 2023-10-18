@@ -48,3 +48,6 @@ packages = ["esis"]
 testpaths = [
     "esis/optics/_tests",
 ]
+
+[tool.black]
+include = "(esis/optics/_tests)|(esis/optics/_primary_mirrors)"
