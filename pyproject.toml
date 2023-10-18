@@ -46,5 +46,5 @@ packages = ["esis"]
 
 [tool.pytest.ini_options]
 testpaths = [
-    "esis/optics/primary_mirrors",
+    "esis/optics/_tests",
 ]
