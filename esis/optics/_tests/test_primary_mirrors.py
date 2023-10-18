@@ -1,13 +1,15 @@
+import numpy as np
 import pytest
-import abc
 import astropy.units as u
 import named_arrays as na
 import optika
+from optika._tests import test_mixins
 import esis
 
 
 class AbstractTestAbstractPrimaryMirror(
-    abc.ABC,
+    test_mixins.AbstractTestPrintable,
+    test_mixins.AbstractTestTransformable,
 ):
     def test_name(
         self,
@@ -61,6 +63,14 @@ class AbstractTestAbstractPrimaryMirror(
         a: esis.optics.abc.AbstractPrimaryMirror,
     ):
         assert isinstance(a.material, optika.materials.AbstractMaterial)
+
+    def test_translation(
+        self,
+        a: esis.optics.abc.AbstractPrimaryMirror,
+    ):
+        result = a.translation
+        assert np.issubdtype(na.get_dtype(result), float)
+        assert na.unit_normalized(result).is_equivalent(u.mm)
 
     def test_surface(
         self,

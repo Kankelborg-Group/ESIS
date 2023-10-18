@@ -71,6 +71,17 @@ class AbstractPrimaryMirror(
         """optical material of this component"""
 
     @property
+    @abc.abstractmethod
+    def translation(self) -> na.AbstractCartesian3dVectorArray:
+        """location of the apex of this surface"""
+
+    @property
+    def transformation(self) -> na.transformations.TransformationList:
+        return na.transformations.TransformationList([
+            na.transformations.Translation(self.translation),
+        ])
+
+    @property
     def surface(self) -> optika.surfaces.Surface:
         return optika.surfaces.Surface(
             name=self.name,
@@ -98,4 +109,4 @@ class PrimaryMirror(
     width_clear: u.Quantity | na.AbstractScalar = 0 * u.mm
     width_border: u.Quantity | na.AbstractScalar = 0 * u.mm
     material: None | optika.materials.AbstractMaterial = None
-    transformation: None | na.transformations.AbstractTransformation = None
+    translation: u.Quantity | na.AbstractCartesian3dVectorArray = 0 * u.mm
