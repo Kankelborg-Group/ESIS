@@ -77,9 +77,10 @@ class AbstractPrimaryMirror(
 
     @property
     def transformation(self) -> na.transformations.TransformationList:
-        return na.transformations.TransformationList([
+        result = [
             na.transformations.Translation(self.translation),
-        ])
+        ]
+        return na.transformations.TransformationList(result)
 
     @property
     def surface(self) -> optika.surfaces.Surface:
