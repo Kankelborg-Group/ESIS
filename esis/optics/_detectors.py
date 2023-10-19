@@ -5,7 +5,9 @@ import named_arrays as na
 import optika
 from . import mixins
 
-__all__ = ["Detector"]
+__all__ = [
+    "Detector",
+]
 
 
 @dataclasses.dataclass(eq=False, repr=False)
