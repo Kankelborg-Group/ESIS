@@ -9,7 +9,10 @@ import esis
 
 class AbstractTestAbstractPrimaryMirror(
     test_mixins.AbstractTestPrintable,
-    test_mixins.AbstractTestTransformable,
+    test_mixins.AbstractTestRollable,
+    test_mixins.AbstractTestYawable,
+    test_mixins.AbstractTestPitchable,
+    test_mixins.AbstractTestTranslatable,
 ):
     def test_name(
         self,

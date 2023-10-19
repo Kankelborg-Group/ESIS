@@ -13,7 +13,10 @@ __all__ = [
 @dataclasses.dataclass(eq=False, repr=False)
 class AbstractPrimaryMirror(
     optika.mixins.Printable,
-    optika.mixins.Transformable,
+    optika.mixins.Rollable,
+    optika.mixins.Yawable,
+    optika.mixins.Pitchable,
+    optika.mixins.Translatable,
 ):
     @property
     @abc.abstractmethod
@@ -71,18 +74,6 @@ class AbstractPrimaryMirror(
         """optical material of this component"""
 
     @property
-    @abc.abstractmethod
-    def translation(self) -> na.AbstractCartesian3dVectorArray:
-        """location of the apex of this surface"""
-
-    @property
-    def transformation(self) -> na.transformations.TransformationList:
-        result = [
-            na.transformations.Translation(self.translation),
-        ]
-        return na.transformations.TransformationList(result)
-
-    @property
     def surface(self) -> optika.surfaces.Surface:
         return optika.surfaces.Surface(
             name=self.name,
@@ -111,3 +102,6 @@ class PrimaryMirror(
     width_border: u.Quantity | na.AbstractScalar = 0 * u.mm
     material: None | optika.materials.AbstractMaterial = None
     translation: u.Quantity | na.AbstractCartesian3dVectorArray = 0 * u.mm
+    pitch: u.Quantity | na.AbstractScalar = 0 * u.deg
+    yaw: u.Quantity | na.AbstractScalar = 0 * u.deg
+    roll: u.Quantity | na.AbstractScalar = 0 * u.deg
