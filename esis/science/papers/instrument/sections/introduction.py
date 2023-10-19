@@ -13,11 +13,24 @@ def section() -> pylatex.Section:
 The light emitted by the solar \TR\ and corona varies significantly as a function
 of position, wavelength, and time.
 When viewed from Earth, the spectral radiance from the Sun can be written as: $I(x, y, \lambda, t)$, 
-where $x$ and $y$ are the helioprojective Cartesian coordinates \citep{Thompson2006}, $\lambda$ is wavelength, and $t$ is time.
-The ideal solar imaging spectrograph would capture $I(x, y, \lambda, t)$ with high resolution in $x$, $y$, $\lambda$, and $t$
-\textit{and} over a wide \FOV\, wavelength range, and time period.
-However, physical limitations in sensors and materials mean that we must make compromises on either the sampling rate
-or the sampling rangle along each of these four dimensions.
+where $x$ and $y$ are the helioprojective Cartesian coordinates \citep{Thompson2006}, 
+$\lambda$ is wavelength, and $t$ is time.
+The ideal solar imaging spectrograph would capture $I(x, y, \lambda, t)$ with high resolution in $x$, $y$, $\lambda$, 
+and $t$ \textit{and} over a wide \FOV\, wavelength range, and time period.
+Of course, the temporal dimension is privileged, so we often reduce the problem to capturing a 3D spatial/spectral
+cube at a particular time $t_0$: $I(x, y, \lambda, t_0)$.
+Since we use 2D detectors, this means that we must find a way to flatten the 3D cube into two dimensions
+without losing information.
+
+One obvious way to accomplish this is to multiplex one of the three remaining dimensions in time.
+Narrowband, tunable filters, 
+such as the GREGOR Fabry--P{\'e}rot Interferometer \citep{Puschmann12}, 
+multiplex the wavelength dimension in time, 
+and can change the selected wavelength in \SI{100}{\milli\second} or less \citep{vanNoort2022},
+but the technology does not exist to use this technique for wavelengths shorter than 
+$\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
+
+
 Approaching this ideal is the fast tunable filtergraph (\ie\ fast tunable Fabry--P\'erot etalons, \eg\ the GREGOR 
 Fabry--P{\'e}rot Interferometer, \citep{Puschmann12}), but the materials do not exist to extend this technology to 
 \EUV\ wavelengths shortward of $\sim$\SI{150}{\nano\meter}~\citep{2000WuelserFP}.
