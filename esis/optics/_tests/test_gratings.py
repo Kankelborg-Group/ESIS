@@ -2,16 +2,18 @@ import pytest
 import astropy.units as u
 import named_arrays as na
 import optika
-from optika._tests import test_mixins
+import optika._tests.test_mixins
 import esis
+from . import test_mixins
 
 
 class AbstractTestAbstractGrating(
-    test_mixins.AbstractTestPrintable,
-    test_mixins.AbstractTestRollable,
-    test_mixins.AbstractTestYawable,
-    test_mixins.AbstractTestPitchable,
-    test_mixins.AbstractTestTranslatable,
+    optika._tests.test_mixins.AbstractTestPrintable,
+    optika._tests.test_mixins.AbstractTestRollable,
+    optika._tests.test_mixins.AbstractTestYawable,
+    optika._tests.test_mixins.AbstractTestPitchable,
+    optika._tests.test_mixins.AbstractTestTranslatable,
+    test_mixins.AbstractTestCylindricallyTransformable,
 ):
     def test_name(
         self,
