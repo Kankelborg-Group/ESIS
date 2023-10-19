@@ -50,4 +50,4 @@ testpaths = [
 ]
 
 [tool.black]
-include = "(esis/optics/_tests)|(esis/optics/_primary_mirrors)"
+include = "(esis/optics/_tests)|(esis/optics/_primary_mirrors)|(esis/optics/mixins)"
