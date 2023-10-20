@@ -75,6 +75,10 @@ html_theme = 'pydata_sphinx_theme'
 html_static_path = ['_static']
 
 html_theme_options = {
+    "logo": {
+        "image_light": "_static/logo_black.png",
+        "image_dark": "_static/logo_white.png",
+    },
     "icon_links": [
         {
             "name": "GitHub",
@@ -89,8 +93,6 @@ html_theme_options = {
         },
     ],
 }
-
-html_logo = "_static/logo.png"
 
 favicons = [
     dict(href="favicon_io/favicon-16x16.png"),
