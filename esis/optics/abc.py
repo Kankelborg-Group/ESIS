@@ -5,3 +5,4 @@ from ._field_stops import AbstractFieldStop
 from ._gratings import AbstractGrating
 from ._filters import AbstractFilter
 from ._detectors import AbstractDetector
+from ._models import AbstractOpticsModel

@@ -10,3 +10,4 @@ from ._field_stops import *
 from ._gratings import *
 from ._filters import *
 from ._detectors import *
+from ._models import *
