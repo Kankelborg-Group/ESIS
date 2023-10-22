@@ -80,6 +80,32 @@ class AbstractOpticsModel(
             wire @ normal_surface,
         )
 
+    @property
+    def angle_grating_output(self) -> na.AbstractScalar:
+        """
+        The angle between the grating normal vector and the exit arm,
+        in the plane perpendicular to the rulings.
+
+        This is an analogue to the diffracted angle in the
+        `diffraction grating equation https://en.wikipedia.org/wiki/Diffraction_grating`_.
+        """
+        detector = self.detector.surface
+        grating = self.grating.surface
+        position = na.Cartesian3dVectorArray() * u.mm
+        normal_surface = grating.sag.normal(position)
+        normal_rulings = grating.rulings.normal(position)
+        transformation = grating.transformation.inverse @ detector.transformation
+        wire = np.moveaxis(
+            a=detector.aperture.wire(),
+            source="wire",
+            destination="wire_grating_output",
+        )
+        wire = transformation(wire)
+        return np.arctan2(
+            wire @ normal_rulings,
+            wire @ normal_surface,
+        )
+
 
 @dataclasses.dataclass(eq=False, repr=False)
 class OpticsModel(

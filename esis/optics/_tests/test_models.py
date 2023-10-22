@@ -57,6 +57,11 @@ class AbstractTestAbstractOpticsModel(
         assert isinstance(na.as_named_array(result), na.AbstractArray)
         assert na.unit_normalized(result).is_equivalent(u.deg)
 
+    def test_angle_grating_output(self, a: esis.optics.OpticsModel):
+        result = a.angle_grating_output
+        assert isinstance(na.as_named_array(result), na.AbstractArray)
+        assert na.unit_normalized(result).is_equivalent(u.deg)
+
 
 @pytest.mark.parametrize(
     argnames="a",
