@@ -106,6 +106,17 @@ class AbstractTestAbstractDetector(
         assert na.unit_normalized(result).is_equivalent(u.mm)
         assert np.all(result >= 0)
 
+    def test_surface(
+        self,
+        a: esis.optics.abc.AbstractDetector,
+    ):
+        result = a.surface
+        assert isinstance(result, optika.surfaces.AbstractSurface)
+        assert isinstance(result.aperture, optika.apertures.RectangularAperture)
+        assert isinstance(
+            result.transformation, na.transformations.AbstractTransformation
+        )
+
     def test_position_image(
         self,
         a: esis.optics.abc.AbstractDetector,

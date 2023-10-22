@@ -81,6 +81,20 @@ class AbstractDetector(
         """minimum distance between this component and other components"""
 
     @property
+    def surface(self) -> optika.surfaces.Surface:
+        return optika.surfaces.Surface(
+            name="detector",
+            aperture=optika.apertures.RectangularAperture(
+                half_width=self.width_clear / 2,
+                active=False,
+            ),
+            aperture_mechanical=optika.apertures.RectangularAperture(
+                half_width=self.width_mechanical / 2
+            ),
+            transformation=self.transformation,
+        )
+
+    @property
     @abc.abstractmethod
     def position_image(self) -> u.Quantity | na.AbstractCartesian2dVectorArray:
         """nominal position of the center of the field of view"""
