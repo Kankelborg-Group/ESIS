@@ -106,6 +106,27 @@ class AbstractOpticsModel(
             wire @ normal_surface,
         )
 
+    @property
+    def _wavelength_test_grid(self) -> na.AbstractScalar:
+        position = na.Cartesian3dVectorArray() * u.mm
+        grating = self.grating.surface
+        m = grating.rulings.diffraction_order
+        d = grating.rulings.spacing(position)
+        a = self.angle_grating_input
+        b = self.angle_grating_output
+        result = (np.sin(a) + np.sin(b)) * d / m
+        return result.to(u.AA)
+
+    @property
+    def wavelength_min(self) -> u.Quantity | na.AbstractScalar:
+        """the minimum wavelength permitted through the system"""
+        return self._wavelength_test_grid.min()
+
+    @property
+    def wavelength_max(self) -> u.Quantity | na.AbstractScalar:
+        """the maximum wavelength permitted through the system"""
+        return self._wavelength_test_grid.max()
+
 
 @dataclasses.dataclass(eq=False, repr=False)
 class OpticsModel(
