@@ -8,66 +8,66 @@ import esis
 class AbstractTestAbstractOpticsModel(
     optika._tests.test_mixins.AbstractTestPrintable,
 ):
-    def test_name(self, a: esis.optics.OpticsModel):
+    def test_name(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.name
         assert isinstance(result, str)
 
-    def test_front_aperture(self, a: esis.optics.OpticsModel):
+    def test_front_aperture(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.front_aperture
         if result is not None:
             assert isinstance(result, esis.optics.FrontAperture)
 
-    def test_central_obscuration(self, a: esis.optics.OpticsModel):
+    def test_central_obscuration(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.central_obscuration
         if result is not None:
             assert isinstance(result, esis.optics.CentralObscuration)
 
-    def test_primary_mirror(self, a: esis.optics.OpticsModel):
+    def test_primary_mirror(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.primary_mirror
         if result is not None:
             assert isinstance(result, esis.optics.PrimaryMirror)
 
-    def test_field_stop(self, a: esis.optics.OpticsModel):
+    def test_field_stop(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.field_stop
         if result is not None:
             assert isinstance(result, esis.optics.FieldStop)
 
-    def test_grating(self, a: esis.optics.OpticsModel):
+    def test_grating(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.grating
         if result is not None:
             assert isinstance(result, esis.optics.Grating)
 
-    def test_filter(self, a: esis.optics.OpticsModel):
+    def test_filter(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.filter
         if result is not None:
             assert isinstance(result, esis.optics.Filter)
 
-    def test_detector(self, a: esis.optics.OpticsModel):
+    def test_detector(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.detector
         if result is not None:
             assert isinstance(result, esis.optics.Detector)
 
-    def test_grid_input_normalized(self, a: esis.optics.OpticsModel):
+    def test_grid_input_normalized(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.grid_input_normalized
         if result is not None:
             assert isinstance(result, optika.vectors.ObjectVectorArray)
 
-    def test_angle_grating_input(self, a: esis.optics.OpticsModel):
+    def test_angle_grating_input(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.angle_grating_input
         assert isinstance(na.as_named_array(result), na.AbstractArray)
         assert na.unit_normalized(result).is_equivalent(u.deg)
 
-    def test_angle_grating_output(self, a: esis.optics.OpticsModel):
+    def test_angle_grating_output(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.angle_grating_output
         assert isinstance(na.as_named_array(result), na.AbstractArray)
         assert na.unit_normalized(result).is_equivalent(u.deg)
 
-    def test_wavelength_min(self, a: esis.optics.OpticsModel):
+    def test_wavelength_min(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.wavelength_min
         assert isinstance(na.as_named_array(result), na.AbstractScalar)
         assert na.unit_normalized(result).is_equivalent(u.AA)
 
-    def test_wavelength_max(self, a: esis.optics.OpticsModel):
+    def test_wavelength_max(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.wavelength_max
         assert isinstance(na.as_named_array(result), na.AbstractScalar)
         assert na.unit_normalized(result).is_equivalent(u.AA)
