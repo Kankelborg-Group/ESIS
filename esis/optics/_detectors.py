@@ -21,6 +21,11 @@ class AbstractDetector(
 ):
     @property
     @abc.abstractmethod
+    def name_channel(self) -> str | na.AbstractScalar:
+        """human-readable name of each channel of this detector array"""
+
+    @property
+    @abc.abstractmethod
     def manufacturer(self) -> str:
         """the name of the company that manufactured this device"""
 
@@ -179,6 +184,7 @@ class AbstractDetector(
 class Detector(
     AbstractDetector,
 ):
+    name_channel: str | na.AbstractScalar = ""
     manufacturer: str = ""
     serial_number: str = ""
     width_pixels: u.Quantity | na.AbstractCartesian2dVectorArray = 0 * u.mm

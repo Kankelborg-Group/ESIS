@@ -16,6 +16,15 @@ class AbstractTestAbstractDetector(
     optika._tests.test_mixins.AbstractTestTranslatable,
     test_mixins.AbstractTestCylindricallyTransformable,
 ):
+    def test_name_channel(
+        self,
+        a: esis.optics.abc.AbstractDetector,
+    ):
+        result = a.name_channel
+        assert isinstance(result, (str, na.AbstractScalar))
+        if isinstance(result, na.AbstractScalar):
+            assert np.issubdtype(result.dtype, str)
+
     def test_manufacturer(
         self,
         a: esis.optics.abc.AbstractDetector,
@@ -263,6 +272,7 @@ class AbstractTestAbstractDetector(
     argvalues=[
         esis.optics.Detector(),
         esis.optics.Detector(
+            name_channel="Ch 1",
             manufacturer="acme",
             serial_number="123abc",
             width_pixels=15 * u.um,
