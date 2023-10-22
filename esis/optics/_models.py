@@ -87,7 +87,7 @@ class AbstractOpticsModel(
         in the plane perpendicular to the rulings.
 
         This is an analogue to the diffracted angle in the
-        `diffraction grating equation https://en.wikipedia.org/wiki/Diffraction_grating`_.
+        `diffraction grating equation <https://en.wikipedia.org/wiki/Diffraction_grating>`_.
         """
         detector = self.detector.surface
         grating = self.grating.surface
