@@ -72,6 +72,10 @@ class AbstractDetector(
         """size of the border around the light-sensitive area"""
 
     @property
+    def width_mechanical(self) -> u.Quantity | na.AbstractScalar:
+        return self.width_clear + 2 * self.width_border
+
+    @property
     @abc.abstractmethod
     def clearance(self) -> u.Quantity | na.AbstractScalar:
         """minimum distance between this component and other components"""

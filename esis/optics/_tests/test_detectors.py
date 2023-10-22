@@ -85,6 +85,18 @@ class AbstractTestAbstractDetector(
         assert na.unit_normalized(result).is_equivalent(u.mm)
         assert np.all(result >= 0)
 
+    def test_width_mechanical(
+        self,
+        a: esis.optics.abc.AbstractDetector,
+    ):
+        result = a.width_mechanical
+        assert isinstance(
+            na.as_named_array(result),
+            (na.AbstractScalar, na.Cartesian2dVectorArray),
+        )
+        assert na.unit_normalized(result).is_equivalent(u.mm)
+        assert np.all(result >= 0)
+
     def test_clearance(
         self,
         a: esis.optics.abc.AbstractDetector,
