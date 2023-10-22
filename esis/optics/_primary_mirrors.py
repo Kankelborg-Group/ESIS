@@ -18,10 +18,6 @@ class AbstractPrimaryMirror(
     optika.mixins.Pitchable,
     optika.mixins.Translatable,
 ):
-    @property
-    @abc.abstractmethod
-    def name(self) -> str:
-        """human-readable name of this primary mirror"""
 
     @property
     @abc.abstractmethod
@@ -76,7 +72,7 @@ class AbstractPrimaryMirror(
     @property
     def surface(self) -> optika.surfaces.Surface:
         return optika.surfaces.Surface(
-            name=self.name,
+            name="primary",
             sag=self.sag,
             material=self.material,
             aperture=optika.apertures.RegularPolygonalAperture(
@@ -95,7 +91,6 @@ class AbstractPrimaryMirror(
 class PrimaryMirror(
     AbstractPrimaryMirror,
 ):
-    name: str = ""
     sag: None | optika.sags.AbstractSag = None
     num_folds: int = 0
     width_clear: u.Quantity | na.AbstractScalar = 0 * u.mm

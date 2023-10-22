@@ -90,7 +90,6 @@ class AbstractTestAbstractOpticsModel(
                 num_folds=8,
             ),
             primary_mirror=esis.optics.PrimaryMirror(
-                name="primary",
                 sag=optika.sags.ParabolicSag(-1000 * u.mm),
                 num_folds=8,
                 width_clear=100 * u.mm,

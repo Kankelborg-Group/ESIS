@@ -14,11 +14,6 @@ class AbstractTestAbstractPrimaryMirror(
     test_mixins.AbstractTestPitchable,
     test_mixins.AbstractTestTranslatable,
 ):
-    def test_name(
-        self,
-        a: esis.optics.abc.AbstractPrimaryMirror,
-    ):
-        assert isinstance(a.name, str)
 
     def test_sag(
         self,
@@ -86,7 +81,6 @@ class AbstractTestAbstractPrimaryMirror(
     argnames="a",
     argvalues=[
         esis.optics.PrimaryMirror(
-            name="primary",
             sag=optika.sags.ParabolicSag(1000 * u.mm),
             num_folds=8,
             material=optika.materials.Mirror(),
