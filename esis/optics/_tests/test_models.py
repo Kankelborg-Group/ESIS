@@ -72,6 +72,11 @@ class AbstractTestAbstractOpticsModel(
         assert isinstance(na.as_named_array(result), na.AbstractScalar)
         assert na.unit_normalized(result).is_equivalent(u.AA)
 
+    def test_system(self, a: esis.optics.abc.AbstractOpticsModel):
+        result = a.system
+        assert isinstance(result, optika.systems.AbstractSequentialSystem)
+        assert result.surfaces
+
 
 @pytest.mark.parametrize(
     argnames="a",

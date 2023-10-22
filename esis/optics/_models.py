@@ -1,6 +1,7 @@
 from __future__ import annotations
 import abc
 import dataclasses
+import functools
 import numpy as np
 import astropy.units as u
 import named_arrays as na
@@ -126,6 +127,36 @@ class AbstractOpticsModel(
     def wavelength_max(self) -> u.Quantity | na.AbstractScalar:
         """the maximum wavelength permitted through the system"""
         return self._wavelength_test_grid.max()
+
+    @functools.cached_property
+    def system(self) -> optika.systems.SequentialSystem:
+        """
+        Resolve this optics model into an instance of
+        :class:`optika.systems.SequentialSystem`.
+
+        This is a cached property that is only computed once.
+        """
+        surfaces = []
+        surfaces += [self.front_aperture.surface]
+        surfaces += [self.central_obscuration.surface]
+        surfaces += [self.primary_mirror.surface]
+        surfaces += [self.field_stop.surface]
+        surfaces += [self.grating.surface]
+        surfaces += self.filter.surfaces if self.filter is not None else []
+        surfaces += [self.detector.surface]
+
+        wavelength_min = self.wavelength_min
+        wavelength_max = self.wavelength_max
+        wavelength_range = wavelength_max - wavelength_min
+        grid = self.grid_input_normalized
+        grid.wavelength = wavelength_range * grid.wavelength + wavelength_min
+
+        result = optika.systems.SequentialSystem(
+            surfaces=surfaces,
+            grid_input_normalized=grid,
+        )
+
+        return result
 
 
 @dataclasses.dataclass(eq=False, repr=False)
