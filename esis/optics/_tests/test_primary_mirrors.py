@@ -14,7 +14,6 @@ class AbstractTestAbstractPrimaryMirror(
     test_mixins.AbstractTestPitchable,
     test_mixins.AbstractTestTranslatable,
 ):
-
     def test_sag(
         self,
         a: esis.optics.abc.AbstractPrimaryMirror,

@@ -18,7 +18,6 @@ class AbstractPrimaryMirror(
     optika.mixins.Pitchable,
     optika.mixins.Translatable,
 ):
-
     @property
     @abc.abstractmethod
     def sag(self) -> None | optika.sags.AbstractSag:
