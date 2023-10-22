@@ -132,6 +132,7 @@ class AbstractGrating(
             ),
             rulings=self.rulings,
             is_pupil_stop=True,
+            transformation=self.transformation,
         )
 
 
