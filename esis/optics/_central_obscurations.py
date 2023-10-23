@@ -56,6 +56,7 @@ class AbstractCentralObscuration(
                 ),
                 inverted=True,
             ),
+            transformation=self.transformation,
         )
 
 
