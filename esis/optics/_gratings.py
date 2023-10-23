@@ -22,11 +22,6 @@ class AbstractGrating(
 ):
     @property
     @abc.abstractmethod
-    def name(self) -> str:
-        """human-readable name of this diffraction grating"""
-
-    @property
-    @abc.abstractmethod
     def serial_number(self) -> str:
         """serial number of this diffraction grating"""
 
@@ -111,7 +106,6 @@ class AbstractGrating(
         distance_radial = self.distance_radial
         side_border_x = width_border / np.sin(angle_aperture / 2) + clearance
         return optika.surfaces.Surface(
-            name=self.name,
             sag=self.sag,
             material=self.material,
             aperture=optika.apertures.IsoscelesTrapezoidalAperture(
@@ -140,7 +134,6 @@ class AbstractGrating(
 class Grating(
     AbstractGrating,
 ):
-    name: str = "grating"
     serial_number: str = ""
     manufacturing_number: str = ""
     angle_input: u.Quantity = 0 * u.deg

@@ -104,7 +104,6 @@ class AbstractTestAbstractOpticsModel(
                 translation=na.Cartesian3dVectorArray(z=1000) * u.mm,
             ),
             grating=esis.optics.Grating(
-                name="grating",
                 serial_number="abc123",
                 manufacturing_number="123abc",
                 sag=optika.sags.SphericalSag(radius=500 * u.mm),

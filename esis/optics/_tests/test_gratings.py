@@ -15,12 +15,6 @@ class AbstractTestAbstractGrating(
     optika._tests.test_mixins.AbstractTestTranslatable,
     test_mixins.AbstractTestCylindricallyTransformable,
 ):
-    def test_name(
-        self,
-        a: esis.optics.abc.AbstractGrating,
-    ):
-        assert isinstance(a.name, str)
-
     def test_serial_number(
         self,
         a: esis.optics.abc.AbstractGrating,
@@ -133,7 +127,6 @@ class AbstractTestAbstractGrating(
     argnames="a",
     argvalues=[
         esis.optics.Grating(
-            name="gratings",
             serial_number="1234",
             manufacturing_number="ABCD",
             sag=optika.sags.SphericalSag(500 * u.mm),
