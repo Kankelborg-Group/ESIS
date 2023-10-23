@@ -106,6 +106,7 @@ class AbstractGrating(
         distance_radial = self.distance_radial
         side_border_x = width_border / np.sin(angle_aperture / 2) + clearance
         return optika.surfaces.Surface(
+            name="grating",
             sag=self.sag,
             material=self.material,
             aperture=optika.apertures.IsoscelesTrapezoidalAperture(
