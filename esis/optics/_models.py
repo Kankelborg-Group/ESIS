@@ -121,12 +121,16 @@ class AbstractOpticsModel(
     @property
     def wavelength_min(self) -> u.Quantity | na.AbstractScalar:
         """the minimum wavelength permitted through the system"""
-        return self._wavelength_test_grid.min()
+        return self._wavelength_test_grid.min(
+            axis=("wire_grating_input", "wire_grating_output"),
+        )
 
     @property
     def wavelength_max(self) -> u.Quantity | na.AbstractScalar:
         """the maximum wavelength permitted through the system"""
-        return self._wavelength_test_grid.max()
+        return self._wavelength_test_grid.max(
+            axis=("wire_grating_input", "wire_grating_output"),
+        )
 
     @functools.cached_property
     def system(self) -> optika.systems.SequentialSystem:
