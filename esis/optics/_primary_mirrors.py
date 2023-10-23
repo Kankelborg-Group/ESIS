@@ -71,7 +71,7 @@ class AbstractPrimaryMirror(
     @property
     def transformation(self) -> na.transformations.AbstractTransformation:
         rotation = na.transformations.Cartesian3dRotationY(180 * u.deg)
-        return rotation @ super().transformation
+        return super().transformation @ rotation
 
     @property
     def surface(self) -> optika.surfaces.Surface:
