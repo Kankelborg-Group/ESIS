@@ -27,8 +27,8 @@ class CylindricallyTransformable(
     def transformation(self) -> na.transformations.AbstractTransformation:
         t = na.transformations.TransformationList(
             [
-                na.transformations.Cartesian3dRotationZ(self.azimuth),
                 na.transformations.Cartesian3dTranslation(x=self.distance_radial),
+                na.transformations.Cartesian3dRotationZ(self.azimuth),
             ]
         )
         return super().transformation @ t
