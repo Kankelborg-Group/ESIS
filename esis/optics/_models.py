@@ -16,6 +16,9 @@ __all__ = [
 @dataclasses.dataclass(eq=False, repr=False)
 class AbstractOpticsModel(
     optika.mixins.Printable,
+    optika.mixins.Rollable,
+    optika.mixins.Yawable,
+    optika.mixins.Pitchable,
 ):
     @property
     @abc.abstractmethod
@@ -158,6 +161,7 @@ class AbstractOpticsModel(
         result = optika.systems.SequentialSystem(
             surfaces=surfaces,
             grid_input_normalized=grid,
+            transformation=self.transformation,
         )
 
         return result
@@ -176,3 +180,6 @@ class OpticsModel(
     filter: None | esis.optics.Filter = None
     detector: None | esis.optics.Detector = None
     grid_input_normalized: None | optika.vectors.ObjectVectorArray = None
+    pitch: u.Quantity | na.AbstractScalar = 0 * u.deg
+    yaw: u.Quantity | na.AbstractScalar = 0 * u.deg
+    roll: u.Quantity | na.AbstractScalar = 0 * u.deg
