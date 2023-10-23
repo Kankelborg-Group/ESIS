@@ -46,7 +46,7 @@ class AbstractDetector(
 
     @property
     def width_clear(self) -> u.Quantity | na.Cartesian2dVectorArray:
-        return self.width_pixels * self.shape_pixels
+        return (self.width_pixels * self.shape_pixels).to(u.mm)
 
     @property
     @abc.abstractmethod
