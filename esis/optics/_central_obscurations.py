@@ -42,7 +42,13 @@ class AbstractCentralObscuration(
         num_folds = self.num_folds
         radius = self.radius
         offset_angle = 360 * u.deg / num_folds
-        angle = na.linspace(0, 360, num=num_folds, axis="vertex") * u.deg
+        angle = na.linspace(
+            start=0 * u.deg,
+            stop=360 * u.deg,
+            num=num_folds,
+            axis="vertex",
+            endpoint=False,
+        )
         if self.remove_last_vertex:
             angle = angle[dict(vertex=slice(None, ~0))]
         angle = angle - offset_angle
