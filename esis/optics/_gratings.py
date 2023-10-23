@@ -105,24 +105,26 @@ class AbstractGrating(
         clearance = self.clearance
         distance_radial = self.distance_radial
         side_border_x = width_border / np.sin(angle_aperture / 2) + clearance
+        offset_clear = distance_radial - side_border_x
+        offset_mechanical = distance_radial - clearance
         return optika.surfaces.Surface(
             name="grating",
             sag=self.sag,
             material=self.material,
             aperture=optika.apertures.IsoscelesTrapezoidalAperture(
-                x_left=halfwidth_inner,
-                x_right=halfwidth_outer,
+                x_left=offset_clear - halfwidth_inner,
+                x_right=offset_clear + halfwidth_outer,
                 angle=angle_aperture,
                 transformation=na.transformations.Cartesian3dTranslation(
-                    x=-(distance_radial - side_border_x),
+                    x=-offset_clear,
                 ),
             ),
             aperture_mechanical=optika.apertures.IsoscelesTrapezoidalAperture(
-                x_left=halfwidth_inner + width_border_inner,
-                x_right=halfwidth_outer + width_border,
+                x_left=offset_mechanical - (halfwidth_inner + width_border_inner),
+                x_right=offset_mechanical + halfwidth_outer + width_border,
                 angle=angle_aperture,
                 transformation=na.transformations.Cartesian3dTranslation(
-                    x=-(distance_radial - clearance),
+                    x=-offset_mechanical,
                 ),
             ),
             rulings=self.rulings,
