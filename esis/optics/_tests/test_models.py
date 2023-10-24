@@ -83,9 +83,7 @@ class AbstractTestAbstractOpticsModel(
     argvalues=[
         esis.optics.OpticsModel(
             name="esis-test",
-            front_aperture=esis.optics.FrontAperture(
-                radius_clear=20 * u.imperial.inch,
-            ),
+            front_aperture=esis.optics.FrontAperture(),
             central_obscuration=esis.optics.CentralObscuration(
                 num_folds=8,
             ),
