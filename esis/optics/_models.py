@@ -155,7 +155,7 @@ class AbstractOpticsModel(
         wavelength_min = self.wavelength_min
         wavelength_max = self.wavelength_max
         wavelength_range = wavelength_max - wavelength_min
-        grid = self.grid_input_normalized
+        grid = self.grid_input_normalized.copy_shallow()
         grid.wavelength = wavelength_range * (grid.wavelength + 1) / 2 + wavelength_min
 
         result = optika.systems.SequentialSystem(
