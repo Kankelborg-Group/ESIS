@@ -34,7 +34,12 @@ def design_proposed(
 
         grid = optika.vectors.ObjectVectorArray(
             wavelength=na.linspace(-1, 1, axis="wavelength",  num=2) / 2,
-            field=0,
+            field=0.99 * na.Cartesian2dVectorLinearSpace(
+                start=-1,
+                stop=1,
+                axis=na.Cartesian2dVectorArray("field_x", "field_y"),
+                num=5,
+            ),
             pupil=na.Cartesian2dVectorLinearSpace(
                 start=-1,
                 stop=1,
@@ -43,13 +48,13 @@ def design_proposed(
             ),
         )
 
-        model = esis.flights.flight_01.optics.models.design_single(
+        model = esis.flights.flight_02.optics.models.design_proposed(
             grid=grid,
             num_distribution=0,
         )
 
         fig, ax = plt.subplots(
-            figsize=(6, 7),
+            figsize=(6, 6.5),
             constrained_layout=True
         )
         ax.set_aspect("equal")
