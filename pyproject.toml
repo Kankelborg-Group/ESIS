@@ -47,6 +47,7 @@ packages = ["esis"]
 [tool.pytest.ini_options]
 testpaths = [
     "esis/optics/_tests",
+    "esis/flight",
 ]
 
 [tool.black]
