@@ -427,7 +427,7 @@ def design_single(
         );
         handles, labels = ax.get_legend_handles_labels()
         labels = dict(zip(labels, handles))
-        fig.legend(labels.values(), labels.keys())
+        fig.legend(labels.values(), labels.keys());
     """
     result = design(
         grid=grid,
