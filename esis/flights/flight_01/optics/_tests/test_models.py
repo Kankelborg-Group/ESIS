@@ -1,5 +1,5 @@
 import pytest
-import esis.optics._tests.test_models
+import esis
 
 
 @pytest.mark.parametrize("num_distribution", [0, 11])
