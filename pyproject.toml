@@ -49,6 +49,7 @@ packages = ["esis"]
 testpaths = [
     "esis/optics/_tests",
     "esis/flights",
+    "esis/science/papers/instrument/_tests",
 ]
 
 [tool.black]
