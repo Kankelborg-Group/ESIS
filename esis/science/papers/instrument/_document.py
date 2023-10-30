@@ -2,7 +2,7 @@ import pathlib
 import matplotlib.pyplot as plt
 import aastex
 from . import preamble
-from . import variables
+# from . import variables
 from . import authors
 from . import sections
 
@@ -37,7 +37,7 @@ def document() -> aastex.Document:
 
     doc.preamble += preamble.body()
 
-    variables.append_to_document(doc)
+    # variables.append_to_document(doc)
 
     doc.append(aastex.Title('The EUV Snapshot Imaging Spectrograph'))
 
