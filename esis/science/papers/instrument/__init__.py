@@ -1,11 +1,6 @@
 import pathlib
 import matplotlib.pyplot as plt
-import pylatex
-import kgpy.format
-import kgpy.latex
-import kgpy.units
-import kgpy.chianti
-import kgpy.optics
+import aastex
 from . import preamble
 from . import variables
 from . import authors
@@ -16,15 +11,15 @@ path_pdf = path_base / 'instrument'
 path_figures = path_base / 'figures'
 
 
-def document() -> kgpy.latex.Document:
+def document() -> aastex.Document:
 
     plt.rcParams['text.usetex'] = True
     plt.rcParams['font.family'] = 'serif'
     plt.rcParams['font.size'] = 9
     plt.rcParams['lines.linewidth'] = 1
 
-    doc = kgpy.latex.Document(
-        default_filepath=str(path_pdf),
+    doc = aastex.Document(
+        default_filepath=path_pdf,
         documentclass='aastex631',
         document_options=[
             'twocolumn',
@@ -32,16 +27,15 @@ def document() -> kgpy.latex.Document:
         ]
     )
 
-    doc.packages.append(pylatex.Package('paralist'))
-    doc.packages.append(pylatex.Package('amsmath'))
-    doc.packages.append(pylatex.Package('acronym'))
-    doc.packages.append(pylatex.Package('savesym'))
+    doc.packages.append(aastex.Package('paralist'))
+    doc.packages.append(aastex.Package('amsmath'))
+    doc.packages.append(aastex.Package('acronym'))
 
     doc.preamble += preamble.body()
 
     variables.append_to_document(doc)
 
-    doc.append(kgpy.latex.Title('The EUV Snapshot Imaging Spectrograph'))
+    doc.append(aastex.Title('The EUV Snapshot Imaging Spectrograph'))
 
     doc += authors.author_list()
 
@@ -59,6 +53,6 @@ def document() -> kgpy.latex.Document:
     #
     # doc.append(sections.conclusion.section())
 
-    doc.append(pylatex.Command('bibliography', arguments='sources'))
+    doc.append(aastex.Bibliography("sources"))
 
     return doc
