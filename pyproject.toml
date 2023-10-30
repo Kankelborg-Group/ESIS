@@ -19,6 +19,7 @@ dependencies = [
     "astropy",
     "named-arrays",
     "optika",
+    "aastex",
 ]
 dynamic = ["version"]
 
