@@ -77,7 +77,7 @@ def design_proposed(
 
     result.grating.rulings.coefficients[0].nominal = 1 / (2700 / u.mm)
     result.grating.rulings.coefficients[1].nominal = -2.852e-5 * (u.um / u.mm)
-    result.grating.rulings.coefficients[2].nominal = -2.112e-7 * (u.um / u.mm)
+    result.grating.rulings.coefficients[2].nominal = -2.112e-7 * (u.um / u.mm**2)
     result.grating.yaw = -3.65 * u.deg
 
     result.filter.translation.z = result.grating.translation.z + 1291.012 * u.mm
