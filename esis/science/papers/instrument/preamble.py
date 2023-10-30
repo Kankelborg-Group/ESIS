@@ -41,7 +41,7 @@ def body() -> typ.List[pylatex.base_classes.LatexObject]:
 
     result.append(pylatex.Command('bibliographystyle', 'aasjournal'))
 
-    result += acronyms.all()
+    result += acronyms()
 
     result.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
 

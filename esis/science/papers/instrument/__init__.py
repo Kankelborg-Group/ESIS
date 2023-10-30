@@ -1,3 +1,4 @@
+from ._acronyms import *
 from . import preamble
 # from . import variables
 from . import authors

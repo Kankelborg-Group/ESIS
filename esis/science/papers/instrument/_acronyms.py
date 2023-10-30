@@ -2,11 +2,11 @@ import aastex
 from aastex import NoEscape
 
 __all__ = [
-    "all",
+    "acronyms",
 ]
 
 
-def all() -> list[aastex.Acronym]:
+def acronyms() -> list[aastex.Acronym]:
     return [
         aastex.Acronym("ESIS", r"EUV Snapshot Imaging Spectrograph"),
         aastex.Acronym("MOSES", r"Multi-Order Solar EUV Spectrograph"),
