@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import tables
 
 __all__ = [
@@ -6,9 +6,8 @@ __all__ = [
 ]
 
 
-def subsection(doc: pylatex.Document) -> pylatex.Subsection:
-    result = pylatex.Subsection('Sensitivity and Cadence')
-    result.escape = False
+def subsection(doc: aastex.Document) -> aastex.Subsection:
+    result = aastex.Subsection('Sensitivity and Cadence')
     result.append(
         r"""
 Count rates for \ESIS\ are estimated using the expected component throughput from Section~\ref{
