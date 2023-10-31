@@ -1,10 +1,10 @@
 import aastex
 from . import acronyms
 
-__all__ = ['body']
+__all__ = ["preamble"]
 
 
-def body() -> list[str]:
+def preamble() -> list[str]:
 
     result = []
 

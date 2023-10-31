@@ -1,5 +1,5 @@
 from ._acronyms import *
-from . import preamble
+from ._preamble import *
 # from . import variables
 from ._authors import *
 from . import sections

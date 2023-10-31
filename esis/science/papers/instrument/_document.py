@@ -35,7 +35,7 @@ def document() -> aastex.Document:
     doc.packages.append(aastex.Package('amsmath'))
     doc.packages.append(aastex.Package('acronym'))
 
-    doc.preamble += preamble.body()
+    doc.preamble += preamble()
 
     # variables.append_to_document(doc)
 
