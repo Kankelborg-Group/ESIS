@@ -2,9 +2,7 @@ import pathlib
 import matplotlib.figure
 import matplotlib.colors
 import astropy.units as u
-import pylatex
-import kgpy.latex
-import kgpy.vector
+import aastex
 import esis.optics
 from . import formatting
 from . import caching
@@ -62,10 +60,10 @@ def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
 
 
-def figure() -> pylatex.Figure:
-    result = pylatex.Figure()
-    result.add_image(str(pdf()), width=None)
-    result.add_caption(pylatex.NoEscape(
+def figure() -> aastex.Figure:
+    result = aastex.Figure("fig:psf")
+    result.add_image(pdf(), width=None)
+    result.add_caption(aastex.NoEscape(
         r"""
 \roy{Raytraced spot diagrams for \OV\ with $\psfFieldSamples \times \psfFieldSamples$ field angles across the \FOV.
 The box around each spot represents a single pixel on the detector.
@@ -78,5 +76,4 @@ The grid spacing is \SI{1}{\micro\meter} and the diffraction limit airy disk (ov
 Imaging performance will be limited by the \SI{15}{\micro\meter} pixel size.
 (Right:) RMS spot radius through focus for the three centered spots; top of \FOV\ (purple curve), center (maroon), and bottom (red)."""
     ))
-    result.append(kgpy.latex.Label('fig:psf'))
     return result
