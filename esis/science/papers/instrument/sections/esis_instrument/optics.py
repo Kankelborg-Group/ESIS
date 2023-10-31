@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 
 __all__ = [
@@ -6,9 +6,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Optics')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Optics')
     result.append(
         r"""
 Figure~\ref{fig:schematic}a shows the relative layout of the optics and detectors for a single 
