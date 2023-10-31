@@ -1,13 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'subsection',
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Mechanical')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Mechanical')
     result.append(
         r"""
 \ESIS\ and \MOSES\ are mounted on opposite sides of a composite optical table structure originally developed for the 
