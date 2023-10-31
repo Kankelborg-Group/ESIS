@@ -1,11 +1,11 @@
-import pylatex
+import aastex
 from ... import figures
 
 __all__ = ['subsection']
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Vignetting')
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Vignetting')
     result.escape = False
     result.append(
         r"""
