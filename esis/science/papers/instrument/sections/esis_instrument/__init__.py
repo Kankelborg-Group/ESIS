@@ -1,5 +1,4 @@
-import pylatex
-import kgpy.latex
+import aastex
 from ... import tables
 from . import optics
 from . import optimization_and_tolerancing
@@ -30,10 +29,9 @@ __all__ = [
 ]
 
 
-def section(doc: kgpy.latex.Document) -> pylatex.Section:
-    result = pylatex.Section(pylatex.NoEscape(r'The \ESIS\ Instrument'))
-    result.escape = False
-    result.append(pylatex.NoEscape(
+def section(doc: aastex.Document) -> aastex.Section:
+    result = aastex.Section(aastex.NoEscape(r'The \ESIS\ Instrument'))
+    result.append(
         r"""\ESIS\ is a multi-projection slitless spectrograph that obtains line intensities, Doppler shifts, and 
 widths in a single snapshot over a 2D \FOV.
 Starting from the notional instrument described in Sec.~\ref{sec:TheESISConcept}, \ESIS\ has been designed to ensure all 
@@ -42,7 +40,7 @@ The final design parameters are summarized in Table~\ref{table:prescription}.
 
 A schematic diagram of a single \ESIS\ channel is presented in Fig.~\ref{fig:schematic}a, while the mechanical features 
 of the primary mirror and gratings are detailed in Figs.~\ref{fig:schematic}b and \ref{fig:schematic}c, respectively."""
-    ))
+    )
     result.append(tables.prescription.table())
     result.append(optics.subsection())
     result.append(optimization_and_tolerancing.subsection(doc))
