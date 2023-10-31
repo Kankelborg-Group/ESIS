@@ -75,9 +75,6 @@ def design_proposed(
         num_distribution=num_distribution,
     )
 
-    if num_distribution == 0:
-        raise ValueError(f"{num_distribution=} is not supported")
-
     result.grating.rulings.coefficients[0].nominal = 1 / (2700 / u.mm)
     result.grating.rulings.coefficients[1].nominal = -2.852e-5 * (u.um / u.mm)
     result.grating.rulings.coefficients[2].nominal = -2.112e-7 * (u.um / u.mm**2)
