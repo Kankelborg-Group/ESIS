@@ -7,7 +7,6 @@ __all__ = [
 
 def subsection() -> aastex.Subsection:
     result = aastex.Subsection('Pointing System')
-    result.escape = False
     result.append(
         r"""
 The imaging target will be selected prior to launch, the morning of the day of flight.
