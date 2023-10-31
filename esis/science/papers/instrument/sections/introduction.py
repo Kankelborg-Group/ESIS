@@ -1,13 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'section',
 ]
 
 
-def section() -> pylatex.Section:
-    result = pylatex.Section('Introduction')
-    result.escape = False
+def section() -> aastex.Section:
+    result = aastex.Section('Introduction')
     result.append(
         r"""
 The solar \TR\ and corona, as viewed from space in its characteristic short wavelengths (\FUV, \EUV, and soft X-ray), 
