@@ -1,21 +1,14 @@
-import typing as typ
-import pylatex
+import aastex
 from . import acronyms
 
 __all__ = ['body']
 
 
-def body() -> typ.List[pylatex.base_classes.LatexObject]:
+def body() -> list[str]:
 
     result = []
 
-    result.append(pylatex.NoEscape(
-        '\\savesymbol{tablenum}\n'
-        '\\usepackage{siunitx}\n'
-        '\\restoresymbol{SIX}{tablenum}\n'
-    ))
-
-    result.append(pylatex.NoEscape(
+    result.append(aastex.NoEscape(
         r"""
 \makeatletter
 \newcommand{\acposs}[1]{%
@@ -35,14 +28,12 @@ def body() -> typ.List[pylatex.base_classes.LatexObject]:
 \makeatother"""
     ))
 
-    result.append(pylatex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
-    result.append(pylatex.NoEscape(r'\newcommand{\jake}[1]{{{\color{purple} #1}}}'))
-    result.append(pylatex.NoEscape(r'\newcommand{\roy}[1]{{{\color{blue} #1}}}'))
-
-    result.append(pylatex.Command('bibliographystyle', 'aasjournal'))
+    result.append(aastex.NoEscape(r'\newcommand{\amy}[1]{{{\color{red} #1}}}'))
+    result.append(aastex.NoEscape(r'\newcommand{\jake}[1]{{{\color{purple} #1}}}'))
+    result.append(aastex.NoEscape(r'\newcommand{\roy}[1]{{{\color{blue} #1}}}'))
 
     result += acronyms()
 
-    result.append(pylatex.Command('DeclareSIUnit', [pylatex.NoEscape(r'\angstrom'), pylatex.NoEscape(r'\AA')]))
+    result.append(aastex.Command('DeclareSIUnit', [aastex.NoEscape(r'\angstrom'), aastex.NoEscape(r'\AA')]))
 
     return result
