@@ -3,8 +3,7 @@ import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.visualization
-import pylatex
-import kgpy.latex
+import aastex
 import esis.optics
 from . import formatting
 from . import caching
@@ -50,14 +49,13 @@ def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
 
 
-def figure() -> pylatex.Figure:
-    result = pylatex.Figure()
+def figure() -> aastex.Figure:
+    result = aastex.Figure("fig:gratingEfficiencyVsPosition")
     result._star_latex_name = True
-    result.add_image(str(pdf()), width=None)
-    result.add_caption(pylatex.NoEscape(
+    result.add_image(pdf(), width=None)
+    result.add_caption(aastex.NoEscape(
         r"""
 \roy{Channel \testGratingChannelIndex\ grating efficiency at \gratingTestWavelength\ vs. position for two orthogonal slices across the optical 
 surface on \testGratingDate.}"""
     ))
-    result.append(kgpy.latex.Label('fig:gratingEfficiencyVsPosition'))
     return result
