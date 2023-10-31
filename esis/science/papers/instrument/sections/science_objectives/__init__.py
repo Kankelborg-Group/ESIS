@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from . import magnetic_reconnection_events
 from . import energy_transfer
 from . import requirements
@@ -11,9 +11,8 @@ __all__ = [
 ]
 
 
-def section() -> pylatex.Section:
-    result = pylatex.Section('Science Objectives')
-    result.escape = False
+def section() -> aastex.Section:
+    result = aastex.Section('Science Objectives')
     result.append(
         r"""
 The previous section discussed the qualitative design aspects of \ESIS\ learned from experience with the 
