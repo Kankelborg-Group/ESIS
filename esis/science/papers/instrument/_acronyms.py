@@ -45,7 +45,7 @@ def acronyms() -> list[aastex.Acronym]:
         aastex.Acronym("MTF", "modulation transfer function"),
         aastex.Acronym("LBNL", "Lawrence Berkley National Laboratory"),
         aastex.Acronym("MSFC", "Marshall Space Flight Center", short=True),
-        aastex.Acronym("VR", NoEscape("\citet{Vernazza78}"), NoEscape("V\&R")),
+        aastex.Acronym("VR", NoEscape(r"\citet{Vernazza78}"), NoEscape(r"V\&R")),
         aastex.Acronym("DACS", "data acquisition and control system"),
         aastex.Acronym("GSE", "ground support equipment"),
         aastex.Acronym("MOTS", "military off-the-shelf"),
