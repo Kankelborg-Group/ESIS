@@ -7,7 +7,7 @@ name = "euv-snapshot-imaging-spectrograph"
 authors = [
     {name = "Roy T. Smart", email = "roytsmart@gmail.com"},
 ]
-description = "A Python library for modeling and interpreting data from the EUV Snapshot Imaging Spectrograph (ESIs)"
+description = "A Python library for modeling and interpreting data from the EUV Snapshot Imaging Spectrograph (ESIS)"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
