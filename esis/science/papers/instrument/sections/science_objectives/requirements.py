@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 from ... import tables
 
@@ -7,9 +7,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Science Requirements')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Science Requirements')
     result.append(
         r"""
 \ESIS\ will investigate two science targets; 
