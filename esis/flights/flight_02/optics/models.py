@@ -80,6 +80,9 @@ def design_proposed(
     result.grating.rulings.coefficients[2].nominal = -2.112e-7 * (u.um / u.mm**2)
     result.grating.yaw = -3.65 * u.deg
 
-    result.filter.translation.z = result.grating.translation.z + 1291.012 * u.mm
+    z_filter = result.grating.translation.z.nominal + 1291.012 * u.mm
+    dz = z_filter - result.filter.translation.z
+    result.filter.translation.z += dz
+    result.detector.translation.z += dz
 
     return result
