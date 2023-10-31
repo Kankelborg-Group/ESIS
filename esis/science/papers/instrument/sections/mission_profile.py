@@ -1,11 +1,10 @@
-import pylatex
+import aastex
 
 __all__ = []
 
 
-def section() -> pylatex.Section:
-    result = pylatex.Section('Mission Profile')
-    result.escape = False
+def section() -> aastex.Section:
+    result = aastex.Section('Mission Profile')
     result.append(
         r"""
 \ESIS\ will be launched aboard a sub-orbital Terrier Black Brant sounding rocket from White Sands Missile Range.
@@ -21,8 +20,7 @@ ground station via high speed telemetry as a safeguard against payload loss or d
 A parachute will slow the descent of the payload after it enters the atmosphere, and recovery will be accomplished by 
 helicopter after the payload is located on the ground."""
     )
-    with result.create(pylatex.Subsection(pylatex.NoEscape('\ESIS\ Mission Update'))) as mission_update:
-        mission_update.escape = False
+    with result.create(aastex.Subsection(aastex.NoEscape('\ESIS\ Mission Update'))) as mission_update:
         mission_update.append(
             r"""
 Since the time of writing \ESIS\ launched and was recovered successfully from White Sands Missile Range on 
