@@ -1,5 +1,4 @@
-import pylatex
-import kgpy.latex
+import aastex
 from ... import figures
 from ... import tables
 
@@ -8,9 +7,8 @@ __all__ = [
 ]
 
 
-def subsection(doc: kgpy.latex.Document) -> pylatex.Subsection:
-    result = pylatex.Subsection('Optimization and Tolerancing')
-    result.escape = False
+def subsection(doc: aastex.Document) -> aastex.Subsection:
+    result = aastex.Subsection('Optimization and Tolerancing')
     result.append(
         r"""
 The science resolution requirement of \angularResolutionRequirement (Table~\ref{table:scireq}) was 
