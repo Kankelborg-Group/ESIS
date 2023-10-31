@@ -1,13 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'subsection',
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Avionics')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Avionics')
     result.append(
         r"""
 The \ESIS\ \DACS\ are based on the designs used for both \CLASP~\citep{Kano12,Kobayashi12} and \HiC~\citep{Kobayashi2014}.
