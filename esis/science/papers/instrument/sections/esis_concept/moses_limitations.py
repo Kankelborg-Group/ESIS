@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 
 __all__ = [
@@ -6,8 +6,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection(pylatex.NoEscape(r'Limitations of the \MOSES\ Design'))
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection(aastex.NoEscape(r'Limitations of the \MOSES\ Design'))
     result.escape = False
     result.append(r"""
 The \MOSES\ design features a single concave diffraction grating forming images on three \CCD\ 
