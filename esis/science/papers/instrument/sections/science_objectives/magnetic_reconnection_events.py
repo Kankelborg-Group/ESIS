@@ -1,13 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'subsection',
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Magnetic Reconnection Events')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Magnetic Reconnection Events')
     result.append(
         r"""
 Magnetic reconnection describes the re-arrangement of the magnetic topology wherein magnetic energy 
