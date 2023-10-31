@@ -1,12 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'subsection',
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Pointing System')
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Pointing System')
     result.escape = False
     result.append(
         r"""
