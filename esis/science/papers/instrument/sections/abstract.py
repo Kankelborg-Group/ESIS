@@ -1,13 +1,12 @@
-import kgpy.latex
+import aastex
 
 __all__ = [
     'section'
 ]
 
 
-def section() -> kgpy.latex.Abstract:
-    result = kgpy.latex.Abstract()
-    result.escape = False
+def section() -> aastex.Abstract:
+    result = aastex.Abstract()
     result.append(
         r"""
 The \ESIS\ is a next generation rocket borne instrument designed to investigate magnetic reconnection 
