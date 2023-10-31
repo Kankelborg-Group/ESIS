@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 
 __all__ = [
@@ -6,8 +6,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Alignment and Focus')
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Alignment and Focus')
     result.escape = False
     result.append(
         r"""
