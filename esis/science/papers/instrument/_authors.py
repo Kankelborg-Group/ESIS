@@ -2,11 +2,11 @@ import typing as typ
 import aastex
 
 __all__ = [
-    'author_list'
+    'authors'
 ]
 
 
-def author_list() -> typ.List[aastex.Author]:
+def authors() -> typ.List[aastex.Author]:
     affil_msu = aastex.Affiliation(
         'Montana State University, Department of Physics, '
         'P.O. Box 173840, Bozeman, MT 59717, USA'

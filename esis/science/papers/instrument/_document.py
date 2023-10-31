@@ -41,7 +41,7 @@ def document() -> aastex.Document:
 
     doc.append(aastex.Title('The EUV Snapshot Imaging Spectrograph'))
 
-    doc += authors.author_list()
+    doc += authors()
 
     # doc.append(sections.abstract.section())
 
