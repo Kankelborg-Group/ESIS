@@ -5,6 +5,7 @@ import optika
 
 __all__ = [
     "multilayer_AlSc",
+    "multilayer_SiSc",
 ]
 
 
@@ -59,6 +60,62 @@ def multilayer_AlSc() -> optika.materials.MultilayerMirror:
         material_layers=na.ScalarArray(np.array(n * ["Al", "Sc"]), axes="layer"),
         material_substrate="SiO2",
         thickness_layers=na.ScalarArray(u.Quantity(n * [t_Al, t_Sc]), axes="layer"),
+        axis_layers="layer",
+        profile_interface=optika.materials.profiles.ErfInterfaceProfile(7 * u.AA),
+    )
+
+
+def multilayer_SiSc() -> optika.materials.MultilayerMirror:
+    r"""
+    A proposed coating design for ESIS II which uses :math:`\text{Si/Sc}`
+    layers
+
+    Examples
+    --------
+
+    Plot the efficiency of the coating across the EUV range
+
+    .. jupyter-execute::
+
+        import matplotlib.pyplot as plt
+        import astropy.units as u
+        import named_arrays as na
+        import optika
+        import esis
+
+        # Define an array of wavelengths with which to sample the efficiency
+        wavelength = na.geomspace(100, 1000, axis="wavelength", num=1001) * u.AA
+
+        # Define the incident rays from the wavelength array
+        rays = optika.rays.RayVectorArray(
+            wavelength=wavelength,
+            direction=na.Cartesian3dVectorArray(0, 0, 1),
+        )
+
+        # Initialize the ESIS primary mirror material
+        material = esis.flights.flight_02.optics.materials.multilayer_SiSc()
+
+        # Compute the reflectivity of the primary mirror
+        reflectivity = material.efficiency(
+            rays=rays,
+            normal=na.Cartesian3dVectorArray(0, 0, -1),
+        )
+
+        # Plot the reflectivity vs wavelength
+        fig, ax = plt.subplots(constrained_layout=True)
+        na.plt.plot(wavelength, reflectivity, ax=ax);
+        ax.set_xlabel(f"wavelength ({wavelength.unit})");
+        ax.set_ylabel("reflectivity");
+    """
+    n = 5
+    d = 260 * u.AA
+    gamma = 0.5
+    t_Si = gamma * d
+    t_Sc = (1 - gamma) * d
+    return optika.materials.MultilayerMirror(
+        material_layers=na.ScalarArray(np.array(n * ["Si", "Sc"]), axes="layer"),
+        material_substrate="SiO2",
+        thickness_layers=na.ScalarArray(u.Quantity(n * [t_Si, t_Sc]), axes="layer"),
         axis_layers="layer",
         profile_interface=optika.materials.profiles.ErfInterfaceProfile(7 * u.AA),
     )
