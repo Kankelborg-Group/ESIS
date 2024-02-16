@@ -4,11 +4,11 @@ import named_arrays as na
 import optika
 
 __all__ = [
-    "design",
+    "multilayer_design",
 ]
 
 
-def design() -> optika.materials.MultilayerMirror:
+def multilayer_design() -> optika.materials.MultilayerMirror:
     """
     The as-designed multilayer coating for the ESIS primary mirror.
 
@@ -35,7 +35,7 @@ def design() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the ESIS primary mirror material
-        material = esis.flights.flight_01.optics.primary_mirrors.materials.design()
+        material = esis.flights.flight_01.optics.primary_mirrors.materials.multilayer_design()
 
         # Compute the reflectivity of the primary mirror
         reflectivity = material.efficiency(
