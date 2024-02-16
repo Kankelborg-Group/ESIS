@@ -1,3 +1,4 @@
+import pathlib
 import numpy as np
 import astropy.units as u
 import named_arrays as na
@@ -5,6 +6,7 @@ import optika
 
 __all__ = [
     "multilayer_design",
+    "reflectivity_witness",
 ]
 
 
@@ -56,3 +58,52 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
         axis_layers="layer",
         profile_interface=optika.materials.profiles.ErfInterfaceProfile(2 * u.nm),
     )
+
+
+def reflectivity_witness() -> (
+    na.FunctionArray[na.SpectralDirectionalVectorArray, na.ScalarArray]
+):
+    """
+    A reflectivity measurement of the witness samples to the primary mirror
+    multilayer coating performed by Eric Gullikson.
+
+    Examples
+    --------
+    Load the measurement and plot it as a function of wavelength
+
+    .. jupyter-execute::
+
+        import matplotlib.pyplot as plt
+        import named_arrays as na
+        import esis
+
+        # Load the witness sample measurements
+        measurement = esis.flights.flight_01.optics.primary_mirrors.materials.reflectivity_witness()
+
+        # Plot the measurement as a function of wavelength
+        fig, ax = plt.subplots(constrained_layout=True)
+        na.plt.plot(
+            measurement.inputs.wavelength,
+            measurement.outputs,
+            ax=ax,
+            label=measurement.inputs.direction,
+        )
+        ax.set_xlabel(f"wavelength ({measurement.inputs.wavelength.unit:latex_inline})");
+        ax.set_ylabel("reflectivity");
+        ax.legend();
+    """
+    wavelength, reflectivity = np.loadtxt(
+        fname=pathlib.Path(__file__).parent / "_data/mul063931.abs",
+        skiprows=1,
+        unpack=True,
+    )
+    wavelength = na.ScalarArray(wavelength << u.nm, axes="wavelength")
+    reflectivity = na.ScalarArray(reflectivity, axes="wavelength")
+    result = na.FunctionArray(
+        inputs=na.SpectralDirectionalVectorArray(
+            wavelength=wavelength,
+            direction=4 * u.deg,
+        ),
+        outputs=reflectivity,
+    )
+    return result
