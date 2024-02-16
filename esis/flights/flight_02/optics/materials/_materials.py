@@ -56,10 +56,17 @@ def multilayer_AlSc() -> optika.materials.MultilayerMirror:
     gamma = 0.5
     t_Al = gamma * d
     t_Sc = (1 - gamma) * d
+    t_Al2O3 = 1 * u.nm
     return optika.materials.MultilayerMirror(
-        material_layers=na.ScalarArray(np.array(n * ["Al", "Sc"]), axes="layer"),
+        material_layers=na.ScalarArray(
+            ndarray=np.array(["Al2O3"] + n * ["Al", "Sc"]),
+            axes="layer",
+        ),
         material_substrate="SiO2",
-        thickness_layers=na.ScalarArray(u.Quantity(n * [t_Al, t_Sc]), axes="layer"),
+        thickness_layers=na.ScalarArray(
+            ndarray=u.Quantity([t_Al2O3] + n * [t_Al, t_Sc]),
+            axes="layer",
+        ),
         axis_layers="layer",
         profile_interface=optika.materials.profiles.ErfInterfaceProfile(7 * u.AA),
     )
@@ -112,10 +119,17 @@ def multilayer_SiSc() -> optika.materials.MultilayerMirror:
     gamma = 0.5
     t_Si = gamma * d
     t_Sc = (1 - gamma) * d
+    t_SiO2 = 1 * u.nm
     return optika.materials.MultilayerMirror(
-        material_layers=na.ScalarArray(np.array(n * ["Si", "Sc"]), axes="layer"),
+        material_layers=na.ScalarArray(
+            ndarray=np.array(["SiO2"] + n * ["Si", "Sc"]),
+            axes="layer",
+        ),
         material_substrate="SiO2",
-        thickness_layers=na.ScalarArray(u.Quantity(n * [t_Si, t_Sc]), axes="layer"),
+        thickness_layers=na.ScalarArray(
+            ndarray=u.Quantity([t_SiO2] + n * [t_Si, t_Sc]),
+            axes="layer",
+        ),
         axis_layers="layer",
         profile_interface=optika.materials.profiles.ErfInterfaceProfile(7 * u.AA),
     )
