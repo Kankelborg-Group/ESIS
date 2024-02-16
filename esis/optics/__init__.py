@@ -1,6 +1,7 @@
 """
 Model of the ESIS optical system
 """
+
 from . import mixins
 from . import abc
 from ._front_apertures import *
