@@ -36,10 +36,10 @@ def multilayer_AlSc() -> optika.materials.MultilayerMirror:
             direction=na.Cartesian3dVectorArray(0, 0, 1),
         )
 
-        # Initialize the ESIS primary mirror material
+        # Initialize the multilayer material
         material = esis.flights.flight_02.optics.materials.multilayer_AlSc()
 
-        # Compute the reflectivity of the primary mirror
+        # Compute the reflectivity of the multilayer material
         reflectivity = material.efficiency(
             rays=rays,
             normal=na.Cartesian3dVectorArray(0, 0, -1),
@@ -48,7 +48,7 @@ def multilayer_AlSc() -> optika.materials.MultilayerMirror:
         # Plot the reflectivity vs wavelength
         fig, ax = plt.subplots(constrained_layout=True)
         na.plt.plot(wavelength, reflectivity, ax=ax);
-        ax.set_xlabel(f"wavelength ({wavelength.unit})");
+        ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
         ax.set_ylabel("reflectivity");
     """
     n = 10
@@ -92,10 +92,10 @@ def multilayer_SiSc() -> optika.materials.MultilayerMirror:
             direction=na.Cartesian3dVectorArray(0, 0, 1),
         )
 
-        # Initialize the ESIS primary mirror material
+        # Initialize the multilayer material
         material = esis.flights.flight_02.optics.materials.multilayer_SiSc()
 
-        # Compute the reflectivity of the primary mirror
+        # Compute the reflectivity of the multilayer
         reflectivity = material.efficiency(
             rays=rays,
             normal=na.Cartesian3dVectorArray(0, 0, -1),
@@ -104,7 +104,7 @@ def multilayer_SiSc() -> optika.materials.MultilayerMirror:
         # Plot the reflectivity vs wavelength
         fig, ax = plt.subplots(constrained_layout=True)
         na.plt.plot(wavelength, reflectivity, ax=ax);
-        ax.set_xlabel(f"wavelength ({wavelength.unit})");
+        ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
         ax.set_ylabel("reflectivity");
     """
     n = 5
