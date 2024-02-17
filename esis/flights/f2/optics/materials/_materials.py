@@ -37,7 +37,7 @@ def multilayer_AlSc() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the multilayer material
-        material = esis.flights.flight_02.optics.materials.multilayer_AlSc()
+        material = esis.flights.f2.optics.materials.multilayer_AlSc()
 
         # Compute the reflectivity of the multilayer material
         reflectivity = material.efficiency(
@@ -100,7 +100,7 @@ def multilayer_SiSc() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the multilayer material
-        material = esis.flights.flight_02.optics.materials.multilayer_SiSc()
+        material = esis.flights.f2.optics.materials.multilayer_SiSc()
 
         # Compute the reflectivity of the multilayer
         reflectivity = material.efficiency(

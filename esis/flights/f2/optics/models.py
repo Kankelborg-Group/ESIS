@@ -48,7 +48,7 @@ def design_proposed(
             ),
         )
 
-        model = esis.flights.flight_02.optics.models.design_proposed(
+        model = esis.flights.f2.optics.models.design_proposed(
             grid=grid,
             num_distribution=0,
         )
