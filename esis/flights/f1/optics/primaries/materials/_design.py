@@ -9,6 +9,7 @@ __all__ = [
     "multilayer_design",
     "reflectivity_witness",
     "multilayer_witness",
+    "multilayer_fit",
 ]
 
 
@@ -252,3 +253,67 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
     )
 
     return _multilayer(*fit.x)
+
+
+def multilayer_fit() -> optika.materials.MultilayerMirror:
+    """
+    A multilayer coating determined by modifying :func:`multilayer_witness`
+    to have a glass substrate.
+
+    Examples
+    --------
+
+    Plot the reflectivity of this multilayer stack as a function of incidence angle.
+
+    .. jupyter-execute::
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import astropy.units as u
+        import named_arrays as na
+        import optika
+        import esis
+
+        # Define a grid of wavelength samples
+        wavelength = na.geomspace(100, 1000, axis="wavelength", num=1001) * u.AA
+
+        # Define a grid of incidence angles
+        angle = na.linspace(0, 20, axis="angle", num=3) * u.deg
+
+        # Define the light rays incident on the multilayer stack
+        rays = optika.rays.RayVectorArray(
+            wavelength=wavelength,
+            direction=na.Cartesian3dVectorArray(
+                x=np.sin(angle),
+                y=0,
+                z=np.cos(angle),
+            ),
+        )
+
+        # Initialize the multilayer stack
+        multilayer = esis.flights.f1.optics.primaries.materials.multilayer_fit()
+
+        # Compute the reflectivity of the multilayer for the given incident rays
+        reflectivity = multilayer.efficiency(
+            rays=rays,
+            normal=na.Cartesian3dVectorArray(0, 0, -1),
+        )
+
+        # Plot the reflectivity of the multilayer as a function of wavelength
+        fig, ax = plt.subplots(constrained_layout=True)
+        na.plt.plot(
+            wavelength,
+            reflectivity,
+            ax=ax,
+            axis="wavelength",
+            label=angle,
+        );
+        ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
+        ax.set_ylabel("reflectivity");
+        ax.legend();
+    """
+    design = multilayer_design()
+    result = multilayer_witness()
+    result.material_substrate = design.material_substrate
+    return result
+
