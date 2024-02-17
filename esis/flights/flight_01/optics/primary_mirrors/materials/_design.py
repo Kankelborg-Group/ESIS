@@ -1,5 +1,6 @@
 import pathlib
 import numpy as np
+import scipy.optimize
 import astropy.units as u
 import named_arrays as na
 import optika
@@ -7,6 +8,7 @@ import optika
 __all__ = [
     "multilayer_design",
     "reflectivity_witness",
+    "multilayer_witness",
 ]
 
 
@@ -97,7 +99,7 @@ def reflectivity_witness() -> (
         skiprows=1,
         unpack=True,
     )
-    wavelength = na.ScalarArray(wavelength << u.nm, axes="wavelength")
+    wavelength = na.ScalarArray(wavelength << u.nm, axes="wavelength").to(u.AA)
     reflectivity = na.ScalarArray(reflectivity, axes="wavelength")
     result = na.FunctionArray(
         inputs=na.SpectralDirectionalVectorArray(
@@ -107,3 +109,146 @@ def reflectivity_witness() -> (
         outputs=reflectivity,
     )
     return result
+
+
+def multilayer_witness() -> optika.materials.MultilayerMirror:
+    """
+    A multilayer stack fitted to the :func:`reflectivity_witness` measurement.
+
+    Examples
+    --------
+    Plot the fitted vs. measured reflectivity of the primary mirror witness sample.
+
+    .. jupyter-execute::
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import named_arrays as na
+        import optika
+        import esis
+
+        # Load the measured reflectivity of the witness sample
+        reflectivity_measured = esis.flights.flight_01.optics.primary_mirrors.materials.reflectivity_witness()
+
+        # Fit a multilayer stack to the measured reflectivity
+        multilayer = esis.flights.flight_01.optics.primary_mirrors.materials.multilayer_witness()
+
+        # Define the rays incident on the multilayer stack that will be used to
+        # compute the reflectivity
+        rays = optika.rays.RayVectorArray(
+            wavelength=reflectivity_measured.inputs.wavelength,
+            direction=na.Cartesian3dVectorArray(
+                x=np.sin(reflectivity_measured.inputs.direction),
+                y=0,
+                z=np.cos(reflectivity_measured.inputs.direction),
+            ),
+        )
+
+        # Compute the reflectivity of the fitted multilayer stack
+        reflectivity_fit = multilayer.efficiency(
+            rays=rays,
+            normal=na.Cartesian3dVectorArray(0, 0, -1),
+        )
+
+        # Plot the fitted vs. measured reflectivity
+        fig, ax = plt.subplots(constrained_layout=True)
+        na.plt.scatter(
+            reflectivity_measured.inputs.wavelength,
+            reflectivity_measured.outputs,
+            ax=ax,
+            label="measured"
+        );
+        na.plt.plot(
+            rays.wavelength,
+            reflectivity_fit,
+            ax=ax,
+            label="fitted",
+            color="tab:orange",
+        );
+        ax.set_xlabel(f"wavelength ({rays.wavelength.unit:latex_inline})")
+        ax.set_ylabel("reflectivity")
+        ax.legend();
+
+        # Print the fitted multilayer stack
+        multilayer
+    """
+
+    design = multilayer_design()
+
+    (
+        guess_SiO2,
+        guess_SiC,
+        guess_Cr,
+    ) = design.thickness_layers.ndarray
+
+    guess_interface = 0.5 * u.nm
+
+    type_profile = type(design.profile_interface)
+
+    reflectivity = reflectivity_witness()
+    unit = u.nm
+
+    rays = optika.rays.RayVectorArray(
+        wavelength=reflectivity.inputs.wavelength,
+        direction=na.Cartesian3dVectorArray(
+            x=np.sin(reflectivity.inputs.direction),
+            y=0,
+            z=np.cos(reflectivity.inputs.direction),
+        ),
+    )
+
+    normal = na.Cartesian3dVectorArray(0, 0, -1)
+
+    def _multilayer(
+        thickness_SiO2: float,
+        thickness_SiC: float,
+        thickness_Cr: float,
+        thickness_interface: float,
+    ):
+        return optika.materials.MultilayerMirror(
+            material_layers=design.material_layers,
+            material_substrate="Si",
+            thickness_layers=na.ScalarArray(
+                ndarray=[
+                    thickness_SiO2,
+                    thickness_SiC,
+                    thickness_Cr,
+                ]
+                * unit,
+                axes=design.axis_layers,
+            ),
+            axis_layers=design.axis_layers,
+            profile_interface=type_profile(thickness_interface * unit),
+        )
+
+    def _func(x: np.ndarray):
+
+        multilayer = _multilayer(*x)
+
+        reflectivity_fit = multilayer.efficiency(
+            rays=rays,
+            normal=normal,
+        )
+
+        result = np.sqrt(np.mean(np.square(reflectivity_fit - reflectivity.outputs)))
+
+        return result.ndarray.value
+
+    fit = scipy.optimize.minimize(
+        fun=_func,
+        x0=[
+            guess_SiO2.to_value(unit),
+            guess_SiC.to_value(unit),
+            guess_Cr.to_value(unit),
+            guess_interface.to_value(unit),
+        ],
+        bounds=[
+            (0, None),
+            (0, None),
+            (guess_Cr.to_value(unit), guess_Cr.to_value(unit)),
+            (0, None),
+        ],
+        method="nelder-mead",
+    )
+
+    return _multilayer(*fit.x)
