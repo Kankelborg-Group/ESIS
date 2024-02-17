@@ -39,7 +39,7 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the ESIS primary mirror material
-        material = esis.flights.f1.optics.primary_mirrors.materials.multilayer_design()
+        material = esis.flights.f1.optics.primaries.materials.multilayer_design()
 
         # Compute the reflectivity of the primary mirror
         reflectivity = material.efficiency(
@@ -80,7 +80,7 @@ def reflectivity_witness() -> (
         import esis
 
         # Load the witness sample measurements
-        measurement = esis.flights.f1.optics.primary_mirrors.materials.reflectivity_witness()
+        measurement = esis.flights.f1.optics.primaries.materials.reflectivity_witness()
 
         # Plot the measurement as a function of wavelength
         fig, ax = plt.subplots(constrained_layout=True)
@@ -128,10 +128,10 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
         import esis
 
         # Load the measured reflectivity of the witness sample
-        reflectivity_measured = esis.flights.f1.optics.primary_mirrors.materials.reflectivity_witness()
+        reflectivity_measured = esis.flights.f1.optics.primaries.materials.reflectivity_witness()
 
         # Fit a multilayer stack to the measured reflectivity
-        multilayer = esis.flights.f1.optics.primary_mirrors.materials.multilayer_witness()
+        multilayer = esis.flights.f1.optics.primaries.materials.multilayer_witness()
 
         # Define the rays incident on the multilayer stack that will be used to
         # compute the reflectivity

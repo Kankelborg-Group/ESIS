@@ -5,12 +5,12 @@ import esis
 
 
 def test_design():
-    r = esis.flights.f1.optics.primary_mirrors.materials.multilayer_design()
+    r = esis.flights.f1.optics.primaries.materials.multilayer_design()
     assert isinstance(r, optika.materials.AbstractMultilayerMirror)
 
 
 def test_reflectivity_witness():
-    r = esis.flights.f1.optics.primary_mirrors.materials.reflectivity_witness()
+    r = esis.flights.f1.optics.primaries.materials.reflectivity_witness()
     assert isinstance(r, na.FunctionArray)
     assert isinstance(r.inputs, na.SpectralDirectionalVectorArray)
     assert isinstance(r.outputs, na.AbstractScalar)
@@ -18,5 +18,5 @@ def test_reflectivity_witness():
 
 
 def test_multilayer_witness():
-    r = esis.flights.f1.optics.primary_mirrors.materials.multilayer_witness()
+    r = esis.flights.f1.optics.primaries.materials.multilayer_witness()
     assert isinstance(r, optika.materials.MultilayerMirror)
