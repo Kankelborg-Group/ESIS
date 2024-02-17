@@ -70,7 +70,7 @@ def design_proposed(
         labels = dict(zip(labels, handles))
         fig.legend(labels.values(), labels.keys());
     """
-    result = esis.flights.flight_01.optics.models.design_full(
+    result = esis.flights.f1.optics.models.design_full(
         grid=grid,
         num_distribution=num_distribution,
     )

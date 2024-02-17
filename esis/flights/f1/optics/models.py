@@ -391,7 +391,7 @@ def design_single(
             ),
         )
 
-        model = esis.flights.flight_01.optics.models.design_single(
+        model = esis.flights.f1.optics.models.design_single(
             grid=grid,
             num_distribution=0,
         )
