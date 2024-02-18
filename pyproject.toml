@@ -53,4 +53,4 @@ testpaths = [
 ]
 
 [tool.black]
-exclude = "(esis/data)|(esis/flight)|(esis/science)|(esis/optics/grating)|(esis/optics/primary)|(esis/optics/design)|(esis/optics/detector)|(esis/optics/optics)|(esis/optics/poletto)|(esis/optics/source)"
+exclude = "(esis/data)|(esis/flight/)|(esis/science)|(esis/optics/grating)|(esis/optics/primary)|(esis/optics/design)|(esis/optics/detector)|(esis/optics/optics)|(esis/optics/poletto)|(esis/optics/source)"
