@@ -258,7 +258,7 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
 def multilayer_fit() -> optika.materials.MultilayerMirror:
     """
     A multilayer coating determined by modifying :func:`multilayer_witness`
-    to have a glass substrate.
+    to have a glass substrate with the appropriate roughness.
 
     Examples
     --------
@@ -376,4 +376,5 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
     design = multilayer_design()
     result = multilayer_witness()
     result.material_substrate = design.material_substrate
+    result.profile_interface = design.profile_interface
     return result
