@@ -316,4 +316,3 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
     result = multilayer_witness()
     result.material_substrate = design.material_substrate
     return result
-
