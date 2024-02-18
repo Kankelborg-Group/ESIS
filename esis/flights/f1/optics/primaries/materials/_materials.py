@@ -263,6 +263,67 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
     Examples
     --------
 
+    Plot the theoretical reflectivity of this multilayer stack vs. the
+    theoretical reflectivity of :func:`multilayer_witness`.
+
+    .. jupyter-execute::
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import astropy.units as u
+        import named_arrays as na
+        import optika
+        import esis
+
+        # Define a grid of wavelength samples
+        wavelength = na.geomspace(100, 1000, axis="wavelength", num=1001) * u.AA
+
+        # Define a grid of incidence angles
+        angle = 4 * u.deg
+
+        # Define the light rays incident on the multilayer stack
+        rays = optika.rays.RayVectorArray(
+            wavelength=wavelength,
+            direction=na.Cartesian3dVectorArray(
+                x=np.sin(angle),
+                y=0,
+                z=np.cos(angle),
+            ),
+        )
+
+        # Initialize the multilayer stacks
+        multilayer_witness = esis.flights.f1.optics.primaries.materials.multilayer_witness()
+        multilayer_fit = esis.flights.f1.optics.primaries.materials.multilayer_fit()
+
+        # Define the vector normal to the multilayer stack
+        normal = na.Cartesian3dVectorArray(0, 0, -1)
+
+        # Compute the reflectivity of the multilayer for the given incident rays
+        reflectivity_witness = multilayer_witness.efficiency(rays, normal)
+        reflectivity_fit = multilayer_fit.efficiency(rays, normal)
+
+        # Plot the reflectivities as a function of wavelength
+        fig, ax = plt.subplots(constrained_layout=True)
+        na.plt.plot(
+            wavelength,
+            reflectivity_witness,
+            ax=ax,
+            axis="wavelength",
+            label="witness",
+        );
+        na.plt.plot(
+            wavelength,
+            reflectivity_fit,
+            ax=ax,
+            axis="wavelength",
+            label="primary",
+        );
+        ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
+        ax.set_ylabel("reflectivity");
+        ax.legend();
+
+    |
+
     Plot the reflectivity of this multilayer stack as a function of incidence angle.
 
     .. jupyter-execute::
