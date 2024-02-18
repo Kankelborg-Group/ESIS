@@ -4,6 +4,7 @@ Model of the ESIS optical system
 
 from . import mixins
 from . import abc
+from ._requirements import *
 from ._front_apertures import *
 from ._central_obscurations import *
 from ._primary_mirrors import PrimaryMirror
