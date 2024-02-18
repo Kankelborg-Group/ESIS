@@ -2,4 +2,4 @@
 Models of the optical coatings and substrates.
 """
 
-from ._design import *
+from ._materials import *
