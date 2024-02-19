@@ -303,6 +303,15 @@ def design_full(
             ),
         )
 
+    requirements = esis.optics.Requirements(
+        resolution_spatial=1.5 * u.Mm,
+        resolution_spectral=18 * u.km / u.s,
+        fov=10 * u.arcmin,
+        snr=17.3 * u.dimensionless_unscaled,
+        cadence=15 * u.s,
+        length_observation=150 * u.s,
+    )
+
     return esis.optics.OpticsModel(
         name="ESIS 1 final design (all channels)",
         front_aperture=front_aperture,
@@ -313,6 +322,7 @@ def design_full(
         filter=filter,
         detector=detector,
         grid_input_normalized=grid,
+        requirements=requirements,
     )
 
 
