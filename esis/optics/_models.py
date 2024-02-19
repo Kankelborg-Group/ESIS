@@ -66,6 +66,11 @@ class AbstractOpticsModel(
         """Normalized wavelength, pupil, and field coordinates to sample the optical system with"""
 
     @property
+    @abc.abstractmethod
+    def requirements(self) -> None | esis.optics.Requirements:
+        """The required optical performance of the instrument."""
+
+    @property
     def angle_grating_input(self) -> na.AbstractScalar:
         fs = self.field_stop.surface
         grating = self.grating.surface
@@ -183,3 +188,4 @@ class OpticsModel(
     pitch: u.Quantity | na.AbstractScalar = 0 * u.deg
     yaw: u.Quantity | na.AbstractScalar = 0 * u.deg
     roll: u.Quantity | na.AbstractScalar = 0 * u.deg
+    requirements: None | esis.optics.Requirements = None

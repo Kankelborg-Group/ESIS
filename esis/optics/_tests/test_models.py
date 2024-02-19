@@ -52,6 +52,11 @@ class AbstractTestAbstractOpticsModel(
         if result is not None:
             assert isinstance(result, optika.vectors.ObjectVectorArray)
 
+    def test_requirements(self, a: esis.optics.abc.AbstractOpticsModel):
+        result = a.requirements
+        if result is not None:
+            assert isinstance(result, esis.optics.Requirements)
+
     def test_angle_grating_input(self, a: esis.optics.abc.AbstractOpticsModel):
         result = a.angle_grating_input
         assert isinstance(na.as_named_array(result), na.AbstractArray)
@@ -139,6 +144,14 @@ class AbstractTestAbstractOpticsModel(
                     x=na.linspace(0, 1, num=5, axis="pupil_x"),
                     y=na.linspace(0, 1, num=5, axis="pupil_y"),
                 ),
+            ),
+            requirements=esis.optics.Requirements(
+                resolution_spatial=1.5 * u.Mm,
+                resolution_spectral=18 * u.km / u.s,
+                fov=10 * u.arcmin,
+                snr=17.3 * u.dimensionless_unscaled,
+                cadence=15 * u.s,
+                length_observation=150 * u.s,
             ),
         )
     ],
