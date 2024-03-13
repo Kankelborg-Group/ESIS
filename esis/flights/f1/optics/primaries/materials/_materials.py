@@ -55,11 +55,44 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
         ax.set_ylabel("reflectivity");
     """
     return optika.materials.MultilayerMirror(
-        material_layers=na.ScalarArray(np.array(["SiO2", "SiC", "Cr"]), axes="layer"),
-        material_substrate="SiO2",
-        thickness_layers=na.ScalarArray([1, 25, 5] * u.nm, axes="layer"),
-        axis_layers="layer",
-        profile_interface=optika.materials.profiles.ErfInterfaceProfile(2 * u.nm),
+        layers=[
+            optika.materials.Layer(
+                chemical="SiO2",
+                thickness=1 * u.nm,
+                interface=optika.materials.profiles.ErfInterfaceProfile(2 * u.nm),
+                kwargs_plot=dict(
+                    color="tab:blue",
+                    alpha=0.3,
+                ),
+            ),
+            optika.materials.Layer(
+                chemical="SiC_palik",
+                thickness=25 * u.nm,
+                interface=optika.materials.profiles.ErfInterfaceProfile(2 * u.nm),
+                kwargs_plot=dict(
+                    color="tab:blue",
+                    alpha=0.5,
+                ),
+            ),
+            optika.materials.Layer(
+                chemical="Cr",
+                thickness=5 * u.nm,
+                interface=optika.materials.profiles.ErfInterfaceProfile(2 * u.nm),
+                kwargs_plot=dict(
+                    color="tab:orange",
+                    alpha=0.5,
+                ),
+            ),
+        ],
+        substrate=optika.materials.Layer(
+            chemical="SiO2",
+            thickness=30 * u.mm,
+            interface=optika.materials.profiles.ErfInterfaceProfile(2 * u.nm),
+            kwargs_plot=dict(
+                color="gray",
+                alpha=0.5,
+            ),
+        ),
     )
 
 
@@ -176,16 +209,6 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
 
     design = multilayer_design()
 
-    (
-        guess_SiO2,
-        guess_SiC,
-        guess_Cr,
-    ) = design.thickness_layers.ndarray
-
-    guess_interface = 0.5 * u.nm
-
-    type_profile = type(design.profile_interface)
-
     reflectivity = reflectivity_witness()
     unit = u.nm
 
@@ -201,26 +224,20 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
     normal = na.Cartesian3dVectorArray(0, 0, -1)
 
     def _multilayer(
-        thickness_SiO2: float,
         thickness_SiC: float,
-        thickness_Cr: float,
-        thickness_interface: float,
+        width_SiC: float,
+        width_Cr: float,
+        width_substrate: float,
     ):
-        return optika.materials.MultilayerMirror(
-            material_layers=design.material_layers,
-            material_substrate="Si",
-            thickness_layers=na.ScalarArray(
-                ndarray=[
-                    thickness_SiO2,
-                    thickness_SiC,
-                    thickness_Cr,
-                ]
-                * unit,
-                axes=design.axis_layers,
-            ),
-            axis_layers=design.axis_layers,
-            profile_interface=type_profile(thickness_interface * unit),
-        )
+        result = multilayer_design()
+        result.layers[1].thickness = thickness_SiC * unit
+        result.layers[1].interface.width = width_SiC * unit
+        result.layers[2].interface.width = width_Cr * unit
+        result.layers.pop(0)
+        result.substrate.interface.width = width_substrate * unit
+        result.substrate.chemical = "Si"
+
+        return result
 
     def _func(x: np.ndarray):
 
@@ -238,15 +255,15 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
     fit = scipy.optimize.minimize(
         fun=_func,
         x0=[
-            guess_SiO2.to_value(unit),
-            guess_SiC.to_value(unit),
-            guess_Cr.to_value(unit),
-            guess_interface.to_value(unit),
+            design.layers[1].thickness.to_value(unit),
+            design.layers[1].interface.width.to_value(unit),
+            design.layers[2].interface.width.to_value(unit),
+            design.substrate.interface.width.to_value(unit),
         ],
         bounds=[
             (0, None),
             (0, None),
-            (guess_Cr.to_value(unit), guess_Cr.to_value(unit)),
+            (0, None),
             (0, None),
         ],
         method="nelder-mead",
@@ -375,6 +392,6 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
     """
     design = multilayer_design()
     result = multilayer_witness()
-    result.material_substrate = design.material_substrate
-    result.profile_interface = design.profile_interface
+    result.substrate.chemical = design.substrate.chemical
+    result.substrate.interface = design.substrate.interface
     return result
