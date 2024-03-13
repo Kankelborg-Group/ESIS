@@ -51,24 +51,60 @@ def multilayer_AlSc() -> optika.materials.MultilayerMirror:
         ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
         ax.set_ylabel("reflectivity");
     """
-    n = 10
     d = 257 * u.AA
     gamma = 0.5
-    t_Al = gamma * d
-    t_Sc = (1 - gamma) * d
-    t_Al2O3 = 1 * u.nm
     return optika.materials.MultilayerMirror(
-        material_layers=na.ScalarArray(
-            ndarray=np.array(["Al2O3"] + n * ["Al", "Sc"]),
-            axes="layer",
+        layers=[
+            optika.materials.Layer(
+                chemical="Al2O3",
+                thickness=1 * u.nm,
+                interface=optika.materials.profiles.ErfInterfaceProfile(
+                    width=7 * u.AA,
+                ),
+                kwargs_plot=dict(
+                    color="tab:blue",
+                    alpha=0.3,
+                ),
+            ),
+            optika.materials.PeriodicLayerSequence(
+                [
+                    optika.materials.Layer(
+                        chemical="Al",
+                        thickness=gamma * d,
+                        interface=optika.materials.profiles.ErfInterfaceProfile(
+                            width=7 * u.AA,
+                        ),
+                        kwargs_plot=dict(
+                            color="tab:blue",
+                            alpha=0.5,
+                        ),
+                    ),
+                    optika.materials.Layer(
+                        chemical="Sc",
+                        thickness=(1 - gamma) * d,
+                        interface=optika.materials.profiles.ErfInterfaceProfile(
+                            width=7 * u.AA,
+                        ),
+                        kwargs_plot=dict(
+                            color="tab:orange",
+                            alpha=0.5,
+                        ),
+                    ),
+                ],
+                num_periods=10,
+            ),
+        ],
+        substrate=optika.materials.Layer(
+            chemical="SiO2",
+            thickness=30 * u.mm,
+            interface=optika.materials.profiles.ErfInterfaceProfile(
+                7 * u.AA,
+            ),
+            kwargs_plot=dict(
+                color="gray",
+                alpha=0.5,
+            ),
         ),
-        material_substrate="SiO2",
-        thickness_layers=na.ScalarArray(
-            ndarray=u.Quantity([t_Al2O3] + n * [t_Al, t_Sc]),
-            axes="layer",
-        ),
-        axis_layers="layer",
-        profile_interface=optika.materials.profiles.ErfInterfaceProfile(7 * u.AA),
     )
 
 
@@ -114,22 +150,58 @@ def multilayer_SiSc() -> optika.materials.MultilayerMirror:
         ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
         ax.set_ylabel("reflectivity");
     """
-    n = 5
     d = 260 * u.AA
     gamma = 0.5
-    t_Si = gamma * d
-    t_Sc = (1 - gamma) * d
-    t_SiO2 = 1 * u.nm
     return optika.materials.MultilayerMirror(
-        material_layers=na.ScalarArray(
-            ndarray=np.array(["SiO2"] + n * ["Si", "Sc"]),
-            axes="layer",
+        layers=[
+            optika.materials.Layer(
+                chemical="SiO2",
+                thickness=1 * u.nm,
+                interface=optika.materials.profiles.ErfInterfaceProfile(
+                    width=7 * u.AA,
+                ),
+                kwargs_plot=dict(
+                    color="tab:blue",
+                    alpha=0.3,
+                ),
+            ),
+            optika.materials.PeriodicLayerSequence(
+                [
+                    optika.materials.Layer(
+                        chemical="Si",
+                        thickness=gamma * d,
+                        interface=optika.materials.profiles.ErfInterfaceProfile(
+                            width=7 * u.AA,
+                        ),
+                        kwargs_plot=dict(
+                            color="tab:blue",
+                            alpha=0.5,
+                        ),
+                    ),
+                    optika.materials.Layer(
+                        chemical="Sc",
+                        thickness=(1 - gamma) * d,
+                        interface=optika.materials.profiles.ErfInterfaceProfile(
+                            width=7 * u.AA,
+                        ),
+                        kwargs_plot=dict(
+                            color="tab:orange",
+                            alpha=0.5,
+                        ),
+                    ),
+                ],
+                num_periods=10,
+            ),
+        ],
+        substrate=optika.materials.Layer(
+            chemical="SiO2",
+            thickness=30 * u.mm,
+            interface=optika.materials.profiles.ErfInterfaceProfile(
+                7 * u.AA,
+            ),
+            kwargs_plot=dict(
+                color="gray",
+                alpha=0.5,
+            ),
         ),
-        material_substrate="SiO2",
-        thickness_layers=na.ScalarArray(
-            ndarray=u.Quantity([t_SiO2] + n * [t_Si, t_Sc]),
-            axes="layer",
-        ),
-        axis_layers="layer",
-        profile_interface=optika.materials.profiles.ErfInterfaceProfile(7 * u.AA),
     )
