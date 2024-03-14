@@ -1,5 +1,3 @@
-import numpy as np
-import named_arrays as na
 import optika
 import esis
 
