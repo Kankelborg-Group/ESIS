@@ -2,7 +2,7 @@ import optika
 import esis
 
 
-def test_design():
+def test_multilayer_design():
     r = esis.flights.f1.optics.primaries.materials.multilayer_design()
     assert isinstance(r, optika.materials.AbstractMultilayerMirror)
 
