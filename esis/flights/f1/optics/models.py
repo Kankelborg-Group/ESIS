@@ -78,9 +78,7 @@ def design_full(
         num_folds=8,
         width_clear=2 * radius_primary_clear * cos_per_channel,
         width_border=(83.7 * u.mm - radius_primary_clear) * cos_per_channel,
-        material=optika.materials.Mirror(
-            thickness_substrate=30 * u.mm,
-        ),
+        material=optika.materials.Mirror(),
         translation=na.Cartesian3dVectorArray(
             x=na.UniformUncertainScalarArray(
                 nominal=0 * u.mm,
@@ -162,9 +160,7 @@ def design_full(
                 period_max=2 * u.um,
             ),
         ),
-        material=optika.materials.Mirror(
-            thickness_substrate=10 * u.mm,
-        ),
+        material=optika.materials.Mirror(),
         rulings=optika.rulings.PolynomialSpacingRulings(
             coefficients={
                 0: 1 / density_grating_rulings,
