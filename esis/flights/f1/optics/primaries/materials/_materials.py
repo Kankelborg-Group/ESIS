@@ -7,7 +7,7 @@ import optika
 
 __all__ = [
     "multilayer_design",
-    "reflectivity_witness",
+    "multilayer_witness_measured",
     "multilayer_witness",
     "multilayer_fit",
 ]
@@ -96,9 +96,7 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
     )
 
 
-def reflectivity_witness() -> (
-    na.FunctionArray[na.SpectralDirectionalVectorArray, na.ScalarArray]
-):
+def multilayer_witness_measured() -> optika.materials.MeasuredMirror:
     """
     A reflectivity measurement of the witness samples to the primary mirror
     multilayer coating performed by Eric Gullikson.
@@ -114,7 +112,8 @@ def reflectivity_witness() -> (
         import esis
 
         # Load the witness sample measurements
-        measurement = esis.flights.f1.optics.primaries.materials.reflectivity_witness()
+        multilayer = esis.flights.f1.optics.primaries.materials.multilayer_witness_measured()
+        measurement = multilayer.efficiency_measured
 
         # Plot the measurement as a function of wavelength
         fig, ax = plt.subplots(constrained_layout=True)
@@ -135,13 +134,20 @@ def reflectivity_witness() -> (
     )
     wavelength = na.ScalarArray(wavelength << u.nm, axes="wavelength").to(u.AA)
     reflectivity = na.ScalarArray(reflectivity, axes="wavelength")
-    result = na.FunctionArray(
-        inputs=na.SpectralDirectionalVectorArray(
-            wavelength=wavelength,
-            direction=4 * u.deg,
+
+    result = optika.materials.MeasuredMirror(
+        efficiency_measured=na.FunctionArray(
+            inputs=na.SpectralDirectionalVectorArray(
+                wavelength=wavelength,
+                direction=np.cos(4 * u.deg),
+            ),
+            outputs=reflectivity,
         ),
-        outputs=reflectivity,
+        substrate=optika.materials.Layer(
+            chemical="Si",
+        ),
     )
+
     return result
 
 
@@ -209,15 +215,18 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
 
     design = multilayer_design()
 
-    reflectivity = reflectivity_witness()
+    measurement = multilayer_witness_measured()
     unit = u.nm
 
+    reflectivity = measurement.efficiency_measured.outputs
+    angle_incidence = np.arccos(measurement.efficiency_measured.inputs.direction)
+
     rays = optika.rays.RayVectorArray(
-        wavelength=reflectivity.inputs.wavelength,
+        wavelength=measurement.efficiency_measured.inputs.wavelength,
         direction=na.Cartesian3dVectorArray(
-            x=np.sin(reflectivity.inputs.direction),
+            x=np.sin(angle_incidence),
             y=0,
-            z=np.cos(reflectivity.inputs.direction),
+            z=np.cos(angle_incidence),
         ),
     )
 
@@ -248,7 +257,7 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
             normal=normal,
         )
 
-        result = np.sqrt(np.mean(np.square(reflectivity_fit - reflectivity.outputs)))
+        result = np.sqrt(np.mean(np.square(reflectivity_fit - reflectivity)))
 
         return result.ndarray.value
 

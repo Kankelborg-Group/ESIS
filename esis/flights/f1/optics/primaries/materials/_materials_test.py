@@ -9,12 +9,9 @@ def test_design():
     assert isinstance(r, optika.materials.AbstractMultilayerMirror)
 
 
-def test_reflectivity_witness():
-    r = esis.flights.f1.optics.primaries.materials.reflectivity_witness()
-    assert isinstance(r, na.FunctionArray)
-    assert isinstance(r.inputs, na.SpectralDirectionalVectorArray)
-    assert isinstance(r.outputs, na.AbstractScalar)
-    assert np.all(r.outputs >= 0)
+def test_multilayer_witness_measured():
+    r = esis.flights.f1.optics.primaries.materials.multilayer_witness_measured()
+    assert isinstance(r, optika.materials.MeasuredMirror)
 
 
 def test_multilayer_witness():
