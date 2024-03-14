@@ -28,7 +28,7 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
         import astropy.units as u
         import named_arrays as na
         import optika
-        import esis
+        from esis.flights.f1.optics import primaries
 
         # Define an array of wavelengths with which to sample the efficiency
         wavelength = na.geomspace(100, 1000, axis="wavelength", num=101) * u.AA
@@ -40,7 +40,7 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the ESIS primary mirror material
-        material = esis.flights.f1.optics.primaries.materials.multilayer_design()
+        material = primaries.materials.multilayer_design()
 
         # Compute the reflectivity of the primary mirror
         reflectivity = material.efficiency(
@@ -51,7 +51,7 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
         # Plot the reflectivity vs wavelength
         fig, ax = plt.subplots(constrained_layout=True)
         na.plt.plot(wavelength, reflectivity, ax=ax);
-        ax.set_xlabel(f"wavelength ({wavelength.unit})");
+        ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
         ax.set_ylabel("reflectivity");
     """
     return optika.materials.MultilayerMirror(
@@ -109,10 +109,10 @@ def multilayer_witness_measured() -> optika.materials.MeasuredMirror:
 
         import matplotlib.pyplot as plt
         import named_arrays as na
-        import esis
+        from esis.flights.f1.optics import primaries
 
         # Load the witness sample measurements
-        multilayer = esis.flights.f1.optics.primaries.materials.multilayer_witness_measured()
+        multilayer = primaries.materials.multilayer_witness_measured()
         measurement = multilayer.efficiency_measured
 
         # Plot the measurement as a function of wavelength
@@ -139,7 +139,7 @@ def multilayer_witness_measured() -> optika.materials.MeasuredMirror:
         efficiency_measured=na.FunctionArray(
             inputs=na.SpectralDirectionalVectorArray(
                 wavelength=wavelength,
-                direction=np.cos(4 * u.deg),
+                direction=4 * u.deg,
             ),
             outputs=reflectivity,
         ),
@@ -153,7 +153,7 @@ def multilayer_witness_measured() -> optika.materials.MeasuredMirror:
 
 def multilayer_witness() -> optika.materials.MultilayerMirror:
     """
-    A multilayer stack fitted to the :func:`reflectivity_witness` measurement.
+    A multilayer stack fitted to the :func:`multilayer_witness_measured` measurement.
 
     Examples
     --------
@@ -165,22 +165,26 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
         import matplotlib.pyplot as plt
         import named_arrays as na
         import optika
-        import esis
+        from esis.flights.f1.optics import primaries
 
         # Load the measured reflectivity of the witness sample
-        reflectivity_measured = esis.flights.f1.optics.primaries.materials.reflectivity_witness()
+        multilayer_measured = primaries.materials.multilayer_witness_measured()
+        measurement = multilayer_measured.efficiency_measured
+
+        # Isolate the angle of incidence of the measurement
+        angle_incidence = measurement.inputs.direction
 
         # Fit a multilayer stack to the measured reflectivity
-        multilayer = esis.flights.f1.optics.primaries.materials.multilayer_witness()
+        multilayer = primaries.materials.multilayer_witness()
 
         # Define the rays incident on the multilayer stack that will be used to
         # compute the reflectivity
         rays = optika.rays.RayVectorArray(
-            wavelength=reflectivity_measured.inputs.wavelength,
+            wavelength=measurement.inputs.wavelength,
             direction=na.Cartesian3dVectorArray(
-                x=np.sin(reflectivity_measured.inputs.direction),
+                x=np.sin(angle_incidence),
                 y=0,
-                z=np.cos(reflectivity_measured.inputs.direction),
+                z=np.cos(angle_incidence),
             ),
         )
 
@@ -193,8 +197,8 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
         # Plot the fitted vs. measured reflectivity
         fig, ax = plt.subplots(constrained_layout=True)
         na.plt.scatter(
-            reflectivity_measured.inputs.wavelength,
-            reflectivity_measured.outputs,
+            measurement.inputs.wavelength,
+            measurement.outputs,
             ax=ax,
             label="measured"
         );
@@ -219,7 +223,7 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
     unit = u.nm
 
     reflectivity = measurement.efficiency_measured.outputs
-    angle_incidence = np.arccos(measurement.efficiency_measured.inputs.direction)
+    angle_incidence = measurement.efficiency_measured.inputs.direction
 
     rays = optika.rays.RayVectorArray(
         wavelength=measurement.efficiency_measured.inputs.wavelength,
@@ -299,7 +303,7 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
         import astropy.units as u
         import named_arrays as na
         import optika
-        import esis
+        from esis.flights.f1.optics import primaries
 
         # Define a grid of wavelength samples
         wavelength = na.geomspace(100, 1000, axis="wavelength", num=1001) * u.AA
@@ -318,8 +322,8 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the multilayer stacks
-        multilayer_witness = esis.flights.f1.optics.primaries.materials.multilayer_witness()
-        multilayer_fit = esis.flights.f1.optics.primaries.materials.multilayer_fit()
+        multilayer_witness = primaries.materials.multilayer_witness()
+        multilayer_fit = primaries.materials.multilayer_fit()
 
         # Define the vector normal to the multilayer stack
         normal = na.Cartesian3dVectorArray(0, 0, -1)
@@ -359,7 +363,7 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
         import astropy.units as u
         import named_arrays as na
         import optika
-        import esis
+        from esis.flights.f1.optics import primaries
 
         # Define a grid of wavelength samples
         wavelength = na.geomspace(100, 1000, axis="wavelength", num=1001) * u.AA
@@ -378,7 +382,7 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the multilayer stack
-        multilayer = esis.flights.f1.optics.primaries.materials.multilayer_fit()
+        multilayer = primaries.materials.multilayer_fit()
 
         # Compute the reflectivity of the multilayer for the given incident rays
         reflectivity = multilayer.efficiency(
