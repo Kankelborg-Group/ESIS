@@ -8,7 +8,7 @@ import optika
 __all__ = [
     "multilayer_design",
     "multilayer_witness_measured",
-    "multilayer_witness",
+    "multilayer_witness_fit",
     "multilayer_fit",
 ]
 
@@ -151,7 +151,7 @@ def multilayer_witness_measured() -> optika.materials.MeasuredMirror:
     return result
 
 
-def multilayer_witness() -> optika.materials.MultilayerMirror:
+def multilayer_witness_fit() -> optika.materials.MultilayerMirror:
     """
     A multilayer stack fitted to the :func:`multilayer_witness_measured` measurement.
 
@@ -175,7 +175,7 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
         angle_incidence = measurement.inputs.direction
 
         # Fit a multilayer stack to the measured reflectivity
-        multilayer = primaries.materials.multilayer_witness()
+        multilayer = primaries.materials.multilayer_witness_fit()
 
         # Define the rays incident on the multilayer stack that will be used to
         # compute the reflectivity
@@ -287,14 +287,14 @@ def multilayer_witness() -> optika.materials.MultilayerMirror:
 
 def multilayer_fit() -> optika.materials.MultilayerMirror:
     """
-    A multilayer coating determined by modifying :func:`multilayer_witness`
+    A multilayer coating determined by modifying :func:`multilayer_witness_fit`
     to have a glass substrate with the appropriate roughness.
 
     Examples
     --------
 
     Plot the theoretical reflectivity of this multilayer stack vs. the
-    theoretical reflectivity of :func:`multilayer_witness`.
+    theoretical reflectivity of :func:`multilayer_witness_fit`.
 
     .. jupyter-execute::
 
@@ -322,14 +322,14 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
         )
 
         # Initialize the multilayer stacks
-        multilayer_witness = primaries.materials.multilayer_witness()
+        multilayer_witness_fit = primaries.materials.multilayer_witness_fit()
         multilayer_fit = primaries.materials.multilayer_fit()
 
         # Define the vector normal to the multilayer stack
         normal = na.Cartesian3dVectorArray(0, 0, -1)
 
         # Compute the reflectivity of the multilayer for the given incident rays
-        reflectivity_witness = multilayer_witness.efficiency(rays, normal)
+        reflectivity_witness = multilayer_witness_fit.efficiency(rays, normal)
         reflectivity_fit = multilayer_fit.efficiency(rays, normal)
 
         # Plot the reflectivities as a function of wavelength
@@ -404,7 +404,7 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
         ax.legend();
     """
     design = multilayer_design()
-    result = multilayer_witness()
+    result = multilayer_witness_fit()
     result.substrate.chemical = design.substrate.chemical
     result.substrate.interface = design.substrate.interface
     return result
