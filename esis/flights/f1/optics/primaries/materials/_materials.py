@@ -339,18 +339,21 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
             reflectivity_witness,
             ax=ax,
             axis="wavelength",
-            label="witness",
+            label="witness fit",
         );
         na.plt.plot(
             wavelength,
             reflectivity_fit,
             ax=ax,
             axis="wavelength",
-            label="primary",
+            label="primary fit",
         );
         ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
         ax.set_ylabel("reflectivity");
         ax.legend();
+
+        # Print the fitted multilayer stack
+        multilayer_fit
 
     |
 
@@ -403,8 +406,13 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
         ax.set_ylabel("reflectivity");
         ax.legend();
     """
-    design = multilayer_design()
-    result = multilayer_witness_fit()
-    result.substrate.chemical = design.substrate.chemical
-    result.substrate.interface = design.substrate.interface
+    result = multilayer_design()
+    witness = multilayer_witness_fit()
+
+    result.layers[+0].interface.width = witness.layers[~1].interface.width
+    result.layers[~1] = witness.layers[~1]
+    result.layers[~0] = witness.layers[~0]
+
+    result.substrate.interface.width = ([5.38, 5.68] * u.AA).mean()
+
     return result
