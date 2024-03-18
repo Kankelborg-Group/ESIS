@@ -66,7 +66,7 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
                 ),
             ),
             optika.materials.Layer(
-                chemical="SiC_palik",
+                chemical="SiC",
                 thickness=25 * u.nm,
                 interface=optika.materials.profiles.ErfInterfaceProfile(2 * u.nm),
                 kwargs_plot=dict(
