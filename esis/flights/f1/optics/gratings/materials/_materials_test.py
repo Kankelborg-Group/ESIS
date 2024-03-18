@@ -10,3 +10,8 @@ def test_multilayer_design():
 def test_multilayer_witness_measured():
     r = esis.flights.f1.optics.gratings.materials.multilayer_witness_measured()
     assert isinstance(r, optika.materials.MeasuredMirror)
+
+
+def test_multilayer_witness_fit():
+    r = esis.flights.f1.optics.gratings.materials.multilayer_witness_fit()
+    assert isinstance(r, optika.materials.MultilayerMirror)
