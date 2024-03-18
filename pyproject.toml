@@ -32,6 +32,7 @@ doc = [
     "matplotlib",
     "graphviz",
     "sphinx-autodoc-typehints",
+    "sphinxcontrib-bibtex",
     "pydata-sphinx-theme",
     "ipykernel",
     "jupyter-sphinx",
