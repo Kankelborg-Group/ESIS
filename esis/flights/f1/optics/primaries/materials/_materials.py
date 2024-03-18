@@ -279,7 +279,6 @@ def multilayer_witness_fit() -> optika.materials.MultilayerMirror:
             (0, None),
             (0, None),
         ],
-        method="nelder-mead",
     )
 
     return _multilayer(*fit.x)
