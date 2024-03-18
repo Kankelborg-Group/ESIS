@@ -556,7 +556,7 @@ def multilayer_fit() -> optika.materials.MultilayerMirror:
     result = multilayer_design()
     witness = multilayer_witness_fit()
 
-    result.layers = witness.layers
+    result.layers = result.layers[:1] + witness.layers
 
     result.substrate.interface.width = 0.5 * u.nm
 
