@@ -17,6 +17,7 @@ __all__ = [
 def multilayer_design() -> optika.materials.MultilayerMirror:
     """
     The as-designed multilayer coating for the ESIS diffraction gratings.
+    This coating is based on the design outlined in :cite:t:`Soufli2012`.
 
     Based on the analysis of :cite:t:`Rebellato2018`, this model uses
     :cite:t:`Kortright1988` for the silicon carbide optical constants, and
