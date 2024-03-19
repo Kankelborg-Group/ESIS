@@ -48,7 +48,7 @@ def multilayer_design() -> optika.materials.MultilayerMirror:
         # Initialize the ESIS diffraction grating material
         material = gratings.materials.multilayer_design()
 
-        # Compute the reflectivity of the primary mirror
+        # Compute the reflectivity of the grating multilayer coating
         reflectivity = material.efficiency(
             rays=rays,
             normal=na.Cartesian3dVectorArray(0, 0, -1),
