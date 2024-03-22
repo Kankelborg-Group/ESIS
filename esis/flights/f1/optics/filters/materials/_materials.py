@@ -54,7 +54,11 @@ def thin_film_design() -> optika.materials.ThinFilmFilter:
             thickness=100 * u.nm,
         ),
         layer_oxide=optika.materials.Layer(
-            chemical="Al2O3",
+            chemical=optika.chemicals.Chemical(
+                formula="Al2O3",
+                is_amorphous=True,
+                table="palik",
+            ),
             thickness=4 * u.nm,
         ),
         mesh=optika.materials.meshes.Mesh(
