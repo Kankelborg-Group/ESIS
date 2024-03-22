@@ -7,6 +7,7 @@ import named_arrays as na
 __all__ = [
     "efficiency_vs_wavelength",
     "efficiency_vs_x",
+    "efficiency_vs_y",
 ]
 
 _directory_data = pathlib.Path(__file__).parent / "_data"
@@ -118,6 +119,60 @@ def efficiency_vs_x() -> (
             time=time_measurement,
             wavelength=63 * u.nm,
             position=x,
+        ),
+        outputs=efficiency,
+    )
+
+
+def efficiency_vs_y() -> (
+    na.FunctionArray[na.TemporalSpectralPositionalVectorArray, na.ScalarArray]
+):
+    """
+    The total (coating + groove) efficiency of the ESIS diffraction gratings
+    as a function of :math:`y` position as measured by Eric Gullikson.
+
+    Examples
+    --------
+    Plot the efficiency vs :math:`y` position measurements using matplotlib.
+
+    .. jupyter-execute::
+
+        import matplotlib.pyplot as plt
+        import named_arrays as na
+        from esis.flights.f1.optics import gratings
+
+        # Load the efficiency measurements
+        efficiency = gratings.efficiencies.efficiency_vs_y()
+
+        # Plot the measurements using matplotlib
+        fig, ax = plt.subplots()
+        na.plt.plot(
+            efficiency.inputs.position,
+            efficiency.outputs,
+            ax=ax,
+            label=efficiency.inputs.time.strftime("%Y-%m-%d"),
+        );
+        ax.set_xlabel(f"$y$ ({efficiency.inputs.position.unit:latex_inline})");
+        ax.set_ylabel(f"efficiency");
+        ax.legend();
+    """
+
+    y, efficiency = np.loadtxt(
+        fname=_directory_data / "mul063282.txt",
+        unpack=True,
+        skiprows=1,
+    )
+
+    y = y << u.mm
+
+    y = na.ScalarArray(y, axes="grating_y")
+    efficiency = na.ScalarArray(efficiency, axes="grating_y")
+
+    return na.FunctionArray(
+        inputs=na.TemporalSpectralPositionalVectorArray(
+            time=time_measurement,
+            wavelength=63 * u.nm,
+            position=y,
         ),
         outputs=efficiency,
     )
