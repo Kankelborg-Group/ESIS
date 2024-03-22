@@ -74,11 +74,11 @@ def efficiency_vs_x() -> (
 ):
     """
     The total (coating + groove) efficiency of the ESIS diffraction gratings
-    as a function of wavelength as measured by Eric Gullikson.
+    as a function of :math:`x` position as measured by Eric Gullikson.
 
     Examples
     --------
-    Plot the efficiency vs wavelength measurements using matplotlib.
+    Plot the efficiency vs :math:`x` position measurements using matplotlib.
 
     .. jupyter-execute::
 
