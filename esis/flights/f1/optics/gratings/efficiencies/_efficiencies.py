@@ -11,11 +11,12 @@ __all__ = [
 _directory_data = pathlib.Path(__file__).parent / "_data"
 
 serial_number = "UBO-16-017"
-time_measurement = date_measurement = astropy.time.Time('2018-01-21')
+time_measurement = astropy.time.Time("2018-01-21")
 
 
-def efficiency_vs_wavelength(
-) -> na.FunctionArray[na.TemporalSpectralDirectionalVectorArray, na.ScalarArray]:
+def efficiency_vs_wavelength() -> (
+    na.FunctionArray[na.TemporalSpectralDirectionalVectorArray, na.ScalarArray]
+):
     """
     The total (coating + groove) efficiency of the ESIS diffraction gratings
     as a function of wavelength as measured by Eric Gullikson.
@@ -47,7 +48,7 @@ def efficiency_vs_wavelength(
     """
 
     wavelength, efficiency = np.loadtxt(
-        fname=_directory_data / 'mul063315.abs',
+        fname=_directory_data / "mul063315.abs",
         unpack=True,
         skiprows=1,
     )
@@ -61,7 +62,7 @@ def efficiency_vs_wavelength(
         inputs=na.TemporalSpectralDirectionalVectorArray(
             time=time_measurement,
             wavelength=wavelength,
-            direction=0 * u.deg
+            direction=0 * u.deg,
         ),
         outputs=efficiency,
     )
