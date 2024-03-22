@@ -46,12 +46,27 @@ def thin_film_design() -> optika.materials.ThinFilmFilter:
         na.plt.plot(wavelength, transmissivity, ax=ax);
         ax.set_xlabel(f"wavelength ({wavelength.unit:latex_inline})");
         ax.set_ylabel("transmissivity");
+
+    Plot the schematic of the layers composing the filter
+
+    .. jupyter-execute::
+
+        with astropy.visualization.quantity_support():
+            fig, ax = plt.subplots()
+            material.plot_layers(
+                ax=ax,
+            )
+            ax.set_axis_off()
+            ax.autoscale()
     """
 
     return optika.materials.ThinFilmFilter(
         layer=optika.materials.Layer(
             chemical="Al",
             thickness=100 * u.nm,
+            kwargs_plot=dict(
+                color="lightgray",
+            ),
         ),
         layer_oxide=optika.materials.Layer(
             chemical=optika.chemicals.Chemical(
@@ -60,6 +75,10 @@ def thin_film_design() -> optika.materials.ThinFilmFilter:
                 table="palik",
             ),
             thickness=4 * u.nm,
+            kwargs_plot=dict(
+                color="gray",
+            ),
+            x_label=1.1,
         ),
         mesh=optika.materials.meshes.Mesh(
             chemical="Ni",
