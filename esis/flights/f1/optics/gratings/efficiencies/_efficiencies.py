@@ -9,6 +9,7 @@ __all__ = [
     "efficiency_vs_x",
     "efficiency_vs_y",
     "efficiency_vs_angle_0deg",
+    "efficiency_vs_angle_3deg",
 ]
 
 _directory_data = pathlib.Path(__file__).parent / "_data"
@@ -230,6 +231,64 @@ def efficiency_vs_angle_0deg() -> (
             wavelength=63 * u.nm,
             direction=na.InputOutputVectorArray(
                 input=0 * u.deg,
+                output=angle,
+            ),
+        ),
+        outputs=efficiency,
+    )
+
+
+def efficiency_vs_angle_3deg() -> (
+    na.FunctionArray[na.TemporalSpectralDirectionalVectorArray, na.ScalarArray]
+):
+    """
+    The total (coating + groove) efficiency of the ESIS diffraction gratings
+    as a function of output angle as measured by Eric Gullikson at an input
+    angle of 3 degrees.
+
+    Examples
+    --------
+    Plot the efficiency vs output angle measurements using matplotlib.
+
+    .. jupyter-execute::
+
+        import matplotlib.pyplot as plt
+        import named_arrays as na
+        from esis.flights.f1.optics import gratings
+
+        # Load the efficiency measurements
+        efficiency = gratings.efficiencies.efficiency_vs_angle_3deg()
+
+        # Plot the measurements using matplotlib
+        fig, ax = plt.subplots()
+        na.plt.plot(
+            efficiency.inputs.direction.output,
+            efficiency.outputs,
+            ax=ax,
+            label=efficiency.inputs.direction.input,
+        );
+        ax.set_xlabel(f"output angle ({efficiency.inputs.direction.input.unit:latex_inline})");
+        ax.set_ylabel(f"efficiency");
+        ax.legend();
+    """
+
+    angle, efficiency = np.loadtxt(
+        fname=_directory_data / "mul063281.txt",
+        unpack=True,
+        skiprows=1,
+    )
+
+    angle = angle << u.deg
+
+    angle = na.ScalarArray(angle, axes="grating_output_angle")
+    efficiency = na.ScalarArray(efficiency, axes="grating_output_angle")
+
+    return na.FunctionArray(
+        inputs=na.TemporalSpectralDirectionalVectorArray(
+            time=time_measurement,
+            wavelength=63 * u.nm,
+            direction=na.InputOutputVectorArray(
+                input=3 * u.deg,
                 output=angle,
             ),
         ),
