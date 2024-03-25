@@ -131,7 +131,11 @@ class AbstractTestAbstractGrating(
             manufacturing_number="ABCD",
             sag=optika.sags.SphericalSag(500 * u.mm),
             material=optika.materials.Mirror(),
-            rulings=optika.rulings.ConstantDensityRulings(5000 / u.mm),
+            rulings=optika.rulings.SawtoothRulings(
+                spacing=5000 / u.mm,
+                depth=10 * u.nm,
+                diffraction_order=1,
+            ),
             num_folds=8,
             halfwidth_inner=10 * u.mm,
             halfwidth_outer=15 * u.mm,

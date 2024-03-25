@@ -161,21 +161,8 @@ def design_full(
             ),
         ),
         material=optika.materials.Mirror(),
-        rulings=optika.rulings.PolynomialSpacingRulings(
-            coefficients={
-                0: 1 / density_grating_rulings,
-                1: na.UniformUncertainScalarArray(
-                    nominal=-3.3849e-5 * (u.um / u.mm),
-                    width=0.0512e-5 * (u.um / u.mm),
-                    num_distribution=num_distribution,
-                ),
-                2: na.UniformUncertainScalarArray(
-                    nominal=-1.3625e-7 * (u.um / u.mm**2),
-                    width=0.08558e-7 * (u.um / u.mm**2),
-                    num_distribution=num_distribution,
-                ),
-            },
-            diffraction_order=1,
+        rulings=esis.flights.f1.optics.gratings.rulings.ruling_design(
+            num_distribution=num_distribution,
         ),
         num_folds=num_folds,
         halfwidth_inner=13.02 * u.mm - width_grating_border_inner,

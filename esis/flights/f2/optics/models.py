@@ -75,9 +75,14 @@ def design_proposed(
         num_distribution=num_distribution,
     )
 
-    result.grating.rulings.coefficients[0].nominal = 1 / (2700 / u.mm)
-    result.grating.rulings.coefficients[1].nominal = -2.852e-5 * (u.um / u.mm)
-    result.grating.rulings.coefficients[2].nominal = -2.112e-7 * (u.um / u.mm**2)
+    c0 = 1 / (2700 / u.mm)
+    c1 = -2.852e-5 * (u.um / u.mm)
+    c2 = -2.112e-7 * (u.um / u.mm ** 2)
+
+    result.grating.rulings.spacing.coefficients[0].nominal = c0
+    result.grating.rulings.spacing.coefficients[1].nominal = c1
+    result.grating.rulings.spacing.coefficients[2].nominal = c2
+
     result.grating.yaw = -3.65 * u.deg
 
     z_filter = result.grating.translation.z.nominal + 1291.012 * u.mm

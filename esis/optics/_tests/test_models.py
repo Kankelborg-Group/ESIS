@@ -111,7 +111,11 @@ class AbstractTestAbstractOpticsModel(
                 manufacturing_number="123abc",
                 sag=optika.sags.SphericalSag(radius=500 * u.mm),
                 material=optika.materials.Mirror(),
-                rulings=optika.rulings.ConstantDensityRulings(5000 / u.mm),
+                rulings=optika.rulings.SawtoothRulings(
+                    spacing=1 * u.um,
+                    depth=10 * u.nm,
+                    diffraction_order=1,
+                ),
                 num_folds=8,
                 halfwidth_inner=15 * u.mm,
                 halfwidth_outer=10 * u.mm,
