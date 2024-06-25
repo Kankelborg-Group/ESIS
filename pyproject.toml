@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "euv-snapshot-imaging-spectrograph"
+authors = [
+    {name = "Roy T. Smart", email = "roytsmart@gmail.com"},
+]
+description = "A Python library for modeling and interpreting data from the EUV Snapshot Imaging Spectrograph (ESIS)"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "astropy",
+    "named-arrays",
+    "optika",
+    "aastex",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+doc = [
+    "pytest",
+    "matplotlib",
+    "graphviz",
+    "sphinx-autodoc-typehints",
+    "sphinxcontrib-bibtex",
+    "pydata-sphinx-theme",
+    "ipykernel",
+    "jupyter-sphinx",
+    "sphinx-favicon",
+]
+
+[project.urls]
+Homepage = "https://github.com/Kankelborg-Group/ESIS"
+Documentation = "https://kankelborg-group.github.io/ESIS/"
+
+[tool.setuptools]
+packages = ["esis"]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "esis/optics/_tests",
+    "esis/flights",
+    "esis/science/papers/instrument/_tests",
+]
+
+[tool.black]
+exclude = "(esis/data)|(esis/flight/)|(esis/science)|(esis/optics/grating)|(esis/optics/primary)|(esis/optics/design)|(esis/optics/detector)|(esis/optics/optics)|(esis/optics/poletto)|(esis/optics/source)"

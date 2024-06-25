@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 
 __all__ = [
@@ -6,9 +6,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Apertures and Baffles')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Apertures and Baffles')
     result.append(figures.baffles.figure())
     result.append(
         r"""

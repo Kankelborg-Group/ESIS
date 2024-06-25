@@ -11,6 +11,13 @@ launched from White Sands Missile Range on September 30th, 2019.
 
     esis
 
+References
+==========
+
+.. bibliography::
+
+|
+
 Indices and tables
 ==================
 

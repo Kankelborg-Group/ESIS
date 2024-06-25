@@ -1,13 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'subsection',
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Pointing System')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Pointing System')
     result.append(
         r"""
 The imaging target will be selected prior to launch, the morning of the day of flight.

@@ -1,17 +1,15 @@
-import pylatex
-import kgpy.latex
+import aastex
 
 __all__ = [
     'figure'
 ]
 
 
-def figure() -> pylatex.Figure:
-    result = pylatex.Figure()
+def figure() -> aastex.Figure:
+    result = aastex.Figure("F-Baff1")
     result._star_latex_name = True
-    result.add_image('figures/static/ESIS_Baffles.png', width=kgpy.latex.textwidth)
-    result.add_caption(pylatex.NoEscape(
+    result.add_image('figures/static/ESIS_Baffles.png', width=aastex.text_width_inches)
+    result.add_caption(aastex.NoEscape(
         r"""Model view of \ESIS\ baffle placement and cutouts."""
     ))
-    result.append(kgpy.latex.Label('F-Baff1'))
     return result

@@ -7,9 +7,7 @@ import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
 import astropy.visualization
-import pylatex
-import kgpy.latex
-import kgpy.format
+import aastex
 import esis.optics
 from .. import optics as optics_factories
 from . import formatting
@@ -141,10 +139,10 @@ def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
 
 
-def figure() -> pylatex.Figure:
-    result = pylatex.Figure()
-    result.add_image(str(pdf()), width=None)
-    result.add_caption(pylatex.NoEscape(
+def figure() -> aastex.Figure:
+    result = aastex.Figure("fig:componentEfficiencyVsWavelength")
+    result.add_image(pdf(), width=None)
+    result.add_caption(aastex.NoEscape(
         r"""
 (Top) Measured reflectance for several multilayer coated witness samples 
 \roy{at an incidence angle of \gratingWitnessMeasurementIncidenceAngle\ on \testGratingDate.
@@ -161,5 +159,4 @@ at an angle of incidence of \gratingMeasurementIncidenceAngle.
 The filter efficiency is a theoretical model that includes the filter mesh, \filterThickness\ of \filterMaterial\ and
 \filterOxideThickness\ of \filterMaterial\ oxide.}"""
     ))
-    result.append(kgpy.latex.Label('fig:componentEfficiencyVsWavelength'))
     return result

@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 
 __all__ = [
@@ -6,8 +6,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection(pylatex.NoEscape(r'\ESIS\ Features'))
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection(aastex.NoEscape(r'\ESIS\ Features'))
     result.escape = False
     result.append(figures.layout.figure())
     result.append(

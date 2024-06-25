@@ -1,13 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'subsection',
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Energy Transfer')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Energy Transfer')
     result.append(
         r"""
 Tracking the mass and energy flow through the solar atmosphere is a long-standing goal in solar physics.

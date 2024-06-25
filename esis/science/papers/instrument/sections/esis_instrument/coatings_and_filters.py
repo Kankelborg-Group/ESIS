@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 
 __all__ = [
@@ -6,9 +6,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Coatings and Filters')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Coatings and Filters')
     result.append(figures.grating_multilayer_schematic.figure())
     result.append(figures.grating_efficiency_vs_angle.figure())
     result.append(figures.component_efficiency_vs_wavelength.figure())

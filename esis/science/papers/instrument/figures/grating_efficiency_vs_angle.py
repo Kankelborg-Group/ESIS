@@ -2,9 +2,7 @@ import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
-import pylatex
-import kgpy.latex
-import kgpy.format
+import aastex
 import esis.optics
 from .. import optics as optics_factories
 from . import formatting
@@ -30,7 +28,7 @@ def figure_mpl() -> matplotlib.figure.Figure:
         ax.plot(
             output_angle.to(output_angle_unit),
             eff.to(eff_unit),
-            label=f'input angle = {kgpy.format.quantity(input_angle, digits_after_decimal=0)}'
+            label=f'input angle = {aastex.format_quantity(input_angle, digits_after_decimal=0)}'
         )
     angle_m0 = 0 * u.deg
     angle_m1 = optics.grating.diffraction_angle(optics.wavelength[0]).to(u.deg)
@@ -63,13 +61,12 @@ def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
 
 
-def figure() -> pylatex.Figure:
-    result = pylatex.Figure()
-    result.add_image(str(pdf()), width=None)
-    result.add_caption(pylatex.NoEscape(
+def figure() -> aastex.Figure:
+    result = aastex.Figure("fig:gratingEfficiencyVsAngle")
+    result.add_image(pdf(), width=None)
+    result.add_caption(aastex.NoEscape(
         r"""
 Measured efficiency \roy{at \gratingTestWavelength} of a single grating \roy{the Channel \testGratingChannelIndex\ grating} as a function of reflection angle on \roy{\testGratingDate}.
 Note flat response in first order over instrument \FOV\ and suppression of zero order."""
     ))
-    result.append(kgpy.latex.Label('fig:gratingEfficiencyVsAngle'))
     return result

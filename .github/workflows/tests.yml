@@ -1,16 +1,21 @@
 
 name: tests
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        python-version: [3.7, 3.8]
-    name: ${{ matrix.os }}, Python ${{ matrix.python-version }} lint and test
+        python-version: ["3.11"]
+    name: ${{ matrix.os }}, Python ${{ matrix.python-version }} tests
     steps:
       - uses: actions/checkout@v2
         with:
@@ -26,16 +31,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools wheel
           pip install -e .
-#      - name: Test with pytest
-#        run: |
-#          pip install pytest pytest-cov
-#          pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml --cov-report=html
-#      - name: Upload coverage to Codecov
-#        uses: codecov/codecov-action@v1
-#        with:
-#          token: ${{ secrets.CODECOV_TOKEN }}
-#          file: coverage.xml
-#          flags: unittests
-#          env_vars: OS,PYTHON
-#          name: codecov-umbrella
-#          fail_ci_if_error: true
+      - name: Test with pytest
+        run: |
+          pip install pytest pytest-cov
+          pytest --cov=. --cov-report=xml --cov-report=html
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: coverage.xml
+          flags: unittests
+          env_vars: OS,PYTHON
+          name: codecov-umbrella
+          fail_ci_if_error: true

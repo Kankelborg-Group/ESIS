@@ -2,9 +2,7 @@ import pathlib
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import astropy.units as u
-import pylatex
-import kgpy.latex
-import kgpy.vectors
+import aastex
 import esis.optics
 from . import formatting
 from . import caching
@@ -19,7 +17,7 @@ def figure_mpl() -> matplotlib.figure.Figure:
     ax_layout.set_axis_off()
     # ax_layout.set_aspect('equal')
     # ax_layout.set_proj_type('ortho')
-    esis_optics = esis.optics.design.final(pupil_samples=kgpy.vectors.Vector2D(3, 1), field_samples=1)
+    esis_optics = esis.optics.design.final(pupil_samples=kgpy.vector.Vector2D(3, 1), field_samples=1)
     # esis_optics.pointing.x = 3 * u.deg
     # esis_optics.pointing.y = 60 * u.deg
     esis_optics.central_obscuration = None
@@ -150,14 +148,14 @@ def pdf() -> pathlib.Path:
     return path
 
 
-def figure() -> pylatex.Figure:
-    result = pylatex.Figure(position='!ht')
+def figure() -> aastex.Figure:
+    result = aastex.Figure("fig:layout", position='!ht')
     result._star_latex_name = True
     result.add_image(
-        filename=str(pdf()),
+        filename=pdf(),
         width=None,
     )
-    result.add_caption(pylatex.NoEscape(
+    result.add_caption(aastex.NoEscape(
         r"""
 \roy{\ESIS\ optical layout. 
 Dashed lines indicate the positions of unpopulated channels. 
@@ -168,5 +166,4 @@ The field stop at prime focus defines instrument spatial/spectral \FOV.
 Eight grating positions appear in this schematic; only six fit within the volume of the rocket payload.
 \NumChannelsWords\ channels are populated for the first flight."""
     ))
-    result.append(kgpy.latex.Label('fig:layout'))
     return result

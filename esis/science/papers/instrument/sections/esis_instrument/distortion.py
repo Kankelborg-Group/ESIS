@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 from ... import tables
 
@@ -7,9 +7,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Distortion')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Distortion')
     result.append(
         r"""
 The distortion is due to two factors: first, the tilt of the detector as needed to maintain good focus over the \FOV 

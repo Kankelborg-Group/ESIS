@@ -1,3 +1,2 @@
-_autosummary/*
-_build/*
-!_build/html/
+_autosummary/
+_build/

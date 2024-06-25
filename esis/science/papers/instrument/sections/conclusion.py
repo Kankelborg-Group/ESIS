@@ -1,13 +1,12 @@
-import pylatex
+import aastex
 
 __all__ = [
     'section'
 ]
 
 
-def section() -> pylatex.Section:
-    result = pylatex.Section('Conclusions and Outlook')
-    result.escape = False
+def section() -> aastex.Section:
+    result = aastex.Section('Conclusions and Outlook')
     result.append(
         r"""
 \ESIS\ is a next generation slitless spectrograph, designed to obtain co-temporal spectral and spatial images of the solar 

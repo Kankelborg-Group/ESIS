@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from . import moses_limitations
 from . import esis_features
 
@@ -7,8 +7,8 @@ __all__ = [
 ]
 
 
-def section() -> pylatex.Section:
-    result = pylatex.Section(pylatex.NoEscape('The \ESIS\ Concept'))
+def section() -> aastex.Section:
+    result = aastex.Section(aastex.NoEscape('The \ESIS\ Concept'))
     result.escape = False
     result.append(
         r"""

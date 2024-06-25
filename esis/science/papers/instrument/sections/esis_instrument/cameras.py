@@ -1,4 +1,4 @@
-import pylatex
+import aastex
 from ... import figures
 from ... import tables
 
@@ -7,9 +7,8 @@ __all__ = [
 ]
 
 
-def subsection() -> pylatex.Subsection:
-    result = pylatex.Subsection('Cameras')
-    result.escape = False
+def subsection() -> aastex.Subsection:
+    result = aastex.Subsection('Cameras')
     result.append(figures.cameras.figure())
     result.append(
         r"""

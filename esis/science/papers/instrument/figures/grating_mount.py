@@ -1,8 +1,7 @@
-import pylatex
-import kgpy.latex
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import pathlib
+import aastex
 from esis.science.papers.instrument.figures import formatting
 from esis.science.papers.instrument.figures import caching
 
@@ -84,10 +83,10 @@ def figure_mpl() -> matplotlib.figure.Figure:
 def pdf() -> pathlib.Path:
     return caching.cache_pdf(figure_mpl)
 
-def figure() -> pylatex.Figure:
-    result = pylatex.Figure()
-    result.add_image(pdf(), width=kgpy.latex.columnwidth)
-    result.add_caption(pylatex.NoEscape(
+def figure() -> aastex.Figure:
+    result = aastex.Figure("F-alt")
+    result.add_image(pdf(), width=formatting.column_width)
+    result.add_caption(aastex.NoEscape(
         r""" A solid model of the \ESIS\ secondary mount.
             Each trapezoidal grating is supported and attached to it's backplate by three bonded, titanium bipods.
             All mounted gratings sit on the "tuffet" and are mounted with three spherical washers.
@@ -95,7 +94,6 @@ def figure() -> pylatex.Figure:
             with out compromising alignment and focus.
              """
     ))
-    result.append(kgpy.latex.Label('F-alt'))
     return result
 
 if __name__ == '__main__':
