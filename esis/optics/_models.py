@@ -165,7 +165,7 @@ class AbstractOpticsModel(
 
         result = optika.systems.SequentialSystem(
             surfaces=surfaces,
-            grid_input_normalized=grid,
+            grid_input=grid,
             transformation=self.transformation,
         )
 
