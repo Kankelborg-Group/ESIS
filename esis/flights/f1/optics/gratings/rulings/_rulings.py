@@ -200,7 +200,7 @@ def ruling_measurement(
     density = na.UniformUncertainScalarArray(
         nominal=2585.5 / u.mm,
         width=1 / u.mm,
-        num_distribution=num_distribution
+        num_distribution=num_distribution,
     )
 
     spacing = design.spacing
@@ -227,7 +227,7 @@ def ruling_measurement(
 
     efficiency_rulings = na.FunctionArray(
         inputs=efficiency_total.inputs,
-        outputs=efficiency_total.outputs / efficiency_coating
+        outputs=efficiency_total.outputs / efficiency_coating,
     )
 
     return optika.rulings.MeasuredRulings(
