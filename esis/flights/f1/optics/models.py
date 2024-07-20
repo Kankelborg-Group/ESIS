@@ -4,6 +4,7 @@ import astropy.modeling
 import named_arrays as na
 import optika
 import esis
+from . import primaries
 
 __all__ = [
     "design_full",
@@ -61,7 +62,7 @@ def design_full(
     radius_primary_clear = 77.9 * u.mm
     primary = esis.optics.PrimaryMirror(
         sag=optika.sags.ParabolicSag(
-            focal_length=1000 * u.mm,
+            focal_length=-1000 * u.mm,
             parameters_slope_error=optika.metrology.SlopeErrorParameters(
                 step_size=4 * u.mm,
                 kernel_size=2 * u.mm,
@@ -78,7 +79,7 @@ def design_full(
         num_folds=8,
         width_clear=2 * radius_primary_clear * cos_per_channel,
         width_border=(83.7 * u.mm - radius_primary_clear) * cos_per_channel,
-        material=optika.materials.Mirror(),
+        material=primaries.materials.multilayer_design(),
         translation=na.Cartesian3dVectorArray(
             x=na.UniformUncertainScalarArray(
                 nominal=0 * u.mm,
@@ -98,7 +99,7 @@ def design_full(
         translation=na.Cartesian3dVectorArray(
             x=0 * u.mm,
             y=0 * u.mm,
-            z=-(primary.sag.focal_length + 500 * u.mm),
+            z=primary.sag.focal_length - 500 * u.mm,
         ),
     )
 
@@ -121,7 +122,7 @@ def design_full(
         translation=na.Cartesian3dVectorArray(
             x=primary.translation.x.copy(),
             y=primary.translation.y.copy(),
-            z=-primary.sag.focal_length,
+            z=primary.sag.focal_length,
         ),
     )
 
@@ -184,7 +185,7 @@ def design_full(
                 num_distribution=num_distribution,
             ),
             z=na.UniformUncertainScalarArray(
-                nominal=-(primary.sag.focal_length + 374.7 * u.mm),
+                nominal=primary.sag.focal_length - 374.7 * u.mm,
                 width=error_grating_z,
                 num_distribution=num_distribution,
             ),
