@@ -155,7 +155,6 @@ class AbstractOpticsModel(
         surfaces += [self.field_stop.surface]
         surfaces += [self.grating.surface]
         surfaces += self.filter.surfaces if self.filter is not None else []
-        surfaces += [self.detector.surface]
 
         wavelength_min = self.wavelength_min
         wavelength_max = self.wavelength_max
@@ -165,6 +164,7 @@ class AbstractOpticsModel(
 
         result = optika.systems.SequentialSystem(
             surfaces=surfaces,
+            sensor=self.detector.surface,
             grid_input=grid,
             transformation=self.transformation,
         )
