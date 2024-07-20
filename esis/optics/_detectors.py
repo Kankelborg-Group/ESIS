@@ -86,13 +86,14 @@ class AbstractDetector(
         """minimum distance between this component and other components"""
 
     @property
-    def surface(self) -> optika.surfaces.Surface:
-        return optika.surfaces.Surface(
+    def surface(self) -> optika.sensors.ImagingSensor:
+        return optika.sensors.ImagingSensor(
             name="detector",
-            aperture=optika.apertures.RectangularAperture(
-                half_width=self.width_clear / 2,
-                active=False,
-            ),
+            width_pixel=self.width_pixels,
+            axis_pixel=na.Cartesian2dVectorArray("detector_x", "detector_y"),
+            num_pixel=self.shape_pixels,
+            timedelta_exposure=self.time_exposure,
+            material=optika.sensors.E2VCCDAIAMaterial(),
             aperture_mechanical=optika.apertures.RectangularAperture(
                 half_width=self.width_mechanical / 2
             ),
