@@ -389,22 +389,23 @@ def design_single(
             num_distribution=0,
         )
 
-        fig, ax = plt.subplots(
-            figsize=(8, 2),
-            constrained_layout=True
-        )
-        ax.set_aspect("equal")
-        model.system.plot(
-            components=("z", "x"),
-            color="black",
-            kwargs_rays=dict(
-                color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
-                label=model.system.grid_input.wavelength.astype(int),
-            ),
-        );
-        handles, labels = ax.get_legend_handles_labels()
-        labels = dict(zip(labels, handles))
-        fig.legend(labels.values(), labels.keys());
+        with astropy.visualization.quantity_support():
+            fig, ax = plt.subplots(
+                figsize=(8, 2),
+                constrained_layout=True
+            )
+            ax.set_aspect("equal")
+            model.system.plot(
+                components=("z", "x"),
+                color="black",
+                kwargs_rays=dict(
+                    color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
+                    label=model.system.grid_input.wavelength.astype(int),
+                ),
+            );
+            handles, labels = ax.get_legend_handles_labels()
+            labels = dict(zip(labels, handles))
+            fig.legend(labels.values(), labels.keys());
     """
     result = design(
         grid=grid,
