@@ -411,7 +411,7 @@ def multilayer_witness_fit() -> optika.materials.MultilayerMirror:
             normal=normal,
         )
 
-        result = np.sqrt(np.mean(np.square(reflectivity_fit - reflectivity)))
+        result = np.sqrt(np.nanmean(np.square(reflectivity_fit - reflectivity)))
 
         return result.ndarray.value
 
