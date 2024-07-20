@@ -96,6 +96,11 @@ class AbstractGrating(
         """minimum distance between adjacent physical gratings"""
 
     @property
+    def transformation(self) -> na.transformations.AbstractTransformation:
+        rotation = na.transformations.Cartesian3dRotationX(180 * u.deg)
+        return super().transformation @ rotation
+
+    @property
     def surface(self) -> optika.surfaces.Surface:
         angle_aperture = self.angle_aperture
         halfwidth_inner = self.halfwidth_inner

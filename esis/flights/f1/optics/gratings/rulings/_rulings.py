@@ -102,7 +102,7 @@ def ruling_design(
             width=0.1,
             num_distribution=num_distribution,
         ),
-        diffraction_order=1,
+        diffraction_order=-1,
     )
 
 
