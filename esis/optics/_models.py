@@ -123,7 +123,7 @@ class AbstractOpticsModel(
         d = grating.rulings.spacing_(position).length
         a = self.angle_grating_input
         b = self.angle_grating_output
-        result = (np.sin(a) + np.sin(b)) * d / m
+        result = np.abs((np.sin(a) + np.sin(b)) * d / m)
         return result.to(u.AA)
 
     @property

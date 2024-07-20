@@ -5,6 +5,7 @@ import named_arrays as na
 import optika
 import esis
 from . import primaries
+from . import gratings
 
 __all__ = [
     "design_full",
@@ -144,7 +145,7 @@ def design_full(
         angle_output=8.057 * u.deg,
         sag=optika.sags.SphericalSag(
             radius=na.UniformUncertainScalarArray(
-                nominal=radius_grating,
+                nominal=-radius_grating,
                 width=radius_grating * error_radius_grating,
                 num_distribution=num_distribution,
             ),
@@ -161,8 +162,8 @@ def design_full(
                 period_max=2 * u.um,
             ),
         ),
-        material=optika.materials.Mirror(),
-        rulings=esis.flights.f1.optics.gratings.rulings.ruling_design(
+        material=gratings.materials.multilayer_design(),
+        rulings=gratings.rulings.ruling_design(
             num_distribution=num_distribution,
         ),
         num_folds=num_folds,
