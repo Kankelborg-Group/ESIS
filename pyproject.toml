@@ -17,7 +17,7 @@ dependencies = [
     "numpy",
     "matplotlib",
     "astropy",
-    "optika==0.2.0",
+    "optika==0.3.0",
     "aastex==0.3.1",
 ]
 dynamic = ["version"]
