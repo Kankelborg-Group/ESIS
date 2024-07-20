@@ -399,7 +399,7 @@ def design_single(
             color="black",
             kwargs_rays=dict(
                 color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
-                label=model.system.grid_input_normalized.wavelength.astype(int),
+                label=model.system.grid_input.wavelength.astype(int),
             ),
         );
         handles, labels = ax.get_legend_handles_labels()
