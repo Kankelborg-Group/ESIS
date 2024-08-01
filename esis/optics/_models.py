@@ -154,7 +154,7 @@ class AbstractOpticsModel(
         surfaces += [self.primary_mirror.surface]
         surfaces += [self.field_stop.surface]
         surfaces += [self.grating.surface]
-        surfaces += self.filter.surfaces if self.filter is not None else []
+        surfaces += [self.filter.surface]
 
         wavelength_min = self.wavelength_min
         wavelength_max = self.wavelength_max

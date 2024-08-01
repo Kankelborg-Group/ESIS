@@ -21,28 +21,8 @@ class AbstractFilter(
 ):
     @property
     @abc.abstractmethod
-    def material(self) -> None | optika.materials.AbstractMaterial:
-        """the nominal material of the filter"""
-
-    @property
-    @abc.abstractmethod
-    def material_oxide(self) -> None | optika.materials.AbstractMaterial:
-        """material representing the oxidation layer"""
-
-    @property
-    @abc.abstractmethod
-    def material_mesh(self) -> None | optika.materials.AbstractMaterial:
-        """name of the material that the mesh is made from"""
-
-    @property
-    @abc.abstractmethod
-    def ratio_mesh(self) -> float | na.AbstractScalar:
-        """the fraction of light that the mesh blocks"""
-
-    @property
-    @abc.abstractmethod
-    def frequency_mesh(self) -> u.Quantity | na.AbstractScalar:
-        """the number of mesh lines per unit length"""
+    def material(self) -> optika.materials.AbstractThinFilmFilter:
+        """A model of the filter material including the mesh and oxide."""
 
     @property
     @abc.abstractmethod
@@ -55,60 +35,20 @@ class AbstractFilter(
         """width of the frame around the clear aperture"""
 
     @property
-    @abc.abstractmethod
-    def thickness(self) -> u.Quantity | na.AbstractScalar:
-        """nominal physical thickness of the filter"""
+    def surface(self) -> optika.surfaces.Surface:
 
-    @property
-    @abc.abstractmethod
-    def thickness_oxide(self) -> u.Quantity | na.AbstractScalar:
-        """thickness of the oxide layers on the outside of the filter"""
-
-    @property
-    def surfaces(self) -> list[optika.surfaces.Surface]:
-        material = self.material
-        material_oxide = self.material_oxide
         radius_clear = self.radius_clear
         radius_mech = radius_clear + self.width_border
         aperture = optika.apertures.CircularAperture(radius_clear)
         aperture_mechanical = optika.apertures.CircularAperture(radius_mech)
-        thickness = self.thickness
-        thickness_oxide = self.thickness_oxide
-        t = self.transformation
-        return [
-            optika.surfaces.Surface(
-                name="filter-oxide-front",
-                material=material_oxide,
-                aperture=aperture,
-                aperture_mechanical=aperture_mechanical,
-                transformation=t,
-            ),
-            optika.surfaces.Surface(
-                name="filter-front",
-                material=material,
-                transformation=t
-                @ na.transformations.Cartesian3dTranslation(
-                    z=thickness_oxide,
-                ),
-            ),
-            optika.surfaces.Surface(
-                name="filter-back",
-                material=material_oxide,
-                transformation=t
-                @ na.transformations.Cartesian3dTranslation(
-                    z=thickness_oxide + thickness
-                ),
-            ),
-            optika.surfaces.Surface(
-                name="filter-oxide-back",
-                aperture=aperture,
-                aperture_mechanical=aperture_mechanical,
-                transformation=t
-                @ na.transformations.Cartesian3dTranslation(
-                    z=thickness_oxide + thickness + thickness_oxide
-                ),
-            ),
-        ]
+
+        return optika.surfaces.Surface(
+            name="filter",
+            material=self.material,
+            aperture=aperture,
+            aperture_mechanical=aperture_mechanical,
+            transformation=self.transformation,
+        )
 
 
 @dataclasses.dataclass(eq=False, repr=False)
