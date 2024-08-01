@@ -22,39 +22,7 @@ class AbstractTestAbstractFilter(
     ):
         result = a.material
         if result is not None:
-            assert isinstance(result, optika.materials.AbstractMaterial)
-
-    def test_material_oxide(
-        self,
-        a: esis.optics.abc.AbstractFilter,
-    ):
-        result = a.material_oxide
-        if result is not None:
-            assert isinstance(result, optika.materials.AbstractMaterial)
-
-    def test_material_mesh(
-        self,
-        a: esis.optics.abc.AbstractFilter,
-    ):
-        result = a.material_mesh
-        if result is not None:
-            assert isinstance(result, optika.materials.AbstractMaterial)
-
-    def test_ratio_mesh(
-        self,
-        a: esis.optics.abc.AbstractFilter,
-    ):
-        result = a.ratio_mesh
-        assert na.unit_normalized(result).is_equivalent(u.dimensionless_unscaled)
-        assert np.all(result >= 0)
-
-    def test_frequency_mesh(
-        self,
-        a: esis.optics.abc.AbstractFilter,
-    ):
-        result = a.frequency_mesh
-        assert na.unit_normalized(result).is_equivalent(1 / u.mm)
-        assert np.all(result >= 0)
+            assert isinstance(result, optika.materials.AbstractThinFilmFilter)
 
     def test_radius_clear(
         self,
@@ -72,30 +40,12 @@ class AbstractTestAbstractFilter(
         assert na.unit_normalized(result).is_equivalent(u.mm)
         assert np.all(result >= 0)
 
-    def test_thickness(
+    def test_surface(
         self,
         a: esis.optics.abc.AbstractFilter,
     ):
-        result = a.thickness
-        assert na.unit_normalized(result).is_equivalent(u.mm)
-        assert np.all(result >= 0)
-
-    def test_thickness_oxide(
-        self,
-        a: esis.optics.abc.AbstractFilter,
-    ):
-        result = a.thickness_oxide
-        assert na.unit_normalized(result).is_equivalent(u.mm)
-        assert np.all(result >= 0)
-
-    def test_surfaces(
-        self,
-        a: esis.optics.abc.AbstractFilter,
-    ):
-        result = a.surfaces
-        assert isinstance(result, list)
-        for surface in result:
-            assert isinstance(surface, optika.surfaces.AbstractSurface)
+        result = a.surface
+        assert isinstance(result, optika.surfaces.AbstractSurface)
 
 
 @pytest.mark.parametrize(
@@ -103,12 +53,23 @@ class AbstractTestAbstractFilter(
     argvalues=[
         esis.optics.Filter(),
         esis.optics.Filter(
-            ratio_mesh=30 * u.percent,
-            frequency_mesh=10 / u.mm,
+            material=optika.materials.ThinFilmFilter(
+                layer=optika.materials.Layer(
+                    chemical="Al",
+                    thickness=100 * u.nm,
+                ),
+                layer_oxide=optika.materials.Layer(
+                    chemical="Al2O3",
+                    thickness=4 * u.nm,
+                ),
+                mesh=optika.materials.meshes.Mesh(
+                    chemical="Ni",
+                    efficiency=0.75,
+                    pitch=1 * u.um,
+                ),
+            ),
             radius_clear=15 * u.mm,
             width_border=1 * u.mm,
-            thickness=100 * u.nm,
-            thickness_oxide=10 * u.nm,
             distance_radial=100 * u.mm,
             azimuth=45 * u.deg,
             yaw=15 * u.deg,
