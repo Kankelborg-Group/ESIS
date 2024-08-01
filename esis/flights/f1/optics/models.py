@@ -6,6 +6,7 @@ import optika
 import esis
 from . import primaries
 from . import gratings
+from . import filters
 
 __all__ = [
     "design_full",
@@ -200,15 +201,9 @@ def design_full(
     )
 
     filter = esis.optics.Filter(
-        material=None,
-        material_oxide=None,
-        material_mesh=None,
-        ratio_mesh=82 * u.percent,
-        frequency_mesh=70 / u.imperial.inch,
+        material=filters.materials.thin_film_design(),
         radius_clear=15 * u.mm,
         width_border=0 * u.mm,
-        thickness=100 * u.nm,
-        thickness_oxide=4 * u.nm,
         distance_radial=95.9 * u.mm,
         azimuth=angle_channel.copy(),
         translation=na.Cartesian3dVectorArray(
