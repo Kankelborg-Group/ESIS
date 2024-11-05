@@ -4,6 +4,9 @@ import astropy.modeling
 import named_arrays as na
 import optika
 import esis
+from . import primaries
+from . import gratings
+from . import filters
 
 __all__ = [
     "design_full",
@@ -61,7 +64,7 @@ def design_full(
     radius_primary_clear = 77.9 * u.mm
     primary = esis.optics.PrimaryMirror(
         sag=optika.sags.ParabolicSag(
-            focal_length=1000 * u.mm,
+            focal_length=-1000 * u.mm,
             parameters_slope_error=optika.metrology.SlopeErrorParameters(
                 step_size=4 * u.mm,
                 kernel_size=2 * u.mm,
@@ -78,7 +81,7 @@ def design_full(
         num_folds=8,
         width_clear=2 * radius_primary_clear * cos_per_channel,
         width_border=(83.7 * u.mm - radius_primary_clear) * cos_per_channel,
-        material=optika.materials.Mirror(),
+        material=primaries.materials.multilayer_design(),
         translation=na.Cartesian3dVectorArray(
             x=na.UniformUncertainScalarArray(
                 nominal=0 * u.mm,
@@ -98,7 +101,7 @@ def design_full(
         translation=na.Cartesian3dVectorArray(
             x=0 * u.mm,
             y=0 * u.mm,
-            z=-(primary.sag.focal_length + 500 * u.mm),
+            z=primary.sag.focal_length - 500 * u.mm,
         ),
     )
 
@@ -121,7 +124,7 @@ def design_full(
         translation=na.Cartesian3dVectorArray(
             x=primary.translation.x.copy(),
             y=primary.translation.y.copy(),
-            z=-primary.sag.focal_length,
+            z=primary.sag.focal_length,
         ),
     )
 
@@ -143,7 +146,7 @@ def design_full(
         angle_output=8.057 * u.deg,
         sag=optika.sags.SphericalSag(
             radius=na.UniformUncertainScalarArray(
-                nominal=radius_grating,
+                nominal=-radius_grating,
                 width=radius_grating * error_radius_grating,
                 num_distribution=num_distribution,
             ),
@@ -160,8 +163,8 @@ def design_full(
                 period_max=2 * u.um,
             ),
         ),
-        material=optika.materials.Mirror(),
-        rulings=esis.flights.f1.optics.gratings.rulings.ruling_design(
+        material=gratings.materials.multilayer_design(),
+        rulings=gratings.rulings.ruling_design(
             num_distribution=num_distribution,
         ),
         num_folds=num_folds,
@@ -184,7 +187,7 @@ def design_full(
                 num_distribution=num_distribution,
             ),
             z=na.UniformUncertainScalarArray(
-                nominal=-(primary.sag.focal_length + 374.7 * u.mm),
+                nominal=primary.sag.focal_length - 374.7 * u.mm,
                 width=error_grating_z,
                 num_distribution=num_distribution,
             ),
@@ -198,15 +201,9 @@ def design_full(
     )
 
     filter = esis.optics.Filter(
-        material=None,
-        material_oxide=None,
-        material_mesh=None,
-        ratio_mesh=82 * u.percent,
-        frequency_mesh=70 / u.imperial.inch,
+        material=filters.materials.thin_film_design(),
         radius_clear=15 * u.mm,
         width_border=0 * u.mm,
-        thickness=100 * u.nm,
-        thickness_oxide=4 * u.nm,
         distance_radial=95.9 * u.mm,
         azimuth=angle_channel.copy(),
         translation=na.Cartesian3dVectorArray(
@@ -389,22 +386,23 @@ def design_single(
             num_distribution=0,
         )
 
-        fig, ax = plt.subplots(
-            figsize=(8, 2),
-            constrained_layout=True
-        )
-        ax.set_aspect("equal")
-        model.system.plot(
-            components=("z", "x"),
-            color="black",
-            kwargs_rays=dict(
-                color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
-                label=model.system.grid_input_normalized.wavelength.astype(int),
-            ),
-        );
-        handles, labels = ax.get_legend_handles_labels()
-        labels = dict(zip(labels, handles))
-        fig.legend(labels.values(), labels.keys());
+        with astropy.visualization.quantity_support():
+            fig, ax = plt.subplots(
+                figsize=(8, 2),
+                constrained_layout=True
+            )
+            ax.set_aspect("equal")
+            model.system.plot(
+                components=("z", "x"),
+                color="black",
+                kwargs_rays=dict(
+                    color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
+                    label=model.system.grid_input.wavelength.astype(int),
+                ),
+            );
+            handles, labels = ax.get_legend_handles_labels()
+            labels = dict(zip(labels, handles))
+            fig.legend(labels.values(), labels.keys());
     """
     result = design(
         grid=grid,

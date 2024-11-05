@@ -53,22 +53,23 @@ def design_proposed(
             num_distribution=0,
         )
 
-        fig, ax = plt.subplots(
-            figsize=(6, 6.5),
-            constrained_layout=True
-        )
-        ax.set_aspect("equal")
-        model.system.plot(
-            components=("x", "y"),
-            color="black",
-            kwargs_rays=dict(
-                color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
-                label=model.system.grid_input.wavelength.astype(int),
-            ),
-        );
-        handles, labels = ax.get_legend_handles_labels()
-        labels = dict(zip(labels, handles))
-        fig.legend(labels.values(), labels.keys());
+        with astropy.visualization.quantity_support():
+            fig, ax = plt.subplots(
+                figsize=(6, 6.5),
+                constrained_layout=True
+            )
+            ax.set_aspect("equal")
+            model.system.plot(
+                components=("x", "y"),
+                color="black",
+                kwargs_rays=dict(
+                    color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
+                    label=model.system.grid_input.wavelength.astype(int),
+                ),
+            );
+            handles, labels = ax.get_legend_handles_labels()
+            labels = dict(zip(labels, handles))
+            fig.legend(labels.values(), labels.keys());
     """
     result = esis.flights.f1.optics.models.design_full(
         grid=grid,

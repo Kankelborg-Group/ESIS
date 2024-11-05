@@ -69,11 +69,6 @@ class AbstractPrimaryMirror(
         """optical material of this component"""
 
     @property
-    def transformation(self) -> na.transformations.AbstractTransformation:
-        rotation = na.transformations.Cartesian3dRotationY(180 * u.deg)
-        return super().transformation @ rotation
-
-    @property
     def surface(self) -> optika.surfaces.Surface:
         return optika.surfaces.Surface(
             name="primary",

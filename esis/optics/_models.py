@@ -123,7 +123,7 @@ class AbstractOpticsModel(
         d = grating.rulings.spacing_(position).length
         a = self.angle_grating_input
         b = self.angle_grating_output
-        result = (np.sin(a) + np.sin(b)) * d / m
+        result = np.abs((np.sin(a) + np.sin(b)) * d / m)
         return result.to(u.AA)
 
     @property
@@ -154,8 +154,7 @@ class AbstractOpticsModel(
         surfaces += [self.primary_mirror.surface]
         surfaces += [self.field_stop.surface]
         surfaces += [self.grating.surface]
-        surfaces += self.filter.surfaces if self.filter is not None else []
-        surfaces += [self.detector.surface]
+        surfaces += [self.filter.surface]
 
         wavelength_min = self.wavelength_min
         wavelength_max = self.wavelength_max
@@ -165,6 +164,7 @@ class AbstractOpticsModel(
 
         result = optika.systems.SequentialSystem(
             surfaces=surfaces,
+            sensor=self.detector.surface,
             grid_input=grid,
             transformation=self.transformation,
         )
