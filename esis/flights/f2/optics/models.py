@@ -175,6 +175,8 @@ def design_proposed_single(
 
     result.grating.yaw = -3.65 * u.deg
 
+    # commenting out to try and optimize around nominal camera position
+
     # z_filter = result.grating.translation.z.nominal + 1291.012 * u.mm
     # dz = z_filter - result.filter.translation.z
     # result.filter.translation.z += dz
