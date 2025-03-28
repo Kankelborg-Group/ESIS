@@ -169,22 +169,31 @@ def design_high_resolution(
     #hack to deal with poor filter placement, fix this
     result.filter.radius_clear = 40 * u.mm
 
-    result.primary_mirror.sag.focal_length = 1609.6 * u.mm
-    result.field_stop.translation.z = -1609.6 * u.mm
+    lots_hole_spacing = 4 * 25.4 * u.mm
+    new_primary_f = result.primary_mirror.sag.focal_length - 6*lots_hole_spacing
 
-    result.grating.translation.z = -2182.71712 * u.mm
+    #extend distance from FS to grating by two holes (8 inches) on LOTS
+    old_grating_z = result.grating.translation.z - result.field_stop.translation.z
+    new_grating_z = old_grating_z + new_primary_f - 2 * lots_hole_spacing
 
-    c0 = 5.53764773e-04 * u.mm
-    c1 = -1.83548407e-05 * (u.um / u.mm)
-    c2 = -1.17579027e-07 * (u.um / u.mm**2)
+    result.primary_mirror.sag.focal_length = new_primary_f
+    result.field_stop.translation.z = new_primary_f
+
+    result.grating.translation.z = new_grating_z
+
+    c0 = 5.57902824e-04 * u.mm
+    c1 = -1.79596543e-05 * (u.um / u.mm)
+    c2 = -1.67614260e-07 * (u.um / u.mm**2)
 
     result.grating.rulings.spacing.coefficients[0].nominal = c0
     result.grating.rulings.spacing.coefficients[1].nominal = c1
     result.grating.rulings.spacing.coefficients[2].nominal = c2
 
-    result.grating.yaw = -2.45125246e+00 * u.deg
-    result.grating.sag.radius = -9.17485462e+02 * u.mm
+    result.grating.yaw = -2.42796088e+00 * u.deg
+    result.grating.sag.radius = -9.24015556e+02 * u.mm
 
+    result.central_obscuration.translation.z = result.grating.translation.z - 25 * u.mm
+    result.front_aperture.translation.z = result.grating.translation.z - 100 * u.mm
 
     return result
 
