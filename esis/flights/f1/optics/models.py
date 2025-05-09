@@ -136,7 +136,7 @@ def design_full(
         num_distribution=num_distribution,
     )
     width_grating_border = 2 * u.mm
-    width_grating_border_inner = 4.86 * u.mm
+    width_grating_border_inner = 4.58 * u.mm
     var_grating_z_single = np.square(2.5e-5 * u.m)
     var_grating_z_systematic = np.square(5e-6 * u.m)
     var_grating_z = var_grating_z_single / 3 + var_grating_z_systematic
