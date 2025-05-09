@@ -93,7 +93,7 @@ class AbstractDetector(
             axis_pixel=na.Cartesian2dVectorArray("detector_x", "detector_y"),
             num_pixel=self.shape_pixels,
             timedelta_exposure=self.time_exposure,
-            material=optika.sensors.E2VCCDAIAMaterial(),
+            material=optika.sensors.E2VCCD203Material(),
             aperture_mechanical=optika.apertures.RectangularAperture(
                 half_width=self.width_mechanical / 2
             ),
