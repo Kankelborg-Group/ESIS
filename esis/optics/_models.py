@@ -76,7 +76,7 @@ class AbstractOpticsModel(
         grating = self.grating.surface
         position = na.Cartesian3dVectorArray() * u.mm
         normal_surface = grating.sag.normal(position)
-        normal_rulings = grating.rulings.spacing_(position).normalized
+        normal_rulings = grating.rulings.spacing_(position, normal_surface).normalized
         transformation = grating.transformation.inverse @ fs.transformation
         wire = np.moveaxis(
             a=fs.aperture.wire(),
@@ -102,7 +102,7 @@ class AbstractOpticsModel(
         grating = self.grating.surface
         position = na.Cartesian3dVectorArray() * u.mm
         normal_surface = grating.sag.normal(position)
-        normal_rulings = grating.rulings.spacing_(position).normalized
+        normal_rulings = grating.rulings.spacing_(position, normal_surface).normalized
         transformation = grating.transformation.inverse @ detector.transformation
         wire = np.moveaxis(
             a=detector.aperture.wire(),
