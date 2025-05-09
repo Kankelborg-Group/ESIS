@@ -107,7 +107,7 @@ class AbstractGrating(
         halfwidth_outer = self.halfwidth_outer
         width_border = self.width_border
         width_border_inner = self.width_border_inner
-        clearance = self.clearance
+        clearance = self.clearance / np.sin(angle_aperture / 2)
         distance_radial = self.distance_radial
         side_border_x = width_border / np.sin(angle_aperture / 2) + clearance
         offset_clear = distance_radial - side_border_x
