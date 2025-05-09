@@ -1,4 +1,5 @@
 import astropy.units as u
+import named_arrays as na
 import optika
 import esis
 
@@ -281,6 +282,97 @@ def design_high_resolution_single(
     result.roll = -result.grating.azimuth
 
     return result
+
+def design_high_resolution_single_visible_light(
+    grid: None | optika.vectors.ObjectVectorArray = None,
+    num_distribution: int = 11,
+) -> esis.optics.OpticsModel:
+    """
+    Single channel of high resolution ESIS2 optical design that uses entire optical bench length for increased resolution.
+
+    Parameters
+    ----------
+    grid
+        sampling of wavelength, field, and pupil positions that will be used to
+        characterize the optical system.
+    num_distribution
+        number of Monte Carlo samples to draw when computing uncertainties
+
+    Examples
+    --------
+    Plot the rays traveling through the optical system, as viewed from the front.
+
+    .. jupyter-execute::
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import astropy.units as u
+        import astropy.visualization
+        import named_arrays as na
+        import optika
+        import esis
+
+        grid = optika.vectors.ObjectVectorArray(
+            wavelength=na.linspace(-1, 1, axis="wavelength",  num=2) / 2,
+            field=0.99 * na.Cartesian2dVectorLinearSpace(
+                start=-1,
+                stop=1,
+                axis=na.Cartesian2dVectorArray("field_x", "field_y"),
+                num=5,
+            ),
+            pupil=na.Cartesian2dVectorLinearSpace(
+                start=-1,
+                stop=1,
+                axis=na.Cartesian2dVectorArray("pupil_x", "pupil_y"),
+                num=5,
+            ),
+        )
+
+        model = esis.flights.f2.optics.models.design_proposed(
+            grid=grid,
+            num_distribution=0,
+        )
+
+        with astropy.visualization.quantity_support():
+            fig, ax = plt.subplots(
+                figsize=(6, 6.5),
+                constrained_layout=True
+            )
+            ax.set_aspect("equal")
+            model.system.plot(
+                components=("x", "y"),
+                color="black",
+                kwargs_rays=dict(
+                    color=na.ScalarArray(np.array(["tab:orange", "tab:blue"]), axes="wavelength"),
+                    label=model.system.grid_input.wavelength.astype(int),
+                ),
+            );
+            handles, labels = ax.get_legend_handles_labels()
+            labels = dict(zip(labels, handles))
+            fig.legend(labels.values(), labels.keys());
+    """
+    model = design_high_resolution_single(
+        grid=grid,
+        num_distribution=num_distribution,
+    )
+
+    wavelength = na.ScalarArray([465.221, 499.406] * u.AA, axes='wavelength')
+    vis_wavelength = na.ScalarArray([6328] * u.AA, axes='wavelength')
+
+    wavelength_ratio = vis_wavelength.to(u.nm) / wavelength.mean().to(u.nm)
+
+    print(wavelength_ratio)
+    model.grating.rulings.spacing.coefficients[0].nominal = model.grating.rulings.spacing.coefficients[0].nominal * wavelength_ratio
+
+    model.grating.rulings.spacing.coefficients[1].nominal = model.grating.rulings.spacing.coefficients[1].nominal * wavelength_ratio
+    # model.grating.rulings.spacing.coefficients[1].nominal = model.grating.rulings.spacing.coefficients[1].nominal * 0
+
+    model.grating.rulings.spacing.coefficients[2].nominal = model.grating.rulings.spacing.coefficients[2].nominal * wavelength_ratio
+    # model.grating.rulings.spacing.coefficients[2].nominal = model.grating.rulings.spacing.coefficients[2].nominal * 0
+
+
+
+    return model
 
 
 
