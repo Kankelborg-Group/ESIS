@@ -6,5 +6,5 @@ Operations Contract (NSROC).
 from ._timeline import Timeline
 
 __all__ = [
-    "Timeline"
+    "Timeline",
 ]
