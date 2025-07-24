@@ -1,7 +1,9 @@
 import astropy.units as u
 import optika
 
-__all__ = ["thin_film_design"]
+__all__ = [
+    "thin_film_design",
+]
 
 
 def thin_film_design() -> optika.materials.ThinFilmFilter:
