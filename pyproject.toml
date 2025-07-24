@@ -58,6 +58,7 @@ exclude = "(esis/_data)|(esis/flight/)|(esis/science)|(esis/optics/grating)|(esi
 [tool.ruff]
 extend-exclude = [
     "esis/_data",
+    "esis/flight",
     "esis/science",
     "esis/optics/grating",
     "esis/optics/primary",
@@ -66,4 +67,5 @@ extend-exclude = [
     "esis/optics/optics",
     "esis/optics/poletto",
     "esis/optics/source",
+    "esis/esis.ipynb",
 ]
