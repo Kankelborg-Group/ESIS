@@ -1,4 +1,3 @@
-import abc
 import dataclasses
 import astropy.units as u
 import named_arrays as na
