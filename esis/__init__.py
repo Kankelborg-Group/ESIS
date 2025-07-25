@@ -3,9 +3,11 @@ Package which provides a model of the ESIS instrument and classes for representi
 """
 
 from . import optics
+from . import nsroc
 from . import flights
 
 __all__ = [
     "optics",
+    "nsroc",
     "flights",
 ]
