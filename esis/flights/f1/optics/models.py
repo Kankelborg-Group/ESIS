@@ -130,11 +130,6 @@ def design_full(
 
     radius_grating = 597.830 * u.mm
     error_radius_grating = 0.4 * u.percent
-    density_grating_rulings = na.UniformUncertainScalarArray(
-        nominal=(2.586608603456000 / u.um).to(1 / u.mm),
-        width=1 / u.mm,
-        num_distribution=num_distribution,
-    )
     width_grating_border = 2 * u.mm
     width_grating_border_inner = 4.58 * u.mm
     var_grating_z_single = np.square(2.5e-5 * u.m)
