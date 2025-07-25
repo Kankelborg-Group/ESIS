@@ -21,7 +21,7 @@ class AbstractTestAbstractCentralObscuration(
         assert na.unit_normalized(result).is_equivalent(u.mm)
         assert np.all(result >= 0)
 
-    def test_halfwidth(self, a: esis.optics.abc.AbstractCentralObscuration):
+    def test_radiush(self, a: esis.optics.abc.AbstractCentralObscuration):
         result = a.radius
         assert na.unit_normalized(result).is_equivalent(u.mm)
         assert np.all(result >= 0)
