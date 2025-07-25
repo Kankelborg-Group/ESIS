@@ -51,15 +51,15 @@ def design_full(
     )
     angle_channel = angle_channel + angle_channel_offset
 
-    dashstyle = (0, (1, 3))
-    dashstyle_channels = na.ScalarArray(
-        ndarray=np.array(
-            object=[dashstyle, "solid", "solid", "solid", "solid", dashstyle],
-            dtype=object,
-        ),
-        axes="channel",
-    )
-    alpha_channels = na.ScalarArray(np.array([0, 1, 1, 1, 1, 0]), axes="channel")
+    # dashstyle = (0, (1, 3))
+    # dashstyle_channels = na.ScalarArray(
+    #     ndarray=np.array(
+    #         object=[dashstyle, "solid", "solid", "solid", "solid", dashstyle],
+    #         dtype=object,
+    #     ),
+    #     axes="channel",
+    # )
+    # alpha_channels = na.ScalarArray(np.array([0, 1, 1, 1, 1, 0]), axes="channel")
 
     radius_primary_clear = 77.9 * u.mm
     primary = esis.optics.PrimaryMirror(
