@@ -2,6 +2,10 @@ import astropy.units as u
 import optika
 import esis
 
+__all__ = [
+    "design_proposed",
+]
+
 
 def design_proposed(
     grid: None | optika.vectors.ObjectVectorArray = None,

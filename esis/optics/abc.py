@@ -6,3 +6,14 @@ from ._gratings import AbstractGrating
 from ._filters import AbstractFilter
 from ._detectors import AbstractDetector
 from ._models import AbstractOpticsModel
+
+__all__ = [
+    "AbstractFrontAperture",
+    "AbstractCentralObscuration",
+    "AbstractPrimaryMirror",
+    "AbstractFieldStop",
+    "AbstractGrating",
+    "AbstractFilter",
+    "AbstractDetector",
+    "AbstractOpticsModel",
+]

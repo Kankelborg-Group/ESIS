@@ -69,7 +69,7 @@ class AbstractTestAbstractDetector(
         assert isinstance(result, int)
         assert result >= 0
 
-    def test_num_columns_overscan(
+    def test_num_columns_blank(
         self,
         a: esis.optics.abc.AbstractDetector,
     ):
