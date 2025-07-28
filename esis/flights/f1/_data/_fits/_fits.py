@@ -31,4 +31,3 @@ def path_fits(
         axes=(axis_channel, axis_time),
     )
     return path
-    
