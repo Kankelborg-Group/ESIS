@@ -4,7 +4,7 @@ import esis
 
 
 def test_timeline():
-    result = esis.flights.f1.timeline()
+    result = esis.flights.f1.nsroc.timeline()
 
     assert isinstance(result, esis.nsroc.Timeline)
 
