@@ -1,5 +1,4 @@
 import pytest
-import msfc_ccd
 from msfc_ccd._images._tests.test_sensor_images import AbstractTestAbstractSensorData
 import esis
 
