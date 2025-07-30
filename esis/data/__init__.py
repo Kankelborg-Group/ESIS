@@ -7,7 +7,7 @@ Description of the ESIS Data Levels
 Level 0
 -------
 
- * The raw data gathered by the ESIS instrument, saved as FITS files.
+* The raw data gathered by the ESIS instrument, saved as FITS files.
 
 """
 
