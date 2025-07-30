@@ -8,7 +8,7 @@ import esis
     argnames="a",
     argvalues=[
         esis.flights.f1.data.level_0(),
-    ]
+    ],
 )
 class TestLevel_0(
     AbstractTestAbstractSensorData,
