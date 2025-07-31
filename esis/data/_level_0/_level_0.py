@@ -36,6 +36,8 @@ class Level_0(
         timeline: None | esis.nsroc.Timeline = None,
     ) -> Self:
 
+        print(f"{path=}")
+
         self = super().from_fits(
             path=path,
             sensor=sensor,
