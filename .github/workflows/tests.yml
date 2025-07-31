@@ -17,7 +17,7 @@ jobs:
         python-version: ["3.11"]
     name: ${{ matrix.os }}, Python ${{ matrix.python-version }} tests
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           lfs: true
       - name: Pull LFS objects
@@ -36,10 +36,10 @@ jobs:
           pip install pytest pytest-cov
           pytest --cov=. --cov-report=xml --cov-report=html
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: coverage.xml
+          files: coverage.xml
           flags: unittests
           env_vars: OS,PYTHON
           name: codecov-umbrella
