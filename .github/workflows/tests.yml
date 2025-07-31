@@ -20,7 +20,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
-      - run: ls -l esis/flights/f1/data/_fits/
+      - name: Pull LFS objects
+        run: git lfs pull
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
