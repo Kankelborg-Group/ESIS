@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
-      - run: cat esis/flights/f1/data/_fits/ESIS1_00096.fit.gz
+      - run: ls -l esis/flights/f1/data/_fits/
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
