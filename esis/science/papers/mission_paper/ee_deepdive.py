@@ -15,6 +15,7 @@ from esis.science.papers.mission_paper import fig_path  # can't figure out relat
 import matplotlib.patheffects as PathEffects
 from kgpy.moment.percentile import width
 from matplotlib.ticker import (MultipleLocator, AutoMinorLocator)
+from ndcube.wcs.tools import unwrap_wcs_to_fitswcs
 
 plt.rcParams.update({'font.size': 9})
 
@@ -83,6 +84,7 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
     # plt.show()
     l4_int = l4.integrated_intensity
     brightest_pix = np.unravel_index(l4_int.argmax(), l4_int.shape)
+    print(f'{brightest_pix=}')
 
     l3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
     times = l3.time
@@ -139,7 +141,7 @@ def ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh):
         for i in range(event_pix.shape[1]):
             axs_top[j].plot(event_pix[1, i] - crop[1].start, event_pix[0, i] - crop[0].start, marker='.', color='r')
 
-        dif_wcs = l3.observation[0, j, event.location[0], event.location[1]].wcs.dropaxis(-1).dropaxis(-1)
+        dif_wcs = unwrap_wcs_to_fitswcs(l3.observation[0, j, event.location[0], event.location[1]].wcs)[0].dropaxis(-1).dropaxis(-1)
         axs_bottom.append(fig1.add_subplot(spec1[1, j],
                                            projection=dif_wcs))
 
@@ -262,7 +264,7 @@ def ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_t
 
     int_max = l4_int[:, crop[0], crop[1]].max()
     int_wcs = l4.wcs_list[0].dropaxis(0).slice((crop[0], crop[1]))
-    dif_wcs = l3.observation[0, 0, event.location[0], event.location[1]].wcs.dropaxis(-1).dropaxis(-1)
+    dif_wcs = unwrap_wcs_to_fitswcs(l3.observation[0, 0, event.location[0], event.location[1]].wcs)[0].dropaxis(-1).dropaxis(-1)
 
     ax_invert = fig1.add_subplot(image_grid[0, 0], projection=int_wcs)
     int_cutout = l4_int[seqs[0], crop[0], crop[1]]
@@ -388,6 +390,7 @@ def ee_deepdive_timeseries_plot(event, seqs, event_pad, guass_fit_trim, dif_thre
     # plt.show()
     l4_int = l4.integrated_intensity
     brightest_pix = np.unravel_index(l4_int.argmax(), l4_int.shape)
+    print(f'{brightest_pix=}')
 
     l3 = level_3.Level_3.from_pickle(level_3.ov_final_path)
     times = l3.time
@@ -492,18 +495,19 @@ if __name__ == '__main__':
     guass_fit_trim = 7
     dif_thresh = 50
 
-    # fig1, fig2 = ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh)
-    #
-    # filepath1 = event.name + '_inverta.pdf'
-    # filepath2 = event.name + '_invertb.pdf'
-    # fig1.savefig(fig_path / filepath1)
-    # fig2.savefig(fig_path / filepath2)
-    # # plt.show()
-    #
-    # seqs = None
-    # movie = ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_trim=time_trim)
+    fig1, fig2 = ee_deepdive_figures(event, seqs, event_pad, guass_fit_trim, dif_thresh)
+
+    filepath1 = event.name + '_inverta.pdf'
+    filepath2 = event.name + '_invertb.pdf'
+    fig1.savefig(fig_path / filepath1)
+    fig2.savefig(fig_path / filepath2)
+    # plt.show()
+
+    seqs = None
+    movie = ee_deepdive_movie(event, seqs, event_pad, guass_fit_trim, dif_thresh, time_trim=time_trim)
     # movie_path = event.name + '_movie.mp4'
-    # movie.save(fig_path / movie_path, 'ffmpeg', dpi=200)
+    movie_path = event.name + '_movie.gif'
+    movie.save(fig_path / movie_path, 'ffmpeg', dpi=200)
 
 
     fig3 = ee_deepdive_timeseries_plot(event, None, event_pad, guass_fit_trim, dif_thresh, time_trim)

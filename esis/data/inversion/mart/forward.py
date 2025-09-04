@@ -157,7 +157,7 @@ def deproject(
     in_sl[x_axis] = slice(max(0, -tx), min(csh[x_axis], -tx + shifted_projection.shape[x_axis]))
     in_sl[y_axis] = slice(max(0, -ty), min(csh[y_axis], -ty + shifted_projection.shape[y_axis]))
 
-    shifted_projection[tuple(out_sl)] = projection[in_sl]
+    shifted_projection[tuple(out_sl)] = projection[tuple(in_sl)]
     backprojected_cube = np.zeros_like(shifted_projection)
 
     ssh = list(cube_shape)
@@ -171,7 +171,7 @@ def deproject(
     out_sl[x_axis], out_sl[y_axis], out_sl[w_axis] = x - spectral_order * (l), y, l
     in_sl[x_axis], in_sl[y_axis], in_sl[w_axis] = x, y, l
 
-    backprojected_cube[tuple(out_sl)] = shifted_projection[in_sl]
+    backprojected_cube[tuple(out_sl)] = shifted_projection[tuple(in_sl)]
     del shifted_projection
     del x, y, l
 

@@ -13,6 +13,8 @@ from itertools import repeat
 import time
 from esis.flight import l3_events
 from kgpy.plot import CubeSlicer
+from ndcube.wcs.tools import unwrap_wcs_to_fitswcs
+
 
 if __name__ == '__main__':
 
@@ -20,9 +22,9 @@ if __name__ == '__main__':
     start = time.time()
     ov = level_3.Level_3.from_pickle(level_3.ov_final_path)
     ov_data = ov.observation.data
-    test_seq = 15
 
-    # slice = CubeSlicer(ov_data[:,0,...])
+
+    # slicer = CubeSlicer(ov_data[:,0,...])
     # plt.show()
     # rotation_kwargs = {
     #     'reshape': False,
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     angles = (np.arange(4) * 45 - 22.5 + -45) * u.deg
     print(angles)
 
-    l3_event = l3_events.perfectx
+    l3_event = l3_events.otherx
 
     save_path = 'lev4_' + l3_event.name + '_mart.pickle'
     event = l3_event.location
@@ -89,10 +91,8 @@ if __name__ == '__main__':
 
     seqs = [i for i in range(ov.observation.data.shape[0])]
     # seqs = [13, 14, 15, 16]
-    seqs = [15]
 
     channels = [0, 1, 2, 3]
-    # channels = [1,2]
 
 
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
     used_angles = [angles[i] for i in channels] * u.deg
     p = mp.Pool(mp.cpu_count() - 2)
-    # p = mp.Pool(len(seqs))
+
     args_iter = zip(projections_list, repeat(used_angles), repeat(np.array(spectral_order)))
     kwargs_iter = repeat(dict(cube_offset_x=ref_wavelen, cube_guess=guess))
 
@@ -124,16 +124,14 @@ if __name__ == '__main__':
     recovered_list = starmap_with_kwargs(p, mart_obj, args_iter, kwargs_iter)
     print('Total Inversion Time = ', time.time() - start)
 
-    image_wcs = ov.observation[0, 0, event[0], event[1]].wcs.dropaxis(-1)
+    image_wcs = unwrap_wcs_to_fitswcs(ov.observation[0,0, event[0], event[1]].wcs)[0].dropaxis(-1)
     image_wcs = image_wcs.dropaxis(-1)
-    print(ref_wavelen)
 
     # plt.figure(dpi=140)
     # plt.plot(recovered_list[0].norm_history)
     # plt.show()
 
-    inverted_results = np.array(
-        [recovered_list[i].best_cube[pad:-pad, pad:-pad, ...] for i in range(len(recovered_list))])
+    inverted_results = [recovered_list[i].best_cube[pad:-pad, pad:-pad, ...] for i in range(len(recovered_list))]
 
     velocity_correction = (.6 / .74)    #comes from rebining to AIA resolution of .6 arcsec per pix
     header = image_wcs.to_header()
@@ -147,13 +145,14 @@ if __name__ == '__main__':
     result_wcs = wcs.WCS(header)
     result_wcs = result_wcs.swapaxes(-1,-2).swapaxes(-2,-3)
     result_wcs.array_shape = inverted_results[0].shape
-    print(result_wcs)
+
+    print(f'{result_wcs=}')
 
     inverted_results_wcs = [result_wcs for i in range(len(recovered_list))]
 
+
     lev4 = level_4.Level_4(inverted_results, inverted_results_wcs)
-    print('Inversion Duration = ', start=time.time())
-    # lev4.to_pickle(path =save_path)
+    lev4.to_pickle(path=save_path)
 
     test = lev4.plot()
     plt.show()

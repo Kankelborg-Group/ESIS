@@ -10,25 +10,24 @@ authors = [
 ]
 description = "Python code for processesing and analysing data from the EUV Snapshot Imaging Spectrograph (ESIS)"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = "==3.10.11"
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
 dependencies = [
-    'pytest',
-    'numpy',
-    'matplotlib',
-    'scipy',
-    'astropy',
-    'sphinx-autodoc-typehints',
-    'astropy-sphinx-theme',
-    'kgpy',
-    'ndcube',
-    'tensorflow',
-    'pylatex',
-    'num2words',
-    'bokeh',
-    'pandas',
+    'pytest==8.4.1',
+    'scipy==1.15.3',
+    'ndcube==2.3.2',
+    'aiapy==0.7.4',
+#    'astropy<5',
+    'sphinx-autodoc-typehints==3.0.1',
+    'astropy-sphinx-theme==2.0',
+    'kgpy==0.1.1',
+    'tensorflow==2.20.0',
+    'pylatex==1.4.2',
+    'num2words==0.5.14',
+    'bokeh==3.7.3',
+    'pandas==2.3.1',
 ]
 dynamic = ["version"]
 
