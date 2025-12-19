@@ -13,6 +13,7 @@ import astropy.units as u
 import matplotlib.patches as patches
 from esis.science.papers.mission_paper import fig_path  # can't figure out relative import here
 import matplotlib.patheffects as PathEffects
+from ndcube.wcs.tools import unwrap_wcs_to_fitswcs
 plt.rcParams.update({'font.size': 9})
 
 
@@ -83,7 +84,7 @@ if __name__ == '__main__':
         for i in range(event_pix.shape[1]):
             axs_top[j].plot(event_pix[1, i] - crop[1].start, event_pix[0, i] - crop[0].start, marker='.', color='r')
 
-        dif_wcs = l3.observation[0, j, event.location[0], event.location[1]].wcs.dropaxis(-1).dropaxis(-1)
+        dif_wcs = unwrap_wcs_to_fitswcs(l3.observation[0, j, event.location[0], event.location[1]].wcs)[0].dropaxis(-1).dropaxis(-1)
         axs_bottom.append(fig1.add_subplot(spec1[1, j],
                                            projection=dif_wcs))
         dif_bound = 50

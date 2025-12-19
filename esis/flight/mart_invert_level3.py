@@ -37,7 +37,8 @@ if __name__ == '__main__':
     angles = (np.arange(4) * 45 - 22.5 + -45) * u.deg
     print(angles)
 
-    l3_event = l3_events.otherx
+    # l3_event = l3_events.otherx
+    l3_event = l3_events.perfectx
 
     save_path = 'lev4_' + l3_event.name + '_mart.pickle'
     event = l3_event.location
@@ -154,5 +155,5 @@ if __name__ == '__main__':
     lev4 = level_4.Level_4(inverted_results, inverted_results_wcs)
     lev4.to_pickle(path=save_path)
 
-    test = lev4.plot()
-    plt.show()
+    # test = lev4.plot()
+    # plt.show()
