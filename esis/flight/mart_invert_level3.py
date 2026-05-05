@@ -60,6 +60,8 @@ if __name__ == '__main__':
     len_scl = min(region.shape[-1], region.shape[-2]) / 2.5
     window = np.exp(-(np.sqrt(np.square(x - x0) + np.square(y - y0)) / len_scl) ** (6))
     window = window.T
+
+    ##sloppy, but it appears I did not window the data used in the paper because of this line.
     window = np.ones_like(window)
 
     guess = np.ones_like(region[0, 0]) * window
