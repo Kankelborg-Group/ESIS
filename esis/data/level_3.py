@@ -25,6 +25,8 @@ import copy
 
 from matplotlib.patches import Polygon
 
+from ndcube.wcs.tools import unwrap_wcs_to_fitswcs
+
 __all__ = ['ov_Level3_initial',
            'ov_Level3_updated', 'mgx_masks', 'ov_Level3_transforms',
            'ov_Level3_masked', 'hei_transforms', 'ov_final_path', 'hei_final_path', 'ov_final_path_spikes',
@@ -395,37 +397,40 @@ class Level_3(Pickleable):
         '''
 
         path.mkdir(parents=True, exist_ok=True)
-        # len1 = self.observation.data.shape[0]
-        # len2 = self.observation.data.shape[1]
-        #
-        # date_obs = self.time
-        # for sequence in range(len1):
-        #     for camera in range(len2):
-        #         data_name = label + str(sequence) + '_' + date_obs[sequence] + '_' + str(camera + 1) + '.fits'
-        #         data_filename = path / data_name
-        #
-        #         mask_name = label + str(sequence) + '_' + date_obs[sequence] + '_' + str(camera + 1) + '_mask.fits'
-        #         mask_filename = path / mask_name
-        #
-        #         hdr = self.observation[sequence, camera].wcs.dropaxis(-1).dropaxis(-1).to_header()
-        #         # hdr['CAM_ID'] = self.cam_id[sequence, camera]
-        #
-        #         hdr['DATE_OBS'] = date_obs
-        #
-        #         hdul = fits.HDUList()
-        #         hdul.append(fits.PrimaryHDU(np.array(self.observation.data[sequence, camera, ...]), hdr))
-        #         hdul.writeto(data_filename, overwrite=True)
-        #
-        #         hdul_mask = fits.HDUList()
-        #         hdul_mask.append(fits.PrimaryHDU(np.array(self.observation.mask[sequence, camera, ...]), hdr))
-        #         hdul.writeto(data_filename, overwrite=True)
+        len1 = self.observation.data.shape[0]
+        len2 = self.observation.data.shape[1]
+
+        individuals_path = path / 'individual_images'
+        individuals_path.mkdir(parents=True, exist_ok=True)
+        date_obs = self.time
+        for sequence in range(len1):
+            for camera in range(len2):
+                time_stamp = date_obs[sequence].isot.replace(':', '-')
+                data_name = individuals_path / f'{label}{sequence}_{time_stamp}_camera_{camera + 1}.fits'
+                data_filename = path / data_name
+
+                mask_name = individuals_path / f'{label}{sequence}_{time_stamp}_camera_{camera + 1}_mask.fits'
+                mask_filename = path / mask_name
+
+                hdr = unwrap_wcs_to_fitswcs(self.observation[sequence, camera].wcs)[0].to_header()
+                hdr['CAM-ID'] = camera + 1
+
+                hdr['DATE-OBS'] = date_obs[sequence].fits
+
+                hdul = fits.HDUList()
+                hdul.append(fits.PrimaryHDU(np.array(self.observation.data[sequence, camera, ...]), hdr))
+                hdul.writeto(data_filename, overwrite=True)
+
+                hdul_mask = fits.HDUList()
+                hdul_mask.append(fits.PrimaryHDU(np.array(self.observation.mask[sequence, camera, ...]), hdr))
+                hdul_mask.writeto(mask_filename, overwrite=True)
 
         hdr = self.observation.wcs.to_header()
 
         hdul = fits.HDUList()
         hdul.append(fits.PrimaryHDU(self.observation.data, hdr))
         data_path = path / 'ESIS_level3.fits'
-        hdul.writeto(data_path)
+        hdul.writeto(data_path, overwrite=True)
 
         output_file = data_path.name + '.tar.gz'
         with tarfile.open(path / output_file, "w:gz") as tar:
@@ -434,7 +439,7 @@ class Level_3(Pickleable):
         hdul = fits.HDUList()
         hdul.append(fits.PrimaryHDU(self.observation.mask, hdr))
         mask_path = path / 'ESIS_level3_mgx_mask.fits'
-        hdul.writeto(mask_path)
+        hdul.writeto(mask_path, overwrite=True)
 
         output_file = mask_path.name + '.tar.gz'
         with tarfile.open(path / output_file, "w:gz") as tar:
